@@ -3,3 +3,4 @@ build
 .bsb.lock
 node_modules
 lib
+src/*.bs.js
