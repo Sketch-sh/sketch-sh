@@ -109,7 +109,7 @@ function isClosed(s) {
           continue ;
         }
         
-      } else if (roundo === roundc && curlyo === curlyc && squareo === squarec && (quote & 1) === 0) {
+      } else if (roundo <= roundc && curlyo <= curlyc && squareo <= squarec && (quote & 1) === 0) {
         return Caml_string.get(s$1, length - 1 | 0) === /* ";" */59;
       } else {
         return false;

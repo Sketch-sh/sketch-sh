@@ -114,9 +114,9 @@ let isClosed = s => {
           )
         };
       } else {
-        roundo == roundc
-        && curlyo == curlyc
-        && squareo == squarec
+        roundo <= roundc
+        && curlyo <= curlyc
+        && squareo <= squarec
         && quote
         land 1 == 0
         && s.[length - 1] == ';';
