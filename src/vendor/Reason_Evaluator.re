@@ -31,7 +31,7 @@ let execute = code => {
   Belt.Result.(
     switch (result) {
     | "" => Error(message)
-    | a => Ok(message ++ "\n" ++ a)
+    | a => Ok(message == "" ? a : message ++ "\n" ++ a)
     }
   );
 };

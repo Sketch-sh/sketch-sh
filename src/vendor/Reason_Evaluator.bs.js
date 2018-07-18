@@ -32,7 +32,8 @@ function execute(code) {
   if (result === "") {
     return /* Error */Block.__(1, [message]);
   } else {
-    return /* Ok */Block.__(0, [message + ("\n" + result)]);
+    var match = message === "";
+    return /* Ok */Block.__(0, [match ? result : message + ("\n" + result)]);
   }
 }
 
