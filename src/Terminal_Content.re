@@ -100,40 +100,43 @@ let make = _children => {
     switch (action) {
     | InputUpdateValue(inputValue) =>
       ReasonReact.Update({
-        ...state, 
-        inputValue, 
-        inputDisplay: inputValue, 
-        historyCursor: None
+        ...state,
+        inputValue,
+        inputDisplay: inputValue,
+        historyCursor: None,
       })
     | InputHistory(amount) =>
-      let cursor = 
-         switch (state.historyCursor) {
+      let cursor =
+        switch (state.historyCursor) {
         | None => amount
         | Some(pos) => pos + 2 * amount
         };
 
-        if (cursor >= (state.stack |. Belt.List.length) - 1) {
-          ReasonReact.NoUpdate
-        }
-        else if (cursor < 0) {
-          ReasonReact.Update({...state, historyCursor: None, inputDisplay: state.inputValue})
-        }
-      else {
-      let inputDisplay =
-        switch (state.stack |. Belt.List.get(cursor)) {
-        | Some(line) =>
-          switch (line) {
-          | Input(string) => string
-          | _ => raise(Invalid_argument("This shouldn't happen wrong line"))
-          }
-        | None => raise(Invalid_argument("This shouldn't happen no line"))
-        };
-      ReasonReact.Update({
-        ...state,
-        inputDisplay,
-        historyCursor: Some(cursor),
-      });
-    }
+      if (cursor >= (state.stack |. Belt.List.length) - 1) {
+        ReasonReact.NoUpdate;
+      } else if (cursor < 0) {
+        ReasonReact.Update({
+          ...state,
+          historyCursor: None,
+          inputDisplay: state.inputValue,
+        });
+      } else {
+        let inputDisplay =
+          switch (state.stack |. Belt.List.get(cursor)) {
+          | Some(line) =>
+            switch (line) {
+            | Input(string) => string
+            | _ =>
+              raise(Invalid_argument("This shouldn't happen wrong line"))
+            }
+          | None => raise(Invalid_argument("This shouldn't happen no line"))
+          };
+        ReasonReact.Update({
+          ...state,
+          inputDisplay,
+          historyCursor: Some(cursor),
+        });
+      };
     | InputEvaluate =>
       let v = state.inputValue |. Js.String.trim;
       let result = Reason_Evaluator.execute(v);
@@ -192,7 +195,7 @@ let make = _children => {
               event => {
                 let keyName = event |. ReactEventRe.Keyboard.key;
                 let shiftKey = event |. ReactEventRe.Keyboard.shiftKey;
-                
+
                 switch (keyName) {
                 | "Enter" =>
                   if (! shiftKey && Utils.isClosed(state.inputValue)) {
