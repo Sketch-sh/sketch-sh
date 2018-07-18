@@ -1,5 +1,3 @@
-open Utils;
-
 module S = {
   let wrapper =
     Css.(

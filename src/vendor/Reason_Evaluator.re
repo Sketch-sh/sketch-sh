@@ -2,33 +2,36 @@ type t;
 
 [@bs.val] external unsafeExecute : string => string = "evaluator.execute";
 
-let error = [||];
+let log = [||];
 
 %bs.raw
 {|
-  function proxy(context, method, message) {
+  function proxy(context, method) {
     return function() {
-      error.push(arguments[0]);
+      log.push(arguments[0]);
       method.apply(context, Array.prototype.slice.apply(arguments))
     }
   }
 
-  console.error = proxy(console, console.error, 'Error:')
+  console.error = proxy(console, console.error)
+  console.log = proxy(console, console.log)
+  console.warning = proxy(console, console.warning)
 |};
 
-let clearError: unit => unit = [%bs.raw {|
+let clearLog: unit => unit = [%bs.raw {|
   function () {
-    error = []
+    log = []
   }
 |}];
 
-let execute = code =>
+let execute = code => {
+  let result = unsafeExecute(code);
+  let message = log |> Js.Array.joinWith("\n");
+  clearLog();
   Belt.Result.(
-    switch (unsafeExecute(code)) {
-    | "" =>
-      let message = error |> Js.Array.joinWith("\n");
-      clearError();
-      Error(message);
-    | a => Ok(a)
+    switch (result) {
+    | "" => Error(message)
+    | a => Ok(message ++ "\n" ++ a)
     }
   );
+};

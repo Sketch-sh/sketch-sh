@@ -3,40 +3,42 @@
 import * as Block from "bs-platform/lib/es6/block.js";
 import * as Curry from "bs-platform/lib/es6/curry.js";
 
-var error = /* array */[];
+var log = /* array */[];
 
 
-  function proxy(context, method, message) {
+  function proxy(context, method) {
     return function() {
-      error.push(arguments[0]);
+      log.push(arguments[0]);
       method.apply(context, Array.prototype.slice.apply(arguments))
     }
   }
 
-  console.error = proxy(console, console.error, 'Error:')
+  console.error = proxy(console, console.error)
+  console.log = proxy(console, console.log)
+  console.warning = proxy(console, console.warning)
 
 ;
 
-var clearError = (
+var clearLog = (
   function () {
-    error = []
+    log = []
   }
 );
 
 function execute(code) {
-  var a = evaluator.execute(code);
-  if (a === "") {
-    var message = error.join("\n");
-    Curry._1(clearError, /* () */0);
+  var result = evaluator.execute(code);
+  var message = log.join("\n");
+  Curry._1(clearLog, /* () */0);
+  if (result === "") {
     return /* Error */Block.__(1, [message]);
   } else {
-    return /* Ok */Block.__(0, [a]);
+    return /* Ok */Block.__(0, [message + ("\n" + result)]);
   }
 }
 
 export {
-  error ,
-  clearError ,
+  log ,
+  clearLog ,
   execute ,
   
 }
