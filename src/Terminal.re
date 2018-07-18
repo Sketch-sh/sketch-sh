@@ -7,13 +7,14 @@ module S = {
         {|
           display: flex;
           position: relative;
-          flex: 1;
+          flex: 4;
           flex-direction: column;
 
           background: #000;
           color: #fff;
           font-family: monospace;
           padding: 1rem;
+          overflow-y: auto;
         |}
       ]
       |. style

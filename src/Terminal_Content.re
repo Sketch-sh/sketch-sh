@@ -1,15 +1,16 @@
 open Utils;
 
 let welcomeText = {|
-                 ___  _______   ________  _  __
-                / _ \/ __/ _ | / __/ __ \/ |/ /
-               / , _/ _// __ |_\ \/ /_/ /    /
-              /_/|_/___/_/ |_/___/\____/_/|_/
+      ___  _______   ________  _  __
+    / _ \/ __/ _ | / __/ __ \/ |/ /
+   / , _/ _// __ |_\ \/ /_/ /    /
+  /_/|_/___/_/ |_/___/\____/_/|_/
 
-Execute statements/let bindings. Hit <enter> after the semicolon. Ctrl-d to quit.
+Execute statements/let bindings.
+Hit <enter> after the semicolon.
 
-      >   let myVar = "Hello Reason!";
-      >   let myList: list(string) = ["first", "second"];
+> let myVar = "Hello Reason!";
+> let myList: list(string) = ["first", "second"];
 |};
 
 module S = {
@@ -23,6 +24,10 @@ module S = {
       ]
       |. style
     );
+  let lineWelcome =
+    Css.([%style {|
+            text-align: center;
+        |}] |. style);
   let sharp =
     Css.(
       [%css
@@ -86,13 +91,12 @@ let make = _children => {
       ReasonReact.Update({...state, inputValue})
     | InputEvaluate =>
       let v = state.inputValue |. Js.String.trim;
-      let v =
-        if (Js.String.sliceToEnd(~from=Js.String.length(v) - 1, v) != ";") {
-          v ++ ";";
-        } else {
-          v;
-        };
       let result = Reason_Evaluator.execute(v);
+      let result =
+        switch (result) {
+        | Belt.Result.Ok(r) => r
+        | Error(r) => r
+        };
 
       ReasonReact.Update({
         /* ...state, */
@@ -109,9 +113,12 @@ let make = _children => {
               state.stack
               |. Belt.List.mapWithIndexU((. index, line) =>
                    switch (line) {
-                   | Result(line)
-                   | Welcome(line) =>
+                   | Result(line) =>
                      <div key=(index |. string_of_int)> (line |. str) </div>
+                   | Welcome(line) =>
+                     <div className=lineWelcome key=(index |. string_of_int)>
+                       (line |. str)
+                     </div>
                    | Input(line) =>
                      <div className=sharp key=(index |. string_of_int)>
                        (line |. str)
@@ -135,12 +142,14 @@ let make = _children => {
             onKeyDown=(
               event => {
                 let keyName = event |. ReactEventRe.Keyboard.key;
+                let shiftKey = event |. ReactEventRe.Keyboard.shiftKey;
 
                 switch (keyName) {
                 | "Enter" =>
-                  /* TODO: check for complete code snippet */
-                  event |. ReactEventRe.Keyboard.preventDefault;
-                  send(InputEvaluate);
+                  if (! shiftKey && Utils.isClosed(state.inputValue)) {
+                    event |. ReactEventRe.Keyboard.preventDefault;
+                    send(InputEvaluate);
+                  }
                 | _ => ()
                 };
               }
