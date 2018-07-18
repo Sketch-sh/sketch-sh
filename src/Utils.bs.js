@@ -5,8 +5,13 @@ function str(prim) {
   return prim;
 }
 
+function valueFromEvent(evt) {
+  return evt.target.value;
+}
+
 export {
   str ,
+  valueFromEvent ,
   
 }
 /* No side effect */
