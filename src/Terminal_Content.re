@@ -28,6 +28,9 @@ module S = {
     Css.([%style {|
             text-align: center;
         |}] |. style);
+  let lineError = Css.([%style {|
+          color: red;
+        |}] |. style);
   let sharp =
     Css.(
       [%css
@@ -69,38 +72,76 @@ module S = {
 type line =
   | Welcome(string)
   | Input(string)
-  | Result(string);
+  | Result(Belt.Result.t(string, string));
 
 type state = {
   inputValue: string,
+  inputDisplay: string,
+  historyCursor: option(int),
   stack: list(line),
 };
 
 type action =
   | InputUpdateValue(string)
+  | InputHistory(int)
   | InputEvaluate;
 
 let component = ReasonReact.reducerComponent("Terminal_Content");
 
 let make = _children => {
   ...component,
-  initialState: () => {stack: [Welcome(welcomeText)], inputValue: ""},
+  initialState: () => {
+    stack: [Welcome(welcomeText)],
+    inputValue: "",
+    inputDisplay: "",
+    historyCursor: None,
+  },
   reducer: (action, state) =>
     switch (action) {
     | InputUpdateValue(inputValue) =>
-      ReasonReact.Update({...state, inputValue})
+      ReasonReact.Update({
+        ...state, 
+        inputValue, 
+        inputDisplay: inputValue, 
+        historyCursor: None
+      })
+    | InputHistory(amount) =>
+      let cursor = 
+         switch (state.historyCursor) {
+        | None => amount
+        | Some(pos) => pos + 2 * amount
+        };
+
+        if (cursor >= (state.stack |. Belt.List.length) - 1) {
+          ReasonReact.NoUpdate
+        }
+        else if (cursor < 0) {
+          ReasonReact.Update({...state, historyCursor: None, inputDisplay: state.inputValue})
+        }
+      else {
+      let inputDisplay =
+        switch (state.stack |. Belt.List.get(cursor)) {
+        | Some(line) =>
+          switch (line) {
+          | Input(string) => string
+          | _ => raise(Invalid_argument("This shouldn't happen wrong line"))
+          }
+        | None => raise(Invalid_argument("This shouldn't happen no line"))
+        };
+      ReasonReact.Update({
+        ...state,
+        inputDisplay,
+        historyCursor: Some(cursor),
+      });
+    }
     | InputEvaluate =>
       let v = state.inputValue |. Js.String.trim;
       let result = Reason_Evaluator.execute(v);
-      let result =
-        switch (result) {
-        | Belt.Result.Ok(r) => r
-        | Error(r) => r
-        };
 
       ReasonReact.Update({
-        /* ...state, */
+        ...state,
         inputValue: "",
+        inputDisplay: "",
         stack: [Result(result), Input(v), ...state.stack],
       });
     },
@@ -114,7 +155,15 @@ let make = _children => {
               |. Belt.List.mapWithIndexU((. index, line) =>
                    switch (line) {
                    | Result(line) =>
-                     <div key=(index |. string_of_int)> (line |. str) </div>
+                     switch (line) {
+                     | Belt.Result.Ok(line) =>
+                       <div key=(index |. string_of_int)> (line |. str) </div>
+                     | Error(line) =>
+                       <div className=lineError key=(index |. string_of_int)>
+                         (line |. str)
+                       </div>
+                     }
+
                    | Welcome(line) =>
                      <div className=lineWelcome key=(index |. string_of_int)>
                        (line |. str)
@@ -133,7 +182,7 @@ let make = _children => {
         <div className=inputWrapper>
           <span className=sharpText> ("Reason # " |. str) </span>
           <textarea
-            value=state.inputValue
+            value=state.inputDisplay
             className=inputC
             autoFocus=true
             onChange=(
@@ -143,12 +192,22 @@ let make = _children => {
               event => {
                 let keyName = event |. ReactEventRe.Keyboard.key;
                 let shiftKey = event |. ReactEventRe.Keyboard.shiftKey;
-
+                
                 switch (keyName) {
                 | "Enter" =>
                   if (! shiftKey && Utils.isClosed(state.inputValue)) {
                     event |. ReactEventRe.Keyboard.preventDefault;
                     send(InputEvaluate);
+                  }
+                | "ArrowUp" =>
+                  if (! shiftKey) {
+                    event |. ReactEventRe.Keyboard.preventDefault;
+                    send(InputHistory(1));
+                  }
+                | "ArrowDown" =>
+                  if (! shiftKey) {
+                    event |. ReactEventRe.Keyboard.preventDefault;
+                    send(InputHistory(-1));
                   }
                 | _ => ()
                 };

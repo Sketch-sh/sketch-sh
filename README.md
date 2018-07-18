@@ -4,7 +4,7 @@
 
 TODOs:
 
-- [ ] ArrowUp and ArrowDown
+- [x] ArrowUp and ArrowDown
 - [ ] Parse and highlight error
 - [ ] Syntax highlighting
 - [ ] Load evaluator async

@@ -8,7 +8,9 @@ var log = /* array */[];
 
   function proxy(context, method) {
     return function() {
-      log.push(arguments[0]);
+      if (shouldRecordLog) {
+        log.push(arguments[0]);
+      }
       method.apply(context, Array.prototype.slice.apply(arguments))
     }
   }
@@ -19,16 +21,25 @@ var log = /* array */[];
 
 ;
 
-var clearLog = (
+var startRecord = (
   function () {
+    shouldRecordLog = true
+    log = []
+  }
+);
+
+var stopRecord = (
+  function () {
+    shouldRecordLog = false
     log = []
   }
 );
 
 function execute(code) {
+  Curry._1(startRecord, /* () */0);
   var result = evaluator.execute(code);
   var message = log.join("\n");
-  Curry._1(clearLog, /* () */0);
+  Curry._1(stopRecord, /* () */0);
   if (result === "") {
     return /* Error */Block.__(1, [message]);
   } else {
@@ -37,9 +48,13 @@ function execute(code) {
   }
 }
 
+var shouldRecordLog = false;
+
 export {
   log ,
-  clearLog ,
+  shouldRecordLog ,
+  startRecord ,
+  stopRecord ,
   execute ,
   
 }
