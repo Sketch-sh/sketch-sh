@@ -62,6 +62,7 @@ module S = {
           height: 100px;
           margin-left: 0.5rem;
           padding: 0;
+          font-family: monospace;
           unsafe: "border" "none";
           unsafe: "outline" "none";
         |}
