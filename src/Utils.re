@@ -11,7 +11,17 @@ let isClosed = s => {
   if (length == 0) {
     false;
   } else {
-    let rec loop = (~roundo, ~roundc, ~curlyo, ~curlyc, ~squareo, ~squarec, i) =>
+    let rec loop =
+            (
+              ~roundo,
+              ~roundc,
+              ~curlyo,
+              ~curlyc,
+              ~squareo,
+              ~squarec,
+              ~quote,
+              i,
+            ) =>
       if (i < length) {
         switch (s.[i]) {
         | '(' =>
@@ -22,6 +32,7 @@ let isClosed = s => {
             ~curlyc,
             ~squareo,
             ~squarec,
+            ~quote,
             i + 1,
           )
         | ')' =>
@@ -32,6 +43,7 @@ let isClosed = s => {
             ~curlyc,
             ~squareo,
             ~squarec,
+            ~quote,
             i + 1,
           )
         | '{' =>
@@ -42,6 +54,7 @@ let isClosed = s => {
             ~curlyc,
             ~squareo,
             ~squarec,
+            ~quote,
             i + 1,
           )
         | '}' =>
@@ -52,6 +65,7 @@ let isClosed = s => {
             ~curlyc=curlyc + 1,
             ~squareo,
             ~squarec,
+            ~quote,
             i + 1,
           )
         | '[' =>
@@ -62,6 +76,7 @@ let isClosed = s => {
             ~curlyc,
             ~squareo=squareo + 1,
             ~squarec,
+            ~quote,
             i + 1,
           )
         | ']' =>
@@ -72,15 +87,38 @@ let isClosed = s => {
             ~curlyc,
             ~squareo,
             ~squarec=squarec + 1,
+            ~quote,
+            i + 1,
+          )
+        | '"' =>
+          loop(
+            ~roundo,
+            ~roundc,
+            ~curlyo,
+            ~curlyc,
+            ~squareo,
+            ~squarec,
+            ~quote=quote + 1,
             i + 1,
           )
         | _ =>
-          loop(~roundo, ~roundc, ~curlyo, ~curlyc, ~squareo, ~squarec, i + 1)
+          loop(
+            ~roundo,
+            ~roundc,
+            ~curlyo,
+            ~curlyc,
+            ~squareo,
+            ~squarec,
+            ~quote,
+            i + 1,
+          )
         };
       } else {
         roundo == roundc
         && curlyo == curlyc
         && squareo == squarec
+        && quote
+        land 1 == 0
         && s.[length - 1] == ';';
       };
     loop(
@@ -90,6 +128,7 @@ let isClosed = s => {
       ~curlyc=0,
       ~squareo=0,
       ~squarec=0,
+      ~quote=0,
       0,
     );
   };

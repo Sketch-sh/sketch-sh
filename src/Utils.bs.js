@@ -23,9 +23,11 @@ function isClosed(s) {
     var _curlyc = 0;
     var _squareo = 0;
     var _squarec = 0;
+    var _quote = 0;
     var _i = 0;
     while(true) {
       var i = _i;
+      var quote = _quote;
       var squarec = _squarec;
       var squareo = _squareo;
       var curlyc = _curlyc;
@@ -73,25 +75,41 @@ function isClosed(s) {
               
             }
           }
-        } else if (match !== 40) {
-          if (match !== 41) {
+        } else {
+          var switcher = match - 34 | 0;
+          if (switcher > 7 || switcher < 0) {
             exit = 1;
           } else {
-            _i = i + 1 | 0;
-            _roundc = roundc + 1 | 0;
-            continue ;
+            switch (switcher) {
+              case 0 : 
+                  _i = i + 1 | 0;
+                  _quote = quote + 1 | 0;
+                  continue ;
+              case 1 : 
+              case 2 : 
+              case 3 : 
+              case 4 : 
+              case 5 : 
+                  exit = 1;
+                  break;
+              case 6 : 
+                  _i = i + 1 | 0;
+                  _roundo = roundo + 1 | 0;
+                  continue ;
+              case 7 : 
+                  _i = i + 1 | 0;
+                  _roundc = roundc + 1 | 0;
+                  continue ;
+              
+            }
           }
-        } else {
-          _i = i + 1 | 0;
-          _roundo = roundo + 1 | 0;
-          continue ;
         }
         if (exit === 1) {
           _i = i + 1 | 0;
           continue ;
         }
         
-      } else if (roundo === roundc && curlyo === curlyc && squareo === squarec) {
+      } else if (roundo === roundc && curlyo === curlyc && squareo === squarec && (quote & 1) === 0) {
         return Caml_string.get(s$1, length - 1 | 0) === /* ";" */59;
       } else {
         return false;
