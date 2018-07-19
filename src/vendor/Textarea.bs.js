@@ -4,13 +4,12 @@ import * as ReasonReact from "reason-react/src/ReasonReact.js";
 import * as Js_primitive from "bs-platform/lib/es6/js_primitive.js";
 import * as ReactTextareaAutosize from "react-textarea-autosize";
 
-function make(className, value, onChange, onKeyDown, autoFocus, children) {
-  var tmp = {};
+function make(className, value, onChange, onKeyDown, autoFocus, minRows, maxRows, children) {
+  var tmp = {
+    value: value
+  };
   if (className) {
     tmp.className = Js_primitive.valFromOption(className);
-  }
-  if (value) {
-    tmp.value = Js_primitive.valFromOption(value);
   }
   if (onChange) {
     tmp.onChange = Js_primitive.valFromOption(onChange);
@@ -21,12 +20,17 @@ function make(className, value, onChange, onKeyDown, autoFocus, children) {
   if (autoFocus) {
     tmp.autoFocus = Js_primitive.valFromOption(autoFocus);
   }
-  return ReasonReact.wrapJsForReason(
-    ReactTextareaAutosize.default,
-    tmp,
-    children
-  );
+  if (minRows) {
+    tmp.minRows = Js_primitive.valFromOption(minRows);
+  }
+  if (maxRows) {
+    tmp.maxRows = Js_primitive.valFromOption(maxRows);
+  }
+  return ReasonReact.wrapJsForReason(ReactTextareaAutosize.default, tmp, children);
 }
 
-export { make };
+export {
+  make ,
+  
+}
 /* ReasonReact Not a pure module */
