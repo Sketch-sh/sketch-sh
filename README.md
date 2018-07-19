@@ -9,7 +9,7 @@ TODOs:
 - [ ] Syntax highlighting
 - [ ] Load evaluator async
 - [ ] Reset session (Press F5 for now)
-- [ ] Input autosize
+- [x] Input autosize
 - [ ] Proper stdin/stdout hook with jsoo instead of hacking console.log
 
 Future:
