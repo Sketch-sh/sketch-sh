@@ -144,8 +144,9 @@ let make = _children => {
       let result = Reason_Evaluator.execute(v);
       let result =
         switch (result) {
-        | Belt.Result.Ok(line) => ResultOk(line)
-        | Error(line) => ResultError(line)
+        | Ok(evaluate) => ResultOk(evaluate)
+        | OkWithLog(evaluate, log) => ResultOk(evaluate ++ "\n" ++ log)
+        | Error(error) => ResultError(error)
         };
       ReasonReact.Update({
         ...state,

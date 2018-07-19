@@ -1,53 +1,30 @@
-type t;
+[@bs.deriving abstract]
+type js_executeResult = {
+  evaluate: string,
+  stderr: string,
+  stdout: string,
+};
 
-[@bs.val] external unsafeExecute : string => string = "evaluator.execute";
+[@bs.val]
+external js_execute : string => js_executeResult = "evaluator.execute";
 
-let log = [||];
-let shouldRecordLog = false;
-
-%bs.raw
-{|
-  function proxy(context, method) {
-    return function() {
-      if (shouldRecordLog) {
-        log.push(arguments[0]);
-      }
-      method.apply(context, Array.prototype.slice.apply(arguments))
-    }
-  }
-
-  console.error = proxy(console, console.error)
-  console.log = proxy(console, console.log)
-  console.warning = proxy(console, console.warning)
-|};
-
-let startRecord: unit => unit = [%bs.raw
-  {|
-  function () {
-    shouldRecordLog = true
-    log = []
-  }
-|}
-];
-
-let stopRecord: unit => unit = [%bs.raw
-  {|
-  function () {
-    shouldRecordLog = false
-    log = []
-  }
-|}
-];
+type executeResult =
+  | Error(string)
+  | Ok(string)
+  | OkWithLog(string, string);
 
 let execute = code => {
-  startRecord();
-  let result = unsafeExecute(code);
-  let message = log |> Js.Array.joinWith("\n");
-  stopRecord();
-  Belt.Result.(
-    switch (result) {
-    | "" => Error(message)
-    | a => Ok(message == "" ? a : message ++ "\n" ++ a)
-    }
-  );
+  let result = js_execute(code);
+  let stderr = result |. stderrGet |. Js.String.trim;
+  let stdout = result |. stdoutGet |. Js.String.trim;
+  let evaluate = result |. evaluateGet |. Js.String.trim;
+  switch (stderr == "", stdout == "", evaluate == "") {
+  | (false, true, true) => Error(stderr)
+  | (true, true, false) => Ok(evaluate)
+  | (true, false, false) => OkWithLog(evaluate, stdout)
+  | _ =>
+    Js.log(result);
+    Invalid_argument("What the heck is going on with this code? " ++ code)
+    |. raise;
+  };
 };
