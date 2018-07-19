@@ -11,7 +11,7 @@ module S = {
           background: #000;
           color: #fff;
           font-family: monospace;
-          padding: 1rem;
+          padding: 1rem 1rem 0 1rem;
           overflow-y: auto;
         |}
       ]
