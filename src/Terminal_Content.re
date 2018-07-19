@@ -31,7 +31,7 @@ module S = {
   let lineError = Css.([%style {|
           color: red;
         |}] |. style);
-  let sharp =
+  let lineInput =
     Css.(
       [%css
         {|
@@ -73,7 +73,8 @@ module S = {
 type line =
   | Welcome(string)
   | Input(string)
-  | Result(Belt.Result.t(string, string));
+  | ResultOk(string)
+  | ResultError(string);
 
 type state = {
   inputValue: string,
@@ -141,12 +142,16 @@ let make = _children => {
     | InputEvaluate =>
       let v = state.inputValue |. Js.String.trim;
       let result = Reason_Evaluator.execute(v);
-
+      let result =
+        switch (result) {
+        | Belt.Result.Ok(line) => ResultOk(line)
+        | Error(line) => ResultError(line)
+        };
       ReasonReact.Update({
         ...state,
         inputValue: "",
         inputDisplay: "",
-        stack: [Result(result), Input(v), ...state.stack],
+        stack: [result, Input(v), ...state.stack],
       });
     },
   render: ({state, send}) =>
@@ -156,28 +161,18 @@ let make = _children => {
           <div className=stack>
             (
               state.stack
-              |. Belt.List.mapWithIndexU((. index, line) =>
-                   switch (line) {
-                   | Result(line) =>
+              |. Belt.List.mapWithIndexU((. index, line) => {
+                   let (className, line) =
                      switch (line) {
-                     | Belt.Result.Ok(line) =>
-                       <div key=(index |. string_of_int)> (line |. str) </div>
-                     | Error(line) =>
-                       <div className=lineError key=(index |. string_of_int)>
-                         (line |. str)
-                       </div>
-                     }
-
-                   | Welcome(line) =>
-                     <div className=lineWelcome key=(index |. string_of_int)>
-                       (line |. str)
-                     </div>
-                   | Input(line) =>
-                     <div className=sharp key=(index |. string_of_int)>
-                       (line |. str)
-                     </div>
-                   }
-                 )
+                     | ResultOk(line) => (None, line)
+                     | ResultError(line) => (Some(lineError), line)
+                     | Welcome(line) => (Some(lineWelcome), line)
+                     | Input(line) => (Some(lineInput), line)
+                     };
+                   <div ?className key=(index |. string_of_int)>
+                     (line |. str)
+                   </div>;
+                 })
               |. Array.of_list
               |. ReasonReact.array
             )
@@ -185,8 +180,9 @@ let make = _children => {
         </pre>
         <div className=inputWrapper>
           <span className=sharpText> ("Reason # " |. str) </span>
-          <textarea
+          <Textarea
             value=state.inputDisplay
+            minRows=10
             className=inputC
             autoFocus=true
             onChange=(
