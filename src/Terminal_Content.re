@@ -195,7 +195,7 @@ let make = _children => {
 
                 switch (keyName) {
                 | "Enter" =>
-                  if (! shiftKey && Utils.isClosed(state.inputValue)) {
+                  if (! shiftKey && Analyzer.shouldEvaluate(state.inputValue)) {
                     event |. ReactEventRe.Keyboard.preventDefault;
                     send(InputEvaluate);
                   }
