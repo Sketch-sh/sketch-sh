@@ -47,13 +47,22 @@ let shouldEvaluate = str => {
   );
 };
 
-/* Guard empty string */
-let shouldEvaluate = str => {
+let shouldEvaluateRe = str => {
   let str = String.trim(str);
   let length = String.length(str);
   if (length == 0) {
     false;
   } else {
     shouldEvaluate(str);
+  };
+};
+
+let shouldEvaluateMl = str => {
+  let str = String.trim(str);
+  let length = String.length(str);
+  if (length == 0) {
+    false;
+  } else {
+    str |> Js.String.substr(~from=length - 2) == ";;";
   };
 };

@@ -1,3 +1,5 @@
+module S = Terminal_Content_Style;
+
 open Utils;
 
 let welcomeText = {|
@@ -13,74 +15,23 @@ Hit <enter> after the semicolon.
 > let myList: list(string) = ["first", "second"];
 |};
 
-module S = {
-  let stack =
-    Css.(
-      [%style
-        {|
-            display: flex;
-            flex-direction: column-reverse;
-        |}
-      ]
-      |. style
-    );
-  let lineWelcome =
-    Css.([%style {|
-            text-align: center;
-        |}] |. style);
-  let lineError = Css.([%style {|
-          color: red;
-        |}] |. style);
-  let lineInput =
-    Css.(
-      [%css
-        {|
-          ::before {
-            color: green;
-            unsafe: "content" "Reason #";
-            margin-right: 0.5rem;
-          }
-        |}
-      ]
-      |. style
-    );
-  let sharpText =
-    Css.([%style {|
-          color: green;
-        |}] |. style);
-  let inputWrapper =
-    Css.([%style {|
-            display: flex;
-        |}] |. style);
-  let inputC =
-    Css.(
-      [%style
-        {|
-          background: transparent;
-          color: #fff;
-          flex: 1;
-          height: 100px;
-          margin-left: 0.5rem;
-          padding: 0;
-          font-family: monospace;
-          unsafe: "border" "none";
-          unsafe: "outline" "none";
-        |}
-      ]
-      |. style
-    );
-};
+type syntax =
+  | Ml
+  | Reason;
+
 type line =
   | Welcome(string)
-  | Input(string)
+  | Input((string, syntax))
   | ResultOk(string)
   | ResultError(string);
 
 type state = {
   inputValue: string,
   inputDisplay: string,
-  historyCursor: option(int),
-  stack: list(line),
+  history: list((string, syntax)),
+  historyCursor: int,
+  displayStack: array(line),
+  currentSyntax: syntax,
 };
 
 type action =
@@ -93,67 +44,104 @@ let component = ReasonReact.reducerComponent("Terminal_Content");
 let make = _children => {
   ...component,
   initialState: () => {
-    stack: [Welcome(welcomeText)],
     inputValue: "",
     inputDisplay: "",
-    historyCursor: None,
+    history: [("", Reason)],
+    historyCursor: (-1),
+    displayStack: [|Welcome(welcomeText)|],
+    currentSyntax: Reason,
   },
   reducer: (action, state) =>
     switch (action) {
     | InputUpdateValue(inputValue) =>
-      ReasonReact.Update({
-        ...state,
-        inputValue,
-        inputDisplay: inputValue,
-        historyCursor: None,
-      })
+      ReasonReact.Update({...state, inputValue, inputDisplay: inputValue, historyCursor: (-1)})
     | InputHistory(amount) =>
-      let cursor =
-        switch (state.historyCursor) {
-        | None => amount
-        | Some(pos) => pos + 2 * amount
-        };
+      let cursor = state.historyCursor + amount;
+      let length = state.history |. Belt.List.length;
 
-      if (cursor >= (state.stack |. Belt.List.length) - 1) {
+      if (cursor >= length - 1) {
         ReasonReact.NoUpdate;
-      } else if (cursor < 0) {
-        ReasonReact.Update({
-          ...state,
-          historyCursor: None,
-          inputDisplay: state.inputValue,
-        });
+      } else if (cursor < (-1)) {
+        ReasonReact.Update({...state, historyCursor: (-1), inputDisplay: state.inputValue});
       } else {
-        let inputDisplay =
-          switch (state.stack |. Belt.List.get(cursor)) {
-          | Some(line) =>
-            switch (line) {
-            | Input(string) => string
-            | _ =>
-              raise(Invalid_argument("This shouldn't happen wrong line"))
-            }
-          | None => raise(Invalid_argument("This shouldn't happen no line"))
+        switch (state.history |. Belt.List.get(cursor)) {
+        | None => ReasonReact.NoUpdate
+        | Some((inputDisplay, _syntax)) =>
+          ReasonReact.Update({...state, inputDisplay, historyCursor: cursor})
+        };
+      };
+    | InputEvaluate =>
+      let inputValue = state.inputValue |. Js.String.trim;
+
+      switch (inputValue, state.currentSyntax) {
+      | ("#reset;", Reason)
+      | ("#reset;;", Ml) =>
+        ReasonReact.UpdateWithSideEffects(
+          {
+            ...state,
+            inputValue: "",
+            inputDisplay: "",
+            history: [(inputValue, state.currentSyntax), ...state.history],
+            displayStack:
+              Belt.Array.concat(
+                [|Input((inputValue, state.currentSyntax))|],
+                state.displayStack,
+              ),
+          },
+          (_ => Reason_Evaluator.reset()),
+        )
+      | ("#toggle_syntax;", Reason) =>
+        ReasonReact.UpdateWithSideEffects(
+          {
+            ...state,
+            inputValue: "",
+            inputDisplay: "",
+            currentSyntax: Ml,
+            history: [(inputValue, state.currentSyntax), ...state.history],
+            displayStack:
+              Belt.Array.concat(
+                [|Input((inputValue, state.currentSyntax))|],
+                state.displayStack,
+              ),
+          },
+          (_ => Reason_Evaluator.mlSyntax()),
+        )
+      | ("#toggle_syntax;;", Ml) =>
+        ReasonReact.UpdateWithSideEffects(
+          {
+            ...state,
+            inputValue: "",
+            inputDisplay: "",
+            currentSyntax: Reason,
+            history: [(inputValue, state.currentSyntax), ...state.history],
+            displayStack:
+              Belt.Array.concat(
+                [|Input((inputValue, state.currentSyntax))|],
+                state.displayStack,
+              ),
+          },
+          (_ => Reason_Evaluator.mlSyntax()),
+        )
+      | _ =>
+        let result = Reason_Evaluator.execute(inputValue);
+        let result =
+          switch (result) {
+          | Ok(evaluate) => ResultOk(evaluate)
+          | OkWithLog(evaluate, log) => ResultOk(evaluate ++ "\n" ++ log)
+          | Error(error) => ResultError(error)
           };
         ReasonReact.Update({
           ...state,
-          inputDisplay,
-          historyCursor: Some(cursor),
+          inputValue: "",
+          inputDisplay: "",
+          history: [(inputValue, state.currentSyntax), ...state.history],
+          displayStack:
+            Belt.Array.concat(
+              [|result, Input((inputValue, state.currentSyntax))|],
+              state.displayStack,
+            ),
         });
       };
-    | InputEvaluate =>
-      let v = state.inputValue |. Js.String.trim;
-      let result = Reason_Evaluator.execute(v);
-      let result =
-        switch (result) {
-        | Ok(evaluate) => ResultOk(evaluate)
-        | OkWithLog(evaluate, log) => ResultOk(evaluate ++ "\n" ++ log)
-        | Error(error) => ResultError(error)
-        };
-      ReasonReact.Update({
-        ...state,
-        inputValue: "",
-        inputDisplay: "",
-        stack: [result, Input(v), ...state.stack],
-      });
     },
   render: ({state, send}) =>
     S.(
@@ -161,34 +149,43 @@ let make = _children => {
         <pre>
           <div className=stack>
             (
-              state.stack
-              |. Belt.List.mapWithIndexU((. index, line) => {
+              state.displayStack
+              |. Belt.Array.mapWithIndexU((. index, line) => {
                    let (className, line) =
                      switch (line) {
                      | ResultOk(line) => (None, line)
                      | ResultError(line) => (Some(lineError), line)
                      | Welcome(line) => (Some(lineWelcome), line)
-                     | Input(line) => (Some(lineInput), line)
+                     | Input((line, syntax)) =>
+                       switch (syntax) {
+                       | Reason => (Some(lineInputRe), line)
+                       | Ml => (Some(lineInputMl), line)
+                       }
                      };
-                   <div ?className key=(index |. string_of_int)>
-                     (line |. str)
-                   </div>;
+                   <div ?className key=(index |. string_of_int)> (line |. str) </div>;
                  })
-              |. Array.of_list
               |. ReasonReact.array
             )
           </div>
         </pre>
         <div className=inputWrapper>
-          <span className=sharpText> ("Reason # " |. str) </span>
+          <span className=sharpText>
+            (
+              (
+                switch (state.currentSyntax) {
+                | Reason => "Reason # "
+                | Ml => "Ocaml # "
+                }
+              )
+              |. str
+            )
+          </span>
           <Textarea
             value=state.inputDisplay
             minRows=10
             className=inputC
             autoFocus=true
-            onChange=(
-              event => event |. valueFromEvent |. InputUpdateValue |. send
-            )
+            onChange=(event => event |. valueFromEvent |. InputUpdateValue |. send)
             onKeyDown=(
               event => {
                 let keyName = event |. ReactEventRe.Keyboard.key;
@@ -196,9 +193,16 @@ let make = _children => {
 
                 switch (keyName) {
                 | "Enter" =>
-                  if (! shiftKey && Analyzer.shouldEvaluate(state.inputValue)) {
-                    event |. ReactEventRe.Keyboard.preventDefault;
-                    send(InputEvaluate);
+                  if (! shiftKey) {
+                    let shouldEvaluate =
+                      switch (state.currentSyntax) {
+                      | Reason => Analyzer.shouldEvaluateRe(state.inputValue)
+                      | Ml => Analyzer.shouldEvaluateMl(state.inputValue)
+                      };
+                    if (shouldEvaluate) {
+                      event |. ReactEventRe.Keyboard.preventDefault;
+                      send(InputEvaluate);
+                    };
                   }
                 | "ArrowUp" =>
                   if (! shiftKey) {

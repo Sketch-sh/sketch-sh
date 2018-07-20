@@ -51,9 +51,10 @@ TODOs:
 - [ ] Parse and highlight error
 - [ ] Syntax highlighting
 - [ ] Load evaluator async
-- [ ] Reset session (Press F5 for now)
+- [x] Reset session (#reset;)
 - [x] Input autosize
 - [x] Proper stdin/stdout hook with jsoo instead of hacking console.log
+- [x] Syntax toggling (#toggle_syntax;)
 
 Future:
 
