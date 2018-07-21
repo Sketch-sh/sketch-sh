@@ -1,15 +1,11 @@
 let stack =
   Css.(
-    [%style
-      {|
-            display: flex;
-            flex-direction: column-reverse;
-        |}
-    ]
-    |. style
+    [%style {|
+        display: flex;
+        flex-direction: column-reverse;
+        |}] |. style
   );
-let lineWelcome =
-  Css.([%style {|
+let lineWelcome = Css.([%style {|
             text-align: center;
         |}] |. style);
 let lineError = Css.([%style {|
@@ -44,8 +40,7 @@ let lineInputMl =
 let sharpText = Css.([%style {|
           color: green;
         |}] |. style);
-let inputWrapper =
-  Css.([%style {|
+let inputWrapper = Css.([%style {|
             display: flex;
         |}] |. style);
 let inputC =
