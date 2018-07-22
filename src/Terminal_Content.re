@@ -19,6 +19,21 @@ type syntax =
   | Ml
   | Reason;
 
+let displayInput = (syntax, input) =>
+  input
+  |> splitOnChar('\n')
+  |> List.mapi((i, line) =>
+       i == 0 ?
+         line :
+         (
+           switch (syntax) {
+           | Ml => "<span class=\"dim2\">Ocaml # </span>" ++ line
+           | Reason => "<span class=\"dim2\">Reason # </span>" ++ line
+           }
+         )
+     )
+  |> String.concat("\n");
+
 type line =
   | Welcome(string)
   | Input((string, syntax))
@@ -34,9 +49,11 @@ type state = {
 };
 
 type action =
+  | UpdateState(state)
+  | CodeEvaluated(string, Reason_Evaluator.executeResult)
   | InputUpdateValue(string)
   | InputHistory(int)
-  | InputEvaluate;
+  | InputEnter;
 
 let component = ReasonReact.reducerComponent("Terminal_Content");
 
@@ -52,6 +69,7 @@ let make = _children => {
   },
   reducer: (action, state) =>
     switch (action) {
+    | UpdateState(state) => ReasonReact.Update(state)
     | InputUpdateValue(inputValue) =>
       ReasonReact.Update({...state, inputValue, inputDisplay: inputValue, historyCursor: (-1)})
     | InputHistory(amount) =>
@@ -69,80 +87,133 @@ let make = _children => {
           ReasonReact.Update({...state, inputDisplay, historyCursor: cursor})
         };
       };
-    | InputEvaluate =>
+    | InputEnter =>
       let inputValue = state.inputValue |. Js.String.trim;
 
       switch (inputValue, state.currentSyntax) {
       | ("#reset;", Reason)
       | ("#reset;;", Ml) =>
-        ReasonReact.UpdateWithSideEffects(
-          {
-            ...state,
-            inputValue: "",
-            inputDisplay: "",
-            history: [(inputValue, state.currentSyntax), ...state.history],
-            displayStack:
-              Belt.Array.concat(
-                [|Input((inputValue, state.currentSyntax))|],
-                state.displayStack,
-              ),
-          },
-          (_ => Reason_Evaluator.reset()),
+        ReasonReact.SideEffects(
+          (
+            ({state, send}) =>
+              Js.Promise.(
+                Reason_Evaluator.reset(.)
+                |> then_(() =>
+                     {
+                       ...state,
+                       inputValue: "",
+                       inputDisplay: "",
+                       history: [(inputValue, state.currentSyntax), ...state.history],
+                       displayStack:
+                         Belt.Array.concat(
+                           state.displayStack,
+                           [|Input((inputValue, state.currentSyntax))|],
+                         ),
+                     }
+                     |. UpdateState
+                     |. send
+                     |. resolve
+                   )
+                |> handleError
+              )
+              |> ignore
+          ),
         )
       | ("#toggle_syntax;", Reason) =>
-        ReasonReact.UpdateWithSideEffects(
-          {
-            ...state,
-            inputValue: "",
-            inputDisplay: "",
-            currentSyntax: Ml,
-            history: [(inputValue, state.currentSyntax), ...state.history],
-            displayStack:
-              Belt.Array.concat(
-                [|Input((inputValue, state.currentSyntax))|],
-                state.displayStack,
-              ),
-          },
-          (_ => Reason_Evaluator.mlSyntax()),
+        ReasonReact.SideEffects(
+          (
+            ({state, send}) =>
+              Js.Promise.(
+                Reason_Evaluator.mlSyntax(.)
+                |> then_(() =>
+                     {
+                       ...state,
+                       inputValue: "",
+                       inputDisplay: "",
+                       currentSyntax: Ml,
+                       history: [(inputValue, state.currentSyntax), ...state.history],
+                       displayStack:
+                         Belt.Array.concat(
+                           state.displayStack,
+                           [|Input((inputValue, state.currentSyntax))|],
+                         ),
+                     }
+                     |. UpdateState
+                     |. send
+                     |. resolve
+                   )
+                |> handleError
+              )
+              |> ignore
+          ),
         )
       | ("#toggle_syntax;;", Ml) =>
-        ReasonReact.UpdateWithSideEffects(
-          {
-            ...state,
-            inputValue: "",
-            inputDisplay: "",
-            currentSyntax: Reason,
-            history: [(inputValue, state.currentSyntax), ...state.history],
-            displayStack:
-              Belt.Array.concat(
-                [|Input((inputValue, state.currentSyntax))|],
-                state.displayStack,
-              ),
-          },
-          (_ => Reason_Evaluator.reasonSyntax()),
+        ReasonReact.SideEffects(
+          (
+            ({state, send}) =>
+              Js.Promise.(
+                Reason_Evaluator.reasonSyntax(.)
+                |> then_(() =>
+                     {
+                       ...state,
+                       inputValue: "",
+                       inputDisplay: "",
+                       currentSyntax: Reason,
+                       history: [(inputValue, state.currentSyntax), ...state.history],
+                       displayStack:
+                         Belt.Array.concat(
+                           state.displayStack,
+                           [|Input((inputValue, state.currentSyntax))|],
+                         ),
+                     }
+                     |. UpdateState
+                     |. send
+                     |. resolve
+                   )
+                |> handleError
+              )
+              |> ignore
+          ),
         )
       | _ =>
-        let result = Reason_Evaluator.execute(inputValue);
-        let result = {
-          ...result,
-          stderr:
-            result.stderr
-            |. Belt.Option.map(stderr =>
-                 Reason_Evaluator.parseError(~content=inputValue, ~error=stderr)
-               ),
-        };
-        ReasonReact.Update({
-          ...state,
-          inputValue: "",
-          inputDisplay: "",
-          history: [(inputValue, state.currentSyntax), ...state.history],
-          displayStack:
-            Belt.Array.concat(
-              [|Result(result), Input((inputValue, state.currentSyntax))|],
-              state.displayStack,
-            ),
-        });
+        ReasonReact.SideEffects(
+          (
+            ({send}) =>
+              Js.Promise.(
+                Reason_Evaluator.execute(inputValue)
+                |> then_((result: Reason_Evaluator.executeResult) =>
+                     switch (result.stderr) {
+                     | None => CodeEvaluated(inputValue, result) |. send |. resolve
+                     | Some(stderr) =>
+                       Reason_Evaluator.parseError(~content=inputValue, ~error=stderr)
+                       |> then_(stderr => {
+                            let result = {...result, stderr: Some(stderr)};
+                            CodeEvaluated(inputValue, result) |. send |. resolve;
+                          })
+                       |> handleError
+                     }
+                   )
+                |> handleError
+              )
+              |> ignore
+          ),
+        )
       };
+    | CodeEvaluated(inputValue, result) =>
+      ReasonReact.Update({
+        ...state,
+        inputValue: "",
+        inputDisplay: "",
+        history: [(inputValue, state.currentSyntax), ...state.history],
+        displayStack:
+          Belt.Array.concat(
+            state.displayStack,
+            [|
+              Input((inputValue |> displayInput(state.currentSyntax), state.currentSyntax)),
+              Result(result),
+            |],
+          ),
+      })
     },
   render: ({state, send}) =>
     S.(
@@ -159,15 +230,17 @@ let make = _children => {
                    | Welcome(line) => (Some(lineWelcome), line) |. simpleLine
                    | Input((line, syntax)) =>
                      switch (syntax) {
-                     | Reason => (Some(lineInputRe), line) |. simpleLine
-                     | Ml => (Some(lineInputMl), line) |. simpleLine
+                     | Reason =>
+                       <div className=lineInputRe dangerouslySetInnerHTML={"__html": line} />
+                     | Ml =>
+                       <div className=lineInputMl dangerouslySetInnerHTML={"__html": line} />
                      }
                    | Result({stderr, stdout, evaluate}) =>
-                     <Fragment>
+                     <div key>
                        (stderr =>> (stderr => <div dangerouslySetInnerHTML={"__html": stderr} />))
-                       (evaluate =>> (evaluate => (None, evaluate) |. simpleLine))
-                       (stdout =>> (stdout => (None, stdout) |. simpleLine))
-                     </Fragment>
+                       (stdout =>> (stdout => <div> (stdout |. str) </div>))
+                       (evaluate =>> (evaluate => <div className="cyan"> (evaluate |. str) </div>))
+                     </div>
                    };
                  })
               |. ReasonReact.array
@@ -207,7 +280,7 @@ let make = _children => {
                       };
                     if (shouldEvaluate) {
                       event |. ReactEventRe.Keyboard.preventDefault;
-                      send(InputEvaluate);
+                      send(InputEnter);
                     };
                   }
                 | "ArrowUp" =>

@@ -19,6 +19,7 @@ const base = {
     path: outputDir,
     publicPath: "/",
     filename: "[name].js",
+    globalObject: "this",
   },
   node: {
     fs: "empty",
@@ -29,6 +30,14 @@ const base = {
       template: path.join(__dirname, "src/index.html"),
     }),
   ],
+  module: {
+    rules: [
+      {
+        test: /\.worker\.js$/,
+        use: { loader: "worker-loader" },
+      },
+    ],
+  },
 };
 
 if (!isProd) {

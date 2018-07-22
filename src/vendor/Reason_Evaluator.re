@@ -1,3 +1,17 @@
+module Worker = {
+  type t;
+};
+
+module RtopWorker = {
+  [@bs.new] [@bs.module] external make : unit => Worker.t = "./rtop.worker.js";
+};
+
+module Comlink = {
+  type t;
+  [@bs.module] external comlink : t = "comlink";
+  [@bs.send] external proxy : (t, Worker.t) => 'a = "proxy";
+};
+
 [@bs.deriving abstract]
 type js_executeResult = {
   evaluate: string,
@@ -6,18 +20,22 @@ type js_executeResult = {
 };
 
 [@bs.deriving abstract]
-type evalutator = {
-  execute: string => js_executeResult,
-  reset: unit => unit,
-  reasonSyntax: unit => unit,
-  mlSyntax: unit => unit,
+type rtop = {
+  execute: (. string) => Js.Promise.t(js_executeResult),
+  reset: (. unit) => Js.Promise.t(unit),
+  reasonSyntax: (. unit) => Js.Promise.t(unit),
+  mlSyntax: (. unit) => Js.Promise.t(unit),
+  parseError: (. string, string) => Js.Promise.t(string),
 };
-[@bs.val] external evaluator : evalutator = "evaluator";
+let worker = RtopWorker.make();
 
-let reset = evaluator |. resetGet;
-let reasonSyntax = evaluator |. reasonSyntaxGet;
-let mlSyntax = evaluator |. mlSyntaxGet;
-let js_execute = evaluator |. executeGet;
+let rtop: rtop = Comlink.comlink |. Comlink.proxy(worker);
+
+let reset = rtop |. resetGet;
+let reasonSyntax = rtop |. reasonSyntaxGet;
+let mlSyntax = rtop |. mlSyntaxGet;
+let js_execute = rtop |. executeGet;
+let js_parseError = rtop |. parseErrorGet;
 
 type executeResult = {
   evaluate: option(string),
@@ -30,21 +48,18 @@ let emptyStringToOption =
   | "" => None
   | str => Some(str);
 
-let execute = code => {
-  let result = code |. js_execute;
-  {
-    evaluate: result |. evaluateGet |. Js.String.trim |. emptyStringToOption,
-    stderr: result |. stderrGet |. Js.String.trim |. emptyStringToOption,
-    stdout: result |. stdoutGet |. Js.String.trim |. emptyStringToOption,
-  };
-};
-
-[@bs.deriving abstract]
-type berror = {parse: (~content: string, ~error: string) => string};
-
-[@bs.val] external berror : berror = "berror";
-
-let js_parseError = berror |. parseGet;
+let execute: string => Js.Promise.t(executeResult) =
+  code =>
+    Js.Promise.(
+      js_execute(. code)
+      |> then_(result =>
+           resolve({
+             evaluate: result |. evaluateGet |. Js.String.trim |. emptyStringToOption,
+             stderr: result |. stderrGet |. Js.String.trim |. emptyStringToOption,
+             stdout: result |. stdoutGet |. Js.String.trim |. emptyStringToOption,
+           })
+         )
+    );
 
 let parseError = (~content, ~error) =>
-  js_parseError(~content, ~error=error |> Js.String.replace({|File ""|}, {|File "_none_"|}));
+  js_parseError(. content, error |> Js.String.replace({|File ""|}, {|File "_none_"|}));

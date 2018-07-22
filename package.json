@@ -17,6 +17,7 @@
     "@thangngoc89/ocaml-re": "^1.0.0",
     "bs-css": "^7.0.1",
     "bs-json": "^1.0.1",
+    "comlink": "^3.0.3",
     "install": "^0.12.1",
     "npm": "^6.2.0",
     "react": "^16.4.1",
@@ -34,6 +35,7 @@
     "webpack": "^4.0.1",
     "webpack-cli": "^2.0.10",
     "webpack-dev-server": "^3.1.0",
+    "worker-loader": "^2.0.0",
     "workerize-loader": "^1.0.3"
   },
   "jest": {

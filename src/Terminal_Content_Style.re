@@ -1,10 +1,8 @@
 let stack =
-  Css.(
-    [%style {|
+  Css.([%style {|
         display: flex;
-        flex-direction: column-reverse;
-        |}] |. style
-  );
+        flex-direction: column;
+        |}] |. style);
 let lineWelcome = Css.([%style {|
             text-align: center;
         |}] |. style);
@@ -15,6 +13,10 @@ let lineInputRe =
   Css.(
     [%css
       {|
+          {
+            margin-top: 0.5rem;
+          }
+
           ::before {
             color: green;
             unsafe: "content" "Reason #";
@@ -28,6 +30,10 @@ let lineInputMl =
   Css.(
     [%css
       {|
+          {
+            margin-top: 0.5rem;
+          }
+
           ::before {
             color: green;
             unsafe: "content" "OCaml #";
