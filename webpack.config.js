@@ -20,6 +20,10 @@ const base = {
     publicPath: "/",
     filename: "[name].js",
   },
+  node: {
+    fs: "empty",
+    child_process: "empty",
+  },
   plugins: [
     new HtmlWebpackPlugin({
       template: path.join(__dirname, "src/index.html"),

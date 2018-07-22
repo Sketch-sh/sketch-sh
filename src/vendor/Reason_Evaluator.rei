@@ -1,4 +1,4 @@
-type executeResult =
+/* type executeResult =
   | Error(string)
   | Ok(string)
   | OkWithLog(string, string)
@@ -12,12 +12,19 @@ type executeResult =
   /* #help; */
   | Log(string)
   /* #print_length 10 */
-  | Nothing;
+  | Nothing; */
+
+type executeResult = {
+  evaluate: option(string),
+  stderr: option(string),
+  stdout: option(string),
+};
 
 let execute: string => executeResult;
 
-[@bs.val] external reset : unit => unit = "evaluator.reset";
-[@bs.val] external reasonSyntax : unit => unit = "evaluator.reasonSyntax";
-[@bs.val] external mlSyntax : unit => unit = "evaluator.mlSyntax";
+let reset: unit => unit;
+let reasonSyntax : unit => unit;
+let mlSyntax : unit => unit;
 
 let parseError: (~content: string, ~error: string) => string;
+

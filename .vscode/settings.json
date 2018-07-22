@@ -1,4 +1,5 @@
 {
   "git.ignoreLimitWarning": true,
-  "reason.diagnostics.tools": ["merlin", "bsb"]
+  "reason.diagnostics.tools": ["merlin", "bsb"],
+  "editor.formatOnSave": true
 }

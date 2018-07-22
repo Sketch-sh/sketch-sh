@@ -22,8 +22,7 @@ type syntax =
 type line =
   | Welcome(string)
   | Input((string, syntax))
-  | ResultOk(string)
-  | ResultError(string);
+  | Result(Reason_Evaluator.executeResult);
 
 type state = {
   inputValue: string,
@@ -44,14 +43,7 @@ let component = ReasonReact.reducerComponent("Terminal_Content");
 let make = _children => {
   ...component,
   initialState: () => {
-    inputValue: {|
-type say = | Hello | Goodbye;
-let say =
-fun
-  | Hello => ()
-  | Goodbye => ()
-  | _ => ();
-    |},
+    inputValue: "",
     inputDisplay: "",
     history: [("", Reason)],
     historyCursor: (-1),
@@ -127,35 +119,28 @@ fun
                 state.displayStack,
               ),
           },
-          (_ => Reason_Evaluator.mlSyntax()),
+          (_ => Reason_Evaluator.reasonSyntax()),
         )
       | _ =>
         let result = Reason_Evaluator.execute(inputValue);
-        let result =
-          switch (result) {
-          | Ok(evaluate) => [|ResultOk(evaluate)|]
-          | OkWithLog(evaluate, log) => [|ResultOk(evaluate ++ "\n" ++ log)|]
-          | OkWithError(evaluate, error) => [|
-              ResultOk(evaluate),
-              Reason_Evaluator.parseError(~content=inputValue, ~error) |. ResultError,
-            |]
-          | Error(error) => [|
-              Reason_Evaluator.parseError(~content=inputValue, ~error) |. ResultError,
-            |]
-          | Log(stdout) => [|ResultOk(stdout)|]
-          | Nothing => [||]
-          };
+        let result = {
+          ...result,
+          stderr:
+            result.stderr
+            |. Belt.Option.map(stderr =>
+                 Reason_Evaluator.parseError(~content=inputValue, ~error=stderr)
+               ),
+        };
         ReasonReact.Update({
           ...state,
           inputValue: "",
           inputDisplay: "",
           history: [(inputValue, state.currentSyntax), ...state.history],
           displayStack:
-            Belt.Array.concatMany([|
-              result,
-              [|Input((inputValue, state.currentSyntax))|],
+            Belt.Array.concat(
+              [|Result(result), Input((inputValue, state.currentSyntax))|],
               state.displayStack,
-            |]),
+            ),
         });
       };
     },
@@ -167,18 +152,22 @@ fun
             (
               state.displayStack
               |. Belt.Array.mapWithIndexU((. index, line) => {
+                   let key = index |. string_of_int;
                    let simpleLine = ((className, line)) =>
-                     <div ?className key=(index |. string_of_int)> (line |. str) </div>;
-                   /* dangerouslySetInnerHTML */
+                     <div ?className key> (line |. str) </div>;
                    switch (line) {
-                   | ResultOk(line) => (None, line) |. simpleLine
-                   | ResultError(line) => <div dangerouslySetInnerHTML={"__html": line} />
                    | Welcome(line) => (Some(lineWelcome), line) |. simpleLine
                    | Input((line, syntax)) =>
                      switch (syntax) {
                      | Reason => (Some(lineInputRe), line) |. simpleLine
                      | Ml => (Some(lineInputMl), line) |. simpleLine
                      }
+                   | Result({stderr, stdout, evaluate}) =>
+                     <Fragment>
+                       (stderr =>> (stderr => <div dangerouslySetInnerHTML={"__html": stderr} />))
+                       (evaluate =>> (evaluate => (None, evaluate) |. simpleLine))
+                       (stdout =>> (stdout => (None, stdout) |. simpleLine))
+                     </Fragment>
                    };
                  })
               |. ReasonReact.array

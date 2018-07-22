@@ -5,40 +5,46 @@ type js_executeResult = {
   stdout: string,
 };
 
-[@bs.val] external js_execute : string => js_executeResult = "evaluator.execute";
+[@bs.deriving abstract]
+type evalutator = {
+  execute: string => js_executeResult,
+  reset: unit => unit,
+  reasonSyntax: unit => unit,
+  mlSyntax: unit => unit,
+};
+[@bs.val] external evaluator : evalutator = "evaluator";
 
-type executeResult =
-  | Error(string)
-  | Ok(string)
-  | OkWithLog(string, string)
-  | OkWithError(string, string)
-  | Log(string)
-  | Nothing;
+let reset = evaluator |. resetGet;
+let reasonSyntax = evaluator |. reasonSyntaxGet;
+let mlSyntax = evaluator |. mlSyntaxGet;
+let js_execute = evaluator |. executeGet;
+
+type executeResult = {
+  evaluate: option(string),
+  stderr: option(string),
+  stdout: option(string),
+};
+
+let emptyStringToOption =
+  fun
+  | "" => None
+  | str => Some(str);
 
 let execute = code => {
-  let result = js_execute(code);
-  let stderr = result |. stderrGet |. Js.String.trim;
-  let stdout = result |. stdoutGet |. Js.String.trim;
-  let evaluate = result |. evaluateGet |. Js.String.trim;
-  switch (stderr == "", stdout == "", evaluate == "") {
-  /* no error, no output, no evaluate */
-  | (false, true, true) => Error(stderr)
-  | (true, true, false) => Ok(evaluate)
-  | (true, false, false) => OkWithLog(evaluate, stdout)
-  | (false, true, false) => OkWithError(evaluate, stderr)
-  | (true, false, true) => Log(stdout)
-  | (true, true, true) => Nothing
-  | _ =>
-    Js.log(result);
-    Invalid_argument("What the heck is going on with this code? " ++ code) |. raise;
+  let result = code |. js_execute;
+  {
+    evaluate: result |. evaluateGet |. Js.String.trim |. emptyStringToOption,
+    stderr: result |. stderrGet |. Js.String.trim |. emptyStringToOption,
+    stdout: result |. stdoutGet |. Js.String.trim |. emptyStringToOption,
   };
 };
 
-[@bs.val] external reset : unit => unit = "evaluator.reset";
-[@bs.val] external reasonSyntax : unit => unit = "evaluator.reasonSyntax";
-[@bs.val] external mlSyntax : unit => unit = "evaluator.mlSyntax";
+[@bs.deriving abstract]
+type berror = {parse: (~content: string, ~error: string) => string};
 
-[@bs.val] external js_parseError : (~content: string, ~error: string) => string = "berror.parse";
+[@bs.val] external berror : berror = "berror";
+
+let js_parseError = berror |. parseGet;
 
 let parseError = (~content, ~error) =>
   js_parseError(~content, ~error=error |> Js.String.replace({|File ""|}, {|File "_none_"|}));
