@@ -6,10 +6,12 @@
   "sources": [
     "src",
     "src/vendor",
-    // {
-    //   "dir": "src/vendor/__tests__",
-    //   "type": "dev"
-    // }
+    "src_editor",
+    "src_analyzer",
+    {
+      "dir": "src_analyzer/__tests__",
+      "type": "dev"
+    }
   ],
   "package-specs": [
     {

@@ -1,0 +1,386 @@
+@import url(https://fonts.googleapis.com/css?family=Ubuntu+Mono:400);
+.theme-border-color {
+  border-color: #e8e5e8 !important;
+}
+.theme-hover-background-from-border-color:hover {
+  background: #e8e5e8;
+}
+.theme-border-radius {
+  border-radius: 4px;
+}
+.theme-controls-color {
+  color: #978998;
+}
+.theme-controls-background {
+  background: #f9f8f7;
+  margin: 0;
+}
+.theme-logo-color {
+  color: #978998;
+}
+.theme-hover-color-controls:hover,
+.theme-hover-color-controls:hover .theme-logo-color {
+  color: #625666;
+}
+.theme-controls-color-edited,
+.theme-controls-color-edited:hover {
+  color: #3c2b3f;
+}
+.theme-run-button,
+.theme-run-button:hover {
+  border-color: transparent !important;
+  color: #fff !important;
+  text-shadow: 0 1px 0 transparent !important;
+}
+.theme-run-button {
+  background: #33b277;
+}
+.theme-run-button:hover {
+  background: #20935e;
+}
+.theme-evaluation-state-color {
+  color: #33b277;
+}
+.CodeMirror,
+.source-editor .prerender,
+.source-viewer .prerender {
+  font-size: 15px;
+  font-family: "Ubuntu Mono", monospace;
+  font-weight: 400;
+  line-height: 1.4375;
+  background: 0 0;
+}
+.CodeMirror pre {
+  padding: 0;
+}
+.CodeMirror-gutters {
+  border: 0;
+  background-color: transparent;
+}
+.CodeMirror-linenumber {
+  padding: 0;
+  margin-left: -17px;
+}
+.CodeMirror-linenumbers {
+  width: 35px;
+}
+.CodeMirror-lines {
+  padding: 4px 8px;
+}
+.inside-gutter .CodeMirror-linenumbers {
+  width: inherit;
+}
+.inside-gutter .CodeMirror-linenumber {
+  margin-left: 0;
+}
+.inside-gutter .CodeMirror {
+  border-style: solid;
+  border-width: 1px;
+  border-radius: 4px 4px 0 0;
+}
+.inside-gutter .CodeMirror-focused .CodeMirror-lines,
+.inside-gutter .CodeMirror-lines {
+  border: 0;
+  border-radius: 0;
+}
+.source-editor .prerender,
+.source-viewer .prerender {
+  border-width: 1px;
+  border-style: solid;
+  border-color: #e8e5e8;
+  padding: 4px 8px;
+  margin-bottom: 0;
+  white-space: pre;
+  overflow-x: hidden;
+  color: #625666;
+  background-color: #fff;
+}
+.outside-gutter .source-editor .prerender,
+.outside-gutter .source-viewer .prerender {
+  margin-left: 36px;
+}
+.embedded-notebook .source-editor .CodeMirror-lines,
+.embedded-notebook .source-editor .CodeMirror-scroll,
+.embedded-notebook .source-editor .prerender,
+.embedded-notebook .source-viewer .prerender {
+  min-height: 94.25px;
+}
+.embedded-notebook .inside-gutter .source-editor .gutter,
+.embedded-notebook .inside-gutter .source-editor .prerender,
+.embedded-notebook .inside-gutter .source-viewer .gutter,
+.embedded-notebook .inside-gutter .source-viewer .prerender {
+  border-color: #e8e5e8;
+  border-style: solid;
+}
+.embedded-notebook .inside-gutter .source-editor .gutter,
+.embedded-notebook .inside-gutter .source-viewer .gutter {
+  border-radius: 4px 0 0 0;
+  background-color: #f9f8f7;
+  border-width: 1px 0 1px 1px;
+  width: 36px;
+}
+.embedded-notebook .inside-gutter .source-editor .prerender,
+.embedded-notebook .inside-gutter .source-viewer .prerender {
+  margin-left: 36px;
+  border-radius: 0 4px 0 0;
+  border-width: 1px 1px 1px 0;
+}
+.cm-s-runkit-light.CodeMirror {
+  font-family: "Ubuntu Mono", monospace;
+  font-weight: 400;
+}
+.cm-s-runkit-light.CodeMirror span.CodeMirror-matchingbracket,
+.cm-s-runkit-light.CodeMirror span.CodeMirror-nonmatchingbracket {
+  color: #33b277;
+  border-color: transparent;
+  border-style: none;
+  border-width: 0;
+  background: 0 0;
+}
+.cm-s-runkit-light.CodeMirror span.CodeMirror-nonmatchingbracket {
+  color: #625666;
+}
+.cm-s-runkit-light .CodeMirror-lines {
+  color: #625666;
+  background: #fff;
+  border-color: #e8e5e8;
+  border-width: 1px;
+}
+.cm-s-runkit-light .CodeMirror-linenumber {
+  color: rgba(151, 137, 152, 0.5);
+}
+.cm-s-runkit-light .CodeMirror-cursor {
+  width: 1px;
+  border: 0;
+  background: #2e383b;
+  z-index: 1;
+}
+.cm-s-runkit-light.CodeMirror-focused .CodeMirror-selected {
+  background: #b6d1ef;
+}
+.cm-s-runkit-light.CodeMirror-focused .CodeMirror-lines {
+  border-width: 1px;
+  border-color: rgba(151, 137, 152, 0.7);
+}
+.cm-s-runkit-light.CodeMirror-focused .CodeMirror-linenumber {
+  color: rgba(151, 137, 152, 0.7);
+}
+.cm-s-runkit-light .cm-require-end-cap::before {
+  color: #767676;
+  background: #f1f1f1;
+}
+.cm-s-runkit-light .cm-require-path ::after {
+  color: #33b277;
+  background: #f9f8f7 !important;
+}
+.cm-s-runkit-light .cm-negative {
+  color: #2e383b;
+}
+.cm-s-runkit-light .cm-positive {
+  color: #33b277;
+}
+.cm-s-runkit-light .cm-header,
+.cm-s-runkit-light .cm-quote {
+  color: inherit;
+}
+.cm-s-runkit-light .cm-header,
+.cm-s-runkit-light .cm-strong {
+  font-weight: 700;
+}
+.cm-s-runkit-light .cm-em {
+  font-style: italic;
+}
+.cm-s-runkit-light .cm-link,
+.cm-s-runkit-light .cm-require-path a {
+  color: #4a91e2;
+}
+.cm-s-runkit-light .cm-strikethrough {
+  text-decoration: line-through;
+}
+.cm-s-runkit-light .cm-keyword {
+  color: #4a91e2;
+  font-weight: 400;
+}
+.cm-s-runkit-light .cm-atom {
+  color: #625666;
+}
+.cm-s-runkit-light .cm-null,
+.cm-s-runkit-light .cm-undefined {
+  color: #978998;
+}
+.cm-s-runkit-light .cm-boolean {
+  color: #eaad3a;
+}
+.cm-s-runkit-light .cm-number {
+  color: #33b277;
+}
+.cm-s-runkit-light .cm-def,
+.cm-s-runkit-light .cm-property,
+.cm-s-runkit-light .cm-punctuation {
+  color: #625666;
+}
+.cm-s-runkit-light .cm-operator {
+  color: #625666;
+  font-weight: 400;
+}
+.cm-s-runkit-light .cm-variable {
+  color: #8e85e5;
+  font-weight: 400;
+}
+.cm-s-runkit-light .cm-variable-2,
+.cm-s-runkit-light .cm-variable-3 {
+  color: #8e85e5;
+}
+.cm-s-runkit-light .cm-comment {
+  color: #978998;
+}
+.cm-s-runkit-light .cm-string {
+  color: #dd6546;
+}
+.cm-s-runkit-light .cm-string-2 {
+  color: #cc4928;
+}
+.cm-s-runkit-light .cm-meta {
+  color: #625666;
+}
+.cm-s-runkit-light .cm-qualifier {
+  color: #8e85e5;
+  font-weight: 400;
+}
+.cm-s-runkit-light .cm-attribute,
+.cm-s-runkit-light .cm-bracket,
+.cm-s-runkit-light .cm-builtin,
+.cm-s-runkit-light .cm-node,
+.cm-s-runkit-light .cm-tag {
+  color: #625666;
+}
+.cm-s-runkit-light .cm-hr {
+  color: inherit;
+}
+.cm-s-runkit-light .cm-error {
+  color: #2e383b;
+}
+.cm-s-runkit-light .cm-invalidchar {
+  color: inherit;
+}
+.monospace {
+  font-family: "Ubuntu Mono", monospace;
+}
+.proportional {
+  font-family: fira-sans, sans-serif;
+}
+.inside-gutter .cm-s-runkit-light .CodeMirror-lines,
+.regexp-results .cm-s-runkit-light.CodeMirror {
+  border: 0;
+}
+.inside-gutter .cm-s-runkit-light .CodeMirror-linenumber {
+  margin: 0;
+}
+.inside-gutter .cm-s-runkit-light .CodeMirror-linenumbers {
+  background-color: #f9f8f7;
+  padding: 0 8px 0 6px;
+}
+.inside-gutter .cm-s-runkit-light.CodeMirror {
+  border-style: solid;
+  border-width: 1px;
+  border-color: #e8e5e8;
+}
+.inside-gutter .cm-s-runkit-light.CodeMirror-focused {
+  border-color: rgba(151, 137, 152, 0.7);
+}
+.source-cell-wrapper {
+  border-radius: 4px;
+}
+.inside-gutter.source-cell-wrapper,
+.source-cell {
+  box-shadow: none;
+  margin: inherit;
+}
+.inside-gutter .source-cell {
+  margin-bottom: 0;
+  box-shadow: 0 0 transparent;
+}
+.source-cell {
+  border-radius: 4px;
+  margin: 0;
+}
+.embedded-notebook .object-description {
+  border-radius: 4px;
+  margin: 5px 0 0 27px;
+  width: calc(100% - 27px);
+  box-shadow: 0 0 transparent;
+}
+.object-description {
+  border-width: 1px;
+  border-style: solid;
+  border-color: #e8e5e8;
+  color: #625666;
+  font-size: 15px;
+  background: #f9f8f7;
+}
+.syntax-error {
+  background-color: #fdeeee;
+  color: #eb5656;
+  overflow: hidden;
+}
+.syntax-error-icon {
+  width: 6px;
+  display: inline-block;
+  background-color: #eb5656;
+}
+.type-boolean {
+  color: #eaad3a;
+}
+.type-metadata {
+  color: #767676;
+  background: #f1f1f1;
+  border: 1px solid #dedede;
+}
+.type-null {
+  color: #978998;
+}
+.type-number {
+  color: #33b277;
+}
+.type-property {
+  color: #625666;
+}
+.type-string {
+  color: #dd6546;
+}
+.type-system {
+  color: #625666;
+}
+.type-undefined {
+  color: #978998;
+}
+.icon-boolean {
+  fill: #eaad3a;
+}
+.icon-function {
+  fill: #8e85e5;
+}
+.icon-inner {
+  fill: #fff;
+}
+.icon-null {
+  fill: #978998;
+}
+.icon-number {
+  fill: #33b277;
+}
+.icon-object {
+  fill: #e2772f;
+}
+.icon-string {
+  fill: #dd6546;
+}
+.icon-undefined {
+  fill: #978998;
+}
+.string-viewer .cm-s-runkit-light.CodeMirror {
+  border: 0;
+}
+.string-viewer .cm-s-runkit-light.CodeMirror .CodeMirror-lines {
+  border-radius: 0 0 4px 4px;
+}

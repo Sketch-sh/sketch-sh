@@ -4,9 +4,10 @@ const path = require("path");
 const outputDir = path.join(__dirname, "build/");
 
 const isProd = process.env.NODE_ENV === "production";
+const baseFolder = process.env.EDITOR === "1" ? "src_editor" : "src";
 
 const base = {
-  entry: ["react-hot-loader/patch", "./entry.js"],
+  entry: ["react-hot-loader/patch", "./" + baseFolder + "/entry.js"],
   mode: isProd ? "production" : "development",
   devServer: {
     hot: true,
@@ -27,7 +28,7 @@ const base = {
   },
   plugins: [
     new HtmlWebpackPlugin({
-      template: path.join(__dirname, "src/index.html"),
+      template: path.join(__dirname, baseFolder, "index.html"),
     }),
   ],
   module: {
@@ -35,6 +36,26 @@ const base = {
       {
         test: /\.worker\.js$/,
         use: { loader: "worker-loader" },
+      },
+      {
+        test: /\.css$/,
+        use: ["style-loader", "css-loader"],
+      },
+      {
+        test: file => file.endsWith(".js") && !file.endsWith(".bs.js"),
+        include: /src_editor/,
+        exclude: /node_modules/,
+        use: {
+          loader: "babel-loader",
+          options: {
+            presets: [
+              ["@babel/preset-env", { modules: false }],
+              "@babel/preset-react",
+            ],
+            plugins: ["react-hot-loader/babel"],
+            babelrc: false,
+          },
+        },
       },
     ],
   },
