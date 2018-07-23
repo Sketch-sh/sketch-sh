@@ -231,9 +231,9 @@ let make = _children => {
                    | Input((line, syntax)) =>
                      switch (syntax) {
                      | Reason =>
-                       <div className=lineInputRe dangerouslySetInnerHTML={"__html": line} />
+                       <div key className=lineInputRe dangerouslySetInnerHTML={"__html": line} />
                      | Ml =>
-                       <div className=lineInputMl dangerouslySetInnerHTML={"__html": line} />
+                       <div key className=lineInputMl dangerouslySetInnerHTML={"__html": line} />
                      }
                    | Result({stderr, stdout, evaluate}) =>
                      <div key>
