@@ -21,7 +21,7 @@ module BracketCounting = {
     quote: 0,
   };
 
-  type stringTyp = 
+  type stringTyp =
     | Single
     | Double
     | Block;
@@ -31,62 +31,63 @@ module BracketCounting = {
     let prevChar = ref(None);
     let parsingStr: ref(option(stringTyp)) = ref(None);
 
-    let loop = (char) => {
+    let loop = char => {
       let s = bracketState^;
-      let shouldTerminal = switch (char) {
-      /* 
-        Handle nested parsing 
-        {|  {| |}
-      */
-      | '|' when prevChar^ == Some('{') && parsingStr^ == None  => 
-        parsingStr := Some(Block);
-        false;
-      | '}' when prevChar^ == Some('|') => 
-        parsingStr := None;
-        false;
-      | '"' =>
-        if (parsingStr^ == None) {
-          parsingStr := Some(Double);
-          ();
+      let shouldTerminal =
+        switch (char) {
+        /*
+           Handle nested parsing
+           {|  {| |}
+         */
+        | '|' when prevChar^ == Some('{') && parsingStr^ == None =>
+          parsingStr := Some(Block);
+          false;
+        | '}' when prevChar^ == Some('|') =>
+          parsingStr := None;
+          false;
+        | '"' =>
+          if (parsingStr^ == None) {
+            parsingStr := Some(Double);
+            ();
+          };
+          bracketState := {...s, doubleQuote: s.doubleQuote + 1};
+          false;
+        /* Normal brackets */
+        | '(' =>
+          bracketState := {...s, roundo: s.roundo + 1};
+          false;
+        | ')' =>
+          bracketState := {...s, roundc: s.roundc + 1};
+          false;
+        | '{' =>
+          bracketState := {...s, curlyo: s.curlyo + 1};
+          false;
+        | '}' =>
+          bracketState := {...s, curlyc: s.curlyc + 1};
+          false;
+        | '[' =>
+          bracketState := {...s, squareo: s.squareo + 1};
+          false;
+        | ']' =>
+          bracketState := {...s, squarec: s.squarec + 1};
+          false;
+        | ';' =>
+          if (s.roundo == s.roundc
+              && s.curlyo == s.curlyc
+              && s.squareo == s.squarec
+              && s.quote
+              land 1 == 0
+              && s.doubleQuote
+              land 1 == 0) {
+            bracketState := initialState;
+            true;
+          } else {
+            false;
+          }
+        | _ => false
         };
-        bracketState := {...s, doubleQuote: s.doubleQuote + 1};
-        false;
-      /* Normal brackets */
-      | '(' =>
-        bracketState := {...s, roundo: s.roundo + 1};
-        false;
-      | ')' =>
-        bracketState := {...s, roundc: s.roundc + 1};
-        false;
-      | '{' =>
-        bracketState := {...s, curlyo: s.curlyo + 1};
-        false;
-      | '}' =>
-        bracketState := {...s, curlyc: s.curlyc + 1};
-        false;
-      | '[' =>
-        bracketState := {...s, squareo: s.squareo + 1};
-        false;
-      | ']' =>
-        bracketState := {...s, squarec: s.squarec + 1};
-        false;
-      | ';' =>
-        if (s.roundo == s.roundc
-        && s.curlyo == s.curlyc
-        && s.squareo == s.squarec
-        && s.quote land 1 == 0
-        && s.doubleQuote land 1 == 0
-        ) {
-          bracketState := initialState;
-          true
-        }
-        else {
-          false
-        }
-      | _ => false
-      };
       prevChar := Some(char);
-      shouldTerminal
+      shouldTerminal;
     };
     loop;
   };

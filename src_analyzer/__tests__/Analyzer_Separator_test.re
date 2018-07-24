@@ -144,32 +144,37 @@ let make = Analyzer_Separator.exprSeperator;
 
 external _stringify : array(string) => Js.Json.t = "%identity";
 
-describe("Separate code block into expressions", () => {
-  open Expect;
-  open! Expect.Operators;
+Skip.describe(
+  "Separate code block into expressions",
+  () => {
+    open Expect;
+    open! Expect.Operators;
 
-  test("simple", () =>
-    expect(make(code) |> Array.of_list) == [|"let a = 1;", "let b = 2;"|]
-  );
-  test("complex", () =>
-    expect(make(code2) |> Array.of_list)
-    == [|
-         "let zero = (f, x) => x;",
-         "let succ = (n, f, x) => f(n(f, x));",
-         "let one = succ(zero);",
-         "let two = succ(succ(zero));",
-         "let add = (n1, n2, f, x) => n1(f, n2(f, x));",
-         {|let to_string = n => n(k => "S" ++ k, "0");|},
-         "to_string(add(succ(two), two));",
-       |]
-  );
-  test("bad indentation", () =>
-    expect(make(code3) |> Array.of_list) == [|"let a=1;", "let b=2;"|]
-  );
-  test("long function body", () =>
-    expect(make(code4 |> Js.Array.joinWith("\n")) |> Array.of_list) == code4
-  );
-  test("nested module", () =>
-    expect(make(code5) |> List.length) == 5
-  );
-});
+    test("simple", () =>
+      expect(make(code) |> Array.of_list)
+      == [|"let a = 1;", "let b = 2;"|]
+    );
+    test("complex", () =>
+      expect(make(code2) |> Array.of_list)
+      == [|
+           "let zero = (f, x) => x;",
+           "let succ = (n, f, x) => f(n(f, x));",
+           "let one = succ(zero);",
+           "let two = succ(succ(zero));",
+           "let add = (n1, n2, f, x) => n1(f, n2(f, x));",
+           {|let to_string = n => n(k => "S" ++ k, "0");|},
+           "to_string(add(succ(two), two));",
+         |]
+    );
+    test("bad indentation", () =>
+      expect(make(code3) |> Array.of_list) == [|"let a=1;", "let b=2;"|]
+    );
+    test("long function body", () =>
+      expect(make(code4 |> Js.Array.joinWith("\n")) |> Array.of_list)
+      == code4
+    );
+    test("nested module", () =>
+      expect(make(code5) |> List.length) == 5
+    );
+  },
+);

@@ -1,0 +1,113 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`valid 1 line 1`] = `
+Array [
+  Array [
+    "let a = 1;",
+    Array [
+      "let a: int = 1;",
+      undefined,
+      undefined,
+    ],
+    Array [
+      0,
+      10,
+    ],
+  ],
+]
+`;
+
+exports[`valid multiple directive in same line 1`] = `
+Array [
+  Array [
+    "let a = 1;",
+    Array [
+      "let a: int = 1;",
+      undefined,
+      undefined,
+    ],
+    Array [
+      0,
+      10,
+    ],
+  ],
+  Array [
+    "let b = a + a;",
+    Array [
+      "let b: int = 2;",
+      undefined,
+      undefined,
+    ],
+    Array [
+      11,
+      25,
+    ],
+  ],
+]
+`;
+
+exports[`valid multiple line 1`] = `
+Array [
+  Array [
+    "
+type tree = Leaf | Node(int, tree, tree);",
+    Array [
+      "type tree = Leaf | Node(int, tree, tree);",
+      undefined,
+      undefined,
+    ],
+    Array [
+      0,
+      42,
+    ],
+  ],
+  Array [
+    "let rec sum = (item) => {
+  switch (item) {
+  | Leaf => 0
+  | Node(value, left, right) => value + sum(left) + sum(right);
+  }
+};",
+    Array [
+      "let sum: tree => int = <fun>;",
+      undefined,
+      undefined,
+    ],
+    Array [
+      44,
+      172,
+    ],
+  ],
+  Array [
+    "let myTree =
+  Node(
+    1,
+    Node(2, Node(4, Leaf, Leaf), Node(6, Leaf, Leaf)),
+    Node(3, Node(5, Leaf, Leaf), Node(7, Leaf, Leaf))
+  );",
+    Array [
+      "let myTree: tree =
+  Node(1, Node(2, Node(4, Leaf, Leaf), Node(6, Leaf, Leaf)),
+   Node(3, Node(5, Leaf, Leaf), Node(7, Leaf, Leaf)));",
+      undefined,
+      undefined,
+    ],
+    Array [
+      174,
+      315,
+    ],
+  ],
+  Array [
+    "Printf.sprintf(\\"%i\\", sum(myTree));",
+    Array [
+      "- : string = \\"28\\"",
+      undefined,
+      undefined,
+    ],
+    Array [
+      317,
+      351,
+    ],
+  ],
+]
+`;

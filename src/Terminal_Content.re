@@ -71,7 +71,12 @@ let make = _children => {
     switch (action) {
     | UpdateState(state) => ReasonReact.Update(state)
     | InputUpdateValue(inputValue) =>
-      ReasonReact.Update({...state, inputValue, inputDisplay: inputValue, historyCursor: (-1)})
+      ReasonReact.Update({
+        ...state,
+        inputValue,
+        inputDisplay: inputValue,
+        historyCursor: (-1),
+      })
     | InputHistory(amount) =>
       let cursor = state.historyCursor + amount;
       let length = state.history |. Belt.List.length;
@@ -79,12 +84,20 @@ let make = _children => {
       if (cursor >= length - 1) {
         ReasonReact.NoUpdate;
       } else if (cursor < (-1)) {
-        ReasonReact.Update({...state, historyCursor: (-1), inputDisplay: state.inputValue});
+        ReasonReact.Update({
+          ...state,
+          historyCursor: (-1),
+          inputDisplay: state.inputValue,
+        });
       } else {
         switch (state.history |. Belt.List.get(cursor)) {
         | None => ReasonReact.NoUpdate
         | Some((inputDisplay, _syntax)) =>
-          ReasonReact.Update({...state, inputDisplay, historyCursor: cursor})
+          ReasonReact.Update({
+            ...state,
+            inputDisplay,
+            historyCursor: cursor,
+          })
         };
       };
     | InputEnter =>
@@ -103,7 +116,10 @@ let make = _children => {
                        ...state,
                        inputValue: "",
                        inputDisplay: "",
-                       history: [(inputValue, state.currentSyntax), ...state.history],
+                       history: [
+                         (inputValue, state.currentSyntax),
+                         ...state.history,
+                       ],
                        displayStack:
                          Belt.Array.concat(
                            state.displayStack,
@@ -131,7 +147,10 @@ let make = _children => {
                        inputValue: "",
                        inputDisplay: "",
                        currentSyntax: Ml,
-                       history: [(inputValue, state.currentSyntax), ...state.history],
+                       history: [
+                         (inputValue, state.currentSyntax),
+                         ...state.history,
+                       ],
                        displayStack:
                          Belt.Array.concat(
                            state.displayStack,
@@ -159,7 +178,10 @@ let make = _children => {
                        inputValue: "",
                        inputDisplay: "",
                        currentSyntax: Reason,
-                       history: [(inputValue, state.currentSyntax), ...state.history],
+                       history: [
+                         (inputValue, state.currentSyntax),
+                         ...state.history,
+                       ],
                        displayStack:
                          Belt.Array.concat(
                            state.displayStack,
@@ -183,13 +205,24 @@ let make = _children => {
                 Reason_Evaluator.execute(inputValue)
                 |> then_((result: Reason_Evaluator.executeResult) =>
                      switch (result.stderr) {
-                     | None => CodeEvaluated(inputValue, result) |. send |. resolve
+                     | None =>
+                       CodeEvaluated(inputValue, result) |. send |. resolve
                      | Some(stderr) =>
-                       Reason_Evaluator.parseError(~content=inputValue, ~error=stderr)
-                       |> then_(stderr => {
-                            let result = {...result, stderr: Some(stderr)};
-                            CodeEvaluated(inputValue, result) |. send |. resolve;
-                          })
+                       Reason_Evaluator.parseError(
+                         ~content=inputValue,
+                         ~error=stderr,
+                       )
+                       |> then_(
+                            stderr => {
+                              let result = {
+                                ...result,
+                                stderr: Some(stderr),
+                              };
+                              CodeEvaluated(inputValue, result)
+                              |. send
+                              |. resolve;
+                            },
+                          )
                        |> handleError
                      }
                    )
@@ -209,7 +242,10 @@ let make = _children => {
           Belt.Array.concat(
             state.displayStack,
             [|
-              Input((inputValue |> displayInput(state.currentSyntax), state.currentSyntax)),
+              Input((
+                inputValue |> displayInput(state.currentSyntax),
+                state.currentSyntax,
+              )),
               Result(result),
             |],
           ),
@@ -222,27 +258,56 @@ let make = _children => {
           <div className=stack>
             (
               state.displayStack
-              |. Belt.Array.mapWithIndexU((. index, line) => {
-                   let key = index |. string_of_int;
-                   let simpleLine = ((className, line)) =>
-                     <div ?className key> (line |. str) </div>;
-                   switch (line) {
-                   | Welcome(line) => (Some(lineWelcome), line) |. simpleLine
-                   | Input((line, syntax)) =>
-                     switch (syntax) {
-                     | Reason =>
-                       <div key className=lineInputRe dangerouslySetInnerHTML={"__html": line} />
-                     | Ml =>
-                       <div key className=lineInputMl dangerouslySetInnerHTML={"__html": line} />
-                     }
-                   | Result({stderr, stdout, evaluate}) =>
-                     <div key>
-                       (stderr =>> (stderr => <div dangerouslySetInnerHTML={"__html": stderr} />))
-                       (stdout =>> (stdout => <div> (stdout |. str) </div>))
-                       (evaluate =>> (evaluate => <div className="cyan"> (evaluate |. str) </div>))
-                     </div>
-                   };
-                 })
+              |. Belt.Array.mapWithIndexU(
+                   (. index, line) => {
+                     let key = index |. string_of_int;
+                     let simpleLine = ((className, line)) =>
+                       <div ?className key> (line |. str) </div>;
+                     switch (line) {
+                     | Welcome(line) =>
+                       (Some(lineWelcome), line) |. simpleLine
+                     | Input((line, syntax)) =>
+                       switch (syntax) {
+                       | Reason =>
+                         <div
+                           key
+                           className=lineInputRe
+                           dangerouslySetInnerHTML={"__html": line}
+                         />
+                       | Ml =>
+                         <div
+                           key
+                           className=lineInputMl
+                           dangerouslySetInnerHTML={"__html": line}
+                         />
+                       }
+                     | Result({stderr, stdout, evaluate}) =>
+                       <div key>
+                         (
+                           stderr
+                           =>> (
+                             stderr =>
+                               <div
+                                 dangerouslySetInnerHTML={"__html": stderr}
+                               />
+                           )
+                         )
+                         (
+                           stdout =>> (stdout => <div> (stdout |. str) </div>)
+                         )
+                         (
+                           evaluate
+                           =>> (
+                             evaluate =>
+                               <div className="cyan">
+                                 (evaluate |. str)
+                               </div>
+                           )
+                         )
+                       </div>
+                     };
+                   },
+                 )
               |. ReasonReact.array
             )
           </div>
@@ -264,7 +329,9 @@ let make = _children => {
             minRows=10
             className=inputC
             autoFocus=true
-            onChange=(event => event |. valueFromEvent |. InputUpdateValue |. send)
+            onChange=(
+              event => event |. valueFromEvent |. InputUpdateValue |. send
+            )
             onKeyDown=(
               event => {
                 let keyName = event |. ReactEventRe.Keyboard.key;
@@ -275,7 +342,8 @@ let make = _children => {
                   if (! shiftKey) {
                     let shouldEvaluate =
                       switch (state.currentSyntax) {
-                      | Reason => Analyzer.shouldEvaluateRe(state.inputValue)
+                      | Reason =>
+                        Analyzer.shouldEvaluateRe(state.inputValue)
                       | Ml => Analyzer.shouldEvaluateMl(state.inputValue)
                       };
                     if (shouldEvaluate) {

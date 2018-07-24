@@ -26,9 +26,10 @@
     "reason-react",
     "bs-css",
     "@glennsl/bs-json",
-    "@thangngoc89/ocaml-re"
+    "@thangngoc89/ocaml-re",
+    "@glennsl/bs-jest"
   ],
-  "bs-dev-dependencies": ["@glennsl/bs-jest"],
+  // "bs-dev-dependencies": ["@glennsl/bs-jest"],
   "refmt": 3,
   "warnings": {
     "error": "+5"
