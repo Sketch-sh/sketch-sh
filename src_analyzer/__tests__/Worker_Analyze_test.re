@@ -8,7 +8,7 @@ let tap = a => {
   a;
 };
 
-let exe = code => Analyze.execute(code) |> Array.of_list;
+let exe = code => Analyze.execute(. code) |> Array.of_list;
 
 let sneakyModule = {|module BracketCounting = {
   type t = {
@@ -117,8 +117,7 @@ describe(
     test("multiple line", () =>
       expect(
         exe(
-          {|
-type tree = Leaf | Node(int, tree, tree);
+          {|type tree = Leaf | Node(int, tree, tree);
 
 let rec sum = (item) => {
   switch (item) {
@@ -134,8 +133,7 @@ let myTree =
     Node(3, Node(5, Leaf, Leaf), Node(7, Leaf, Leaf))
   );
 
-Printf.sprintf("%i", sum(myTree));
-      |},
+Printf.sprintf("%i", sum(myTree));|},
         ),
       )
       |> toMatchSnapshot

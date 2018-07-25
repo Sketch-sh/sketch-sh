@@ -1,3 +1,5 @@
+/* open Utils; */
+
 module Make = (ESig: Worker_Evaluator.EvaluatorSig) => {
   module Evaluator = Worker_Evaluator.Make(ESig);
   open Worker_Types;
@@ -28,15 +30,42 @@ module Make = (ESig: Worker_Evaluator.EvaluatorSig) => {
     startPos: int,
     shouldSkip: bool,
     result: list(wholeProgramExecuteResult),
-    lineNum: int,
-    lineStart: int,
   };
 
+  /*
+    /* Normal */
+    let offset = 25;
+    let lineStartOffsets =
+       [0, 10, 20, 30];
+                   ^^ 30 > 25, index[30] = 4 ==> index = 3
+
+    /* Last line */
+    let offset = 40;
+    let lineStartOffsets =
+       [0, 10, 20, 30];
+                       ^^ find = -1 => last line, index = 4;
+   */
+  let toLoc = (lineStartOffsets, offset) => {
+    let find =
+      lineStartOffsets |> Js.Array.findIndex(value => value >= offset);
+
+    let index =
+      switch (find) {
+      | 0 => 0
+      | (-1) => Js.Array.length(lineStartOffsets) - 1
+      | index => index - 1
+      };
+    let lineStart = lineStartOffsets[index];
+    {line: index, col: offset - lineStart, offset};
+  };
   let parseCommand = (~f, code) => {
     let length = String.length(code);
 
+    let lineStartOffsets = [|0|];
+    let toLoc = toLoc(lineStartOffsets);
+
     let rec loop = (i, state) => {
-      let {startPos, shouldSkip, result, lineNum, lineStart} = state;
+      let {startPos, shouldSkip, result} = state;
 
       if (i < length) {
         switch (code.[i]) {
@@ -46,17 +75,10 @@ module Make = (ESig: Worker_Evaluator.EvaluatorSig) => {
             loop(i + 1, {...state, startPos: startPos + 1}) :
             loop(i + 1, state)
         | '\n' =>
+          lineStartOffsets |> Js.Array.push(i + 1) |> ignore;
           shouldSkip ?
-            loop(
-              i + 1,
-              {
-                ...state,
-                startPos: startPos + 1,
-                lineNum: lineNum + 1,
-                lineStart: i + 1,
-              },
-            ) :
-            loop(i + 1, {...state, lineNum: lineNum + 1, lineStart: i + 1})
+            loop(i + 1, {...state, startPos: startPos + 1}) :
+            loop(i + 1, state);
 
         | ';' =>
           let buffer =
@@ -71,11 +93,13 @@ module Make = (ESig: Worker_Evaluator.EvaluatorSig) => {
                 startPos: i + 1,
                 shouldSkip: true,
                 result: [
-                  {buffer, executeResult, pos: (startPos, i + 1)},
+                  {
+                    buffer,
+                    executeResult,
+                    pos: (toLoc(startPos), toLoc(i + 1)),
+                  },
                   ...result,
                 ],
-                lineNum,
-                lineStart,
               },
             );
         | _ => loop(i + 1, {...state, shouldSkip: false})
@@ -93,7 +117,11 @@ module Make = (ESig: Worker_Evaluator.EvaluatorSig) => {
               Js.String.substring(~from=startPos, ~to_=length + 1, code);
             let (_, executeResult) = f(buffer);
             [
-              {buffer, executeResult, pos: (startPos, length + 1)},
+              {
+                buffer,
+                executeResult,
+                pos: (toLoc(startPos), toLoc(length + 1)),
+              },
               ...result,
             ];
           } else {
@@ -102,17 +130,8 @@ module Make = (ESig: Worker_Evaluator.EvaluatorSig) => {
         result |> List.rev;
       };
     };
-    loop(
-      0,
-      {
-        startPos: 0,
-        shouldSkip: false,
-        result: [],
-        lineNum: 0,
-        lineStart: 0,
-      },
-    );
+    loop(0, {startPos: 0, shouldSkip: true, result: []});
   };
 
-  let execute = parseCommand(~f=tryExecute);
+  let execute = (. code) => parseCommand(~f=tryExecute, code);
 };

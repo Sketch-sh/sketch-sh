@@ -28,3 +28,23 @@ let splitOnChar = (sep, s) => {
   let tl = r.contents;
   [String.sub(s, 0, j.contents), ...tl];
 };
+
+let listFindOpt = (p, l) =>
+  try (Some(List.find(p, l))) {
+  | Not_found => None
+  };
+
+let countLine = s => {
+  let length = String.length(s);
+
+  let rec countLine' = (i, result) =>
+    if (i < length) {
+      switch (s.[i]) {
+      | '\n' => countLine'(i + 1, result + 1)
+      | _ => countLine'(i + 1, result)
+      };
+    } else {
+      result;
+    };
+  countLine'(0, 0);
+};

@@ -10,6 +10,6 @@ module Worker = {
 module Comlink = {
   type t;
   [@bs.module] external comlink : t = "comlink";
-  [@bs.send] external proxy : (t, Worker.t) => 'a = "proxy";
-  [@bs.send] external expose : (t, 'a, Worker.self) => unit = "proxy";
+  [@bs.send] external proxy : (t, Worker.t) => 'a = "";
+  [@bs.send] external expose : (t, 'a, Worker.self) => unit = "";
 };

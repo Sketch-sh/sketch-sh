@@ -3,8 +3,8 @@
 .CodeMirror,
 .source-editor .prerender,
 .source-viewer .prerender {
-  font-size: 15px;
-  font-family: "Ubuntu Mono", monospace;
+  font-size: 16px;
+  font-family: "Fira Code", "Ubuntu Mono", monospace;
   font-weight: 400;
   line-height: 1.4375;
   background: 0 0;
@@ -85,7 +85,7 @@
   border-width: 1px 1px 1px 0;
 }
 .cm-s-runkit-light.CodeMirror {
-  font-family: "Ubuntu Mono", monospace;
+  font-family: "Fira Code", "Ubuntu Mono", monospace;
   font-weight: 400;
 }
 .cm-s-runkit-light.CodeMirror span.CodeMirror-matchingbracket,
@@ -255,35 +255,5 @@
 }
 
 /* /////////////// Additions */
-
-.syntax-error__wrapper {
-  background-color: #fdeeee;
-  color: #eb5656;
-  overflow: hidden;
-}
-.syntax-error__wrapper-lg {
-  position: relative;
-  left: 28px;
-  width: calc(100% - 30px);
-  height: 2em;
-  display: flex;
-  align-items: center;
-  margin-left: -8px;
-}
-.syntax-error__icon {
-  display: inline-block;
-  background-color: #eb5656;
-  margin-right: 1px;
-  height: 100%;
-}
-.syntax-error__icon-1 {
-  width: 6px;
-}
-.syntax-error__icon-2 {
-  width: 2px;
-}
-.syntax-error__content {
-  padding-left: 6px;
-}
 
 /* \\\\\\\\\\\\\\\ Additions */

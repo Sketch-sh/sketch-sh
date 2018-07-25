@@ -10,8 +10,16 @@ Array [
       undefined,
     ],
     Array [
-      0,
-      10,
+      Array [
+        0,
+        0,
+        0,
+      ],
+      Array [
+        0,
+        10,
+        10,
+      ],
     ],
   ],
 ]
@@ -27,8 +35,16 @@ Array [
       undefined,
     ],
     Array [
-      0,
-      10,
+      Array [
+        0,
+        0,
+        0,
+      ],
+      Array [
+        0,
+        10,
+        10,
+      ],
     ],
   ],
   Array [
@@ -39,8 +55,16 @@ Array [
       undefined,
     ],
     Array [
-      11,
-      25,
+      Array [
+        0,
+        11,
+        11,
+      ],
+      Array [
+        0,
+        25,
+        25,
+      ],
     ],
   ],
 ]
@@ -49,16 +73,23 @@ Array [
 exports[`valid multiple line 1`] = `
 Array [
   Array [
-    "
-type tree = Leaf | Node(int, tree, tree);",
+    "type tree = Leaf | Node(int, tree, tree);",
     Array [
       "type tree = Leaf | Node(int, tree, tree);",
       undefined,
       undefined,
     ],
     Array [
-      0,
-      42,
+      Array [
+        0,
+        0,
+        0,
+      ],
+      Array [
+        0,
+        41,
+        41,
+      ],
     ],
   ],
   Array [
@@ -74,8 +105,16 @@ type tree = Leaf | Node(int, tree, tree);",
       undefined,
     ],
     Array [
-      44,
-      172,
+      Array [
+        1,
+        1,
+        43,
+      ],
+      Array [
+        7,
+        2,
+        171,
+      ],
     ],
   ],
   Array [
@@ -93,8 +132,16 @@ type tree = Leaf | Node(int, tree, tree);",
       undefined,
     ],
     Array [
-      174,
-      315,
+      Array [
+        8,
+        1,
+        173,
+      ],
+      Array [
+        14,
+        4,
+        314,
+      ],
     ],
   ],
   Array [
@@ -105,8 +152,16 @@ type tree = Leaf | Node(int, tree, tree);",
       undefined,
     ],
     Array [
-      317,
-      351,
+      Array [
+        15,
+        1,
+        316,
+      ],
+      Array [
+        16,
+        34,
+        350,
+      ],
     ],
   ],
 ]

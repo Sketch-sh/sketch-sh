@@ -34,7 +34,8 @@ const base = {
   module: {
     rules: [
       {
-        test: /\.worker\.js$/,
+        test: file =>
+          file.endsWith(".worker.js") || file.endsWith("Worker_Index.bs.js"),
         use: { loader: "worker-loader" },
       },
       {
