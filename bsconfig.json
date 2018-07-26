@@ -19,6 +19,7 @@
       "in-source": true
     }
   ],
+  "bsc-flags": ["-bs-g"],
   "ppx-flags": ["./ppx_bs_css\\ --as-ppx"],
   "suffix": ".bs.js",
   "namespace": true,

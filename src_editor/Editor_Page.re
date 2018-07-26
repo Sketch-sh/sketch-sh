@@ -1,3 +1,4 @@
+[%%debugger.chrome];
 open Worker_Types;
 open Editor_CodeBlockTypes;
 
