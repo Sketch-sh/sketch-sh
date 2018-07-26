@@ -23,7 +23,7 @@ body {
   overflow: hidden;
   position: relative;
   left: 28px;
-  width: calc(100% - 30px);
+  width: calc(100% - 26px);
   min-height: 2em;
   margin-left: -8px;
   border-left: 6px solid #eb5656;

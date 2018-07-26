@@ -79,8 +79,7 @@ module EditorConfiguration = {
     dragDrop: bool,
     [@bs.optional] /** When given , this will be called when the editor is handling a dragenter , dragover , or drop event.
         It will be passed the editor instance and the event object as arguments.
-        The callback can choose to handle the event itself , in which case it should return true to indicate that CodeMirror should not do anything further. */ /* TODO */ /* onDragEvent?: (instance: CodeMirror.Editor, event: Event) => boolean; */
-                                                                    /** This provides a rather low - level hook into CodeMirror's key handling.
+        The callback can choose to handle the event itself , in which case it should return true to indicate that CodeMirror should not do anything further. */ /* TODO */ /* onDragEvent?: (instance: CodeMirror.Editor, event: Event) => boolean; */ /** This provides a rather low - level hook into CodeMirror's key handling.
         If provided, this function will be called on every keydown, keyup, and keypress event that CodeMirror captures.
         It will be passed two arguments, the editor instance and the key event.
         This key event is pretty much the raw key event, except that a stop() method is always added to it.
@@ -120,7 +119,7 @@ module EditorConfiguration = {
     viewportMargin: float,
     [@bs.optional] /** Optional lint configuration to be used in conjunction with CodeMirror's linter addon. */ /* TODO */ /* lint?: boolean | LintOptions; */ /** Optional value to be used in conjunction with CodeMirror’s placeholder add-on. */
     placeholder: string,
-    [@bs.optinal]
+    [@bs.optional]
     matchBrackets: bool,
   };
 
@@ -152,13 +151,13 @@ module LineWidget = {
   external changed : t => unit = "";
   [@bs.deriving abstract]
   type options = {
-    [@bs.optional] /** Whether the widget should cover the gutter. */
+    /** Whether the widget should cover the gutter. */
     coverGutter: bool,
-    [@bs.optional] /** Whether the widget should stay fixed in the face of horizontal scrolling. */
+    /** Whether the widget should stay fixed in the face of horizontal scrolling. */
     noHScroll: bool,
-    [@bs.optional] /** Causes the widget to be placed above instead of below the text of the line. */
+    /** Causes the widget to be placed above instead of below the text of the line. */
     above: bool,
-    [@bs.optional] /** When true, will cause the widget to be rendered even if the line it is associated with is hidden. */
+    /** When true, will cause the widget to be rendered even if the line it is associated with is hidden. */
     showIfHidden: bool,
   };
 };
@@ -199,7 +198,7 @@ module Editor = {
       ~element: Dom.element,
       ~options: LineWidget.options
     ) =>
-    unit =
+    LineWidget.t =
     "";
 
   [@bs.send]

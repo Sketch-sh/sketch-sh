@@ -16,7 +16,7 @@ let make =
           ~lineNumbers=true,
           ~viewportMargin=infinity,
           ~matchBrackets=true,
-          ~tabSize=2,
+          ~lineWrapping=true,
           ~firstLineNumber,
           ~extraKeys={
             let key = Js.Dict.empty();
