@@ -1,4 +1,8 @@
 let str = ReasonReact.string;
+let tapLog = a => {
+  Js.log(a);
+  a;
+};
 
 let valueFromEvent = evt : string => {
   let obj = evt |> ReactEventRe.Form.target |> ReactDOMRe.domElementToObj;

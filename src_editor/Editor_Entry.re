@@ -20,7 +20,7 @@ let blocks =
              bc_lines: lines,
              bc_widgets: [||],
            });
-         (Belt.Array.concat(acc, [|block|]), lines + firstLineNumber);
+         (Belt.Array.concat(acc, [|block|]), lines + firstLineNumber + 1);
        },
      )
   |. (((acc, _firstLineNumber)) => acc);

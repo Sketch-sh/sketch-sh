@@ -34,7 +34,7 @@
     "@babel/preset-react": "^7.0.0-beta.54",
     "@glennsl/bs-jest": "^0.4.2",
     "babel-loader": "^8.0.0-beta.4",
-    "bs-platform": "^4.0.0",
+    "bs-platform": "^4.0.1",
     "css-loader": "^1.0.0",
     "html-webpack-plugin": "^3.0.6",
     "react-hot-loader": "^3.1.3",

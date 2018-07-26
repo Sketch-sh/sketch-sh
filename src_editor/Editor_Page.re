@@ -52,11 +52,13 @@ module CodeBlock = {
     );
 };
 
+open Editor_CodeBlockTypes;
+
 type bcode = {
   bc_value: string,
   bc_firstLineNumber: int,
   bc_lines: int,
-  bc_widgets: array(CodeBlock.lineWidget),
+  bc_widgets: array(Widget.t),
 };
 
 type block =
@@ -68,7 +70,7 @@ type state = {blocks: array(block)};
 type action =
   | UpdateBlockValue(int, string)
   | ExecuteBlock(int)
-  | Block_AddWidgets(int, array(CodeBlock.lineWidget));
+  | Block_AddWidgets(int, array(Widget.t));
 
 let component = ReasonReact.reducerComponent("Editor_Page");
 
@@ -118,34 +120,25 @@ let make = (~blocks: array(block), _children) => {
                                   let evaluate =
                                     executeResult.evaluate
                                     |. Belt.Option.map(content =>
-                                         CodeBlock.lineWidget(
-                                           ~typ=Lw_Value,
-                                           ~line,
-                                           ~content,
-                                         )
+                                         Widget.Lw_Value({line, content})
                                        );
 
                                   let stdout =
                                     executeResult.stdout
                                     |. Belt.Option.map(content =>
-                                         CodeBlock.lineWidget(
-                                           ~typ=Lw_Stdout,
-                                           ~line,
-                                           ~content,
-                                         )
+                                         Widget.Lw_Stdout({line, content})
                                        );
 
                                   let stderr =
                                     executeResult.stderr
                                     |. Belt.Option.map(content =>
-                                         CodeBlock.lineWidget(
-                                           ~typ=Lw_Error,
-                                           ~line,
-                                           ~content=
+                                         Widget.Lw_Error({
+                                           line,
+                                           content:
                                              content
                                              ++ "\nDebug information: "
                                              ++ pos_of_string(pos),
-                                         )
+                                         })
                                        );
 
                                   let finalWidgets =
@@ -225,7 +218,7 @@ let make = (~blocks: array(block), _children) => {
              | B_Code({bc_value, bc_widgets, bc_firstLineNumber}) =>
                <div key=(index |> string_of_int) className="cell__container">
                  <div className="source-editor">
-                   <CodeBlock
+                   <Editor_CodeBlock
                      value=bc_value
                      onChange=(
                        newValue => send(UpdateBlockValue(index, newValue))
