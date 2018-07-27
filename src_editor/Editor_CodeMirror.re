@@ -1,8 +1,8 @@
 %bs.raw
 {|
 /* import "codemirror/mode/mllike/mllike" */
+import "./reason-mode.js"
 import "codemirror/addon/edit/matchbrackets"
-import "codemirror/mode/rust/rust"
 import "codemirror/lib/codemirror.css"
 
 import "./cm-theme.css"

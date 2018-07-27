@@ -11,7 +11,7 @@ let make =
       widgets
       options=(
         CodeMirror.EditorConfiguration.make(
-          ~mode="rust",
+          ~mode="reason",
           ~theme="runkit-light",
           ~lineNumbers=true,
           ~viewportMargin=infinity,

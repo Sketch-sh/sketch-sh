@@ -7,7 +7,7 @@ let random_gaussian = () =>
   +. sqrt((-2.) *. log(Random.float(1.)))
   *. cos(2. *. pi *. Random.float(1.));
 
-for (i in 0 to 40) {
+for (i in 0 to 2) {
   random_gaussian() |> string_of_float |> print_endline;
 };|};
 
