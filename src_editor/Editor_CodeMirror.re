@@ -10,8 +10,6 @@ import "./source-editor.css"
 import "./app.css" /* <-- Important, no semi */
 |};
 
-[%%debugger.chrome];
-
 /* open Utils; */
 
 type state = {
