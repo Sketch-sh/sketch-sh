@@ -5,7 +5,10 @@ type js_executeResult = {
   stdout: string,
 };
 
-module type EvaluatorSig = {let js_execute: string => js_executeResult;};
+module type EvaluatorSig = {
+  let js_execute: string => js_executeResult;
+  let js_reset: unit => unit;
+};
 
 module Make = (B: EvaluatorSig) => {
   open Worker_Types;
@@ -14,6 +17,8 @@ module Make = (B: EvaluatorSig) => {
     fun
     | "" => None
     | str => Some(str);
+
+  let reset = B.js_reset;
 
   let execute = code => {
     let result = B.js_execute(code);
