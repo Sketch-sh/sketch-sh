@@ -166,13 +166,13 @@ let make =
            (editor, diff) => {
              Js.log(diff);
              let currentEditorValue = editor |. CodeMirror.Editor.getValue();
-
-             if (currentEditorValue != value) {
-               switch (onChange) {
-               | None => ()
-               | Some(onChange) => onChange(currentEditorValue)
-               };
+             /* TODO: Figure out why this behaves differently from JS version */
+             /* if (currentEditorValue != value) { */
+             switch (onChange) {
+             | None => ()
+             | Some(onChange) => onChange(currentEditorValue)
              };
+             /* }; */
            },
          );
       state.editor := Some(editor);
