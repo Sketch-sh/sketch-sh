@@ -15,7 +15,7 @@ type js_executeResult = {
 [@bs.deriving abstract]
 type rtop = {
   execute:
-    (. string) =>
+    (. bool, string) =>
     Js.Promise.t(list(Worker_Types.wholeProgramExecuteResult)),
   /* reset: (. unit) => Js.Promise.t(unit),
      reasonSyntax: (. unit) => Js.Promise.t(unit),

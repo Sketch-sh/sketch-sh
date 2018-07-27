@@ -54,7 +54,7 @@ let make = (~blocks: array(block), _children) => {
             (
               self =>
                 Js.Promise.(
-                  Editor_Worker.execute(. bc_value)
+                  Editor_Worker.execute(. true, bc_value)
                   |> then_(
                        result => {
                          let widgets =

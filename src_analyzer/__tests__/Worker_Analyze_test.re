@@ -8,7 +8,7 @@ let tap = a => {
   a;
 };
 
-let exe = code => Analyze.execute(. code) |> Array.of_list;
+let exe = code => Analyze.execute(. true, code) |> Array.of_list;
 
 let sneakyModule = {|module BracketCounting = {
   type t = {

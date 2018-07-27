@@ -133,5 +133,11 @@ module Make = (ESig: Worker_Evaluator.EvaluatorSig) => {
     loop(0, {startPos: 0, shouldSkip: true, result: []});
   };
 
-  let execute = (. code) => parseCommand(~f=tryExecute, code);
+  let execute =
+    (. reset, code) => {
+      if (reset) {
+        Evaluator.reset();
+      };
+      parseCommand(~f=tryExecute, code);
+    };
 };
