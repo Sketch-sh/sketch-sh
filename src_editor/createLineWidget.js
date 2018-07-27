@@ -12,10 +12,7 @@ const createLintWidget = (modifier, html) => {
   return widget;
 };
 
-export const createErrorWidget = html => {
-  console.log("generate modifier error");
-  return createLintWidget("error", html);
-};
+export const createErrorWidget = html => createLintWidget("error", html);
 export const createWarningWidget = html => createLintWidget("warning", html);
 
 export const createValueWidget = text => {

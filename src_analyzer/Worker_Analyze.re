@@ -137,8 +137,39 @@ module Make = (ESig: Worker_Evaluator.EvaluatorSig) => {
     stderr
     |. Belt.Option.map(stderr =>
          stderr
-         |. tapLog
          |. Worker_ParseLocation.parse
+         /* TODO: Investigating this
+              This is a hack.
+              Toplevel won't stop evaluating if it encounters an error
+              This will simply remove all warnings/errors after enountering
+              an error
+            */
+         |. Belt.Array.reduce(
+              ([], false), ((acc, hasError), error: Error.t) =>
+              if (hasError) {
+                (acc, hasError);
+              } else {
+                switch (error) {
+                | Err_Unknown(string) => (
+                    [Error.Err_Unknown(string), ...acc],
+                    false,
+                  )
+                | Err_Warning(content) => (
+                    [Err_Warning(content), ...acc],
+                    false,
+                  )
+                | Err_Error(content) => (
+                    [Err_Error(content), ...acc],
+                    true,
+                  )
+                };
+              }
+            )
+         /* TODO:
+            Return hasError to stop executing the next code block
+            */
+         |. (((acc, hasError)) => acc)
+         |. Belt.List.toArray
          |. Belt.Array.map(
               (error: Error.t) => {
                 let correctLoc = (content: Error.content) => {
