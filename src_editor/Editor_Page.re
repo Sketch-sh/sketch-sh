@@ -1,6 +1,7 @@
 [%%debugger.chrome];
 open Worker_Types;
 open Editor_CodeBlockTypes;
+open Utils;
 
 type bcode = {
   bc_value: string,
@@ -62,46 +63,92 @@ let make = (~blocks: array(block), _children) => {
                            |. Belt.List.reduceU(
                                 [||],
                                 (. acc, exeResult) => {
-                                  let {buffer: _, executeResult, pos} = exeResult;
-                                  let (_, {line}) = pos;
+                                  let {
+                                    fn_buffer: _,
+                                    fn_result: result,
+                                    fn_pos,
+                                  } = exeResult;
+                                  let (_, {line}) = fn_pos;
 
                                   let evaluate =
-                                    executeResult.evaluate
+                                    result.fn_evaluate
                                     |. Belt.Option.map(content =>
                                          Widget.Lw_Value({line, content})
                                        );
 
                                   let stdout =
-                                    executeResult.stdout
+                                    result.fn_stdout
                                     |. Belt.Option.map(content =>
                                          Widget.Lw_Stdout({line, content})
                                        );
 
                                   let stderr =
-                                    executeResult.stderr
-                                    |. Belt.Option.map(content =>
-                                         Widget.Lw_Error({
-                                           line,
-                                           content:
-                                             content
-                                             ++ "\nDebug information: "
-                                             ++ pos_of_string(pos),
-                                         })
-                                       );
+                                    switch (result.fn_stderr) {
+                                    | None => [||]
+                                    | Some(errors) =>
+                                      errors
+                                      |. Belt.Array.map(
+                                           error => {
+                                             let toWidgetContent =
+                                                 (content: Error.content) => {
+                                               let (
+                                                 {
+                                                   lno_line,
+                                                   lno_col: colStart,
+                                                 },
+                                                 {
+                                                   lno_line: _,
+                                                   lno_col: colEnd,
+                                                 },
+                                               ) =
+                                                 content.pos;
+                                               {
+                                                 Editor_CodeBlockTypes.Widget.line: lno_line,
+                                                 content:
+                                                   renderErrorIndicator(
+                                                     colStart,
+                                                     colEnd,
+                                                     content.content,
+                                                   ),
+                                               };
+                                             };
+
+                                             switch (error) {
+                                             | Err_Warning(content) =>
+                                               Js.log("warnng");
+                                               Widget.Lw_Warning(
+                                                 toWidgetContent(content),
+                                               );
+                                             | Err_Error(content) =>
+                                               Widget.Lw_Error(
+                                                 toWidgetContent(content),
+                                               )
+                                             | Err_Unknown(content) =>
+                                               Widget.Lw_Error({
+                                                 line,
+                                                 content,
+                                               })
+                                             };
+                                           },
+                                         )
+                                    };
 
                                   let finalWidgets =
-                                    [stdout, evaluate, stderr]
-                                    |. Belt.List.reduceU(
-                                         [], (. acc2, lineWidget) =>
+                                    [|stdout, evaluate|]
+                                    |. Belt.Array.reduceU(
+                                         [||], (. acc2, lineWidget) =>
                                          switch (lineWidget) {
                                          | None => acc2
-                                         | Some(lw) => [lw, ...acc2]
+                                         | Some(lw) =>
+                                           Belt.Array.concat(acc2, [|lw|])
                                          }
                                        );
-                                  Belt.Array.concat(
+
+                                  Belt.Array.concatMany([|
                                     acc,
-                                    finalWidgets |. Belt.List.toArray,
-                                  );
+                                    stderr,
+                                    finalWidgets,
+                                  |]);
                                 },
                               );
                          resolve(

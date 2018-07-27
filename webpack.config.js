@@ -42,22 +42,6 @@ const base = {
         test: /\.css$/,
         use: ["style-loader", "css-loader"],
       },
-      {
-        test: file => file.endsWith(".js") && !file.endsWith(".bs.js"),
-        include: /src_editor/,
-        exclude: /node_modules/,
-        use: {
-          loader: "babel-loader",
-          options: {
-            presets: [
-              ["@babel/preset-env", { modules: false }],
-              "@babel/preset-react",
-            ],
-            plugins: ["react-hot-loader/babel"],
-            babelrc: false,
-          },
-        },
-      },
     ],
   },
 };

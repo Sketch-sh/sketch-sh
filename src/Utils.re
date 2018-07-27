@@ -52,3 +52,17 @@ let countLine = s => {
     };
   countLine'(0, 0);
 };
+let min = (min, value) => value < min ? min : value;
+
+let renderErrorIndicator = (colStart, colEnd, content) =>
+  String.make(colStart, ' ')
+  ++ String.make(
+       /* Sometime it reports characters 1-1 */
+       switch (colEnd - colStart) {
+       | 0 => 1
+       | a => a
+       },
+       '^',
+     )
+  ++ "\n"
+  ++ content;

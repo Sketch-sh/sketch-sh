@@ -11,6 +11,12 @@ for (i in 0 to 2) {
   random_gaussian() |> string_of_float |> print_endline;
 };|};
 
+let code3 = {|type say = | Hello | Bye;
+fun
+| Hello => ()
+| Bye => ()
+| _ => ();|};
+
 let code2 = {|type tree = Leaf | Node(int, tree, tree);
 
 let rec sum = (item) => {

@@ -16,7 +16,7 @@ type js_executeResult = {
 type rtop = {
   execute:
     (. bool, string) =>
-    Js.Promise.t(list(Worker_Types.wholeProgramExecuteResult)),
+    Js.Promise.t(list(Worker_Types.final_programEvaluationResult)),
   /* reset: (. unit) => Js.Promise.t(unit),
      reasonSyntax: (. unit) => Js.Promise.t(unit),
      mlSyntax: (. unit) => Js.Promise.t(unit),

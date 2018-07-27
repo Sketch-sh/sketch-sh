@@ -1,0 +1,51 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`valid multi 1`] = `
+Array [
+  Array [
+    "Warning 11: this match case is unused.",
+    5,
+    Array [
+      2,
+      5,
+    ],
+  ],
+  Array [
+    "Error: Syntax error",
+    3,
+    Array [
+      0,
+      3,
+    ],
+  ],
+  Array [
+    "Error: Unbound value pi",
+    3,
+    Array [
+      15,
+      17,
+    ],
+  ],
+  Array [
+    "Error: Unbound value random_gaussian",
+    3,
+    Array [
+      2,
+      17,
+    ],
+  ],
+]
+`;
+
+exports[`valid single 1`] = `
+Array [
+  Array [
+    "Warning 11: this match case is unused.",
+    5,
+    Array [
+      2,
+      5,
+    ],
+  ],
+]
+`;

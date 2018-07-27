@@ -2,7 +2,11 @@ open Utils;
 
 let component = ReasonReact.statelessComponent("Editor_Entry");
 
-let code = [|Editor_Loremipsum.code1, Editor_Loremipsum.code2|];
+let code = [|
+  Editor_Loremipsum.code1,
+  /* Editor_Loremipsum.code2, */
+  Editor_Loremipsum.code3,
+|];
 
 let blocks =
   code

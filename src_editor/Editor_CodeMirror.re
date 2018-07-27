@@ -106,6 +106,19 @@ let make =
                                   ~showIfHidden=false,
                                 ),
                             )
+                       | Lw_Warning({content, line}) =>
+                         editor
+                         |. CodeMirror.Editor.addLineWidget(
+                              ~line,
+                              ~element=createWarningWidget(content),
+                              ~options=
+                                CodeMirror.LineWidget.options(
+                                  ~coverGutter=true,
+                                  ~noHScroll=false,
+                                  ~above=false,
+                                  ~showIfHidden=false,
+                                ),
+                            )
                        | Lw_Value({content, line}) =>
                          editor
                          |. CodeMirror.Editor.addLineWidget(
@@ -163,6 +176,8 @@ let make =
            },
          );
       state.editor := Some(editor);
+      %bs.raw
+      {|window.editor = editor|};
       ();
     },
   render: ({handle, state: _}) =>

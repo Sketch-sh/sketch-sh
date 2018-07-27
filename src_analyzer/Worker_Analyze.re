@@ -1,4 +1,4 @@
-/* open Utils; */
+open Utils;
 
 module Make = (ESig: Worker_Evaluator.EvaluatorSig) => {
   module Evaluator = Worker_Evaluator.Make(ESig);
@@ -56,7 +56,7 @@ module Make = (ESig: Worker_Evaluator.EvaluatorSig) => {
       | index => index - 1
       };
     let lineStart = lineStartOffsets[index];
-    {line: index, col: offset - lineStart, offset};
+    {line: index, col: offset - lineStart - 1, offset};
   };
   let parseCommand = (~f, code) => {
     let length = String.length(code);
@@ -75,7 +75,7 @@ module Make = (ESig: Worker_Evaluator.EvaluatorSig) => {
             loop(i + 1, {...state, startPos: startPos + 1}) :
             loop(i + 1, state)
         | '\n' =>
-          lineStartOffsets |> Js.Array.push(i + 1) |> ignore;
+          lineStartOffsets |> Js.Array.push(i) |> ignore;
           shouldSkip ?
             loop(i + 1, {...state, startPos: startPos + 1}) :
             loop(i + 1, state);
@@ -133,11 +133,70 @@ module Make = (ESig: Worker_Evaluator.EvaluatorSig) => {
     loop(0, {startPos: 0, shouldSkip: true, result: []});
   };
 
+  let parseAndCorrectStderrPos = (stderr, ~lineFrom, ~colFrom) =>
+    stderr
+    |. Belt.Option.map(stderr =>
+         stderr
+         |. tapLog
+         |. Worker_ParseLocation.parse
+         |. Belt.Array.map(
+              (error: Error.t) => {
+                let correctLoc = (content: Error.content) => {
+                  let (from, to_) = content.pos;
+                  {
+                    ...content,
+                    pos: (
+                      {
+                        lno_line: from.lno_line + lineFrom,
+                        lno_col: from.lno_col + colFrom,
+                      },
+                      {
+                        lno_line: to_.lno_line + lineFrom,
+                        lno_col: to_.lno_col + colFrom,
+                      },
+                    ),
+                  };
+                };
+                switch (error) {
+                | Err_Unknown(string) => Error.Err_Unknown(string)
+                | Err_Warning(content) =>
+                  Err_Warning(content |. correctLoc)
+                | Err_Error(content) => Err_Error(content |. correctLoc)
+                };
+              },
+            )
+       );
   let execute =
     (. reset, code) => {
       if (reset) {
         Evaluator.reset();
       };
-      parseCommand(~f=tryExecute, code);
+      /* Execute and split program into chunks */
+      let result = parseCommand(~f=tryExecute, code);
+
+      /* Parse and correct stderr error location */
+      let result =
+        result
+        |. Belt.List.map(
+             directiveResult => {
+               let ({line: lineFrom, col: colFrom}, _) =
+                 directiveResult.pos;
+
+               let executeResult = directiveResult.executeResult;
+               let stderr =
+                 executeResult.stderr
+                 |. parseAndCorrectStderrPos(~lineFrom, ~colFrom);
+               {
+                 fn_buffer: directiveResult.buffer,
+                 fn_result: {
+                   fn_evaluate: executeResult.evaluate,
+                   fn_stdout: executeResult.stdout,
+                   fn_stderr: stderr,
+                 },
+                 fn_pos: directiveResult.pos,
+               };
+             },
+           );
+      result;
     };
 };

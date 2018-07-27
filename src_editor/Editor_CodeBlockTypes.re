@@ -1,6 +1,7 @@
 module Widget = {
   type t =
     | Lw_Error(widgetContent)
+    | Lw_Warning(widgetContent)
     | Lw_Value(widgetContent)
     | Lw_Stdout(widgetContent)
   and widgetContent = {

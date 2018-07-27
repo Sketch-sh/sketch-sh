@@ -17,31 +17,39 @@ body {
 
 /* ///////////////////// Widgets ////////////// */
 
-.widget__error {
-  background-color: #fdeeee;
-  color: #eb5656;
+.widget__lint-error {
+  --main-color: #eb5656;
+  --background-color: #fdeeee;
+}
+.widget__lint-warning {
+  --main-color: #9f6000;
+  --background-color: #feefb3;
+}
+.widget__lint .wrapper {
+  background-color: var(--background-color);
+  color: var(--main-color);
   overflow: hidden;
   position: relative;
   left: 28px;
   width: calc(100% - 26px);
   min-height: 2em;
   margin-left: -8px;
-  border-left: 6px solid #eb5656;
+  border-left: 6px solid var(--main-color);
   display: flex;
   align-items: center;
 }
 
-.widget__error::before {
+.widget__lint .wrapper::before {
   content: " ";
   position: absolute;
   top: 0;
   left: 1px;
   right: 0;
   bottom: 0;
-  border-left: 2px solid #eb5656;
+  border-left: 2px solid var(--main-color);
 }
 
-.widget__error-content {
+.widget__lint .content {
   padding-left: 10px;
   white-space: pre;
 }
