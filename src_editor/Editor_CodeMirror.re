@@ -12,7 +12,7 @@ import "./app.css" /* <-- Important, no semi */
 
 [%%debugger.chrome];
 
-open Utils;
+/* open Utils; */
 
 type state = {
   editor: ref(option(CodeMirror.editor)),
@@ -58,28 +58,28 @@ let make =
     getEditor(state, ~default=state, ~f=editor =>
       {
         ...state,
-        value:
+        value: {
           if (state.value != value
               && value != (editor |. CodeMirror.Editor.getValue())) {
             editor |. CodeMirror.Editor.setValue(value);
-            value;
-          } else {
-            state.value;
-          },
-        firstLineNumber:
+          };
+
+          value;
+        },
+        firstLineNumber: {
           if (state.firstLineNumber != firstLineNumber) {
             editor
             |. CodeMirror.Editor.setOption(
                  "firstLineNumber",
                  firstLineNumber,
                );
-            firstLineNumber;
-          } else {
-            state.firstLineNumber;
-          },
-        codeBlockWidgets:
+          };
+          firstLineNumber;
+        },
+        codeBlockWidgets: {
           if (widgets != state.codeBlockWidgets) {
             let cachedLineWidgets = state.lineWidgets^;
+
             cachedLineWidgets
             |. Belt.List.forEachU((. lw)
                  /* TODO: should I remove the domNode ?
@@ -116,7 +116,7 @@ let make =
                               ~options=
                                 CodeMirror.LineWidget.options(
                                   ~coverGutter=false,
-                                  ~noHScroll=true,
+                                  ~noHScroll=false,
                                   ~above=false,
                                   ~showIfHidden=false,
                                 ),
@@ -138,10 +138,9 @@ let make =
                      [newLineWidget, ...acc];
                    },
                  );
-            widgets;
-          } else {
-            state.codeBlockWidgets;
-          },
+          };
+          widgets;
+        },
       }
     ),
   didMount: ({state}) =>
@@ -168,5 +167,6 @@ let make =
       state.editor := Some(editor);
       ();
     },
-  render: ({handle, state}) => <div ?className ref=(handle(setDivRef)) />,
+  render: ({handle, state: _}) =>
+    <div ?className ref=(handle(setDivRef)) />,
 };
