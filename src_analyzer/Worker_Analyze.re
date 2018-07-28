@@ -75,7 +75,7 @@ module Make = (ESig: Worker_Evaluator.EvaluatorSig) => {
             loop(i + 1, {...state, startPos: startPos + 1}) :
             loop(i + 1, state)
         | '\n' =>
-          lineStartOffsets |> Js.Array.push(i) |> ignore;
+          lineStartOffsets |> Js.Array.push(i + 1) |> ignore;
           shouldSkip ?
             loop(i + 1, {...state, startPos: startPos + 1}) :
             loop(i + 1, state);

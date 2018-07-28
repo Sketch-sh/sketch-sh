@@ -102,6 +102,12 @@ let make = (~blocks: array(block), _children) => {
                                                  },
                                                ) =
                                                  content.pos;
+                                               Js.log3(
+                                                 colStart,
+                                                 colEnd,
+                                                 content.content,
+                                               );
+
                                                {
                                                  Editor_CodeBlockTypes.Widget.line: lno_line,
                                                  content:
