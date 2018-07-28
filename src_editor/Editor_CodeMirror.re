@@ -3,6 +3,7 @@
 /* import "codemirror/mode/mllike/mllike" */
 import "./reason-mode.js"
 import "codemirror/addon/edit/matchbrackets"
+import "codemirror/mode/gfm/gfm"
 import "codemirror/lib/codemirror.css"
 
 import "./cm-theme.css"

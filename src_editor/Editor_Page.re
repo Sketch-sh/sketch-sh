@@ -204,7 +204,12 @@ let make = (~blocks: array(block), _children) => {
                    nextFirstLineNumber := Some(lineNum + bcode.bc_lines + 1);
                    B_Code({...bcode, bc_firstLineNumber: lineNum});
                  }
-               | B_Text(_content) => failwith("not implemented")
+               | B_Text(_) =>
+                 if (i != blockIndex) {
+                   block;
+                 } else {
+                   B_Text(newValue);
+                 }
                }
              );
         },
@@ -230,7 +235,17 @@ let make = (~blocks: array(block), _children) => {
                    />
                  </div>
                </div>
-             | B_Text(_) => failwith("not implemented")
+             | B_Text(text) =>
+               <div key=(index |> string_of_int) className="cell__container">
+                 <div className="text-editor">
+                   <Editor_TextBlock
+                     value=text
+                     onChange=(
+                       newValue => send(UpdateBlockValue(index, newValue))
+                     )
+                   />
+                 </div>
+               </div>
              }
            )
         |. ReasonReact.array

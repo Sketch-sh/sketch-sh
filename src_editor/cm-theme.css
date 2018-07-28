@@ -255,5 +255,7 @@
 }
 
 /* /////////////// Additions */
-
+.CodeMirror-placeholder {
+  color: #aaa !important;
+}
 /* \\\\\\\\\\\\\\\ Additions */

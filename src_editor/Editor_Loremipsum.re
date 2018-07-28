@@ -34,3 +34,28 @@ let myTree =
   );
 
 Printf.sprintf("%i", sum(myTree));|};
+
+let text1 = {|# ReasonML playground
+
+You're viewing an early demo of ReasonML playground.
+This is meant to be a note-like application for teaching and sharing ReasonML code with inline evaluation of the code.
+
+This is **OCaml 4.06.0 toplevel** compiled with [js_of_ocaml](http://ocsigen.org/js_of_ocaml/).
+
+Please note that this is **not** Bucklescript so you can't use these modules:
+  - Js
+  - Dom
+  - Node
+  - Belt (Belt could be compiled with js_of_ocaml so this could be done with some works)
+
+## Usage:
+
+- Write your code
+- Press **Shift-enter** to evaluate each codeblock
+- Share your work
+
+## Contribute
+
+This is an open source project, if you see a missing feature, you can help me build it
+
+Repository: https://github.com/thangngoc89/rtop-ui|};

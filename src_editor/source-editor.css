@@ -1,17 +1,6 @@
 /* ///////////// base.css */
 /* Source Editor */
-.cm-secret-key-syntax-error {
-  background-color: #ffeced !important;
-  color: #dc654b !important;
-  border-bottom: 2px dotted #dc654b;
-  padding-bottom: 1px;
-}
-.cm-secret-key-syntax-warning {
-  background-color: #ffeed7 !important;
-  color: #dc654b !important;
-  border-bottom: 2px dotted #fda429;
-  padding-bottom: 1px;
-}
+
 .cm-read-only .CodeMirror-cursor {
   visibility: hidden !important;
 }
@@ -38,10 +27,7 @@
   bottom: 0;
   left: 0;
 }
-.source-editor .CodeMirror,
-.source-viewer .CodeMirror {
-  height: auto !important;
-}
+
 .source-viewer .CodeMirror-scroll {
   min-height: 1em;
   max-height: 300px;
@@ -73,9 +59,7 @@
 .regex-highlight {
   background-color: rgba(21, 179, 0, 0.3);
 }
-.CodeMirror-placeholder {
-  color: #aaa !important;
-}
+
 .source-editor .CodeMirror-lines {
   border: 1px solid #e5e9ef;
 }
@@ -85,14 +69,22 @@
 .source-editor .CodeMirror-focused .CodeMirror-lines {
   border: 1px solid rgba(90, 163, 225, 0.63);
 }
-.object-description .cm-s-runkit-light .CodeMirror-gutter {
-  width: 40px;
+
+/* ////////////////// Additions */
+.text-editor .CodeMirror,
+.source-editor .CodeMirror,
+.source-viewer .CodeMirror {
+  height: auto !important;
 }
-.object-description .cm-s-runkit-light .CodeMirror-linenumber {
-  padding: 0;
-  margin-left: -10px;
+
+.text-editor {
+  margin-left: 36px;
 }
-.object-description .cm-s-runkit-light .CodeMirror-gutters {
-  border-right: 1px solid #ddd;
-  background-color: #f7f7f7;
+
+.text-editor .cm-header-1 {
+  font-size: 2em;
+}
+
+.text-editor .cm-header-2 {
+  font-size: 1.5em;
 }

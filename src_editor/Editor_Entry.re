@@ -14,7 +14,6 @@ let blocks =
        ([||], 1),
        (. (acc, firstLineNumber), code) => {
          open Editor_Page;
-
          let lines = countLine(code);
 
          let block =
@@ -28,6 +27,12 @@ let blocks =
        },
      )
   |. (((acc, _firstLineNumber)) => acc);
+
+let blocks =
+  Belt.Array.concat(
+    [|Editor_Page.B_Text(Editor_Loremipsum.text1)|],
+    blocks,
+  );
 
 let make = _children => {
   ...component,
