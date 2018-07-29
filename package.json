@@ -5,11 +5,12 @@
     "bs:build": "bsb -make-world",
     "bs:start": "bsb -make-world -w",
     "bs:clean": "bsb -clean-world",
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest",
     "build": "bsb -make-world && NODE_ENV=production webpack && cp public/* build",
-    "deploy": "cd build && now && now alias",
-    "start": "webpack-dev-server",
-    "start:editor": "EDITOR=1 webpack-dev-server"
+    "deploy": "now build && now alias",
+    "staging": "npm run build && now build && now alias staging.rtop.khoanguyen.me",
+    "start:terminal": "TERMINAL_UI=1 webpack-dev-server",
+    "start": "webpack-dev-server"
   },
   "author": "",
   "license": "MIT",

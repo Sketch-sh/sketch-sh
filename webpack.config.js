@@ -4,7 +4,7 @@ const path = require("path");
 const outputDir = path.join(__dirname, "build/");
 
 const isProd = process.env.NODE_ENV === "production";
-const baseFolder = process.env.EDITOR === "1" ? "src_editor" : "src";
+const baseFolder = process.env.TERMINAL_UI === "1" ? "src" : "src_editor";
 
 const base = {
   entry: ["react-hot-loader/patch", "./" + baseFolder + "/entry.js"],
