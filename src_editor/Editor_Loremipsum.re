@@ -1,15 +1,5 @@
-let code1 = {|print_endline("Hello ReasonML folks!");
-
-let pi = 4. *. atan(1.);
-
-let random_gaussian = () =>
-  1.
-  +. sqrt((-2.) *. log(Random.float(1.)))
-  *. cos(2. *. pi *. Random.float(1.));
-
-for (i in 0 to 2) {
-  random_gaussian() |> string_of_float |> print_endline;
-};|};
+let code1 = {|print_endline("Hello ReasonML folks!")
+let a = 2;|};
 
 let code3 = {|type say = | Hello | Bye;
 fun

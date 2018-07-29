@@ -1,50 +1,85 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`valid multi 1`] = `
+exports[`parsing error messages from ocaml compiler multi error messages 1`] = `
 Array [
   Array [
-    "Warning 11: this match case is unused.",
-    5,
     Array [
-      2,
-      5,
+      "Warning 11: this match case is unused.",
+      Array [
+        Array [
+          5,
+          2,
+        ],
+        Array [
+          5,
+          5,
+        ],
+      ],
     ],
   ],
   Array [
-    "Error: Syntax error",
-    3,
     Array [
-      0,
-      3,
+      "Error: Syntax error",
+      Array [
+        Array [
+          3,
+          0,
+        ],
+        Array [
+          3,
+          3,
+        ],
+      ],
     ],
   ],
   Array [
-    "Error: Unbound value pi",
-    3,
     Array [
-      15,
-      17,
+      "Error: Unbound value pi",
+      Array [
+        Array [
+          3,
+          15,
+        ],
+        Array [
+          3,
+          17,
+        ],
+      ],
     ],
   ],
   Array [
-    "Error: Unbound value random_gaussian",
-    3,
     Array [
-      2,
-      17,
+      "Error: Unbound value random_gaussian",
+      Array [
+        Array [
+          3,
+          2,
+        ],
+        Array [
+          3,
+          17,
+        ],
+      ],
     ],
   ],
 ]
 `;
 
-exports[`valid single 1`] = `
+exports[`parsing error messages from ocaml compiler single error message 1`] = `
 Array [
   Array [
-    "Warning 11: this match case is unused.",
-    5,
     Array [
-      2,
-      5,
+      "Warning 11: this match case is unused.",
+      Array [
+        Array [
+          5,
+          2,
+        ],
+        Array [
+          5,
+          5,
+        ],
+      ],
     ],
   ],
 ]

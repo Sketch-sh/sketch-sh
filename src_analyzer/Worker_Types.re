@@ -1,12 +1,16 @@
-type locNoOffset = {
-  lno_line: int,
-  lno_col: int,
-};
-
-module Error = {
+module CompilerErrorMessage = {
+  /*
+   Ocaml's parse location is really weird:
+   - Line: 1-based
+   - Col: 0-based
+   */
+  type loc = {
+    o_line: int,
+    o_col: int,
+  };
   type content = {
-    content: string,
-    pos: (locNoOffset, locNoOffset),
+    o_content: string,
+    o_pos: (loc, loc),
   };
 
   type t =
@@ -24,15 +28,7 @@ type singleExecuteResult = {
 type loc = {
   line: int,
   col: int,
-  offset: int,
 };
-let loc_of_string = ({line, col}) => {j|{line: $(line), ch: $(col)}|j};
-let pos_of_string = ((from, to_)) =>
-  "editor.getRange("
-  ++ loc_of_string(from)
-  ++ ","
-  ++ loc_of_string(to_)
-  ++ ")";
 
 type wholeProgramExecuteResult = {
   buffer: string,
@@ -42,7 +38,7 @@ type wholeProgramExecuteResult = {
 
 type final_evaluationResult = {
   fn_evaluate: option(string),
-  fn_stderr: option(array(Error.t)),
+  fn_stderr: option(array(CompilerErrorMessage.t)),
   fn_stdout: option(string),
 };
 

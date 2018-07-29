@@ -1,23 +1,8 @@
-let renderErrorIndicator = (colStart, colEnd, content) => {
-  /* TODO:
-       why is the colStart = -1
-       Reproduce:
-
-       ```
-       print_endline("Hello ReasonML folks!")
-       let a = 2;
-       ```
-     */
-  let (colStart, pad) =
-    if (colStart < 0) {
-      (0, abs(colStart));
-    } else {
-      (colStart, 0);
-    };
+let renderErrorIndicator = (colStart, colEnd, content) =>
   String.make(colStart, ' ')
   ++ String.make(
        /* Sometime it reports characters 1-1 */
-       switch (colEnd - colStart + pad) {
+       switch (colEnd - colStart) {
        | 0 => 1
        | a => a
        },
@@ -25,12 +10,8 @@ let renderErrorIndicator = (colStart, colEnd, content) => {
      )
   ++ "\n"
   ++ content;
-};
-
 let executeRessultToWidget =
-    (
-      result: list(ReactTemplate.Worker_Types.final_programEvaluationResult),
-    ) => {
+    (result: list(Worker_Types.final_programEvaluationResult)) => {
   open Worker_Types;
   open Editor_CodeBlockTypes;
 
@@ -57,30 +38,31 @@ let executeRessultToWidget =
              | None => [||]
              | Some(errors) =>
                errors
-               |. Belt.Array.map(
-                    error => {
-                      let toWidgetContent = (content: Error.content) => {
+               |. Belt.Array.mapU(
+                    (. error) => {
+                      open CompilerErrorMessage;
+                      let toWidgetContent =
+                          (content: CompilerErrorMessage.content) => {
                         let (
-                          {lno_line, lno_col: colStart},
-                          {lno_line: _, lno_col: colEnd},
+                          {o_line, o_col: colStart},
+                          {o_line: _, o_col: colEnd},
                         ) =
-                          content.pos;
+                          content.o_pos;
 
                         {
-                          Editor_CodeBlockTypes.Widget.line: lno_line,
+                          Editor_CodeBlockTypes.Widget.line: o_line,
                           content:
                             renderErrorIndicator(
                               colStart,
                               colEnd,
-                              content.content,
+                              content.o_content,
                             ),
                         };
                       };
 
                       switch (error) {
                       | Err_Warning(content) =>
-                        Js.log("warnng");
-                        Widget.Lw_Warning(toWidgetContent(content));
+                        Widget.Lw_Warning(toWidgetContent(content))
                       | Err_Error(content) =>
                         Widget.Lw_Error(toWidgetContent(content))
                       | Err_Unknown(content) =>

@@ -55,3 +55,19 @@ let countLine = s => {
 let min = (min, value) => value < min ? min : value;
 
 [@bs.val] external env : string = "process.env.NODE_ENV";
+
+let arrayFindIndex = (f, array) => {
+  let length = Array.length(array);
+  let rec loop = i =>
+    if (i < length) {
+      let element = array[i];
+      if (f(element)) {
+        Some(i);
+      } else {
+        loop(i + 1);
+      };
+    } else {
+      None;
+    };
+  loop(0);
+};

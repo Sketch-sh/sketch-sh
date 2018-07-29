@@ -3,14 +3,12 @@ type editor;
 module EditorConfiguration = {
   [@bs.deriving abstract]
   type editorConfiguration = {
-    /* TODO: Use bs.unwrap | `String(string) | `DomElement(Dom.element) when bucklescript
-       Supporting it inside deriving abstract */
-    /** string| The starting value of the editor. Can be a string, or a document object. */ [@bs.optional]
+    [@bs.optional] /** string| The starting value of the editor. Can be a string, or a document object. */
     value: string,
-    /** string|object. The mode to use. When not given, this will default to the first mode that was loaded.
+    [@bs.optional] /** string|object. The mode to use. When not given, this will default to the first mode that was loaded.
         It may be a string, which either simply names the mode or is a MIME type associated with the mode.
         Alternatively, it may be an object containing configuration options for the mode,
-        with a name property that names the mode (for example {name: "javascript", json: true}). */ [@bs.optional]
+        with a name property that names the mode (for example {name: "javascript", json: true}). */
     mode: string,
     [@bs.optional] /** The theme to style the editor with. You must make sure the CSS file defining the corresponding .cm-s-[name] styles is loaded.
         The default is "default". */
@@ -23,22 +21,22 @@ module EditorConfiguration = {
     tabSize: int,
     [@bs.optional] /** Whether, when indenting, the first N*tabSize spaces should be replaced by N tabs. Default is false. */
     indentWithTabs: bool,
-    /** Configures whether the editor should re-indent the current line when a character is typed
-        that might change its proper indentation (only works if the mode supports indentation). Default is true. */ [@bs.optional]
+    [@bs.optional] /** Configures whether the editor should re-indent the current line when a character is typed
+        that might change its proper indentation (only works if the mode supports indentation). Default is true. */
     electricChars: bool,
     [@bs.optional] /** Determines whether horizontal cursor movement through right-to-left (Arabic, Hebrew) text
         is visual (pressing the left arrow moves the cursor left)
         or logical (pressing the left arrow moves to the next lower index in the string, which is visually right in right-to-left text).
         The default is false on Windows, and true on other platforms. */
     rtlMoveVisually: bool,
-    /** Configures the keymap to use. The default is "default", which is the only keymap defined in codemirror.js itself.
-        Extra keymaps are found in the keymap directory. See the section on keymaps for more information. */ [@bs.optional]
+    [@bs.optional] /** Configures the keymap to use. The default is "default", which is the only keymap defined in codemirror.js itself.
+        Extra keymaps are found in the keymap directory. See the section on keymaps for more information. */
     keyMap: string,
-    /** Can be used to specify extra keybindings for the editor, alongside the ones defined by keyMap. Should be either null, or a valid keymap value. */ [@bs.optional]
+    [@bs.optional] /** Can be used to specify extra keybindings for the editor, alongside the ones defined by keyMap. Should be either null, or a valid keymap value. */
     extraKeys: Js.Dict.t(editor => unit),
-    /** Whether CodeMirror should scroll or wrap for long lines. Defaults to false (scroll). */ [@bs.optional]
+    [@bs.optional] /** Whether CodeMirror should scroll or wrap for long lines. Defaults to false (scroll). */
     lineWrapping: bool,
-    /** Whether to show line numbers to the left of the editor. */ [@bs.optional]
+    [@bs.optional] /** Whether to show line numbers to the left of the editor. */
     lineNumbers: bool,
     [@bs.optional] /** At which number to start counting lines. Default is 1. */
     firstLineNumber: int,
@@ -79,7 +77,8 @@ module EditorConfiguration = {
     dragDrop: bool,
     [@bs.optional] /** When given , this will be called when the editor is handling a dragenter , dragover , or drop event.
         It will be passed the editor instance and the event object as arguments.
-        The callback can choose to handle the event itself , in which case it should return true to indicate that CodeMirror should not do anything further. */ /* TODO */ /* onDragEvent?: (instance: CodeMirror.Editor, event: Event) => boolean; */ /** This provides a rather low - level hook into CodeMirror's key handling.
+        The callback can choose to handle the event itself , in which case it should return true to indicate that CodeMirror should not do anything further. */ /* TODO */ /* onDragEvent?: (instance: CodeMirror.Editor, event: Event) => boolean; */
+                                                                    /** This provides a rather low - level hook into CodeMirror's key handling.
         If provided, this function will be called on every keydown, keyup, and keypress event that CodeMirror captures.
         It will be passed two arguments, the editor instance and the key event.
         This key event is pretty much the raw key event, except that a stop() method is always added to it.

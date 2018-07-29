@@ -1,9 +1,7 @@
-open Utils;
-
 module Make = (ESig: Worker_Evaluator.EvaluatorSig) => {
   module Evaluator = Worker_Evaluator.Make(ESig);
   open Worker_Types;
-
+  open CompilerErrorMessage;
   let tryExecute = code => {
     let executeResult = Evaluator.execute(code);
     let stderr = executeResult.stderr;
@@ -14,6 +12,8 @@ module Make = (ESig: Worker_Evaluator.EvaluatorSig) => {
         ! (
           stderr
           |> Js.String.indexOf("Syntax error") == (-1)
+          && stderr
+          |> Js.String.indexOf("Comment not terminated") == (-1)
           && stderr
           |>
           Js.String.indexOf(
@@ -33,38 +33,17 @@ module Make = (ESig: Worker_Evaluator.EvaluatorSig) => {
   };
 
   /*
-    /* Normal */
-    let offset = 25;
-    let lineStartOffsets =
-       [0, 10, 20, 30];
-                   ^^ 30 > 25, index[30] = 4 ==> index = 3
+     This function try to execute whenever it encounters a semicolon
+     If there is any syntax error, skip to the next semicolon
 
-    /* Last line */
-    let offset = 40;
-    let lineStartOffsets =
-       [0, 10, 20, 30];
-                       ^^ find = -1 => last line, index = 4;
+     It also build up a sorted range array lineStartOffSets for converting offset to {line,column} (0-origin)
    */
-  let toLoc = (lineStartOffsets, offset) => {
-    let find =
-      lineStartOffsets |> Js.Array.findIndex(value => value >= offset);
-
-    let index =
-      switch (find) {
-      | 0 => 0
-      | (-1) => Js.Array.length(lineStartOffsets) - 1
-      | index => index - 1
-      };
-    let lineStart = lineStartOffsets[index];
-    {line: index, col: offset - lineStart - 1, offset};
-  };
   let parseCommand = (~f, code) => {
+    open Worker_Location_Utils;
+
     let length = String.length(code);
 
-    let lineStartOffsets = [|0|];
-    let toLoc = toLoc(lineStartOffsets);
-
-    let rec loop = (i, state) => {
+    let rec loop = (i, state, lineStartOffsets) => {
       let {startPos, shouldSkip, result} = state;
 
       if (i < length) {
@@ -72,21 +51,31 @@ module Make = (ESig: Worker_Evaluator.EvaluatorSig) => {
         /* Skip spaces between directives */
         | ' ' =>
           shouldSkip ?
-            loop(i + 1, {...state, startPos: startPos + 1}) :
-            loop(i + 1, state)
+            loop(
+              i + 1,
+              {...state, startPos: startPos + 1},
+              lineStartOffsets,
+            ) :
+            loop(i + 1, state, lineStartOffsets)
         | '\n' =>
-          lineStartOffsets |> Js.Array.push(i + 1) |> ignore;
           shouldSkip ?
-            loop(i + 1, {...state, startPos: startPos + 1}) :
-            loop(i + 1, state);
-
+            loop(
+              i + 1,
+              {...state, startPos: startPos + 1},
+              Belt.Array.concat(lineStartOffsets, [|i + 1|]),
+            ) :
+            loop(
+              i + 1,
+              state,
+              Belt.Array.concat(lineStartOffsets, [|i + 1|]),
+            )
         | ';' =>
           let buffer =
             Js.String.substring(~from=startPos, ~to_=i + 1, code);
           let (hasSyntaxError, executeResult) = f(buffer);
 
           hasSyntaxError ?
-            loop(i + 1, state) :
+            loop(i + 1, state, lineStartOffsets) :
             loop(
               i + 1,
               {
@@ -96,13 +85,17 @@ module Make = (ESig: Worker_Evaluator.EvaluatorSig) => {
                   {
                     buffer,
                     executeResult,
-                    pos: (toLoc(startPos), toLoc(i + 1)),
+                    pos: (
+                      toLoc(lineStartOffsets, startPos),
+                      toLoc(lineStartOffsets, i + 1),
+                    ),
                   },
                   ...result,
                 ],
               },
+              lineStartOffsets,
             );
-        | _ => loop(i + 1, {...state, shouldSkip: false})
+        | _ => loop(i + 1, {...state, shouldSkip: false}, lineStartOffsets)
         };
       } else {
         /* Execute the remaining */
@@ -120,7 +113,10 @@ module Make = (ESig: Worker_Evaluator.EvaluatorSig) => {
               {
                 buffer,
                 executeResult,
-                pos: (toLoc(startPos), toLoc(length + 1)),
+                pos: (
+                  toLoc(lineStartOffsets, startPos),
+                  toLoc(lineStartOffsets, length + 1),
+                ),
               },
               ...result,
             ];
@@ -130,10 +126,10 @@ module Make = (ESig: Worker_Evaluator.EvaluatorSig) => {
         result |> List.rev;
       };
     };
-    loop(0, {startPos: 0, shouldSkip: true, result: []});
+    loop(0, {startPos: 0, shouldSkip: true, result: []}, [|0|]);
   };
 
-  let parseAndCorrectStderrPos = (stderr, ~lineFrom, ~colFrom) =>
+  let parseAndCorrectStderrPos = (stderr, blockPos) =>
     stderr
     |. Belt.Option.map(stderr =>
          stderr
@@ -145,13 +141,14 @@ module Make = (ESig: Worker_Evaluator.EvaluatorSig) => {
               an error
             */
          |. Belt.Array.reduce(
-              ([], false), ((acc, hasError), error: Error.t) =>
+              ([], false),
+              ((acc, hasError), error: CompilerErrorMessage.t) =>
               if (hasError) {
                 (acc, hasError);
               } else {
                 switch (error) {
                 | Err_Unknown(string) => (
-                    [Error.Err_Unknown(string), ...acc],
+                    [Err_Unknown(string), ...acc],
                     false,
                   )
                 | Err_Warning(content) => (
@@ -168,33 +165,26 @@ module Make = (ESig: Worker_Evaluator.EvaluatorSig) => {
          /* TODO:
             Return hasError to stop executing the next code block
             */
-         |. (((acc, hasError)) => acc)
+         |. (((acc, _hasError)) => acc)
          |. Belt.List.toArray
-         |. Belt.Array.map(
-              (error: Error.t) => {
-                let correctLoc = (content: Error.content) => {
-                  let (from, to_) = content.pos;
-                  {
-                    ...content,
-                    pos: (
-                      {
-                        lno_line: from.lno_line + lineFrom,
-                        lno_col: from.lno_col + colFrom,
-                      },
-                      {
-                        lno_line: to_.lno_line + lineFrom,
-                        lno_col: to_.lno_col + colFrom,
-                      },
-                    ),
-                  };
-                };
-                switch (error) {
-                | Err_Unknown(string) => Error.Err_Unknown(string)
-                | Err_Warning(content) =>
-                  Err_Warning(content |. correctLoc)
-                | Err_Error(content) => Err_Error(content |. correctLoc)
-                };
-              },
+         |. Belt.Array.map((error: CompilerErrorMessage.t) =>
+              switch (error) {
+              | Err_Unknown(string) => Err_Unknown(string)
+              | Err_Warning(content) =>
+                Err_Warning(
+                  Worker_Location_Utils.errorMessageToAbsoluteLocation(
+                    content,
+                    blockPos,
+                  ),
+                )
+              | Err_Error(content) =>
+                Err_Error(
+                  Worker_Location_Utils.errorMessageToAbsoluteLocation(
+                    content,
+                    blockPos,
+                  ),
+                )
+              }
             )
        );
   let execute =
@@ -204,27 +194,24 @@ module Make = (ESig: Worker_Evaluator.EvaluatorSig) => {
       };
       /* Execute and split program into chunks */
       let result = parseCommand(~f=tryExecute, code);
-
       /* Parse and correct stderr error location */
       let result =
         result
         |. Belt.List.map(
-             directiveResult => {
-               let ({line: lineFrom, col: colFrom}, _) =
-                 directiveResult.pos;
+             blockResult => {
+               let executeResult = blockResult.executeResult;
 
-               let executeResult = directiveResult.executeResult;
                let stderr =
                  executeResult.stderr
-                 |. parseAndCorrectStderrPos(~lineFrom, ~colFrom);
+                 |. parseAndCorrectStderrPos(blockResult.pos);
                {
-                 fn_buffer: directiveResult.buffer,
+                 fn_buffer: blockResult.buffer,
                  fn_result: {
                    fn_evaluate: executeResult.evaluate,
                    fn_stdout: executeResult.stdout,
                    fn_stderr: stderr,
                  },
-                 fn_pos: directiveResult.pos,
+                 fn_pos: blockResult.pos,
                };
              },
            );

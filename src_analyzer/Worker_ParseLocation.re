@@ -1,4 +1,5 @@
 open Worker_Types;
+open Worker_Types.CompilerErrorMessage;
 
 let parse = output =>
   output
@@ -15,14 +16,13 @@ let parse = output =>
          let item =
            switch (matches |. Belt.Array.length) {
            | 5 =>
-             open Error;
              let line = matches[1] |. int_of_string;
              let content = matches[4] |. Js.String.trim;
              let errContent = {
-               content,
-               pos: (
-                 {lno_line: line - 1, lno_col: matches[2] |. int_of_string},
-                 {lno_line: line - 1, lno_col: matches[3] |. int_of_string},
+               o_content: content,
+               o_pos: (
+                 {o_line: line, o_col: matches[2] |. int_of_string},
+                 {o_line: line, o_col: matches[3] |. int_of_string},
                ),
              };
              /* Error and Warning at the beginning */

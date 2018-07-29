@@ -1,10 +1,8 @@
 open Jest;
-open Worker_Types;
+
 let error = {|
 File "", line 5, characters 2-5:
 Warning 11: this match case is unused.
-
-
 |};
 
 let errors = {|
@@ -20,16 +18,24 @@ Error: Unbound value random_gaussian
 
 let parse = Worker_ParseLocation.parse;
 
+/* open Worker_Types.CompilerErrorMessage; */
+
 describe(
-  "valid",
+  "parsing error messages from ocaml compiler",
   () => {
     open Expect;
     open! Expect.Operators;
-
-    test("single", () =>
-      parse(error) |> expect |> toMatchSnapshot
+    test("single error message", () =>
+      expect(parse(error)) |> toMatchSnapshot
     );
-    test("multi", () =>
+    /* expect(parse(error))
+       == [|
+            Err_Warning({
+              o_content: "Warning 11: this match case is unused.",
+              o_pos: ({o_line: 5, o_col: 2}, {o_line: 5, o_col: 5}),
+            }),
+          |] */
+    test("multi error messages", () =>
       parse(errors) |> expect |> toMatchSnapshot
     );
   },
