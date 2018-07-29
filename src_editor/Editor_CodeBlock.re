@@ -117,11 +117,7 @@ let make =
         },
       }
     ),
-  render: ({state}) => {
-    /* TODO:
-           Remove me after finish debugging
-       */
-    let firstLineNumber = Utils.env == "production" ? firstLineNumber : 0;
+  render: ({state}) =>
     <Editor_CodeMirror
       value
       onChange
@@ -160,6 +156,5 @@ let make =
           (),
         )
       )
-    />;
-  },
+    />,
 };

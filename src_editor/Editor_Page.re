@@ -1,29 +1,15 @@
 [%%debugger.chrome];
 open Utils;
 open Editor_CodeBlockTypes;
-
-type bcode = {
-  bc_value: string,
-  bc_firstLineNumber: int,
-  bc_lines: int,
-  bc_widgets: array(Widget.t),
-};
-
-type id = string;
-type blockType =
-  | B_Code(bcode)
-  | B_Text(string);
-
-type block = {
-  b_id: id,
-  b_data: blockType,
-};
+open Editor_Types.Block;
 
 type state = {blocks: array(block)};
 
 type action =
-  | UpdateBlockValue(id, string)
-  | ExecuteBlock(id)
+  | Block_Add(id, blockType)
+  | Block_Execute(id)
+  | Block_Delete(id)
+  | Block_UpdateValue(id, string)
   | Block_AddWidgets(id, array(Widget.t));
 
 let component = ReasonReact.reducerComponent("Editor_Page");
@@ -33,7 +19,7 @@ let make = (~blocks: array(block), _children) => {
   initialState: () => {blocks: blocks},
   didMount: self => {
     blocks
-    |. Belt.Array.forEachU((. {b_id}) => self.send(ExecuteBlock(b_id)));
+    |. Belt.Array.forEachU((. {b_id}) => self.send(Block_Execute(b_id)));
     ();
   },
   reducer: (action, state) =>
@@ -60,7 +46,7 @@ let make = (~blocks: array(block), _children) => {
                },
              ),
       })
-    | ExecuteBlock(blockId) =>
+    | Block_Execute(blockId) =>
       let block = state.blocks |. arrayFind(({b_id}) => b_id == blockId);
       switch (block) {
       | None => ReasonReact.NoUpdate
@@ -90,61 +76,58 @@ let make = (~blocks: array(block), _children) => {
         }
       };
 
-    | UpdateBlockValue(blockId, newValue) =>
+    | Block_UpdateValue(blockId, newValue) =>
       ReasonReact.Update({
         /* ...state, */
-        blocks: {
-          let nextFirstLineNumber = ref(None);
+        blocks:
           state.blocks
           |. Belt.Array.mapU(
                (. block) => {
                  let {b_id, b_data} = block;
-                 switch (b_data) {
-                 | B_Code(bcode) =>
-                   switch (nextFirstLineNumber^) {
-                   | None =>
-                     if (b_id != blockId) {
-                       block;
-                     } else {
-                       let newValueLines =
-                         newValue
-                         |> Js.String.split("\n")
-                         |> Js.Array.length;
-                       (
-                         if (bcode.bc_lines != newValueLines) {
-                           nextFirstLineNumber := Some(newValueLines + 1);
-                         }
-                       )
-                       |> ignore;
-                       {
-                         b_id,
-                         b_data:
-                           B_Code({
-                             ...bcode,
-                             bc_value: newValue,
-                             bc_lines: newValueLines,
-                           }),
-                       };
-                     }
-                   | Some(lineNum) =>
-                     nextFirstLineNumber :=
-                       Some(lineNum + bcode.bc_lines + 1);
-                     {
+                 if (b_id != blockId) {
+                   block;
+                 } else {
+                   switch (b_data) {
+                   | B_Code(bcode) => {
                        b_id,
-                       b_data:
-                         B_Code({...bcode, bc_firstLineNumber: lineNum}),
-                     };
-                   }
-                 | B_Text(_) =>
-                   if (b_id != blockId) {
-                     block;
-                   } else {
-                     {b_id, b_data: B_Text(newValue)};
-                   }
+                       b_data: B_Code({...bcode, bc_value: newValue}),
+                     }
+                   | B_Text(_) => {b_id, b_data: B_Text(newValue)}
+                   };
                  };
                },
-             );
-        },
+             )
+          |. Editor_Page_Utils.syncLineNumber,
+      })
+    | Block_Delete(blockId) =>
+      ReasonReact.Update({
+        blocks:
+          state.blocks
+          |. Belt.Array.keepU((. {b_id}) => b_id != blockId)
+          |. Editor_Page_Utils.syncLineNumber,
+      })
+    | Block_Add(afterBlockId, blockType) =>
+      ReasonReact.Update({
+        blocks:
+          state.blocks
+          |. Belt.Array.reduceU(
+               [||],
+               (. acc, block) => {
+                 let {b_id} = block;
+                 if (b_id != afterBlockId) {
+                   Belt.Array.concat(acc, [|block|]);
+                 } else {
+                   Belt.Array.concat(
+                     acc,
+                     [|
+                       block,
+                       {b_id: Utils.generateId(), b_data: blockType},
+                     |],
+                   );
+                 };
+               },
+             )
+          |. Editor_Page_Utils.syncLineNumber,
       })
     },
   render: ({send, state}) =>
@@ -160,9 +143,10 @@ let make = (~blocks: array(block), _children) => {
                      <Editor_CodeBlock
                        value=bc_value
                        onChange=(
-                         newValue => send(UpdateBlockValue(b_id, newValue))
+                         newValue =>
+                           send(Block_UpdateValue(b_id, newValue))
                        )
-                       onExecute=(() => send(ExecuteBlock(b_id)))
+                       onExecute=(() => send(Block_Execute(b_id)))
                        widgets=bc_widgets
                        firstLineNumber=bc_firstLineNumber
                      />
@@ -172,16 +156,41 @@ let make = (~blocks: array(block), _children) => {
                      <Editor_TextBlock
                        value=text
                        onChange=(
-                         newValue => send(UpdateBlockValue(b_id, newValue))
+                         newValue =>
+                           send(Block_UpdateValue(b_id, newValue))
                        )
                      />
                    </div>
                  }
                )
                <div className="cell__controls">
-                 <button> ("Delete cell" |> str) </button>
-                 <button> ("Add text cell" |> str) </button>
-                 <button> ("Add code cell" |> str) </button>
+                 <button onClick=(_ => send(Block_Delete(b_id)))>
+                   ("Delete block" |> str)
+                 </button>
+                 <button
+                   onClick=(
+                     _ =>
+                       send(
+                         Block_Add(
+                           b_id,
+                           Editor_Page_Utils.emptyTextBlock(),
+                         ),
+                       )
+                   )>
+                   ("Add text block" |> str)
+                 </button>
+                 <button
+                   onClick=(
+                     _ =>
+                       send(
+                         Block_Add(
+                           b_id,
+                           Editor_Page_Utils.emptyCodeBlock(),
+                         ),
+                       )
+                   )>
+                   ("Add code block" |> str)
+                 </button>
                </div>
              </div>
            )

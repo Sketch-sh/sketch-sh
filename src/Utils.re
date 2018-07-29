@@ -52,6 +52,9 @@ let countLine = s => {
     };
   countLine'(0, 0);
 };
+
+let js_countLine = s => s |> Js.String.split("\n") |> Js.Array.length;
+
 let min = (min, value) => value < min ? min : value;
 
 [@bs.val] external env : string = "process.env.NODE_ENV";
@@ -89,3 +92,5 @@ let arrayFind = (array, f) => {
 };
 
 let generateId = NanoId.Secure.make;
+
+let pluckAcc = ((acc, _)) => acc;

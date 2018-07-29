@@ -77,3 +77,34 @@ let executeRessultToWidget = (result: list(Worker_Types.blockData)) => {
        );
   widgets;
 };
+
+open Editor_Types.Block;
+let syncLineNumber: array(block) => array(block) =
+  blocks =>
+    blocks
+    |. Belt.Array.reduceU(
+         ([||], 1),
+         (. (acc, firstLineNumber), block) => {
+           let {b_id, b_data} = block;
+           switch (b_data) {
+           | B_Code(bcode) =>
+             let {bc_value} = bcode;
+             let newBCode =
+               B_Code({...bcode, bc_firstLineNumber: firstLineNumber});
+             (
+               Belt.Array.concat(acc, [|{b_id, b_data: newBCode}|]),
+               firstLineNumber + (bc_value |. Utils.js_countLine),
+             );
+           | B_Text(_) => (
+               Belt.Array.concat(acc, [|block|]),
+               firstLineNumber,
+             )
+           };
+         },
+       )
+    |. Utils.pluckAcc;
+
+let emptyCodeBlock = () =>
+  B_Code({bc_value: "", bc_firstLineNumber: 1, bc_widgets: [||]});
+
+let emptyTextBlock = () => B_Text("");
