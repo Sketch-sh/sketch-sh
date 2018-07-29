@@ -4,8 +4,9 @@
     "react-jsx": 2
   },
   "sources": [
-    "src",
-    "src/vendor",
+    // "src",
+    // "src/vendor",
+    "shared",
     "src_editor",
     "src_analyzer",
     {
@@ -20,7 +21,7 @@
     }
   ],
   "bsc-flags": ["-bs-g"],
-  "ppx-flags": ["./ppx_bs_css\\ --as-ppx"],
+  // "ppx-flags": ["./ppx_bs_css\\ --as-ppx"],
   "suffix": ".bs.js",
   "namespace": true,
   "bs-dependencies": [
