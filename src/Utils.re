@@ -54,33 +54,4 @@ let countLine = s => {
 };
 let min = (min, value) => value < min ? min : value;
 
-let renderErrorIndicator = (colStart, colEnd, content) => {
-  /* TODO:
-       why is the colStart = -1
-       Reproduce:
-
-       ```
-       print_endline("Hello ReasonML folks!")
-       let a = 2;
-       ```
-     */
-  let (colStart, pad) =
-    if (colStart < 0) {
-      (0, abs(colStart));
-    } else {
-      (colStart, 0);
-    };
-  String.make(colStart, ' ')
-  ++ String.make(
-       /* Sometime it reports characters 1-1 */
-       switch (colEnd - colStart + pad) {
-       | 0 => 1
-       | a => a
-       },
-       '^',
-     )
-  ++ "\n"
-  ++ content;
-};
-
 [@bs.val] external env : string = "process.env.NODE_ENV";

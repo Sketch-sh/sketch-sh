@@ -26,6 +26,13 @@ let component = ReasonReact.reducerComponent("Editor_Page");
 let make = (~blocks: array(block), _children) => {
   ...component,
   initialState: () => {blocks: blocks},
+  didMount: self => {
+    blocks
+    |. Belt.Array.forEachWithIndexU((. blockIndex, _block) =>
+         self.send(ExecuteBlock(blockIndex))
+       );
+    ();
+  },
   reducer: (action, state) =>
     switch (action) {
     | Block_AddWidgets(blockIndex, widgets) =>
@@ -59,104 +66,7 @@ let make = (~blocks: array(block), _children) => {
                   |> then_(
                        result => {
                          let widgets =
-                           result
-                           |. Belt.List.reduceU(
-                                [||],
-                                (. acc, exeResult) => {
-                                  let {
-                                    fn_buffer: _,
-                                    fn_result: result,
-                                    fn_pos,
-                                  } = exeResult;
-                                  let (_, {line}) = fn_pos;
-
-                                  let evaluate =
-                                    result.fn_evaluate
-                                    |. Belt.Option.map(content =>
-                                         Widget.Lw_Value({line, content})
-                                       );
-
-                                  let stdout =
-                                    result.fn_stdout
-                                    |. Belt.Option.map(content =>
-                                         Widget.Lw_Stdout({line, content})
-                                       );
-
-                                  let stderr =
-                                    switch (result.fn_stderr) {
-                                    | None => [||]
-                                    | Some(errors) =>
-                                      errors
-                                      |. Belt.Array.map(
-                                           error => {
-                                             let toWidgetContent =
-                                                 (content: Error.content) => {
-                                               let (
-                                                 {
-                                                   lno_line,
-                                                   lno_col: colStart,
-                                                 },
-                                                 {
-                                                   lno_line: _,
-                                                   lno_col: colEnd,
-                                                 },
-                                               ) =
-                                                 content.pos;
-                                               Js.log3(
-                                                 colStart,
-                                                 colEnd,
-                                                 content.content,
-                                               );
-
-                                               {
-                                                 Editor_CodeBlockTypes.Widget.line: lno_line,
-                                                 content:
-                                                   renderErrorIndicator(
-                                                     colStart,
-                                                     colEnd,
-                                                     content.content,
-                                                   ),
-                                               };
-                                             };
-
-                                             switch (error) {
-                                             | Err_Warning(content) =>
-                                               Js.log("warnng");
-                                               Widget.Lw_Warning(
-                                                 toWidgetContent(content),
-                                               );
-                                             | Err_Error(content) =>
-                                               Widget.Lw_Error(
-                                                 toWidgetContent(content),
-                                               )
-                                             | Err_Unknown(content) =>
-                                               Widget.Lw_Error({
-                                                 line,
-                                                 content,
-                                               })
-                                             };
-                                           },
-                                         )
-                                    };
-
-                                  let finalWidgets =
-                                    [|stdout, evaluate|]
-                                    |. Belt.Array.reduceU(
-                                         [||], (. acc2, lineWidget) =>
-                                         switch (lineWidget) {
-                                         | None => acc2
-                                         | Some(lw) =>
-                                           Belt.Array.concat(acc2, [|lw|])
-                                         }
-                                       );
-
-                                  Belt.Array.concatMany([|
-                                    acc,
-                                    stderr,
-                                    finalWidgets,
-                                  |]);
-                                },
-                              );
+                           Editor_Page_Utils.executeRessultToWidget(result);
                          resolve(
                            self.send(
                              Block_AddWidgets(blockIndex, widgets),
