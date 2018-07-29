@@ -43,20 +43,6 @@ npm run bs:start
 
 - Do cool things :cool:
 
-## Plans
+## LICENSE
 
-TODOs:
-
-- [x] ArrowUp and ArrowDown
-- [ ] Parse and highlight error
-- [ ] Syntax highlighting
-- [ ] Load evaluator async
-- [x] Reset session (#reset;)
-- [x] Input autosize
-- [x] Proper stdin/stdout hook with jsoo instead of hacking console.log
-- [x] Syntax toggling (#toggle_syntax;)
-
-Future:
-
-- [ ] Save/load session
-- [ ] Write the introduction (right column)
+Apache 2.0. See the included LICENSE file for more information
