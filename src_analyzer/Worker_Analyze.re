@@ -14,6 +14,8 @@ module Make = (ESig: Worker_Evaluator.EvaluatorSig) => {
           && stderr
           |> Js.String.indexOf("Comment not terminated") == (-1)
           && stderr
+          |> Js.String.indexOf("String literal not terminated") == (-1)
+          && stderr
           |>
           Js.String.indexOf(
             "This comment contains an unterminated string literal",
