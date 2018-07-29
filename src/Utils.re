@@ -82,3 +82,5 @@ let renderErrorIndicator = (colStart, colEnd, content) => {
   ++ "\n"
   ++ content;
 };
+
+[@bs.val] external env : string = "process.env.NODE_ENV";

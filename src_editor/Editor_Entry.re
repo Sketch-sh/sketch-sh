@@ -29,10 +29,14 @@ let blocks =
   |. (((acc, _firstLineNumber)) => acc);
 
 let blocks =
-  Belt.Array.concat(
-    [|Editor_Page.B_Text(Editor_Loremipsum.text1)|],
-    blocks,
-  );
+  if (Utils.env == "production") {
+    Belt.Array.concat(
+      [|Editor_Page.B_Text(Editor_Loremipsum.text1)|],
+      blocks,
+    );
+  } else {
+    blocks;
+  };
 
 let make = _children => {
   ...component,
