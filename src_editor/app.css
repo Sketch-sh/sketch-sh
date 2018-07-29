@@ -9,11 +9,17 @@ body {
   margin: auto;
 }
 
+/* ////////////////////// Cells //////////////// */
 .cell__container {
   margin-top: 25px;
   padding: 0px;
   position: relative;
 }
+.cell__controls {
+  display: flex;
+  flex-direction: row-reverse;
+}
+/* \\\\\\\\\\\\\\\\\\\\\\ Cells \\\\\\\\\\\\\\\ */
 
 /* ///////////////////// Widgets ////////////// */
 

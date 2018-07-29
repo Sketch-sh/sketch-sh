@@ -38,6 +38,11 @@ let blocks =
     blocks;
   };
 
+let blocks =
+  blocks
+  |. Belt.Array.mapU((. b_data) =>
+       {Editor_Page.b_id: Utils.generateId(), b_data}
+     );
 let make = _children => {
   ...component,
   render: _self => <Editor_Page blocks />,

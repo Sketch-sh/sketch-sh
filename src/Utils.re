@@ -56,7 +56,7 @@ let min = (min, value) => value < min ? min : value;
 
 [@bs.val] external env : string = "process.env.NODE_ENV";
 
-let arrayFindIndex = (f, array) => {
+let arrayFindIndex = (array, f) => {
   let length = Array.length(array);
   let rec loop = i =>
     if (i < length) {
@@ -71,3 +71,21 @@ let arrayFindIndex = (f, array) => {
     };
   loop(0);
 };
+
+let arrayFind = (array, f) => {
+  let length = Array.length(array);
+  let rec loop = i =>
+    if (i < length) {
+      let element = array[i];
+      if (f(element)) {
+        Some(array[i]);
+      } else {
+        loop(i + 1);
+      };
+    } else {
+      None;
+    };
+  loop(0);
+};
+
+let generateId = NanoId.Secure.make;
