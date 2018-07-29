@@ -1,0 +1,86 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`syntax error error in same line with another block 1`] = `
+Array [
+  Array [
+    "let a = 1;",
+    Array [
+      "let a: int = 1;",
+      undefined,
+      undefined,
+    ],
+    Array [
+      Array [
+        0,
+        0,
+      ],
+      Array [
+        0,
+        10,
+      ],
+    ],
+  ],
+  Array [
+    "b",
+    Array [
+      undefined,
+      "File \\"\\", line 1, characters 1-1:
+Error: Syntax error",
+      undefined,
+    ],
+    Array [
+      Array [
+        0,
+        10,
+      ],
+      Array [
+        0,
+        12,
+      ],
+    ],
+  ],
+]
+`;
+
+exports[`syntax error error spawning 2 line 1`] = `
+Array [
+  Array [
+    "let a = 1;",
+    Array [
+      "let a: int = 1;",
+      undefined,
+      undefined,
+    ],
+    Array [
+      Array [
+        0,
+        0,
+      ],
+      Array [
+        0,
+        10,
+      ],
+    ],
+  ],
+  Array [
+    "b
+cd",
+    Array [
+      undefined,
+      "File \\"\\", line 2, characters 0-2:
+Error: Syntax error",
+      undefined,
+    ],
+    Array [
+      Array [
+        0,
+        10,
+      ],
+      Array [
+        1,
+        3,
+      ],
+    ],
+  ],
+]
+`;

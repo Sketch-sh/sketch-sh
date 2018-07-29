@@ -12,14 +12,26 @@ let compilerPosToPos:
 
 let compilerErrorMessageToAbsolutePos =
     (content: CompilerErrorMessage.content, blockPos: (loc, loc)) => {
-  let (blockFrom, _blockTo) = blockPos;
-  let {line: blockFromLine} = blockFrom;
+  let (
+    {line: blockFromLine, col: blockFromCol},
+    {line: blockToLine, col: blockToCol},
+  ) = blockPos;
   let (from, to_) = content.o_pos;
   {
     ...content,
     o_pos: (
-      {o_line: from.o_line + blockFromLine, o_col: from.o_col},
-      {o_line: to_.o_line + blockFromLine, o_col: to_.o_col},
+      {
+        o_line: from.o_line + blockFromLine,
+        o_col:
+          from.o_col
+          + (from.o_line == 1 && blockFromCol != 0 ? blockFromCol : 0),
+      },
+      {
+        o_line: to_.o_line + blockFromLine,
+        o_col:
+          to_.o_col
+          + (from.o_line == 1 && blockFromCol != 0 ? blockFromCol : 0),
+      },
     ),
   };
 };

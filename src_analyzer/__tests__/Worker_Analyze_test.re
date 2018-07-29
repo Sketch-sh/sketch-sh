@@ -245,3 +245,31 @@ Printf.sprintf("%i", sum(myTree));|};
     );
   },
 );
+
+describe(
+  "syntax error",
+  () => {
+    open Expect;
+    open! Expect.Operators;
+
+    test(
+      "error in same line with another block",
+      () => {
+        let code = "let a = 1;b";
+        let result = exe(code);
+
+        expect(result) |> toMatchSnapshot;
+      },
+    );
+
+    test(
+      "error spawning 2 line",
+      () => {
+        let code = "let a = 1;b\ncd";
+        let result = exe(code);
+
+        expect(result) |> toMatchSnapshot;
+      },
+    );
+  },
+);

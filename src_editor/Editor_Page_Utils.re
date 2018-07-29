@@ -1,6 +1,12 @@
 let renderErrorIndicator = (colStart, colEnd, content) =>
   String.make(colStart, ' ')
-  ++ String.make(colEnd - colStart, '^')
+  ++ String.make(
+       switch (colEnd - colStart) {
+       | 0 => 1
+       | a => a
+       },
+       '^',
+     )
   ++ "\n"
   ++ content;
 

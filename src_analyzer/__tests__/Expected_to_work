@@ -1,0 +1,80 @@
+module Helpers = {
+  let listDrop = (n, lst) => {
+    let lst = ref(lst);
+    for (i in 1 to n) {
+      lst := List.tl(lst^);
+    };
+    lst^;
+  };
+  let listTakeWhile = (f, lst) => {
+    let result = ref([]);
+    let lst = ref(lst);
+    while (f(List.hd(lst^))) {
+      result := [List.hd(lst^), ...result^];
+      lst := List.tl(lst^);
+    };
+    List.rev(result^);
+  };
+};
+
+let normalizeCompilerLineColsToRange = (~fileLines, ~lineRaw, ~col1Raw, ~col2Raw) => {
+  /* accept strings to constraint usage to parse directly from raw data */
+  let line = int_of_string(lineRaw);
+  let fileLength = List.length(fileLines);
+  let isOCamlBeingBadAndPointingToALineBeyondFileLength = line > fileLength;
+  let (col1, col2) =
+    if (isOCamlBeingBadAndPointingToALineBeyondFileLength) {
+      let lastDamnReachableSpotInTheFile = String.length(List.nth(fileLines, fileLength - 1));
+      (lastDamnReachableSpotInTheFile - 1, lastDamnReachableSpotInTheFile)
+    } else {
+      switch (col1Raw, col2Raw) {
+      | (Some(a), Some(b)) => (int_of_string(a), int_of_string(b))
+      /* some error msgs don't have column numbers; we normal them to 0 here */
+      | _ => (0, 0)
+      }
+    };
+  let startRow =
+    if (isOCamlBeingBadAndPointingToALineBeyondFileLength) {
+      fileLength - 1
+    } else {
+      line - 1
+    };
+  let currentLine = List.nth(fileLines, startRow);
+  let numberOfCharsBetweenStartAndEndColumn = col2 - col1;
+  let numberOfCharsLeftToCoverOnStartingRow =
+    /* +1 bc ocaml looooves to count new line as a char below when the error
+       spans multiple lines*/
+    String.length(currentLine) - col1 + 1;
+  if (numberOfCharsBetweenStartAndEndColumn <= numberOfCharsLeftToCoverOnStartingRow) {
+    ((startRow, col1), (startRow, col2))
+  } else {
+    let howManyCharsLeftToCoverOnSubsequentLines =
+      ref(numberOfCharsBetweenStartAndEndColumn - numberOfCharsLeftToCoverOnStartingRow);
+    let suddenlyFunctionalProgrammingOutOfNowhere =
+      fileLines
+      |> Helpers.listDrop(startRow + 1)
+      |> List.map(String.length)
+      |> Helpers.listTakeWhile(
+           (numberOfCharsOnThisLine) =>
+             if (howManyCharsLeftToCoverOnSubsequentLines^ > numberOfCharsOnThisLine) {
+               howManyCharsLeftToCoverOnSubsequentLines :=
+                 howManyCharsLeftToCoverOnSubsequentLines^ - numberOfCharsOnThisLine - 1;
+               true
+             } else {
+               false
+             }
+         );
+    let howManyMoreRowsCoveredSinceStartRow =
+      1 + List.length(suddenlyFunctionalProgrammingOutOfNowhere);
+    (
+      (startRow, col1),
+      (startRow + howManyMoreRowsCoveredSinceStartRow, howManyCharsLeftToCoverOnSubsequentLines^)
+    )
+  }
+};
+normalizeCompilerLineColsToRange(
+  ~fileLines=["let a = 1;b"], 
+  ~lineRaw="1", 
+  ~col1Raw=Some("1"), 
+  ~col2Raw=Some("2"),
+);
