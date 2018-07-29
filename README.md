@@ -1,4 +1,8 @@
-# Reason online REPL - rtop
+# ReasonML playground
+
+A note writing application for teaching and sharing ReasonML code with inline evaluation.
+
+![](github/screenshot.png)
 
 ## How does it work?
 

@@ -1,15 +1,15 @@
-let code1 = {|print_endline("Hello ReasonML folks!");
+let code1 = {|/* Inline evaluation and stdout */
+print_endline("Hello ReasonML folks!");
+type say = | Hello | Bye;
 
-let pi = 4. *. atan(1.);
+/* A warning */
+fun
+| Hello
+| Bye => ()
+| _ => ();
 
-let random_gaussian = () =>
-  1.
-  +. sqrt((-2.) *. log(Random.float(1.)))
-  *. cos(2. *. pi *. Random.float(1.));
-
-for (i in 0 to 2) {
-  random_gaussian() |> string_of_float |> print_endline;
-};|};
+/* A syntax error */
+a|};
 
 let code3 = {|type say = | Hello | Bye;
 fun
@@ -38,7 +38,8 @@ Printf.sprintf("%i", sum(myTree));|};
 let text1 = {|# ReasonML playground
 
 You're viewing an early demo of ReasonML playground.
-This is meant to be a note-like application for teaching and sharing ReasonML code with inline evaluation of the code.
+
+A note writing application for teaching and sharing ReasonML code with inline evaluation.
 
 This is **OCaml 4.06.0 toplevel** compiled with [js_of_ocaml](http://ocsigen.org/js_of_ocaml/).
 
