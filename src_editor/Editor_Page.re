@@ -1,7 +1,5 @@
 [%%debugger.chrome];
-open Worker_Types;
 open Editor_CodeBlockTypes;
-open Utils;
 
 type bcode = {
   bc_value: string,

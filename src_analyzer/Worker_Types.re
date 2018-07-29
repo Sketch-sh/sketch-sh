@@ -36,14 +36,26 @@ type wholeProgramExecuteResult = {
   pos: (loc, loc),
 };
 
-type final_evaluationResult = {
-  fn_evaluate: option(string),
-  fn_stderr: option(array(CompilerErrorMessage.t)),
-  fn_stdout: option(string),
+module ErrorMessage = {
+  type content = {
+    errMsg_content: string,
+    errMsg_pos: (loc, loc),
+  };
+
+  type t =
+    | Err_Warning(content)
+    | Err_Error(content)
+    | Err_Unknown(string);
 };
 
-type final_programEvaluationResult = {
-  fn_buffer: string,
-  fn_result: final_evaluationResult,
-  fn_pos: (loc, loc),
+type blockResult = {
+  blockResult_evaluate: option(string),
+  blockResult_stderr: option(array(ErrorMessage.t)),
+  blockResult_stdout: option(string),
+};
+
+type blockData = {
+  block_content: string,
+  block_result: blockResult,
+  block_pos: (loc, loc),
 };

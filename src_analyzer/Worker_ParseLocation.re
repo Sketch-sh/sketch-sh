@@ -1,4 +1,3 @@
-open Worker_Types;
 open Worker_Types.CompilerErrorMessage;
 
 let parse = output =>

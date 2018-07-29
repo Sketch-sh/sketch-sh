@@ -1,7 +1,6 @@
 module Make = (ESig: Worker_Evaluator.EvaluatorSig) => {
   module Evaluator = Worker_Evaluator.Make(ESig);
   open Worker_Types;
-  open CompilerErrorMessage;
   let tryExecute = code => {
     let executeResult = Evaluator.execute(code);
     let stderr = executeResult.stderr;
@@ -148,7 +147,7 @@ module Make = (ESig: Worker_Evaluator.EvaluatorSig) => {
               } else {
                 switch (error) {
                 | Err_Unknown(string) => (
-                    [Err_Unknown(string), ...acc],
+                    [CompilerErrorMessage.Err_Unknown(string), ...acc],
                     false,
                   )
                 | Err_Warning(content) => (
@@ -169,25 +168,25 @@ module Make = (ESig: Worker_Evaluator.EvaluatorSig) => {
          |. Belt.List.toArray
          |. Belt.Array.map((error: CompilerErrorMessage.t) =>
               switch (error) {
-              | Err_Unknown(string) => Err_Unknown(string)
+              | Err_Unknown(string) => ErrorMessage.Err_Unknown(string)
               | Err_Warning(content) =>
                 Err_Warning(
-                  Worker_Location_Utils.errorMessageToAbsoluteLocation(
-                    content,
-                    blockPos,
+                  Worker_Location_Utils.(
+                    compilerErrorMessageToAbsolutePos(content, blockPos)
+                    |. compilerErrorMessageToErrorMessage
                   ),
                 )
               | Err_Error(content) =>
                 Err_Error(
-                  Worker_Location_Utils.errorMessageToAbsoluteLocation(
-                    content,
-                    blockPos,
+                  Worker_Location_Utils.(
+                    compilerErrorMessageToAbsolutePos(content, blockPos)
+                    |. compilerErrorMessageToErrorMessage
                   ),
                 )
               }
             )
        );
-  let execute =
+  let execute: (. bool, string) => list(Worker_Types.blockData) =
     (. reset, code) => {
       if (reset) {
         Evaluator.reset();
@@ -198,20 +197,20 @@ module Make = (ESig: Worker_Evaluator.EvaluatorSig) => {
       let result =
         result
         |. Belt.List.map(
-             blockResult => {
-               let executeResult = blockResult.executeResult;
+             blockData => {
+               let executeResult = blockData.executeResult;
 
                let stderr =
                  executeResult.stderr
-                 |. parseAndCorrectStderrPos(blockResult.pos);
+                 |. parseAndCorrectStderrPos(blockData.pos);
                {
-                 fn_buffer: blockResult.buffer,
-                 fn_result: {
-                   fn_evaluate: executeResult.evaluate,
-                   fn_stdout: executeResult.stdout,
-                   fn_stderr: stderr,
+                 block_content: blockData.buffer,
+                 block_result: {
+                   blockResult_evaluate: executeResult.evaluate,
+                   blockResult_stdout: executeResult.stdout,
+                   blockResult_stderr: stderr,
                  },
-                 fn_pos: blockResult.pos,
+                 block_pos: blockData.pos,
                };
              },
            );

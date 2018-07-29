@@ -1,17 +1,10 @@
 let renderErrorIndicator = (colStart, colEnd, content) =>
   String.make(colStart, ' ')
-  ++ String.make(
-       /* Sometime it reports characters 1-1 */
-       switch (colEnd - colStart) {
-       | 0 => 1
-       | a => a
-       },
-       '^',
-     )
+  ++ String.make(colEnd - colStart, '^')
   ++ "\n"
   ++ content;
-let executeRessultToWidget =
-    (result: list(Worker_Types.final_programEvaluationResult)) => {
+
+let executeRessultToWidget = (result: list(Worker_Types.blockData)) => {
   open Worker_Types;
   open Editor_CodeBlockTypes;
 
@@ -20,48 +13,46 @@ let executeRessultToWidget =
     |. Belt.List.reduceU(
          [||],
          (. acc, exeResult) => {
-           let {fn_buffer: _, fn_result: result, fn_pos} = exeResult;
-           let (_, {line}) = fn_pos;
+           let {block_content: _, block_result: result, block_pos} = exeResult;
+           let (_, {line}) = block_pos;
 
            let evaluate =
-             result.fn_evaluate
+             result.blockResult_evaluate
              |. Belt.Option.map(content => Widget.Lw_Value({line, content}));
 
            let stdout =
-             result.fn_stdout
+             result.blockResult_stdout
              |. Belt.Option.map(content =>
                   Widget.Lw_Stdout({line, content})
                 );
 
            let stderr =
-             switch (result.fn_stderr) {
+             switch (result.blockResult_stderr) {
              | None => [||]
              | Some(errors) =>
                errors
                |. Belt.Array.mapU(
                     (. error) => {
-                      open CompilerErrorMessage;
-                      let toWidgetContent =
-                          (content: CompilerErrorMessage.content) => {
+                      let toWidgetContent = (content: ErrorMessage.content) => {
                         let (
-                          {o_line, o_col: colStart},
-                          {o_line: _, o_col: colEnd},
+                          {line, col: colStart},
+                          {line: _, col: colEnd},
                         ) =
-                          content.o_pos;
+                          content.errMsg_pos;
 
                         {
-                          Editor_CodeBlockTypes.Widget.line: o_line,
+                          Editor_CodeBlockTypes.Widget.line,
                           content:
                             renderErrorIndicator(
                               colStart,
                               colEnd,
-                              content.o_content,
+                              content.errMsg_content,
                             ),
                         };
                       };
 
                       switch (error) {
-                      | Err_Warning(content) =>
+                      | ErrorMessage.Err_Warning(content) =>
                         Widget.Lw_Warning(toWidgetContent(content))
                       | Err_Error(content) =>
                         Widget.Lw_Error(toWidgetContent(content))

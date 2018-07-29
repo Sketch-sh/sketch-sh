@@ -1,6 +1,16 @@
 open Worker_Types;
 
-let errorMessageToAbsoluteLocation =
+let compilerLocToCodeEditorLoc: CompilerErrorMessage.loc => loc =
+  loc => {line: loc.o_line - 1, col: loc.o_col};
+
+let compilerPosToPos:
+  ((CompilerErrorMessage.loc, CompilerErrorMessage.loc)) => (loc, loc) =
+  compilerPos => {
+    let (from, to_) = compilerPos;
+    (compilerLocToCodeEditorLoc(from), compilerLocToCodeEditorLoc(to_));
+  };
+
+let compilerErrorMessageToAbsolutePos =
     (content: CompilerErrorMessage.content, blockPos: (loc, loc)) => {
   let (blockFrom, _blockTo) = blockPos;
   let {line: blockFromLine} = blockFrom;
@@ -14,16 +24,12 @@ let errorMessageToAbsoluteLocation =
   };
 };
 
-let compilerLocToCodeEditorLoc: CompilerErrorMessage.loc => loc =
-  loc => {line: loc.o_line - 1, col: loc.o_col};
-
-let compilerPosToCodeEditorPos:
-  ((CompilerErrorMessage.loc, CompilerErrorMessage.loc)) => (loc, loc) =
-  compilerPos => {
-    let (from, to_) = compilerPos;
-    (compilerLocToCodeEditorLoc(from), compilerLocToCodeEditorLoc(to_));
-  };
-
+let compilerErrorMessageToErrorMessage =
+    (content: CompilerErrorMessage.content)
+    : ErrorMessage.content => {
+  errMsg_content: content.o_content,
+  errMsg_pos: content.o_pos |> compilerPosToPos,
+};
 /**
  * Find a lower-bound index of a value in a sorted array of ranges.
  *
