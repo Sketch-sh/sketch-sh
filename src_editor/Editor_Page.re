@@ -12,6 +12,40 @@ type action =
   | Block_UpdateValue(id, string)
   | Block_AddWidgets(id, array(Widget.t));
 
+let blockControlsButtons = (b_id, send) =>
+  <div className="cell__controls-buttons">
+    <button onClick=(_ => send(Block_Delete(b_id)))>
+      ("Delete block" |. str)
+    </button>
+    <button
+      onClick=(
+        _ => send(Block_Add(b_id, Editor_Page_Utils.emptyTextBlock()))
+      )>
+      ("Add text block" |. str)
+    </button>
+    <button
+      onClick=(
+        _ => send(Block_Add(b_id, Editor_Page_Utils.emptyCodeBlock()))
+      )>
+      ("Add code block" |. str)
+    </button>
+  </div>;
+
+let blockHint = (b_id, send) =>
+  <div className="cell__controls-hint">
+    <button
+      onClick=(_ => send(Block_Execute(b_id)))
+      className="cell__controls-hint--run">
+      ("run" |. str)
+    </button>
+    <span>
+      (" or press " |. str)
+      <kdb> ("Shift" |. str) </kdb>
+      (" + " |. str)
+      <kdb> ("Enter" |. str) </kdb>
+    </span>
+  </div>;
+
 let component = ReasonReact.reducerComponent("Editor_Page");
 
 let make = (~blocks: array(block), _children) => {
@@ -135,64 +169,40 @@ let make = (~blocks: array(block), _children) => {
       (
         state.blocks
         |. Belt.Array.mapU((. {b_id, b_data}) =>
-             <div key=b_id id=b_id className="cell__container">
-               (
-                 switch (b_data) {
-                 | B_Code({bc_value, bc_widgets, bc_firstLineNumber}) =>
-                   <div className="source-editor">
-                     <Editor_CodeBlock
-                       value=bc_value
-                       onChange=(
-                         newValue =>
-                           send(Block_UpdateValue(b_id, newValue))
-                       )
-                       onExecute=(() => send(Block_Execute(b_id)))
-                       widgets=bc_widgets
-                       firstLineNumber=bc_firstLineNumber
-                     />
-                   </div>
-                 | B_Text(text) =>
-                   <div className="text-editor">
-                     <Editor_TextBlock
-                       value=text
-                       onChange=(
-                         newValue =>
-                           send(Block_UpdateValue(b_id, newValue))
-                       )
-                     />
-                   </div>
-                 }
-               )
-               <div className="cell__controls">
-                 <button onClick=(_ => send(Block_Delete(b_id)))>
-                   ("Delete block" |> str)
-                 </button>
-                 <button
-                   onClick=(
-                     _ =>
-                       send(
-                         Block_Add(
-                           b_id,
-                           Editor_Page_Utils.emptyTextBlock(),
-                         ),
-                       )
-                   )>
-                   ("Add text block" |> str)
-                 </button>
-                 <button
-                   onClick=(
-                     _ =>
-                       send(
-                         Block_Add(
-                           b_id,
-                           Editor_Page_Utils.emptyCodeBlock(),
-                         ),
-                       )
-                   )>
-                   ("Add code block" |> str)
-                 </button>
+             switch (b_data) {
+             | B_Code({bc_value, bc_widgets, bc_firstLineNumber}) =>
+               <div key=b_id id=b_id className="cell__container">
+                 <div className="source-editor">
+                   <Editor_CodeBlock
+                     value=bc_value
+                     onChange=(
+                       newValue => send(Block_UpdateValue(b_id, newValue))
+                     )
+                     onExecute=(() => send(Block_Execute(b_id)))
+                     widgets=bc_widgets
+                     firstLineNumber=bc_firstLineNumber
+                   />
+                 </div>
+                 <div className="cell__controls">
+                   (blockControlsButtons(b_id, send))
+                   (blockHint(b_id, send))
+                 </div>
                </div>
-             </div>
+             | B_Text(text) =>
+               <div key=b_id id=b_id className="cell__container">
+                 <div className="text-editor">
+                   <Editor_TextBlock
+                     value=text
+                     onChange=(
+                       newValue => send(Block_UpdateValue(b_id, newValue))
+                     )
+                   />
+                 </div>
+                 <div className="cell__controls">
+                   (blockControlsButtons(b_id, send))
+                 </div>
+               </div>
+             }
            )
         |. ReasonReact.array
       )

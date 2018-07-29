@@ -1,5 +1,23 @@
 body {
   margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+}
+
+kdb {
+  display: inline-block;
+  margin: 0 0.1em;
+  padding: 0.1em 0.6em;
+  font-size: 0.86em;
+  color: inherit;
+  line-height: 1.4;
+  text-shadow: 0 1px 0 #fff;
+  font-family: inherit;
+  background: #ffffff;
+  background: linear-gradient(to bottom, #ffffff 0%, #f4f4f4 100%);
+  border: 1px solid #adb3b9;
+  border-radius: 3px;
+  box-shadow: 0 1px 0 rgba(12, 13, 14, 0.2), 0 0 0 2px #fff inset;
 }
 
 .pageSizer {
@@ -15,9 +33,43 @@ body {
   padding: 0px;
   position: relative;
 }
+
 .cell__controls {
+  margin-top: 4px;
+  margin-left: 36px;
   display: flex;
   flex-direction: row-reverse;
+}
+
+.cell__controls-buttons {
+  flex: 0 0 50%;
+  display: flex;
+  flex-direction: row-reverse;
+}
+
+.cell__controls-hint {
+  flex: 0 0 50%;
+  color: rgb(136, 136, 136);
+  font-size: 13px;
+  font-style: italic;
+  display: flex;
+  align-items: center;
+}
+
+.cell__controls-hint--run {
+  font-style: italic;
+  border: 0;
+  color: white;
+  padding: 0 5px;
+  font-weight: bold;
+  margin: 0;
+  height: 25px;
+  line-height: 25px;
+  font-size: 13px;
+  transform: scale(0.9, 0.9);
+  background: #00c72b;
+  text-shadow: 0px 1px 0 #11b53c;
+  cursor: pointer;
 }
 /* \\\\\\\\\\\\\\\\\\\\\\ Cells \\\\\\\\\\\\\\\ */
 
