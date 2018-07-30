@@ -14,7 +14,15 @@ let getEditor = (state, ~default, ~f) =>
   };
 
 let make =
-    (~value, ~firstLineNumber, ~widgets, ~onChange, ~onExecute, _children)
+    (
+      ~value,
+      ~firstLineNumber,
+      ~widgets,
+      ~onChange,
+      ~onFocus,
+      ~onExecute,
+      _children,
+    )
     : ReasonReact.component(state, _, unit) => {
   ...component,
   initialState: () => {
@@ -118,6 +126,7 @@ let make =
     <Editor_CodeMirror
       value
       onChange
+      onFocus
       setEditor=(
         editor => {
           state.editor := Some(editor);
