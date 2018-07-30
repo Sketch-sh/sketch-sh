@@ -202,4 +202,9 @@ module Editor = {
   external onChange :
     (editor, [@bs.as "change"] _, (editor, EditorChange.t) => unit) => unit =
     "on";
+
+  [@bs.send]
+  external onFocus :
+    (editor, [@bs.as "focus"] _, (editor, Dom.event) => unit) => unit =
+    "on";
 };

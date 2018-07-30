@@ -3,12 +3,16 @@ open Utils;
 open Editor_CodeBlockTypes;
 open Editor_Types.Block;
 
-type state = {blocks: array(block)};
+type state = {
+  blocks: array(block),
+  focusedBlock: option(id),
+};
 
 type action =
   | Block_Add(id, blockType)
   | Block_Execute(id)
   | Block_Delete(id)
+  | Block_Focus(id)
   | Block_UpdateValue(id, string)
   | Block_AddWidgets(id, array(Widget.t));
 
@@ -50,7 +54,7 @@ let component = ReasonReact.reducerComponent("Editor_Page");
 
 let make = (~blocks: array(block), _children) => {
   ...component,
-  initialState: () => {blocks: blocks},
+  initialState: () => {blocks, focusedBlock: None},
   didMount: self => {
     blocks
     |. Belt.Array.forEachU((. {b_id}) => self.send(Block_Execute(b_id)));
@@ -60,7 +64,7 @@ let make = (~blocks: array(block), _children) => {
     switch (action) {
     | Block_AddWidgets(blockId, widgets) =>
       ReasonReact.Update({
-        /* ...state, */
+        ...state,
         blocks:
           state.blocks
           |. Belt.Array.mapU((. block) => {
@@ -108,7 +112,7 @@ let make = (~blocks: array(block), _children) => {
 
     | Block_UpdateValue(blockId, newValue) =>
       ReasonReact.Update({
-        /* ...state, */
+        ...state,
         blocks:
           state.blocks
           |. Belt.Array.mapU((. block) => {
@@ -133,9 +137,18 @@ let make = (~blocks: array(block), _children) => {
           state.blocks
           |. Belt.Array.keepU((. {b_id}) => b_id != blockId)
           |. Editor_Page_Utils.syncLineNumber,
+        focusedBlock:
+          switch (state.focusedBlock) {
+          | None => None
+          | Some(focusedBlock) =>
+            focusedBlock == blockId ? None : Some(focusedBlock)
+          },
       })
+    | Block_Focus(blockId) =>
+      ReasonReact.Update({...state, focusedBlock: Some(blockId)})
     | Block_Add(afterBlockId, blockType) =>
       ReasonReact.Update({
+        ...state,
         blocks:
           state.blocks
           |. Belt.Array.reduceU(
@@ -173,6 +186,7 @@ let make = (~blocks: array(block), _children) => {
                      onChange=(
                        newValue => send(Block_UpdateValue(b_id, newValue))
                      )
+                     onFocus=(() => send(Block_Focus(b_id)))
                      onExecute=(() => send(Block_Execute(b_id)))
                      widgets=bc_widgets
                      firstLineNumber=bc_firstLineNumber
@@ -181,12 +195,18 @@ let make = (~blocks: array(block), _children) => {
                  <div className="cell__controls">
                    (blockControlsButtons(b_id, send))
                    (
-                     last_block_id
-                     =>> (
-                       last_b_id =>
-                         last_b_id === b_id ?
-                           blockHint(b_id, send) : ReasonReact.null
-                     )
+                     switch (state.focusedBlock) {
+                     | None =>
+                       last_block_id
+                       =>> (
+                         last_b_id =>
+                           last_b_id === b_id ?
+                             blockHint(b_id, send) : ReasonReact.null
+                       )
+                     | Some(focusedBlock) =>
+                       focusedBlock === b_id ?
+                         blockHint(b_id, send) : ReasonReact.null
+                     }
                    )
                  </div>
                </div>

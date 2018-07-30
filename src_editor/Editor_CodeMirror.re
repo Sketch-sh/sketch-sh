@@ -38,6 +38,7 @@ let make =
       ~options: CodeMirror.EditorConfiguration.t,
       ~setEditor: option(CodeMirror.editor => unit)=?,
       ~onChange=?,
+      ~onFocus=?,
       _children,
     )
     : ReasonReact.component(state, _, unit) => {
@@ -80,6 +81,15 @@ let make =
            };
            /* }; */
          });
+
+      editor
+      |. CodeMirror.Editor.onFocus((_editor, _event) =>
+           switch (onFocus) {
+           | None => ()
+           | Some(onFocus) => onFocus()
+           }
+         );
+
       state.editor := Some(editor);
       %bs.raw
       {|window.editor = editor|};
