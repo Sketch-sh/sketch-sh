@@ -233,7 +233,7 @@ let make = (~blocks: array(block), _children) => {
     },
   render: ({send, state}) => {
     let lastCodeBlockId = Editor_Page_Utils.findLastCodeBlock(state.blocks);
-    <div className="pageSizer">
+    <Fragment>
       (
         state.blocks
         |. Belt.Array.mapU((. {b_id, b_data}) =>
@@ -291,7 +291,7 @@ let make = (~blocks: array(block), _children) => {
                      focused=(
                        switch (state.focusedBlock) {
                        | None => None
-                       | Some((id, blockTyp, changeTyp)) =>
+                       | Some((id, _blockTyp, changeTyp)) =>
                          id == b_id ? Some(changeTyp) : None
                        }
                      )
@@ -311,6 +311,6 @@ let make = (~blocks: array(block), _children) => {
            )
         |. ReasonReact.array
       )
-    </div>;
+    </Fragment>;
   },
 };

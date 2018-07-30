@@ -39,7 +39,7 @@ let blocks =
 
 let make = _children => {
   ...component,
-  render: _self => <Editor_Page blocks />,
+  render: _self => <Editor_Note blocks />,
 };
 
 let default = ReasonReact.wrapReasonForJs(~component, _jsProps => make([||]));
