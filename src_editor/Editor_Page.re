@@ -63,22 +63,20 @@ let make = (~blocks: array(block), _children) => {
         /* ...state, */
         blocks:
           state.blocks
-          |. Belt.Array.mapU(
-               (. block) => {
-                 let {b_id, b_data} = block;
-                 if (b_id != blockId) {
-                   block;
-                 } else {
-                   switch (b_data) {
-                   | B_Text(_) => block
-                   | B_Code(bcode) => {
-                       b_id,
-                       b_data: B_Code({...bcode, bc_widgets: widgets}),
-                     }
-                   };
+          |. Belt.Array.mapU((. block) => {
+               let {b_id, b_data} = block;
+               if (b_id != blockId) {
+                 block;
+               } else {
+                 switch (b_data) {
+                 | B_Text(_) => block
+                 | B_Code(bcode) => {
+                     b_id,
+                     b_data: B_Code({...bcode, bc_widgets: widgets}),
+                   }
                  };
-               },
-             ),
+               };
+             }),
       })
     | Block_Execute(blockId) =>
       let block = state.blocks |. arrayFind(({b_id}) => b_id == blockId);
@@ -93,15 +91,13 @@ let make = (~blocks: array(block), _children) => {
               self =>
                 Js.Promise.(
                   Editor_Worker.execute(. true, bc_value)
-                  |> then_(
-                       result => {
-                         let widgets =
-                           Editor_Page_Utils.executeRessultToWidget(result);
-                         resolve(
-                           self.send(Block_AddWidgets(blockId, widgets)),
-                         );
-                       },
-                     )
+                  |> then_(result => {
+                       let widgets =
+                         Editor_Page_Utils.executeRessultToWidget(result);
+                       resolve(
+                         self.send(Block_AddWidgets(blockId, widgets)),
+                       );
+                     })
                   |> catch(error => resolve(Js.log(error)))
                   |> ignore
                 )
@@ -115,22 +111,20 @@ let make = (~blocks: array(block), _children) => {
         /* ...state, */
         blocks:
           state.blocks
-          |. Belt.Array.mapU(
-               (. block) => {
-                 let {b_id, b_data} = block;
-                 if (b_id != blockId) {
-                   block;
-                 } else {
-                   switch (b_data) {
-                   | B_Code(bcode) => {
-                       b_id,
-                       b_data: B_Code({...bcode, bc_value: newValue}),
-                     }
-                   | B_Text(_) => {b_id, b_data: B_Text(newValue)}
-                   };
+          |. Belt.Array.mapU((. block) => {
+               let {b_id, b_data} = block;
+               if (b_id != blockId) {
+                 block;
+               } else {
+                 switch (b_data) {
+                 | B_Code(bcode) => {
+                     b_id,
+                     b_data: B_Code({...bcode, bc_value: newValue}),
+                   }
+                 | B_Text(_) => {b_id, b_data: B_Text(newValue)}
                  };
-               },
-             )
+               };
+             })
           |. Editor_Page_Utils.syncLineNumber,
       })
     | Block_Delete(blockId) =>
@@ -164,7 +158,8 @@ let make = (~blocks: array(block), _children) => {
           |. Editor_Page_Utils.syncLineNumber,
       })
     },
-  render: ({send, state}) =>
+  render: ({send, state}) => {
+    let last_block_id = Editor_Page_Utils.findLastCodeBlock(state.blocks);
     <div className="pageSizer">
       (
         state.blocks
@@ -185,7 +180,14 @@ let make = (~blocks: array(block), _children) => {
                  </div>
                  <div className="cell__controls">
                    (blockControlsButtons(b_id, send))
-                   (blockHint(b_id, send))
+                   (
+                     last_block_id
+                     =>> (
+                       last_b_id =>
+                         last_b_id === b_id ?
+                           blockHint(b_id, send) : ReasonReact.null
+                     )
+                   )
                  </div>
                </div>
              | B_Text(text) =>
@@ -206,5 +208,6 @@ let make = (~blocks: array(block), _children) => {
            )
         |. ReasonReact.array
       )
-    </div>,
+    </div>;
+  },
 };

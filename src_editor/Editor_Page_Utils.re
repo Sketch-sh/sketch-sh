@@ -28,45 +28,38 @@ let executeRessultToWidget = (result: list(Worker_Types.blockData)) => {
 
            let stdout =
              result.blockResult_stdout
-             |. Belt.Option.map(content =>
-                  Widget.Lw_Stdout({line, content})
-                );
+             |. Belt.Option.map(content => Widget.Lw_Stdout({line, content}));
 
            let stderr =
              switch (result.blockResult_stderr) {
              | None => [||]
              | Some(errors) =>
                errors
-               |. Belt.Array.mapU(
-                    (. error) => {
-                      let toWidgetContent = (content: ErrorMessage.content) => {
-                        let (
-                          {line, col: colStart},
-                          {line: _, col: colEnd},
-                        ) =
-                          content.errMsg_pos;
+               |. Belt.Array.mapU((. error) => {
+                    let toWidgetContent = (content: ErrorMessage.content) => {
+                      let ({line, col: colStart}, {line: _, col: colEnd}) =
+                        content.errMsg_pos;
 
-                        {
-                          Editor_CodeBlockTypes.Widget.line,
-                          content:
-                            renderErrorIndicator(
-                              colStart,
-                              colEnd,
-                              content.errMsg_content,
-                            ),
-                        };
+                      {
+                        Editor_CodeBlockTypes.Widget.line,
+                        content:
+                          renderErrorIndicator(
+                            colStart,
+                            colEnd,
+                            content.errMsg_content,
+                          ),
                       };
+                    };
 
-                      switch (error) {
-                      | ErrorMessage.Err_Warning(content) =>
-                        Widget.Lw_Warning(toWidgetContent(content))
-                      | Err_Error(content) =>
-                        Widget.Lw_Error(toWidgetContent(content))
-                      | Err_Unknown(content) =>
-                        Widget.Lw_Error({line, content})
-                      };
-                    },
-                  )
+                    switch (error) {
+                    | ErrorMessage.Err_Warning(content) =>
+                      Widget.Lw_Warning(toWidgetContent(content))
+                    | Err_Error(content) =>
+                      Widget.Lw_Error(toWidgetContent(content))
+                    | Err_Unknown(content) =>
+                      Widget.Lw_Error({line, content})
+                    };
+                  })
              };
 
            let finalWidgets =
@@ -114,3 +107,17 @@ let emptyCodeBlock = () =>
   B_Code({bc_value: "", bc_firstLineNumber: 1, bc_widgets: [||]});
 
 let emptyTextBlock = () => B_Text("");
+
+let findLastCodeBlock = blocks => {
+  let length = Array.length(blocks);
+  let rec loop = i =>
+    if (i >= 0) {
+      switch (blocks[i]) {
+      | {b_id, b_data: B_Code(_)} => Some(b_id)
+      | _ => loop(i - 1)
+      };
+    } else {
+      None;
+    };
+  loop(length - 1);
+};
