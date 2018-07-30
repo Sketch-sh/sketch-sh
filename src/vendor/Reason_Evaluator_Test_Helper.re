@@ -8,17 +8,22 @@ type js_executeResult = {
 [@bs.deriving abstract]
 type evalutator = {execute: string => js_executeResult};
 
-[@bs.module "../../public/reason.js"] external evalutator : evalutator = "evaluator";
+[@bs.module "../../public/reason.js"]
+external evalutator : evalutator = "evaluator";
 let js_execute = executeGet(evalutator);
 
 [@bs.deriving abstract]
 type refmterr = {parse: (~content: string, ~error: string) => string};
 
-[@bs.module "../../public/reason.js"] external refmterr : refmterr = "refmterr";
+[@bs.module "../../public/reason.js"]
+external refmterr : refmterr = "refmterr";
 let js_parseError = parseGet(refmterr);
 
 let parseError = (~content, ~error) =>
-  js_parseError(~content, ~error=error |> Js.String.replace({|File ""|}, {|File "_none_"|}));
+  js_parseError(
+    ~content,
+    ~error=error |> Js.String.replace({|File ""|}, {|File "_none_"|}),
+  );
 
 type executeResult =
   | Error(string)
@@ -36,6 +41,7 @@ let execute = code => {
   | (true, false, false) => OkWithLog(evaluate, stdout)
   | _ =>
     Js.log(result);
-    Invalid_argument("What the heck is going on with this code? " ++ code) |. raise;
+    Invalid_argument("What the heck is going on with this code? " ++ code)
+    |. raise;
   };
 };

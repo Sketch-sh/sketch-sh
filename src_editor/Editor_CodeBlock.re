@@ -30,10 +30,7 @@ let make =
         firstLineNumber: {
           if (state.firstLineNumber != firstLineNumber) {
             editor
-            |. CodeMirror.Editor.setOption(
-                 "firstLineNumber",
-                 firstLineNumber,
-               );
+            |. CodeMirror.Editor.setOption("firstLineNumber", firstLineNumber);
           };
           firstLineNumber;
         },
@@ -139,17 +136,14 @@ let make =
           ~extraKeys={
             let key = Js.Dict.empty();
             key
-            |. Js.Dict.set(
-                 "Tab",
-                 cm => {
-                   let spaces =
-                     String.make(
-                       cm |. CodeMirror.Editor.GetOption.indentUnit,
-                       ' ',
-                     );
-                   cm |. CodeMirror.Editor.replaceSelection(spaces);
-                 },
-               );
+            |. Js.Dict.set("Tab", cm => {
+                 let spaces =
+                   String.make(
+                     cm |. CodeMirror.Editor.GetOption.indentUnit,
+                     ' ',
+                   );
+                 cm |. CodeMirror.Editor.replaceSelection(spaces);
+               });
             key |. Js.Dict.set("Shift-Enter", _cm => onExecute());
             key;
           },

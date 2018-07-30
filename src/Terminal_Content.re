@@ -93,11 +93,7 @@ let make = _children => {
         switch (state.history |. Belt.List.get(cursor)) {
         | None => ReasonReact.NoUpdate
         | Some((inputDisplay, _syntax)) =>
-          ReasonReact.Update({
-            ...state,
-            inputDisplay,
-            historyCursor: cursor,
-          })
+          ReasonReact.Update({...state, inputDisplay, historyCursor: cursor})
         };
       };
     | InputEnter =>
@@ -212,17 +208,12 @@ let make = _children => {
                          ~content=inputValue,
                          ~error=stderr,
                        )
-                       |> then_(
-                            stderr => {
-                              let result = {
-                                ...result,
-                                stderr: Some(stderr),
-                              };
-                              CodeEvaluated(inputValue, result)
-                              |. send
-                              |. resolve;
-                            },
-                          )
+                       |> then_(stderr => {
+                            let result = {...result, stderr: Some(stderr)};
+                            CodeEvaluated(inputValue, result)
+                            |. send
+                            |. resolve;
+                          })
                        |> handleError
                      }
                    )
@@ -258,56 +249,50 @@ let make = _children => {
           <div className=stack>
             (
               state.displayStack
-              |. Belt.Array.mapWithIndexU(
-                   (. index, line) => {
-                     let key = index |. string_of_int;
-                     let simpleLine = ((className, line)) =>
-                       <div ?className key> (line |. str) </div>;
-                     switch (line) {
-                     | Welcome(line) =>
-                       (Some(lineWelcome), line) |. simpleLine
-                     | Input((line, syntax)) =>
-                       switch (syntax) {
-                       | Reason =>
-                         <div
-                           key
-                           className=lineInputRe
-                           dangerouslySetInnerHTML={"__html": line}
-                         />
-                       | Ml =>
-                         <div
-                           key
-                           className=lineInputMl
-                           dangerouslySetInnerHTML={"__html": line}
-                         />
-                       }
-                     | Result({stderr, stdout, evaluate}) =>
-                       <div key>
-                         (
-                           stderr
-                           =>> (
-                             stderr =>
-                               <div
-                                 dangerouslySetInnerHTML={"__html": stderr}
-                               />
-                           )
+              |. Belt.Array.mapWithIndexU((. index, line) => {
+                   let key = index |. string_of_int;
+                   let simpleLine = ((className, line)) =>
+                     <div ?className key> (line |. str) </div>;
+                   switch (line) {
+                   | Welcome(line) =>
+                     (Some(lineWelcome), line) |. simpleLine
+                   | Input((line, syntax)) =>
+                     switch (syntax) {
+                     | Reason =>
+                       <div
+                         key
+                         className=lineInputRe
+                         dangerouslySetInnerHTML={"__html": line}
+                       />
+                     | Ml =>
+                       <div
+                         key
+                         className=lineInputMl
+                         dangerouslySetInnerHTML={"__html": line}
+                       />
+                     }
+                   | Result({stderr, stdout, evaluate}) =>
+                     <div key>
+                       (
+                         stderr
+                         =>> (
+                           stderr =>
+                             <div
+                               dangerouslySetInnerHTML={"__html": stderr}
+                             />
                          )
-                         (
-                           stdout =>> (stdout => <div> (stdout |. str) </div>)
+                       )
+                       (stdout =>> (stdout => <div> (stdout |. str) </div>))
+                       (
+                         evaluate
+                         =>> (
+                           evaluate =>
+                             <div className="cyan"> (evaluate |. str) </div>
                          )
-                         (
-                           evaluate
-                           =>> (
-                             evaluate =>
-                               <div className="cyan">
-                                 (evaluate |. str)
-                               </div>
-                           )
-                         )
-                       </div>
-                     };
-                   },
-                 )
+                       )
+                     </div>
+                   };
+                 })
               |. ReasonReact.array
             )
           </div>
@@ -342,8 +327,7 @@ let make = _children => {
                   if (! shiftKey) {
                     let shouldEvaluate =
                       switch (state.currentSyntax) {
-                      | Reason =>
-                        Analyzer.shouldEvaluateRe(state.inputValue)
+                      | Reason => Analyzer.shouldEvaluateRe(state.inputValue)
                       | Ml => Analyzer.shouldEvaluateMl(state.inputValue)
                       };
                     if (shouldEvaluate) {

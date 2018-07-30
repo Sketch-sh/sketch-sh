@@ -22,10 +22,7 @@ let splitOnChar = (sep, s) => {
   let r = ref([]);
   for (i in String.length(s) - 1 downto 0) {
     if (String.unsafe_get(s, i) == sep) {
-      r.contents = [
-        String.sub(s, i + 1, j.contents - i - 1),
-        ...r.contents,
-      ];
+      r.contents = [String.sub(s, i + 1, j.contents - i - 1), ...r.contents];
       j.contents = i;
     };
   };

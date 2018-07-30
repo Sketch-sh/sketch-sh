@@ -127,8 +127,7 @@ module EditorConfiguration = {
 };
 
 [@bs.module]
-external make : (Dom.element, EditorConfiguration.t) => editor =
-  "codemirror";
+external make : (Dom.element, EditorConfiguration.t) => editor = "codemirror";
 
 module Position = {
   [@bs.deriving abstract]
@@ -142,8 +141,7 @@ module LineWidget = {
   type t;
   /**
     Removes the widget.
-  */ [@bs.send]
-  external clear : t => unit = "";
+  */ [@bs.send] external clear : t => unit = "";
   /** Call this if you made some change to the widget's DOM node that might affect its height.
         It'll force CodeMirror to update the height of the line that contains the widget. */
   [@bs.send]

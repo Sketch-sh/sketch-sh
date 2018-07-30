@@ -69,19 +69,17 @@ let make =
       editor |. CodeMirror.Editor.setValue(value);
 
       editor
-      |. CodeMirror.Editor.onChange(
-           (editor, diff) => {
-             Js.log(diff);
-             let currentEditorValue = editor |. CodeMirror.Editor.getValue();
-             /* TODO: Figure out why this behaves differently from JS version */
-             /* if (currentEditorValue != value) { */
-             switch (onChange) {
-             | None => ()
-             | Some(onChange) => onChange(currentEditorValue)
-             };
-             /* }; */
-           },
-         );
+      |. CodeMirror.Editor.onChange((editor, diff) => {
+           Js.log(diff);
+           let currentEditorValue = editor |. CodeMirror.Editor.getValue();
+           /* TODO: Figure out why this behaves differently from JS version */
+           /* if (currentEditorValue != value) { */
+           switch (onChange) {
+           | None => ()
+           | Some(onChange) => onChange(currentEditorValue)
+           };
+           /* }; */
+         });
       state.editor := Some(editor);
       %bs.raw
       {|window.editor = editor|};

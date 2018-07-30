@@ -54,12 +54,18 @@ let execute: string => Js.Promise.t(executeResult) =
       js_execute(. code)
       |> then_(result =>
            resolve({
-             evaluate: result |. evaluateGet |. Js.String.trim |. emptyStringToOption,
-             stderr: result |. stderrGet |. Js.String.trim |. emptyStringToOption,
-             stdout: result |. stdoutGet |. Js.String.trim |. emptyStringToOption,
+             evaluate:
+               result |. evaluateGet |. Js.String.trim |. emptyStringToOption,
+             stderr:
+               result |. stderrGet |. Js.String.trim |. emptyStringToOption,
+             stdout:
+               result |. stdoutGet |. Js.String.trim |. emptyStringToOption,
            })
          )
     );
 
 let parseError = (~content, ~error) =>
-  js_parseError(. content, error |> Js.String.replace({|File ""|}, {|File "_none_"|}));
+  js_parseError(.
+    content,
+    error |> Js.String.replace({|File ""|}, {|File "_none_"|}),
+  );
