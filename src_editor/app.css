@@ -27,6 +27,18 @@ kdb {
   margin: auto;
 }
 
+.page__Metadata-input {
+  width: 100%;
+  font-size: 32px;
+  font-weight: bold;
+  line-height: 52px;
+  border: none;
+  outline: none;
+  margin: 0;
+  padding: 2px;
+  background-color: transparent;
+}
+
 /* ////////////////////// Cells //////////////// */
 .cell__container {
   margin-top: 25px;
