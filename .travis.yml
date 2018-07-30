@@ -11,7 +11,7 @@ install:
   - npm install
 script:
   - npm run ci:build
-  # - npm run test
+  - npm run test
 before_deploy: npm install now --no-save
 deploy:
   - provider: script
