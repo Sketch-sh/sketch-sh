@@ -71,8 +71,7 @@ module Make = (ESig: Worker_Evaluator.EvaluatorSig) => {
               Belt.Array.concat(lineStartOffsets, [|i + 1|]),
             )
         | ';' =>
-          let buffer =
-            Js.String.substring(~from=startPos, ~to_=i + 1, code);
+          let buffer = Js.String.substring(~from=startPos, ~to_=i + 1, code);
           let (hasSyntaxError, executeResult) = f(buffer);
 
           hasSyntaxError ?
@@ -142,8 +141,7 @@ module Make = (ESig: Worker_Evaluator.EvaluatorSig) => {
               an error
             */
          |. Belt.Array.reduce(
-              ([], false),
-              ((acc, hasError), error: CompilerErrorMessage.t) =>
+              ([], false), ((acc, hasError), error: CompilerErrorMessage.t) =>
               if (hasError) {
                 (acc, hasError);
               } else {
@@ -198,24 +196,21 @@ module Make = (ESig: Worker_Evaluator.EvaluatorSig) => {
       /* Parse and correct stderr error location */
       let result =
         result
-        |. Belt.List.map(
-             blockData => {
-               let executeResult = blockData.executeResult;
+        |. Belt.List.map(blockData => {
+             let executeResult = blockData.executeResult;
 
-               let stderr =
-                 executeResult.stderr
-                 |. parseAndCorrectStderrPos(blockData.pos);
-               {
-                 block_content: blockData.buffer,
-                 block_result: {
-                   blockResult_evaluate: executeResult.evaluate,
-                   blockResult_stdout: executeResult.stdout,
-                   blockResult_stderr: stderr,
-                 },
-                 block_pos: blockData.pos,
-               };
-             },
-           );
+             let stderr =
+               executeResult.stderr |. parseAndCorrectStderrPos(blockData.pos);
+             {
+               block_content: blockData.buffer,
+               block_result: {
+                 blockResult_evaluate: executeResult.evaluate,
+                 blockResult_stdout: executeResult.stdout,
+                 blockResult_stderr: stderr,
+               },
+               block_pos: blockData.pos,
+             };
+           });
       result;
     };
 };

@@ -23,8 +23,7 @@ module Make = (B: EvaluatorSig) => {
   let execute = code => {
     let result = B.js_execute(code);
     {
-      evaluate:
-        result |. evaluateGet |. Js.String.trim |. emptyStringToOption,
+      evaluate: result |. evaluateGet |. Js.String.trim |. emptyStringToOption,
       stderr: result |. stderrGet |. Js.String.trim |. emptyStringToOption,
       stdout: result |. stdoutGet |. Js.String.trim |. emptyStringToOption,
     };

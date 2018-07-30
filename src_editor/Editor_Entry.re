@@ -35,13 +35,11 @@ let blocks =
   };
 
 let blocks =
-  blocks
-  |. Belt.Array.mapU((. b_data) => {b_id: Utils.generateId(), b_data});
+  blocks |. Belt.Array.mapU((. b_data) => {b_id: Utils.generateId(), b_data});
 
 let make = _children => {
   ...component,
   render: _self => <Editor_Page blocks />,
 };
 
-let default =
-  ReasonReact.wrapReasonForJs(~component, _jsProps => make([||]));
+let default = ReasonReact.wrapReasonForJs(~component, _jsProps => make([||]));
