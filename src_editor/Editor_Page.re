@@ -14,7 +14,9 @@ type action =
   | Block_Delete(id)
   | Block_Focus(id)
   | Block_UpdateValue(id, string)
-  | Block_AddWidgets(id, array(Widget.t));
+  | Block_AddWidgets(id, array(Widget.t))
+  | Block_FocusUp(id)
+  | Block_FocusDown(id);
 
 let blockControlsButtons = (b_id, send) =>
   <div className="cell__controls-buttons">
@@ -170,61 +172,120 @@ let make = (~blocks: array(block), _children) => {
              )
           |. Editor_Page_Utils.syncLineNumber,
       })
+    | Block_FocusUp(blockId) =>
+      let upperBlockId = {
+        let rec loop = i =>
+          if (i >= 0) {
+            let {b_id} = state.blocks[i];
+            if (b_id == blockId && i != 0) {
+              Some(state.blocks[i - 1].b_id);
+            } else {
+              loop(i - 1);
+            };
+          } else {
+            None;
+          };
+        loop((state.blocks |. Belt.Array.length) - 1);
+      };
+      switch (upperBlockId) {
+      | None => ReasonReact.NoUpdate
+      | Some(upperBlockId) =>
+        ReasonReact.Update({...state, focusedBlock: Some(upperBlockId)})
+      };
+    | Block_FocusDown(blockId) =>
+      let lowerBlockId = {
+        let length = state.blocks |. Belt.Array.length;
+        let rec loop = i =>
+          if (i < length) {
+            let {b_id} = state.blocks[i];
+            if (b_id == blockId && i != length - 1) {
+              Some(state.blocks[i + 1].b_id);
+            } else {
+              loop(i + 1);
+            };
+          } else {
+            None;
+          };
+        loop(0);
+      };
+      switch (lowerBlockId) {
+      | None => ReasonReact.NoUpdate
+      | Some(lowerBlockId) =>
+        ReasonReact.Update({...state, focusedBlock: Some(lowerBlockId)})
+      };
     },
   render: ({send, state}) => {
-    let last_block_id = Editor_Page_Utils.findLastCodeBlock(state.blocks);
+    let lastCodeBlockId = Editor_Page_Utils.findLastCodeBlock(state.blocks);
     <div className="pageSizer">
       (
         state.blocks
         |. Belt.Array.mapU((. {b_id, b_data}) =>
-             switch (b_data) {
-             | B_Code({bc_value, bc_widgets, bc_firstLineNumber}) =>
-               <div key=b_id id=b_id className="cell__container">
-                 <div className="source-editor">
-                   <Editor_CodeBlock
-                     value=bc_value
-                     onChange=(
-                       newValue => send(Block_UpdateValue(b_id, newValue))
-                     )
-                     onFocus=(() => send(Block_Focus(b_id)))
-                     onExecute=(() => send(Block_Execute(b_id)))
-                     widgets=bc_widgets
-                     firstLineNumber=bc_firstLineNumber
-                   />
-                 </div>
-                 <div className="cell__controls">
-                   (blockControlsButtons(b_id, send))
-                   (
-                     switch (state.focusedBlock) {
-                     | None =>
-                       last_block_id
-                       =>> (
-                         last_b_id =>
-                           last_b_id === b_id ?
-                             blockHint(b_id, send) : ReasonReact.null
+             <div key=b_id id=b_id className="cell__container">
+               (
+                 switch (b_data) {
+                 | B_Code({bc_value, bc_widgets, bc_firstLineNumber}) =>
+                   <div className="source-editor">
+                     <Editor_CodeBlock
+                       value=bc_value
+                       focused=(
+                         switch (state.focusedBlock) {
+                         | None => false
+                         | Some(id) => id == b_id
+                         }
                        )
-                     | Some(focusedBlock) =>
-                       focusedBlock === b_id ?
-                         blockHint(b_id, send) : ReasonReact.null
-                     }
-                   )
-                 </div>
-               </div>
-             | B_Text(text) =>
-               <div key=b_id id=b_id className="cell__container">
-                 <div className="text-editor">
-                   <Editor_TextBlock
-                     value=text
-                     onChange=(
-                       newValue => send(Block_UpdateValue(b_id, newValue))
+                       onChange=(
+                         newValue => send(Block_UpdateValue(b_id, newValue))
+                       )
+                       onExecute=(() => send(Block_Execute(b_id)))
+                       onFocus=(() => send(Block_Focus(b_id)))
+                       onBlockUp=(() => send(Block_FocusUp(b_id)))
+                       onBlockDown=(() => send(Block_FocusDown(b_id)))
+                       widgets=bc_widgets
+                       firstLineNumber=bc_firstLineNumber
+                     />
+                   </div>
+                 | B_Text(text) =>
+                   <div className="text-editor">
+                     <Editor_TextBlock
+                       value=text
+                       focused=(
+                         switch (state.focusedBlock) {
+                         | None => false
+                         | Some(id) => id == b_id
+                         }
+                       )
+                       onFocus=(() => send(Block_Focus(b_id)))
+                       onBlockUp=(() => send(Block_FocusUp(b_id)))
+                       onBlockDown=(() => send(Block_FocusDown(b_id)))
+                       onChange=(
+                         newValue => send(Block_UpdateValue(b_id, newValue))
+                       )
+                     />
+                   </div>
+                 }
+               )
+               <div className="cell__controls">
+                 (blockControlsButtons(b_id, send))
+                 (
+                   /*
+                    Display hint on focusedBlock or last CodeBlock
+                    If there are no CodeBlock then don't display anything
+                    */
+                   switch (state.focusedBlock) {
+                   | None =>
+                     lastCodeBlockId
+                     =>> (
+                       last_b_id =>
+                         last_b_id == b_id ?
+                           blockHint(b_id, send) : ReasonReact.null
                      )
-                   />
-                 </div>
-                 <div className="cell__controls">
-                   (blockControlsButtons(b_id, send))
-                 </div>
+                   | Some(focusedBlock) =>
+                     focusedBlock == b_id ?
+                       blockHint(b_id, send) : ReasonReact.null
+                   }
+                 )
                </div>
-             }
+             </div>
            )
         |. ReasonReact.array
       )

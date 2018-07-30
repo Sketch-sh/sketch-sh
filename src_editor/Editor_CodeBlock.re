@@ -16,10 +16,13 @@ let getEditor = (state, ~default, ~f) =>
 let make =
     (
       ~value,
+      ~focused,
       ~firstLineNumber,
       ~widgets,
       ~onChange,
       ~onFocus,
+      ~onBlockUp=?,
+      ~onBlockDown=?,
       ~onExecute,
       _children,
     )
@@ -125,8 +128,11 @@ let make =
   render: ({state}) =>
     <Editor_CodeMirror
       value
+      focused
       onChange
       onFocus
+      ?onBlockUp
+      ?onBlockDown
       setEditor=(
         editor => {
           state.editor := Some(editor);

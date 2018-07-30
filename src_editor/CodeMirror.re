@@ -134,6 +134,7 @@ module Position = {
   type t = {
     ch: int,
     line: int,
+    sticky: Js.Nullable.t(string),
   };
 };
 
@@ -143,7 +144,7 @@ module LineWidget = {
     Removes the widget.
   */ [@bs.send] external clear : t => unit = "";
   /** Call this if you made some change to the widget's DOM node that might affect its height.
-        It'll force CodeMirror to update the height of the line that contains the widget. */
+  It'll force CodeMirror to update the height of the line that contains the widget. */
   [@bs.send]
   external changed : t => unit = "";
   [@bs.deriving abstract]
@@ -175,8 +176,23 @@ module EditorChange = {
   };
 };
 
+module Doc = {
+  type t;
+
+  /** start is a an optional string indicating which end of the selection to return.
+    It may be "start" , "end" , "head"(the side of the selection that moves when you press shift + arrow),
+    or "anchor"(the fixed side of the selection).
+    Omitting the argument is the same as passing "head".A { line , ch } object will be returned.
+  */
+  [@bs.send]
+  external getCursor :
+    (t, [@bs.string] [ | `start | [@bs.as "end"] `end_ | `head | `anchor]) =>
+    Position.t =
+    "";
+};
+
 module Editor = {
-  [@bs.send] external getValue : (editor, unit) => string = "";
+  [@bs.send] external getValue : editor => string = "";
   [@bs.send] external setValue : (editor, string) => unit = "";
   [@bs.send] external setOption : (editor, string, 'a) => unit = "";
   [@bs.send] external getOption : (editor, string) => 'a = "";
@@ -198,6 +214,13 @@ module Editor = {
     LineWidget.t =
     "";
 
+  [@bs.send] external getDoc : editor => Doc.t = "";
+  [@bs.send] external hasFocus : editor => bool = "";
+  [@bs.send] external focus : editor => unit = "";
+
+  [@bs.send] external getLine : (editor, int) => string = "";
+  [@bs.send] external lineCount : editor => int = "";
+
   [@bs.send]
   external onChange :
     (editor, [@bs.as "change"] _, (editor, EditorChange.t) => unit) => unit =
@@ -206,5 +229,10 @@ module Editor = {
   [@bs.send]
   external onFocus :
     (editor, [@bs.as "focus"] _, (editor, Dom.event) => unit) => unit =
+    "on";
+
+  [@bs.send]
+  external onKeydown :
+    (editor, [@bs.as "keydown"] _, (editor, Dom.keyboardEvent) => unit) => unit =
     "on";
 };
