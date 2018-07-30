@@ -110,7 +110,7 @@ describe("valid", () => {
   open Expect;
   open! Expect.Operators;
 
-  describe("1 block, 1 line", () => {
+  Only.describe("1 block, 1 line", () => {
     let code = "let a = 1;";
     let result = exe(code)[0];
 
