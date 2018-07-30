@@ -5,14 +5,14 @@ open Editor_Types.Block;
 
 type state = {
   blocks: array(block),
-  focusedBlock: option((id, focusChangeType)),
+  focusedBlock: option((id, blockTyp, focusChangeType)),
 };
 
 type action =
-  | Block_Add(id, blockType)
+  | Block_Add(id, blockData)
   | Block_Execute(id)
   | Block_Delete(id)
-  | Block_Focus(id)
+  | Block_Focus(id, blockTyp)
   | Block_UpdateValue(id, string)
   | Block_AddWidgets(id, array(Widget.t))
   | Block_FocusUp(id)
@@ -142,14 +142,14 @@ let make = (~blocks: array(block), _children) => {
         focusedBlock:
           switch (state.focusedBlock) {
           | None => None
-          | Some((focusedBlock, _)) =>
+          | Some((focusedBlock, _, _)) =>
             focusedBlock == blockId ? None : state.focusedBlock
           },
       })
-    | Block_Focus(blockId) =>
+    | Block_Focus(blockId, blockTyp) =>
       ReasonReact.Update({
         ...state,
-        focusedBlock: Some((blockId, FcTyp_EditorFocus)),
+        focusedBlock: Some((blockId, blockTyp, FcTyp_EditorFocus)),
       })
     | Block_Add(afterBlockId, blockType) =>
       ReasonReact.Update({
@@ -181,7 +181,11 @@ let make = (~blocks: array(block), _children) => {
           if (i >= 0) {
             let {b_id} = state.blocks[i];
             if (b_id == blockId && i != 0) {
-              Some(state.blocks[i - 1].b_id);
+              let {b_id, b_data} = state.blocks[i - 1];
+              switch (b_data) {
+              | B_Code(_) => Some((b_id, BTyp_Code))
+              | B_Text(_) => Some((b_id, BTyp_Text))
+              };
             } else {
               loop(i - 1);
             };
@@ -192,10 +196,10 @@ let make = (~blocks: array(block), _children) => {
       };
       switch (upperBlockId) {
       | None => ReasonReact.NoUpdate
-      | Some(upperBlockId) =>
+      | Some((upperBlockId, blockTyp)) =>
         ReasonReact.Update({
           ...state,
-          focusedBlock: Some((upperBlockId, FcTyp_BlockFocusUp)),
+          focusedBlock: Some((upperBlockId, blockTyp, FcTyp_BlockFocusUp)),
         })
       };
     | Block_FocusDown(blockId) =>
@@ -205,7 +209,11 @@ let make = (~blocks: array(block), _children) => {
           if (i < length) {
             let {b_id} = state.blocks[i];
             if (b_id == blockId && i != length - 1) {
-              Some(state.blocks[i + 1].b_id);
+              let {b_id, b_data} = state.blocks[i + 1];
+              switch (b_data) {
+              | B_Code(_) => Some((b_id, BTyp_Code))
+              | B_Text(_) => Some((b_id, BTyp_Text))
+              };
             } else {
               loop(i + 1);
             };
@@ -216,10 +224,10 @@ let make = (~blocks: array(block), _children) => {
       };
       switch (lowerBlockId) {
       | None => ReasonReact.NoUpdate
-      | Some(lowerBlockId) =>
+      | Some((lowerBlockId, blockTyp)) =>
         ReasonReact.Update({
           ...state,
-          focusedBlock: Some((lowerBlockId, FcTyp_BlockFocusDown)),
+          focusedBlock: Some((lowerBlockId, blockTyp, FcTyp_BlockFocusDown)),
         })
       };
     },
@@ -238,14 +246,15 @@ let make = (~blocks: array(block), _children) => {
                      focused=(
                        switch (state.focusedBlock) {
                        | None => None
-                       | Some((id, typ)) => id == b_id ? Some(typ) : None
+                       | Some((id, _blockTyp, changeTyp)) =>
+                         id == b_id ? Some(changeTyp) : None
                        }
                      )
                      onChange=(
                        newValue => send(Block_UpdateValue(b_id, newValue))
                      )
                      onExecute=(() => send(Block_Execute(b_id)))
-                     onFocus=(() => send(Block_Focus(b_id)))
+                     onFocus=(() => send(Block_Focus(b_id, BTyp_Code)))
                      onBlockUp=(() => send(Block_FocusUp(b_id)))
                      onBlockDown=(() => send(Block_FocusDown(b_id)))
                      widgets=bc_widgets
@@ -260,16 +269,16 @@ let make = (~blocks: array(block), _children) => {
                       If there are no CodeBlock then don't display anything
                       */
                      switch (state.focusedBlock) {
-                     | None =>
+                     | Some((focusedBlock, BTyp_Code, _)) =>
+                       focusedBlock == b_id ?
+                         blockHint(b_id, send) : ReasonReact.null
+                     | _ =>
                        lastCodeBlockId
                        =>> (
                          last_b_id =>
                            last_b_id == b_id ?
                              blockHint(b_id, send) : ReasonReact.null
                        )
-                     | Some((focusedBlock, _)) =>
-                       focusedBlock == b_id ?
-                         blockHint(b_id, send) : ReasonReact.null
                      }
                    )
                  </div>
@@ -282,10 +291,11 @@ let make = (~blocks: array(block), _children) => {
                      focused=(
                        switch (state.focusedBlock) {
                        | None => None
-                       | Some((id, typ)) => id == b_id ? Some(typ) : None
+                       | Some((id, blockTyp, changeTyp)) =>
+                         id == b_id ? Some(changeTyp) : None
                        }
                      )
-                     onFocus=(() => send(Block_Focus(b_id)))
+                     onFocus=(() => send(Block_Focus(b_id, BTyp_Text)))
                      onBlockUp=(() => send(Block_FocusUp(b_id)))
                      onBlockDown=(() => send(Block_FocusDown(b_id)))
                      onChange=(

@@ -7,13 +7,17 @@ module Block = {
 
   type id = string;
 
-  type blockType =
+  type blockData =
     | B_Code(bcode)
     | B_Text(string);
 
+  type blockTyp =
+    | BTyp_Code
+    | BTyp_Text;
+
   type block = {
     b_id: id,
-    b_data: blockType,
+    b_data: blockData,
   };
 
   type focusChangeType =
