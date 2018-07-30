@@ -27,10 +27,14 @@ kdb {
   margin: auto;
 }
 
-.page__Metadata-input {
+.metadata {
+  margin-left: 36px;
+}
+
+.metadata-input {
   width: 100%;
   font-size: 32px;
-  font-weight: bold;
+  font-weight: 900;
   line-height: 52px;
   border: none;
   outline: none;
