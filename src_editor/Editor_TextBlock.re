@@ -9,14 +9,26 @@ let getEditor = (state, ~default, ~f) =>
   };
 
 let make =
-    (~value, ~onChange, _children)
+    (
+      ~value,
+      ~focused,
+      ~onChange,
+      ~onFocus,
+      ~onBlockUp=?,
+      ~onBlockDown=?,
+      _children,
+    )
     : ReasonReact.component(state, _, unit) => {
   ...component,
   initialState: () => {editor: ref(None)},
   render: ({state}) =>
     <Editor_CodeMirror
       value
+      focused
       onChange
+      onFocus
+      ?onBlockUp
+      ?onBlockDown
       setEditor=(
         editor => {
           state.editor := Some(editor);

@@ -5,16 +5,18 @@ open Editor_Types.Block;
 
 type state = {
   blocks: array(block),
-  focusedBlock: option(id),
+  focusedBlock: option((id, blockTyp, focusChangeType)),
 };
 
 type action =
-  | Block_Add(id, blockType)
+  | Block_Add(id, blockData)
   | Block_Execute(id)
   | Block_Delete(id)
-  | Block_Focus(id)
+  | Block_Focus(id, blockTyp)
   | Block_UpdateValue(id, string)
-  | Block_AddWidgets(id, array(Widget.t));
+  | Block_AddWidgets(id, array(Widget.t))
+  | Block_FocusUp(id)
+  | Block_FocusDown(id);
 
 let blockControlsButtons = (b_id, send) =>
   <div className="cell__controls-buttons">
@@ -140,12 +142,15 @@ let make = (~blocks: array(block), _children) => {
         focusedBlock:
           switch (state.focusedBlock) {
           | None => None
-          | Some(focusedBlock) =>
-            focusedBlock == blockId ? None : Some(focusedBlock)
+          | Some((focusedBlock, _, _)) =>
+            focusedBlock == blockId ? None : state.focusedBlock
           },
       })
-    | Block_Focus(blockId) =>
-      ReasonReact.Update({...state, focusedBlock: Some(blockId)})
+    | Block_Focus(blockId, blockTyp) =>
+      ReasonReact.Update({
+        ...state,
+        focusedBlock: Some((blockId, blockTyp, FcTyp_EditorFocus)),
+      })
     | Block_Add(afterBlockId, blockType) =>
       ReasonReact.Update({
         ...state,
@@ -170,9 +175,64 @@ let make = (~blocks: array(block), _children) => {
              )
           |. Editor_Page_Utils.syncLineNumber,
       })
+    | Block_FocusUp(blockId) =>
+      let upperBlockId = {
+        let rec loop = i =>
+          if (i >= 0) {
+            let {b_id} = state.blocks[i];
+            if (b_id == blockId && i != 0) {
+              let {b_id, b_data} = state.blocks[i - 1];
+              switch (b_data) {
+              | B_Code(_) => Some((b_id, BTyp_Code))
+              | B_Text(_) => Some((b_id, BTyp_Text))
+              };
+            } else {
+              loop(i - 1);
+            };
+          } else {
+            None;
+          };
+        loop((state.blocks |. Belt.Array.length) - 1);
+      };
+      switch (upperBlockId) {
+      | None => ReasonReact.NoUpdate
+      | Some((upperBlockId, blockTyp)) =>
+        ReasonReact.Update({
+          ...state,
+          focusedBlock: Some((upperBlockId, blockTyp, FcTyp_BlockFocusUp)),
+        })
+      };
+    | Block_FocusDown(blockId) =>
+      let lowerBlockId = {
+        let length = state.blocks |. Belt.Array.length;
+        let rec loop = i =>
+          if (i < length) {
+            let {b_id} = state.blocks[i];
+            if (b_id == blockId && i != length - 1) {
+              let {b_id, b_data} = state.blocks[i + 1];
+              switch (b_data) {
+              | B_Code(_) => Some((b_id, BTyp_Code))
+              | B_Text(_) => Some((b_id, BTyp_Text))
+              };
+            } else {
+              loop(i + 1);
+            };
+          } else {
+            None;
+          };
+        loop(0);
+      };
+      switch (lowerBlockId) {
+      | None => ReasonReact.NoUpdate
+      | Some((lowerBlockId, blockTyp)) =>
+        ReasonReact.Update({
+          ...state,
+          focusedBlock: Some((lowerBlockId, blockTyp, FcTyp_BlockFocusDown)),
+        })
+      };
     },
   render: ({send, state}) => {
-    let last_block_id = Editor_Page_Utils.findLastCodeBlock(state.blocks);
+    let lastCodeBlockId = Editor_Page_Utils.findLastCodeBlock(state.blocks);
     <div className="pageSizer">
       (
         state.blocks
@@ -183,11 +243,20 @@ let make = (~blocks: array(block), _children) => {
                  <div className="source-editor">
                    <Editor_CodeBlock
                      value=bc_value
+                     focused=(
+                       switch (state.focusedBlock) {
+                       | None => None
+                       | Some((id, _blockTyp, changeTyp)) =>
+                         id == b_id ? Some(changeTyp) : None
+                       }
+                     )
                      onChange=(
                        newValue => send(Block_UpdateValue(b_id, newValue))
                      )
-                     onFocus=(() => send(Block_Focus(b_id)))
                      onExecute=(() => send(Block_Execute(b_id)))
+                     onFocus=(() => send(Block_Focus(b_id, BTyp_Code)))
+                     onBlockUp=(() => send(Block_FocusUp(b_id)))
+                     onBlockDown=(() => send(Block_FocusDown(b_id)))
                      widgets=bc_widgets
                      firstLineNumber=bc_firstLineNumber
                    />
@@ -195,17 +264,21 @@ let make = (~blocks: array(block), _children) => {
                  <div className="cell__controls">
                    (blockControlsButtons(b_id, send))
                    (
+                     /*
+                      Display hint on focusedBlock or last CodeBlock
+                      If there are no CodeBlock then don't display anything
+                      */
                      switch (state.focusedBlock) {
-                     | None =>
-                       last_block_id
+                     | Some((focusedBlock, BTyp_Code, _)) =>
+                       focusedBlock == b_id ?
+                         blockHint(b_id, send) : ReasonReact.null
+                     | _ =>
+                       lastCodeBlockId
                        =>> (
                          last_b_id =>
-                           last_b_id === b_id ?
+                           last_b_id == b_id ?
                              blockHint(b_id, send) : ReasonReact.null
                        )
-                     | Some(focusedBlock) =>
-                       focusedBlock === b_id ?
-                         blockHint(b_id, send) : ReasonReact.null
                      }
                    )
                  </div>
@@ -215,6 +288,16 @@ let make = (~blocks: array(block), _children) => {
                  <div className="text-editor">
                    <Editor_TextBlock
                      value=text
+                     focused=(
+                       switch (state.focusedBlock) {
+                       | None => None
+                       | Some((id, blockTyp, changeTyp)) =>
+                         id == b_id ? Some(changeTyp) : None
+                       }
+                     )
+                     onFocus=(() => send(Block_Focus(b_id, BTyp_Text)))
+                     onBlockUp=(() => send(Block_FocusUp(b_id)))
+                     onBlockDown=(() => send(Block_FocusDown(b_id)))
                      onChange=(
                        newValue => send(Block_UpdateValue(b_id, newValue))
                      )

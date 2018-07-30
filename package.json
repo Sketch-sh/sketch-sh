@@ -20,6 +20,7 @@
     "@thangngoc89/ocaml-re": "^1.0.0",
     "bs-css": "^7.0.1",
     "bs-json": "^1.0.1",
+    "bs-webapi": "^0.10.0",
     "codemirror": "^5.39.2",
     "comlink": "^3.0.3",
     "install": "^0.12.1",

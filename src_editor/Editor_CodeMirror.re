@@ -35,8 +35,11 @@ let make =
     (
       ~className=?,
       ~value,
+      ~focused,
       ~options: CodeMirror.EditorConfiguration.t,
       ~setEditor: option(CodeMirror.editor => unit)=?,
+      ~onBlockUp: option(unit => unit)=?,
+      ~onBlockDown: option(unit => unit)=?,
       ~onChange=?,
       ~onFocus=?,
       _children,
@@ -45,18 +48,43 @@ let make =
   ...component,
   initialState: () => {editor: ref(None), divRef: ref(None), value},
   willReceiveProps: ({state}) =>
-    getEditor(state, ~default=state, ~f=editor =>
-      {
-        ...state,
-        value: {
-          if (state.value != value
-              && value != (editor |. CodeMirror.Editor.getValue())) {
-            editor |. CodeMirror.Editor.setValue(value);
+    getEditor(
+      state,
+      ~default=state,
+      ~f=editor => {
+        switch (focused) {
+        | None => ()
+        | Some(typ) =>
+          open Editor_Types.Block;
+          editor |. CodeMirror.Editor.focus;
+          switch (typ) {
+          | FcTyp_BlockFocusDown =>
+            let doc = editor |. CodeMirror.Editor.getDoc;
+            doc
+            |. CodeMirror.Doc.setCursor(
+                 CodeMirror.Position.make(~line=0, ~ch=0, ()),
+               );
+          | FcTyp_BlockFocusUp =>
+            let doc = editor |. CodeMirror.Editor.getDoc;
+            let lastLinePlusOne = editor |. CodeMirror.Editor.lineCount;
+            doc
+            |. CodeMirror.Doc.setCursor(
+                 CodeMirror.Position.make(~line=lastLinePlusOne, ~ch=0, ()),
+               );
+          | FcTyp_EditorFocus => ()
           };
-
-          value;
-        },
-      }
+        };
+        {
+          ...state,
+          value: {
+            if (state.value != value
+                && value != (editor |. CodeMirror.Editor.getValue)) {
+              editor |. CodeMirror.Editor.setValue(value);
+            };
+            value;
+          },
+        };
+      },
     ),
   didMount: ({state}) =>
     switch (state.divRef^) {
@@ -69,26 +97,48 @@ let make =
       };
       editor |. CodeMirror.Editor.setValue(value);
 
-      editor
-      |. CodeMirror.Editor.onChange((editor, diff) => {
-           Js.log(diff);
-           let currentEditorValue = editor |. CodeMirror.Editor.getValue();
-           /* TODO: Figure out why this behaves differently from JS version */
-           /* if (currentEditorValue != value) { */
-           switch (onChange) {
-           | None => ()
-           | Some(onChange) => onChange(currentEditorValue)
-           };
-           /* }; */
-         });
+      switch (onChange) {
+      | None => ()
+      | Some(onChange) =>
+        editor
+        |. CodeMirror.Editor.onChange((editor, diff) => {
+             Js.log(diff);
+             let currentEditorValue = editor |. CodeMirror.Editor.getValue;
+             onChange(currentEditorValue);
+           })
+      };
 
-      editor
-      |. CodeMirror.Editor.onFocus((_editor, _event) =>
-           switch (onFocus) {
-           | None => ()
-           | Some(onFocus) => onFocus()
-           }
-         );
+      switch (onFocus) {
+      | None => ()
+      | Some(onFocus) =>
+        editor |. CodeMirror.Editor.onFocus((_editor, _event) => onFocus())
+      };
+
+      switch (onBlockUp, onBlockDown) {
+      | (Some(onBlockUp), Some(onBlockDown)) =>
+        editor
+        |. CodeMirror.Editor.onKeydown((editor, event) => {
+             open CodeMirror.Position;
+             let doc = editor |. CodeMirror.Editor.getDoc;
+             let cursor = doc |. CodeMirror.Doc.getCursor(`head);
+             switch (event |. Webapi.Dom.KeyboardEvent.key) {
+             | "ArrowUp" when cursor |. lineGet == 0 && cursor |. chGet == 0 =>
+               onBlockUp()
+             | "ArrowDown" =>
+               let lastLine = (editor |. CodeMirror.Editor.lineCount) - 1;
+               let lastChar =
+                 editor
+                 |. CodeMirror.Editor.getLine(lastLine)
+                 |. Js.String.length;
+               if (lineGet(cursor) == lastLine
+                   && lastChar == (cursor |. chGet)) {
+                 onBlockDown();
+               };
+             | _ => ()
+             };
+           })
+      | _ => ()
+      };
 
       state.editor := Some(editor);
       %bs.raw

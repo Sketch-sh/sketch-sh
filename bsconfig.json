@@ -28,7 +28,7 @@
     "reason-react",
     "bs-css",
     "@glennsl/bs-json",
-    "@thangngoc89/ocaml-re"
+    "bs-webapi"
   ],
   "bs-dev-dependencies": ["@glennsl/bs-jest"],
   "refmt": 3,

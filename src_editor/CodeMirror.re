@@ -77,8 +77,7 @@ module EditorConfiguration = {
     dragDrop: bool,
     [@bs.optional] /** When given , this will be called when the editor is handling a dragenter , dragover , or drop event.
         It will be passed the editor instance and the event object as arguments.
-        The callback can choose to handle the event itself , in which case it should return true to indicate that CodeMirror should not do anything further. */ /* TODO */ /* onDragEvent?: (instance: CodeMirror.Editor, event: Event) => boolean; */
-                                                                    /** This provides a rather low - level hook into CodeMirror's key handling.
+        The callback can choose to handle the event itself , in which case it should return true to indicate that CodeMirror should not do anything further. */ /* TODO */ /* onDragEvent?: (instance: CodeMirror.Editor, event: Event) => boolean; */ /** This provides a rather low - level hook into CodeMirror's key handling.
         If provided, this function will be called on every keydown, keyup, and keypress event that CodeMirror captures.
         It will be passed two arguments, the editor instance and the key event.
         This key event is pretty much the raw key event, except that a stop() method is always added to it.
@@ -134,7 +133,10 @@ module Position = {
   type t = {
     ch: int,
     line: int,
+    [@bs.optional]
+    sticky: Js.Nullable.t(string),
   };
+  let make = t;
 };
 
 module LineWidget = {
@@ -143,7 +145,7 @@ module LineWidget = {
     Removes the widget.
   */ [@bs.send] external clear : t => unit = "";
   /** Call this if you made some change to the widget's DOM node that might affect its height.
-        It'll force CodeMirror to update the height of the line that contains the widget. */
+  It'll force CodeMirror to update the height of the line that contains the widget. */
   [@bs.send]
   external changed : t => unit = "";
   [@bs.deriving abstract]
@@ -175,8 +177,25 @@ module EditorChange = {
   };
 };
 
+module Doc = {
+  type t;
+
+  /** start is a an optional string indicating which end of the selection to return.
+    It may be "start" , "end" , "head"(the side of the selection that moves when you press shift + arrow),
+    or "anchor"(the fixed side of the selection).
+    Omitting the argument is the same as passing "head".A { line , ch } object will be returned.
+  */
+  [@bs.send]
+  external getCursor :
+    (t, [@bs.string] [ | `start | [@bs.as "end"] `end_ | `head | `anchor]) =>
+    Position.t =
+    "";
+
+  [@bs.send] external setCursor : (t, Position.t) => unit = "";
+};
+
 module Editor = {
-  [@bs.send] external getValue : (editor, unit) => string = "";
+  [@bs.send] external getValue : editor => string = "";
   [@bs.send] external setValue : (editor, string) => unit = "";
   [@bs.send] external setOption : (editor, string, 'a) => unit = "";
   [@bs.send] external getOption : (editor, string) => 'a = "";
@@ -198,6 +217,13 @@ module Editor = {
     LineWidget.t =
     "";
 
+  [@bs.send] external getDoc : editor => Doc.t = "";
+  [@bs.send] external hasFocus : editor => bool = "";
+  [@bs.send] external focus : editor => unit = "";
+
+  [@bs.send] external getLine : (editor, int) => string = "";
+  [@bs.send] external lineCount : editor => int = "";
+
   [@bs.send]
   external onChange :
     (editor, [@bs.as "change"] _, (editor, EditorChange.t) => unit) => unit =
@@ -206,5 +232,10 @@ module Editor = {
   [@bs.send]
   external onFocus :
     (editor, [@bs.as "focus"] _, (editor, Dom.event) => unit) => unit =
+    "on";
+
+  [@bs.send]
+  external onKeydown :
+    (editor, [@bs.as "keydown"] _, (editor, Dom.keyboardEvent) => unit) => unit =
     "on";
 };
