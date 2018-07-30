@@ -1,0 +1,7 @@
+{
+  "name": "rtop",
+  "type": "static",
+  "public": true,
+  "alias": "staging.rtop.khoanguyen.me",
+  "files": ["build"]
+}
