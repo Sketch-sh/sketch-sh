@@ -6,6 +6,7 @@ module Block = {
   };
 
   type id = string;
+
   type blockType =
     | B_Code(bcode)
     | B_Text(string);
@@ -14,4 +15,9 @@ module Block = {
     b_id: id,
     b_data: blockType,
   };
+
+  type focusChangeType =
+    | FcTyp_EditorFocus
+    | FcTyp_BlockFocusUp
+    | FcTyp_BlockFocusDown;
 };

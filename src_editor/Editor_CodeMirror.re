@@ -18,7 +18,6 @@ type state = {
   editor: ref(option(CodeMirror.editor)),
   divRef: ref(option(Dom.element)),
   value: string,
-  focused: bool,
 };
 
 let setDivRef = (theRef, {ReasonReact.state}) =>
@@ -36,7 +35,7 @@ let make =
     (
       ~className=?,
       ~value,
-      ~focused: bool,
+      ~focused,
       ~options: CodeMirror.EditorConfiguration.t,
       ~setEditor: option(CodeMirror.editor => unit)=?,
       ~onBlockUp: option(unit => unit)=?,
@@ -47,31 +46,45 @@ let make =
     )
     : ReasonReact.component(state, _, unit) => {
   ...component,
-  initialState: () => {
-    editor: ref(None),
-    divRef: ref(None),
-    value,
-    focused,
-  },
+  initialState: () => {editor: ref(None), divRef: ref(None), value},
   willReceiveProps: ({state}) =>
-    getEditor(state, ~default=state, ~f=editor =>
-      {
-        ...state,
-        value: {
-          if (state.value != value
-              && value != (editor |. CodeMirror.Editor.getValue)) {
-            editor |. CodeMirror.Editor.setValue(value);
+    getEditor(
+      state,
+      ~default=state,
+      ~f=editor => {
+        switch (focused) {
+        | None => ()
+        | Some(typ) =>
+          open Editor_Types.Block;
+          editor |. CodeMirror.Editor.focus;
+          switch (typ) {
+          | FcTyp_BlockFocusDown =>
+            let doc = editor |. CodeMirror.Editor.getDoc;
+            doc
+            |. CodeMirror.Doc.setCursor(
+                 CodeMirror.Position.make(~line=0, ~ch=0, ()),
+               );
+          | FcTyp_BlockFocusUp =>
+            let doc = editor |. CodeMirror.Editor.getDoc;
+            let lastLinePlusOne = editor |. CodeMirror.Editor.lineCount;
+            doc
+            |. CodeMirror.Doc.setCursor(
+                 CodeMirror.Position.make(~line=lastLinePlusOne, ~ch=0, ()),
+               );
+          | FcTyp_EditorFocus => ()
           };
-          value;
-        },
-        focused: {
-          if (state.focused != focused
-              && focused != (editor |. CodeMirror.Editor.hasFocus)) {
-            editor |. CodeMirror.Editor.focus;
-          };
-          focused;
-        },
-      }
+        };
+        {
+          ...state,
+          value: {
+            if (state.value != value
+                && value != (editor |. CodeMirror.Editor.getValue)) {
+              editor |. CodeMirror.Editor.setValue(value);
+            };
+            value;
+          },
+        };
+      },
     ),
   didMount: ({state}) =>
     switch (state.divRef^) {
