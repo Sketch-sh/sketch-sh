@@ -1,4 +1,5 @@
-open! Express;
+open Utils;
+open Express;
 
 let isProduction = Utils.env == "production";
 
@@ -20,15 +21,15 @@ App.get(
   Middleware.from((_, _) => Response.sendString("Hello world")),
 );
 
-let apolloServer = {
-  open ApolloServerExpress;
-  let schema = Graphql.(makeSchema(toField({"viewer": Schema.jsSchema})));
-  makeApolloServer(Options.make(~schema));
-};
-
-ApolloServerExpress.(
-  apolloServer
-  ->(applyMiddleware(applyMiddlewareOptions(~app=rtopServer, ())))
+App.get(
+  rtopServer,
+  ~path="/@:username/:noteId.json",
+  Middleware.from((next, req, res) =>
+    switch (getDictString(Request.params(req), "id")) {
+    | Some("123") => Response.sendJson(makeSuccessJson(), res)
+    | _ => next(Next.route, res)
+    }
+  ),
 );
 
 let onListen = e =>

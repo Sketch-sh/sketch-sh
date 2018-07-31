@@ -1,6 +1,6 @@
 {
   "name": "rtop-server",
-  "sources": ["src", "bindings"],
+  "sources": ["api", "src", "bindings"],
   "package-specs": [
     {
       "module": "commonjs",
