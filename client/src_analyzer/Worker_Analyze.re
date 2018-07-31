@@ -186,7 +186,7 @@ module Make = (ESig: Worker_Evaluator.EvaluatorSig) => {
               }
             )
        );
-  let execute: (. bool, string) => list(Worker_Types.blockData) =
+  let execute: (. bool, string) => list(blockData) =
     (. reset, code) => {
       if (reset) {
         Evaluator.reset();
@@ -212,5 +212,13 @@ module Make = (ESig: Worker_Evaluator.EvaluatorSig) => {
              };
            });
       result;
+    };
+
+  let executeMany:
+    (. Belt.Map.String.t(string)) => Belt.Map.String.t(list(blockData)) =
+    (. codeMap) => {
+      /* Reset before evaluating several blocks */
+      Evaluator.reset();
+      codeMap |. Belt.Map.String.map(code => execute(. false, code));
     };
 };
