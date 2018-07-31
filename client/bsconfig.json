@@ -6,7 +6,7 @@
   "sources": [
     // "src",
     // "src/vendor",
-    "../shared",
+    "shared",
     "src_editor",
     "src_analyzer",
     {

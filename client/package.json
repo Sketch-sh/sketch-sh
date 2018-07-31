@@ -2,7 +2,7 @@
   "name": "rtop",
   "version": "0.1.0",
   "scripts": {
-    "postinstall": "mkdir -p node_modules/.lsp",
+    "postinstall": "mkdir -p node_modules/.lsp && bsb -clean-worwld && bsb -make-world",
     "bs:build": "bsb -make-world",
     "bs:start": "bsb -make-world -w",
     "bs:clean": "bsb -clean-world",
