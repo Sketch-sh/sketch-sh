@@ -1,0 +1,23 @@
+{
+  "name": "rtop-server",
+  "sources": ["src", "bindings"],
+  "package-specs": [
+    {
+      "module": "commonjs",
+      "in-source": true
+    }
+  ],
+  "bsc-flags": ["-bs-g"],
+  "suffix": ".bs.js",
+  "namespace": true,
+  "bs-dependencies": [
+    "bs-express",
+    "bs-sql-composer",
+    "@glennsl/bs-json",
+    "bs-graphql-js"
+  ],
+  "refmt": 3,
+  "warnings": {
+    "error": "+5"
+  }
+}

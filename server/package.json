@@ -1,0 +1,27 @@
+{
+  "name": "rtop-server",
+  "version": "1.0.0",
+  "private": true,
+  "main": "src/Server.bs.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "@glennsl/bs-json": "^2.0.0",
+    "apollo-server-express": "^2.0.0",
+    "bs-express": "^0.8.0",
+    "bs-graphql-js": "^0.2.1",
+    "bs-sql-composer": "^3.2.1",
+    "express": "^4.16.3",
+    "graphql": "^0.12.3",
+    "knex": "^0.15.2",
+    "morgan": "^1.9.0",
+    "sqlite3": "^4.0.2"
+  },
+  "devDependencies": {
+    "bs-platform": "^4.0.2",
+    "nodemon": "^1.18.3"
+  }
+}
