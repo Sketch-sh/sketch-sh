@@ -14,7 +14,7 @@ type action =
   | Block_Delete(id)
   | Block_Focus(id, blockTyp)
   | Block_Blur(id)
-  | Block_UpdateValue(id, string)
+  | Block_UpdateValue(id, string, CodeMirror.EditorChange.t)
   | Block_AddWidgets(id, array(Widget.t))
   | Block_FocusUp(id)
   | Block_FocusDown(id);
@@ -113,7 +113,7 @@ let make = (~blocks: array(block), _children) => {
         }
       };
 
-    | Block_UpdateValue(blockId, newValue) =>
+    | Block_UpdateValue(blockId, newValue, diff) =>
       ReasonReact.Update({
         ...state,
         blocks:
@@ -126,7 +126,21 @@ let make = (~blocks: array(block), _children) => {
                  switch (b_data) {
                  | B_Code(bcode) => {
                      b_id,
-                     b_data: B_Code({...bcode, bc_value: newValue}),
+                     b_data:
+                       B_Code({
+                         ...bcode,
+                         bc_value: newValue,
+                         bc_widgets: {
+                           let removeWidgetBelowMe =
+                             diff |. Editor_Blocks_Utils.getFirstLineFromDiff;
+                           let currentWidgets = bcode.bc_widgets;
+                           currentWidgets
+                           |. Belt.Array.keepU(
+                                (. {Editor_CodeBlockTypes.Widget.lw_line, _}) =>
+                                lw_line < removeWidgetBelowMe
+                              );
+                         },
+                       }),
                    }
                  | B_Text(_) => {b_id, b_data: B_Text(newValue)}
                  };
@@ -260,7 +274,8 @@ let make = (~blocks: array(block), _children) => {
                        }
                      )
                      onChange=(
-                       newValue => send(Block_UpdateValue(b_id, newValue))
+                       (newValue, diff) =>
+                         send(Block_UpdateValue(b_id, newValue, diff))
                      )
                      onExecute=(() => send(Block_Execute(b_id)))
                      onFocus=(() => send(Block_Focus(b_id, BTyp_Code)))
@@ -310,7 +325,8 @@ let make = (~blocks: array(block), _children) => {
                      onBlockUp=(() => send(Block_FocusUp(b_id)))
                      onBlockDown=(() => send(Block_FocusDown(b_id)))
                      onChange=(
-                       newValue => send(Block_UpdateValue(b_id, newValue))
+                       (newValue, diff) =>
+                         send(Block_UpdateValue(b_id, newValue, diff))
                      )
                    />
                  </div>

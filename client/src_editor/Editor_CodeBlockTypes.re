@@ -1,11 +1,11 @@
 module Widget = {
-  type t =
-    | Lw_Error(widgetContent)
-    | Lw_Warning(widgetContent)
-    | Lw_Value(widgetContent)
-    | Lw_Stdout(widgetContent)
-  and widgetContent = {
-    content: string,
-    line: int,
+  type lineWidgetData =
+    | Lw_Error(string)
+    | Lw_Warning(string)
+    | Lw_Value(string)
+    | Lw_Stdout(string);
+  type t = {
+    lw_line: int,
+    lw_data: lineWidgetData,
   };
 };

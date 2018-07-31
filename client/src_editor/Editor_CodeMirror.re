@@ -103,9 +103,8 @@ let make =
       | Some(onChange) =>
         editor
         |. CodeMirror.Editor.onChange((editor, diff) => {
-             Js.log(diff);
              let currentEditorValue = editor |. CodeMirror.Editor.getValue;
-             onChange(currentEditorValue);
+             onChange(currentEditorValue, diff);
            })
       };
 
