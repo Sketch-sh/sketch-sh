@@ -1,7 +1,8 @@
-build
 .merlin
 .bsb.lock
 node_modules
 lib
 **.bs.js
-src/*.js
+
+client/build
+client/src/*.js
