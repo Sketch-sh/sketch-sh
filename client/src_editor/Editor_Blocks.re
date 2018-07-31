@@ -95,6 +95,7 @@ let make = (~blocks: array(block), _children) => {
              }
            );
 
+      /* Clear all widgets and execute all blocks */
       ReasonReact.SideEffects(
         (
           self =>
@@ -116,15 +117,23 @@ let make = (~blocks: array(block), _children) => {
         ),
       );
     | Block_UpdateValue(blockId, newValue, diff) =>
+      let foundIndex =
+        arrayFindIndex(state.blocks, ({b_id}) => b_id == blockId);
+      let blockIndex =
+        switch (foundIndex) {
+        | None => (-1)
+        | Some(i) => i
+        };
+
       ReasonReact.Update({
         ...state,
         blocks:
           state.blocks
-          |. Belt.Array.mapU((. block) => {
+          |. Belt.Array.mapWithIndexU((. i, block) => {
                let {b_id, b_data} = block;
-               if (b_id != blockId) {
+               if (i < blockIndex) {
                  block;
-               } else {
+               } else if (i == blockIndex) {
                  switch (b_data) {
                  | B_Code(bcode) => {
                      b_id,
@@ -146,10 +155,18 @@ let make = (~blocks: array(block), _children) => {
                    }
                  | B_Text(_) => {b_id, b_data: B_Text(newValue)}
                  };
+               } else {
+                 switch (b_data) {
+                 | B_Text(_) => block
+                 | B_Code(bcode) => {
+                     ...block,
+                     b_data: B_Code({...bcode, bc_widgets: [||]}),
+                   }
+                 };
                };
              })
           |. Editor_Blocks_Utils.syncLineNumber,
-      })
+      });
     | Block_Delete(blockId) =>
       ReasonReact.Update({
         blocks:
