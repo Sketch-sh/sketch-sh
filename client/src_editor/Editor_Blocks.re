@@ -168,18 +168,27 @@ let make = (~blocks: array(block), _children) => {
           |. Editor_Blocks_Utils.syncLineNumber,
       });
     | Block_Delete(blockId) =>
-      ReasonReact.Update({
-        blocks:
-          state.blocks
-          |. Belt.Array.keepU((. {b_id}) => b_id != blockId)
-          |. Editor_Blocks_Utils.syncLineNumber,
-        focusedBlock:
-          switch (state.focusedBlock) {
-          | None => None
-          | Some((focusedBlock, _, _)) =>
-            focusedBlock == blockId ? None : state.focusedBlock
-          },
-      })
+      let last_block = Belt.Array.length(state.blocks) == 1;
+      if (last_block) {
+        let new_block = {
+          b_id: Utils.generateId(),
+          b_data: Editor_Blocks_Utils.emptyCodeBlock(),
+        };
+        ReasonReact.Update({blocks: [|new_block|], focusedBlock: None});
+      } else {
+        ReasonReact.Update({
+          blocks:
+            state.blocks
+            |. Belt.Array.keepU((. {b_id}) => b_id != blockId)
+            |. Editor_Blocks_Utils.syncLineNumber,
+          focusedBlock:
+            switch (state.focusedBlock) {
+            | None => None
+            | Some((focusedBlock, _, _)) =>
+              focusedBlock == blockId ? None : state.focusedBlock
+            },
+        });
+      };
     | Block_Focus(blockId, blockTyp) =>
       ReasonReact.Update({
         ...state,
