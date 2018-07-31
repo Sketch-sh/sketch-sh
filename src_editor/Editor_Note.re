@@ -5,9 +5,15 @@ type action =
 
 let component = ReasonReact.reducerComponent("Editor_Page");
 
-let make = (~blocks, _children) => {
+let make = (~blocks, ~title: option(string)=?, _children) => {
   ...component,
-  initialState: () => {title: ""},
+  initialState: () => {
+    title:
+      switch (title) {
+      | None => ""
+      | Some(title) => title
+      },
+  },
   reducer: (action, _state) =>
     switch (action) {
     | TitleUpdate(title) => ReasonReact.Update({title: title})
@@ -20,12 +26,15 @@ let make = (~blocks, _children) => {
         </title>
       </Helmet>
       <div className="metadata">
-        <input
-          className="metadata-input"
-          placeholder="untitled note"
-          value=state.title
-          onChange=(event => valueFromEvent(event) |. TitleUpdate |. send)
-        />
+        <div className="metadata__title">
+          <span className="metadata__title-sharp"> ("#" |. str) </span>
+          <input
+            className="metadata__title-input"
+            placeholder="untitled note"
+            value=state.title
+            onChange=(event => valueFromEvent(event) |. TitleUpdate |. send)
+          />
+        </div>
       </div>
       <Editor_Blocks blocks />
     </div>,

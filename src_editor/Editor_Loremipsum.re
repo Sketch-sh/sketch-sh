@@ -35,9 +35,7 @@ let myTree =
 
 Printf.sprintf("%i", sum(myTree));|};
 
-let text1 = {|# ReasonML playground
-
-You're viewing an early demo of ReasonML playground.
+let text1 = {|You're viewing an early demo of ReasonML playground.
 
 A note writing application for teaching and sharing ReasonML code with inline evaluation.
 
