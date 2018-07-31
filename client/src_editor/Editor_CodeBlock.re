@@ -63,9 +63,10 @@ let make =
                    (. acc, w) => {
                      open Editor_CodeBlockTypes.Widget;
                      open Editor_CodeBlockLineWidget;
+                     let {lw_line: line, lw_data} = w;
                      let newLineWidget =
-                       switch (w) {
-                       | Lw_Error({content, line}) =>
+                       switch (lw_data) {
+                       | Lw_Error(content) =>
                          editor
                          |. CodeMirror.Editor.addLineWidget(
                               ~line,
@@ -78,7 +79,7 @@ let make =
                                   ~showIfHidden=false,
                                 ),
                             )
-                       | Lw_Warning({content, line}) =>
+                       | Lw_Warning(content) =>
                          editor
                          |. CodeMirror.Editor.addLineWidget(
                               ~line,
@@ -91,7 +92,7 @@ let make =
                                   ~showIfHidden=false,
                                 ),
                             )
-                       | Lw_Value({content, line}) =>
+                       | Lw_Value(content) =>
                          editor
                          |. CodeMirror.Editor.addLineWidget(
                               ~line,
@@ -104,7 +105,7 @@ let make =
                                   ~showIfHidden=false,
                                 ),
                             )
-                       | Lw_Stdout({content, line}) =>
+                       | Lw_Stdout(content) =>
                          editor
                          |. CodeMirror.Editor.addLineWidget(
                               ~line,

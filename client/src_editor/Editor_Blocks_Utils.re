@@ -24,11 +24,15 @@ let executeRessultToWidget = (result: list(Worker_Types.blockData)) => {
 
            let evaluate =
              result.blockResult_evaluate
-             |. Belt.Option.map(content => Widget.Lw_Value({line, content}));
+             |. Belt.Option.map(content =>
+                  Widget.{lw_line: line, lw_data: Lw_Value(content)}
+                );
 
            let stdout =
              result.blockResult_stdout
-             |. Belt.Option.map(content => Widget.Lw_Stdout({line, content}));
+             |. Belt.Option.map(content =>
+                  Widget.{lw_line: line, lw_data: Lw_Stdout(content)}
+                );
 
            let stderr =
              switch (result.blockResult_stderr) {
@@ -37,27 +41,32 @@ let executeRessultToWidget = (result: list(Worker_Types.blockData)) => {
                errors
                |. Belt.Array.mapU((. error) => {
                     let toWidgetContent = (content: ErrorMessage.content) => {
-                      let ({line, col: colStart}, {line: _, col: colEnd}) =
+                      let ({line, col: colStart}, {col: colEnd}) =
                         content.errMsg_pos;
 
-                      {
-                        Editor_CodeBlockTypes.Widget.line,
-                        content:
-                          renderErrorIndicator(
-                            colStart,
-                            colEnd,
-                            content.errMsg_content,
-                          ),
-                      };
+                      (
+                        line,
+                        renderErrorIndicator(
+                          colStart,
+                          colEnd,
+                          content.errMsg_content,
+                        ),
+                      );
                     };
 
                     switch (error) {
                     | ErrorMessage.Err_Warning(content) =>
-                      Widget.Lw_Warning(toWidgetContent(content))
+                      let (lw_line, content) = toWidgetContent(content);
+                      Widget.{lw_line, lw_data: Widget.Lw_Warning(content)};
                     | Err_Error(content) =>
-                      Widget.Lw_Error(toWidgetContent(content))
+                      let (lw_line, content) = toWidgetContent(content);
+
+                      Widget.{lw_line, lw_data: Widget.Lw_Error(content)};
                     | Err_Unknown(content) =>
-                      Widget.Lw_Error({line, content})
+                      Widget.{
+                        lw_line: line,
+                        lw_data: Widget.Lw_Error(content),
+                      }
                     };
                   })
              };
@@ -120,4 +129,11 @@ let findLastCodeBlock = blocks => {
       None;
     };
   loop(length - 1);
+};
+
+let getFirstLineFromDiff = (diff: CodeMirror.EditorChange.t) => {
+  let fromPos = diff |. CodeMirror.EditorChange.fromGet;
+  let line = fromPos |. CodeMirror.Position.lineGet;
+
+  line;
 };
