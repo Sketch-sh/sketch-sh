@@ -13,7 +13,8 @@ let make =
       ~value,
       ~focused,
       ~onChange,
-      ~onFocus,
+      ~onFocus=?,
+      ~onBlur=?,
       ~onBlockUp=?,
       ~onBlockDown=?,
       _children,
@@ -26,7 +27,8 @@ let make =
       value
       focused
       onChange
-      onFocus
+      ?onFocus
+      ?onBlur
       ?onBlockUp
       ?onBlockDown
       setEditor=(

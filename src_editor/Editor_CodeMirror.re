@@ -41,7 +41,8 @@ let make =
       ~onBlockUp: option(unit => unit)=?,
       ~onBlockDown: option(unit => unit)=?,
       ~onChange=?,
-      ~onFocus=?,
+      ~onFocus: option(unit => unit)=?,
+      ~onBlur: option(unit => unit)=?,
       _children,
     )
     : ReasonReact.component(state, _, unit) => {
@@ -106,6 +107,12 @@ let make =
              let currentEditorValue = editor |. CodeMirror.Editor.getValue;
              onChange(currentEditorValue);
            })
+      };
+
+      switch (onBlur) {
+      | None => ()
+      | Some(onBlur) =>
+        editor |. CodeMirror.Editor.onBlur((_editor, _event) => onBlur())
       };
 
       switch (onFocus) {

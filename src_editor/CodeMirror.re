@@ -235,6 +235,11 @@ module Editor = {
     "on";
 
   [@bs.send]
+  external onBlur :
+    (editor, [@bs.as "blur"] _, (editor, Dom.event) => unit) => unit =
+    "on";
+
+  [@bs.send]
   external onKeydown :
     (editor, [@bs.as "keydown"] _, (editor, Dom.keyboardEvent) => unit) => unit =
     "on";

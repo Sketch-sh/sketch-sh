@@ -13,6 +13,7 @@ type action =
   | Block_Execute(id)
   | Block_Delete(id)
   | Block_Focus(id, blockTyp)
+  | Block_Blur(id)
   | Block_UpdateValue(id, string)
   | Block_AddWidgets(id, array(Widget.t))
   | Block_FocusUp(id)
@@ -25,13 +26,13 @@ let blockControlsButtons = (b_id, send) =>
     </button>
     <button
       onClick=(
-        _ => send(Block_Add(b_id, Editor_Page_Utils.emptyTextBlock()))
+        _ => send(Block_Add(b_id, Editor_Blocks_Utils.emptyTextBlock()))
       )>
       ("Add text block" |. str)
     </button>
     <button
       onClick=(
-        _ => send(Block_Add(b_id, Editor_Page_Utils.emptyCodeBlock()))
+        _ => send(Block_Add(b_id, Editor_Blocks_Utils.emptyCodeBlock()))
       )>
       ("Add code block" |. str)
     </button>
@@ -99,7 +100,7 @@ let make = (~blocks: array(block), _children) => {
                   Editor_Worker.execute(. true, bc_value)
                   |> then_(result => {
                        let widgets =
-                         Editor_Page_Utils.executeRessultToWidget(result);
+                         Editor_Blocks_Utils.executeRessultToWidget(result);
                        resolve(
                          self.send(Block_AddWidgets(blockId, widgets)),
                        );
@@ -131,14 +132,14 @@ let make = (~blocks: array(block), _children) => {
                  };
                };
              })
-          |. Editor_Page_Utils.syncLineNumber,
+          |. Editor_Blocks_Utils.syncLineNumber,
       })
     | Block_Delete(blockId) =>
       ReasonReact.Update({
         blocks:
           state.blocks
           |. Belt.Array.keepU((. {b_id}) => b_id != blockId)
-          |. Editor_Page_Utils.syncLineNumber,
+          |. Editor_Blocks_Utils.syncLineNumber,
         focusedBlock:
           switch (state.focusedBlock) {
           | None => None
@@ -151,6 +152,14 @@ let make = (~blocks: array(block), _children) => {
         ...state,
         focusedBlock: Some((blockId, blockTyp, FcTyp_EditorFocus)),
       })
+    | Block_Blur(blockId) =>
+      switch (state.focusedBlock) {
+      | None => ReasonReact.NoUpdate
+      | Some((focusedBlockId, _, _)) =>
+        focusedBlockId == blockId ?
+          ReasonReact.Update({...state, focusedBlock: None}) :
+          ReasonReact.NoUpdate
+      }
     | Block_Add(afterBlockId, blockType) =>
       ReasonReact.Update({
         ...state,
@@ -173,7 +182,7 @@ let make = (~blocks: array(block), _children) => {
                  };
                },
              )
-          |. Editor_Page_Utils.syncLineNumber,
+          |. Editor_Blocks_Utils.syncLineNumber,
       })
     | Block_FocusUp(blockId) =>
       let upperBlockId = {
@@ -232,7 +241,7 @@ let make = (~blocks: array(block), _children) => {
       };
     },
   render: ({send, state}) => {
-    let lastCodeBlockId = Editor_Page_Utils.findLastCodeBlock(state.blocks);
+    let lastCodeBlockId = Editor_Blocks_Utils.findLastCodeBlock(state.blocks);
     <Fragment>
       (
         state.blocks
@@ -255,6 +264,7 @@ let make = (~blocks: array(block), _children) => {
                      )
                      onExecute=(() => send(Block_Execute(b_id)))
                      onFocus=(() => send(Block_Focus(b_id, BTyp_Code)))
+                     onBlur=(() => send(Block_Blur(b_id)))
                      onBlockUp=(() => send(Block_FocusUp(b_id)))
                      onBlockDown=(() => send(Block_FocusDown(b_id)))
                      widgets=bc_widgets
@@ -296,6 +306,7 @@ let make = (~blocks: array(block), _children) => {
                        }
                      )
                      onFocus=(() => send(Block_Focus(b_id, BTyp_Text)))
+                     onBlur=(() => send(Block_Blur(b_id)))
                      onBlockUp=(() => send(Block_FocusUp(b_id)))
                      onBlockDown=(() => send(Block_FocusDown(b_id)))
                      onChange=(

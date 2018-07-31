@@ -20,7 +20,8 @@ let make =
       ~firstLineNumber,
       ~widgets,
       ~onChange,
-      ~onFocus,
+      ~onFocus=?,
+      ~onBlur=?,
       ~onBlockUp=?,
       ~onBlockDown=?,
       ~onExecute,
@@ -130,7 +131,8 @@ let make =
       value
       focused
       onChange
-      onFocus
+      ?onFocus
+      ?onBlur
       ?onBlockUp
       ?onBlockDown
       setEditor=(
