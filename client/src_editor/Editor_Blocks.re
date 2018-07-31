@@ -10,7 +10,7 @@ type state = {
 
 type action =
   | Block_Add(id, blockData)
-  | Block_Execute(id)
+  | Block_Execute
   | Block_Delete(id)
   | Block_Focus(id, blockTyp)
   | Block_Blur(id)
@@ -38,11 +38,10 @@ let blockControlsButtons = (b_id, send) =>
     </button>
   </div>;
 
-let blockHint = (b_id, send) =>
+let blockHint = send =>
   <div className="cell__controls-hint">
     <button
-      onClick=(_ => send(Block_Execute(b_id)))
-      className="cell__controls-hint--run">
+      onClick=(_ => send(Block_Execute)) className="cell__controls-hint--run">
       ("run" |. str)
     </button>
     <span>
@@ -59,8 +58,7 @@ let make = (~blocks: array(block), _children) => {
   ...component,
   initialState: () => {blocks, focusedBlock: None},
   didMount: self => {
-    blocks
-    |. Belt.Array.forEachU((. {b_id}) => self.send(Block_Execute(b_id)));
+    self.send(Block_Execute);
     ();
   },
   reducer: (action, state) =>
@@ -85,44 +83,57 @@ let make = (~blocks: array(block), _children) => {
                };
              }),
       })
-    | Block_Execute(blockId) =>
-      let block = state.blocks |. arrayFind(({b_id}) => b_id == blockId);
-      switch (block) {
-      | None => ReasonReact.NoUpdate
-      | Some(block) =>
-        switch (block.b_data) {
-        | B_Text(_) => ReasonReact.NoUpdate
-        | B_Code({bc_value}) =>
-          ReasonReact.SideEffects(
-            (
-              self =>
-                Js.Promise.(
-                  Editor_Worker.execute(. true, bc_value)
-                  |> then_(result => {
-                       let widgets =
-                         Editor_Blocks_Utils.executeRessultToWidget(result);
-                       resolve(
-                         self.send(Block_AddWidgets(blockId, widgets)),
-                       );
-                     })
-                  |> catch(error => resolve(Js.log(error)))
-                  |> ignore
-                )
-            ),
-          )
-        }
-      };
+    | Block_Execute =>
+      module MS = Belt.Map.String;
 
+      let allCodeBlocks =
+        state.blocks
+        |. Belt.Array.reduceU(MS.empty, (. map, {b_id, b_data}) =>
+             switch (b_data) {
+             | B_Text(_) => map
+             | B_Code({bc_value}) => map |. MS.set(b_id, bc_value)
+             }
+           );
+
+      /* Clear all widgets and execute all blocks */
+      ReasonReact.SideEffects(
+        (
+          self =>
+            Js.Promise.(
+              Editor_Worker.executeMany(. allCodeBlocks)
+              |> then_(results => {
+                   results
+                   |. MS.forEachU((. blockId, result) => {
+                        let widgets =
+                          Editor_Blocks_Utils.executeResultToWidget(result);
+                        self.send(Block_AddWidgets(blockId, widgets));
+                      });
+
+                   resolve();
+                 })
+              |> catch(error => resolve(Js.log(error)))
+              |> ignore
+            )
+        ),
+      );
     | Block_UpdateValue(blockId, newValue, diff) =>
+      let foundIndex =
+        arrayFindIndex(state.blocks, ({b_id}) => b_id == blockId);
+      let blockIndex =
+        switch (foundIndex) {
+        | None => (-1)
+        | Some(i) => i
+        };
+
       ReasonReact.Update({
         ...state,
         blocks:
           state.blocks
-          |. Belt.Array.mapU((. block) => {
+          |. Belt.Array.mapWithIndexU((. i, block) => {
                let {b_id, b_data} = block;
-               if (b_id != blockId) {
+               if (i < blockIndex) {
                  block;
-               } else {
+               } else if (i == blockIndex) {
                  switch (b_data) {
                  | B_Code(bcode) => {
                      b_id,
@@ -144,10 +155,18 @@ let make = (~blocks: array(block), _children) => {
                    }
                  | B_Text(_) => {b_id, b_data: B_Text(newValue)}
                  };
+               } else {
+                 switch (b_data) {
+                 | B_Text(_) => block
+                 | B_Code(bcode) => {
+                     ...block,
+                     b_data: B_Code({...bcode, bc_widgets: [||]}),
+                   }
+                 };
                };
              })
           |. Editor_Blocks_Utils.syncLineNumber,
-      })
+      });
     | Block_Delete(blockId) =>
       ReasonReact.Update({
         blocks:
@@ -199,7 +218,7 @@ let make = (~blocks: array(block), _children) => {
           |. Editor_Blocks_Utils.syncLineNumber,
       })
     | Block_FocusUp(blockId) =>
-      let upperBlockId = {
+      let upperBlock = {
         let rec loop = i =>
           if (i >= 0) {
             let {b_id} = state.blocks[i];
@@ -217,7 +236,7 @@ let make = (~blocks: array(block), _children) => {
           };
         loop((state.blocks |. Belt.Array.length) - 1);
       };
-      switch (upperBlockId) {
+      switch (upperBlock) {
       | None => ReasonReact.NoUpdate
       | Some((upperBlockId, blockTyp)) =>
         ReasonReact.Update({
@@ -226,7 +245,7 @@ let make = (~blocks: array(block), _children) => {
         })
       };
     | Block_FocusDown(blockId) =>
-      let lowerBlockId = {
+      let lowerBlock = {
         let length = state.blocks |. Belt.Array.length;
         let rec loop = i =>
           if (i < length) {
@@ -245,7 +264,7 @@ let make = (~blocks: array(block), _children) => {
           };
         loop(0);
       };
-      switch (lowerBlockId) {
+      switch (lowerBlock) {
       | None => ReasonReact.NoUpdate
       | Some((lowerBlockId, blockTyp)) =>
         ReasonReact.Update({
@@ -277,7 +296,7 @@ let make = (~blocks: array(block), _children) => {
                        (newValue, diff) =>
                          send(Block_UpdateValue(b_id, newValue, diff))
                      )
-                     onExecute=(() => send(Block_Execute(b_id)))
+                     onExecute=(() => send(Block_Execute))
                      onFocus=(() => send(Block_Focus(b_id, BTyp_Code)))
                      onBlur=(() => send(Block_Blur(b_id)))
                      onBlockUp=(() => send(Block_FocusUp(b_id)))
@@ -296,13 +315,13 @@ let make = (~blocks: array(block), _children) => {
                      switch (state.focusedBlock) {
                      | Some((focusedBlock, BTyp_Code, _)) =>
                        focusedBlock == b_id ?
-                         blockHint(b_id, send) : ReasonReact.null
+                         blockHint(send) : ReasonReact.null
                      | _ =>
                        lastCodeBlockId
                        =>> (
                          last_b_id =>
                            last_b_id == b_id ?
-                             blockHint(b_id, send) : ReasonReact.null
+                             blockHint(send) : ReasonReact.null
                        )
                      }
                    )

@@ -10,7 +10,7 @@ let renderErrorIndicator = (colStart, colEnd, content) =>
   ++ "\n"
   ++ content;
 
-let executeRessultToWidget = (result: list(Worker_Types.blockData)) => {
+let executeResultToWidget = (result: list(Worker_Types.blockData)) => {
   open Worker_Types;
   open Editor_CodeBlockTypes;
 

@@ -15,13 +15,14 @@ type js_executeResult = {
 [@bs.deriving abstract]
 type rtop = {
   execute: (. bool, string) => Js.Promise.t(list(Worker_Types.blockData)),
-  /* reset: (. unit) => Js.Promise.t(unit),
-     reasonSyntax: (. unit) => Js.Promise.t(unit),
-     mlSyntax: (. unit) => Js.Promise.t(unit),
-     parseError: (. string, string) => Js.Promise.t(string), */
+  executeMany:
+    (. Belt.Map.String.t(string)) =>
+    Js.Promise.t(Belt.Map.String.t(list(Worker_Types.blockData))),
 };
 let worker = RtopWorker.make();
 
 let rtop: rtop = Comlink.comlink |. Comlink.proxy(worker);
 
 let execute = rtop |. executeGet;
+
+let executeMany = rtop |. executeManyGet;
