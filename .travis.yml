@@ -21,7 +21,7 @@ deploy:
       all_branches: true
       master: false
   - provider: script
-    script: cp now.json build && cd build && now --token $NOW_TOKEN --public build && now alias --token $NOW_TOKEN staging.rtop.khoanguyen.me
+    script: cp now.json build && cd build && now --token $NOW_TOKEN --public && now alias --token $NOW_TOKEN staging.rtop.khoanguyen.me
     skip_cleanup: true
     on:
       master: true
