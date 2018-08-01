@@ -1,0 +1,67 @@
+query_templates: []
+tables:
+- array_relationships: []
+  delete_permissions: []
+  insert_permissions: []
+  object_relationships:
+  - comment: null
+    name: note
+    using:
+      foreign_key_constraint_on: note_id
+  select_permissions: []
+  table: note_revision
+  update_permissions: []
+- array_relationships: []
+  delete_permissions: []
+  insert_permissions: []
+  object_relationships: []
+  select_permissions: []
+  table: user_identity_type
+  update_permissions: []
+- array_relationships: []
+  delete_permissions: []
+  insert_permissions: []
+  object_relationships:
+  - comment: null
+    name: user
+    using:
+      foreign_key_constraint_on: user_id
+  select_permissions: []
+  table: user_identity
+  update_permissions: []
+- array_relationships:
+  - comment: null
+    name: notes
+    using:
+      foreign_key_constraint_on:
+        column: user_id
+        table: note
+  - comment: null
+    name: identities
+    using:
+      foreign_key_constraint_on:
+        column: user_id
+        table: user_identity
+  delete_permissions: []
+  insert_permissions: []
+  object_relationships: []
+  select_permissions: []
+  table: user
+  update_permissions: []
+- array_relationships:
+  - comment: null
+    name: notes
+    using:
+      foreign_key_constraint_on:
+        column: note_id
+        table: note_revision
+  delete_permissions: []
+  insert_permissions: []
+  object_relationships:
+  - comment: null
+    name: user
+    using:
+      foreign_key_constraint_on: user_id
+  select_permissions: []
+  table: note
+  update_permissions: []
