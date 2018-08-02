@@ -21,7 +21,7 @@ matrix:
       - node ../../github/bot/deploy.js
     deploy:
       - provider: script
-        script: cd client/build && NOW_ALIAS="staging.rtop.khoanguyen.me" node ../../github/bot/deploy.js
+        script: ls && NOW_ALIAS="staging.rtop.khoanguyen.me" node ../../github/bot/deploy.js
         skip_cleanup: true
         on:
           master: true
