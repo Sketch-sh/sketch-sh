@@ -21,7 +21,7 @@ matrix:
       - node ../../github/bot/deploy.js
     deploy:
       - provider: script
-        script: now alias --token $NOW_TOKEN staging.rtop.khoanguyen.me
+        script: NOW_ALIAS="staging.rtop.khoanguyen.me" node ../../github/bot/deploy.js
         skip_cleanup: true
         on:
           master: true
