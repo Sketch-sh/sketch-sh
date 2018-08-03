@@ -41,5 +41,3 @@ let make = _children => {
   ...component,
   render: _self => <Editor_Note blocks title="ReasonML playground" />,
 };
-
-let default = ReasonReact.wrapReasonForJs(~component, _jsProps => make([||]));

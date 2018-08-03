@@ -51,13 +51,6 @@ exports.up = function(knex, Promise) {
         return new;
     end; $body$;
     `),
-    knex.raw(`
-    create trigger trigger_note_revision
-      before update
-      on note
-      for each row
-    execute procedure trigger_on_note_revision();
-    `),
   ]);
 };
 
@@ -65,5 +58,6 @@ exports.down = function(knex, Promise) {
   return Promise.all([
     knex.raw("DROP TABLE IF EXISTS note CASCADE"),
     knex.raw("DROP TABLE IF EXISTS note_revision CASCADE"),
+    knex.raw("DROP FUNCTION IF EXISTS trigger_on_note_revision CASCADE"),
   ]);
 };
