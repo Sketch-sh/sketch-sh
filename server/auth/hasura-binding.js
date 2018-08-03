@@ -2,17 +2,32 @@ const fs = require("fs");
 const fetch = require("node-fetch");
 const { Binding } = require("graphql-binding");
 const { createHttpLink } = require("apollo-link-http");
+const { onError } = require("apollo-link-error");
+const { setContext } = require("apollo-link-context");
 const { makeRemoteExecutableSchema } = require("graphql-tools");
-
-const { concat } = require("apollo-link");
-const { HttpLink } = require("apollo-link-http");
-const { ErrorLink, onError } = require("apollo-link-error");
+const jwt = require("jsonwebtoken");
 
 const graphqlEndpoint = process.env.HASURA_ENDPOINT;
+
+const selfSignedToken = jwt.sign(
+  {
+    role: "auth_service",
+  },
+  process.env.JWT_TOKEN
+);
 
 const httpLink = createHttpLink({
   uri: graphqlEndpoint,
   fetch,
+});
+
+const authLink = setContext((_, { headers }) => {
+  return {
+    headers: {
+      ...headers,
+      authorization: `Bearer ${selfSignedToken}`,
+    }
+  }
 });
 
 const errorLink = onError(({ graphQLErrors, networkError }) => {
@@ -27,7 +42,7 @@ const errorLink = onError(({ graphQLErrors, networkError }) => {
   }
 });
 
-const link = errorLink.concat(httpLink);
+const link = errorLink.concat(authLink.concat(httpLink));
 
 class HasuraBinding extends Binding {
   constructor() {
