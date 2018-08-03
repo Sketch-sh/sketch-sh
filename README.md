@@ -17,10 +17,10 @@ for evaluating the input. You can see the binding to the library [here](blob/mas
 https://github.com/thangngoc89/rtop-ui
 ```
 
-- Install dependencies
+- cd into client and install dependencies
 
 ```sh
-npm install
+cd client && npm install
 ```
 
 - Run an initial bsb build
