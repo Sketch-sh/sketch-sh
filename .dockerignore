@@ -1,0 +1,8 @@
+*
+client/shared
+client/src_analyzer
+client/src_editor
+client/.babelrc
+client/bsconfig.json
+client/package.json
+client/package-lock.json
