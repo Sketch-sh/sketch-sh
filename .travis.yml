@@ -13,15 +13,12 @@ matrix:
     script:
       - npm run ci:build
       # - npm run test
-    after_script:
-      - cp now.json build
-      - cd ../github/bot
-      - npm install 
-      - cd ../../client/build 
-      - node ../../github/bot/deploy.js
     deploy:
       - provider: script
-        script: cd build && NOW_ALIAS="staging.rtop.khoanguyen.me" node ../../github/bot/deploy.js
+        script: 
+          - cd .. 
+          - npm install now --no-save
+          - now --token $NOW_TOKEN client/build && now alias --token $NOW_TOKEN
         skip_cleanup: true
         on:
           master: true
