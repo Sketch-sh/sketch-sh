@@ -46,9 +46,9 @@ let blockHint = send =>
     </button>
     <span>
       (" or press " |. str)
-      <kdb> ("Shift" |. str) </kdb>
+      <kbd> ("Shift" |. str) </kbd>
       (" + " |. str)
-      <kdb> ("Enter" |. str) </kdb>
+      <kbd> ("Enter" |. str) </kbd>
     </span>
   </div>;
 
