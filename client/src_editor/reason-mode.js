@@ -176,7 +176,9 @@
   CodeMirror.defineMode(
     "reason",
     function(conf) {
-      return CodeMirror.getMode(conf, "application/reason");
+      return Object.assign(CodeMirror.getMode(conf, "application/reason"), {
+        lineComment: undefined // reason doesn't have line comments
+      });
     },
     "clike"
   );
