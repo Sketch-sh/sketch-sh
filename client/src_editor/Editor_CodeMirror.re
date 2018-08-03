@@ -3,6 +3,7 @@
 /* import "codemirror/mode/mllike/mllike" */
 import "./reason-mode.js"
 import "codemirror/addon/edit/matchbrackets"
+import "codemirror/addon/comment/comment"
 import "codemirror/addon/display/placeholder"
 import "codemirror/mode/gfm/gfm"
 import "codemirror/lib/codemirror.css"
@@ -119,7 +120,7 @@ let make =
       | Some(onFocus) =>
         editor |. CodeMirror.Editor.onFocus((_editor, _event) => onFocus())
       };
-
+      open Webapi.Dom;
       switch (onBlockUp, onBlockDown) {
       | (Some(onBlockUp), Some(onBlockDown)) =>
         editor
@@ -127,7 +128,7 @@ let make =
              open CodeMirror.Position;
              let doc = editor |. CodeMirror.Editor.getDoc;
              let cursor = doc |. CodeMirror.Doc.getCursor(`head);
-             switch (event |. Webapi.Dom.KeyboardEvent.key) {
+             switch (event |. KeyboardEvent.key) {
              | "ArrowUp" when cursor |. lineGet == 0 && cursor |. chGet == 0 =>
                onBlockUp()
              | "ArrowDown" =>
@@ -140,6 +141,13 @@ let make =
                    && lastChar == (cursor |. chGet)) {
                  onBlockDown();
                };
+             | "/" =>
+               if (event |. KeyboardEvent.ctrlKey) {
+                 event |. KeyboardEventRe.preventDefault;
+                 editor |. CodeMirror.Editor.toggleComment();
+               } else {
+                 ();
+               }
              | _ => ()
              };
            })
