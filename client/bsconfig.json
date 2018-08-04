@@ -20,14 +20,15 @@
     }
   ],
   "bsc-flags": ["-bs-g"],
-  // "ppx-flags": ["./ppx_bs_css\\ --as-ppx"],
+  "ppx-flags": ["graphql_ppx/ppx"],
   "suffix": ".bs.js",
   "namespace": true,
   "bs-dependencies": [
     "reason-react",
     "bs-css",
     "@glennsl/bs-json",
-    "bs-webapi"
+    "bs-webapi",
+    "reason-apollo"
   ],
   "bs-dev-dependencies": ["@glennsl/bs-jest"],
   "refmt": 3,

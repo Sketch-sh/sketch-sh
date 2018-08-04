@@ -19,8 +19,7 @@ type t =
 type route = t;
 
 let urlToRoute: ReasonReact.Router.url => t =
-  url => {
-    Js.log(url.path);
+  url =>
     switch (url.path) {
     | [""]
     | []
@@ -42,4 +41,3 @@ let urlToRoute: ReasonReact.Router.url => t =
     | [user, noteId, slug] => Note({user, noteId, slug: Some(slug)})
     | _ => NotFound
     };
-  };

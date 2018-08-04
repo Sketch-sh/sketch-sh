@@ -24,13 +24,17 @@ let make = _children => {
     self.onUnmount(() => ReasonReact.Router.unwatchUrl(watcherID));
   },
   render: ({state}) =>
-    switch (state) {
-    | Home => <Home />
-    | Note(_) => <Editor_Note_Loader />
-    | AuthCallback(token) => <Auth.AuthCallback token />
-    | AuthGithub => <Auth.AuthGithub />
-    | _ => "not implemented" |. str
-    },
+    <ReasonApollo.Provider client=ApolloClient.instance>
+      (
+        switch (state) {
+        | Home => <Home />
+        | Note(_) => <Editor_Note_Loader />
+        | AuthCallback(token) => <Auth.AuthCallback token />
+        | AuthGithub => <Auth.AuthGithub />
+        | _ => "not implemented" |. str
+        }
+      )
+    </ReasonApollo.Provider>,
 };
 
 let default = ReasonReact.wrapReasonForJs(~component, _jsProps => make([||]));
