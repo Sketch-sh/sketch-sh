@@ -24,7 +24,7 @@ let make = _children => {
     self.onUnmount(() => ReasonReact.Router.unwatchUrl(watcherID));
   },
   render: ({state}) =>
-    <ReasonApollo.Provider client=ApolloClient.instance>
+    <ReasonApollo.Provider client=GqlClient.instance>
       (
         switch (state) {
         | Home => <Home />
