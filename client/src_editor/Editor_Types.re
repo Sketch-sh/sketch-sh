@@ -65,7 +65,12 @@ module JsonEncode = {
 
   let encode: array(Block.block) => Js.Json.t =
     blocks =>
-      blocks
-      |. Belt.Array.mapU((. block) => block |> blockEncoder)
-      |> jsonArray;
+      object_([
+        (
+          "blocks",
+          blocks
+          |. Belt.Array.mapU((. block) => block |> blockEncoder)
+          |> jsonArray,
+        ),
+      ]);
 };
