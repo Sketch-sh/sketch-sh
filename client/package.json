@@ -33,6 +33,7 @@
     "graphql": "^0.13.2",
     "graphql-tag": "^2.9.2",
     "install": "^0.12.1",
+    "jsonwebtoken": "^8.3.0",
     "nanoid": "^1.1.0",
     "npm": "^6.2.0",
     "react": "^16.4.1",

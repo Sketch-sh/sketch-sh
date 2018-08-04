@@ -32,7 +32,7 @@ let make = _children => {
         | NoteNew => <Note_New />
         | AuthCallback(token) => <Auth.AuthCallback token />
         | AuthGithub => <Auth.AuthGithub />
-        | AuthFailure => "not implemented" |. str
+        | AuthFailure => "auth failure" |. str
         | NotFound => <NotFound />
         }
       )
