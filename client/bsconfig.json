@@ -4,8 +4,7 @@
     "react-jsx": 2
   },
   "sources": [
-    // "src",
-    // "src/vendor",
+    "src",
     "shared",
     "src_editor",
     "src_analyzer",

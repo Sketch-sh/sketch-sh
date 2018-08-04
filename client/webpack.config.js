@@ -4,10 +4,9 @@ const path = require("path");
 const outputDir = path.join(__dirname, "build/");
 
 const isProd = process.env.NODE_ENV === "production";
-const baseFolder = process.env.TERMINAL_UI === "1" ? "src" : "src_editor";
 
 const base = {
-  entry: ["react-hot-loader/patch", "./" + baseFolder + "/entry.js"],
+  entry: ["react-hot-loader/patch", "./src/entry.js"],
   mode: isProd ? "production" : "development",
   devServer: {
     hot: true,
@@ -28,7 +27,7 @@ const base = {
   },
   plugins: [
     new HtmlWebpackPlugin({
-      template: path.join(__dirname, baseFolder, "index.html"),
+      template: path.join(__dirname, "src", "index.html"),
     }),
   ],
   module: {

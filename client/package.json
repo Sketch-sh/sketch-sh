@@ -10,7 +10,6 @@
     "build": "bsb -make-world && NODE_ENV=production webpack && cp public/* build",
     "deploy": "now build && now alias",
     "staging": "npm run build && now build && now alias staging.rtop.khoanguyen.me",
-    "start:terminal": "TERMINAL_UI=1 webpack-dev-server",
     "start": "webpack-dev-server",
     "ci:build": "bsb -clean-world && npm run build"
   },
