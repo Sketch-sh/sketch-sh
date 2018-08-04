@@ -3,5 +3,12 @@ migrate:
 	./node_modules/.bin/knex migrate:latest && \
 	cd ../hasura && \
 	hasura metadata apply --access-key hasura
+save:
+	cd hasura && \
+	hasura metadata export --access-key hasura
 
-.PHONY: migrate
+update-schema: save
+	cd ../client && \
+	./node_modules/.bin/send-introspection-query http://localhost:8081/v1alpha1/graphql
+
+.PHONY: migrate save update-schema

@@ -1146,6 +1146,18 @@
               "args": [],
               "isDeprecated": false,
               "deprecationReason": null,
+              "name": "owner",
+              "type": {
+                "kind": "OBJECT",
+                "name": "user_public",
+                "ofType": null
+              },
+              "description": "An object relationship"
+            },
+            {
+              "args": [],
+              "isDeprecated": false,
+              "deprecationReason": null,
               "name": "title",
               "type": {
                 "kind": "SCALAR",
@@ -1256,6 +1268,16 @@
               "type": {
                 "kind": "INPUT_OBJECT",
                 "name": "note_revision_bool_exp",
+                "ofType": null
+              },
+              "description": null
+            },
+            {
+              "name": "owner",
+              "defaultValue": null,
+              "type": {
+                "kind": "INPUT_OBJECT",
+                "name": "user_public_bool_exp",
                 "ofType": null
               },
               "description": null
