@@ -1,4 +1,9 @@
 let str = ReasonReact.string;
+let optionStr =
+  fun
+  | None => ReasonReact.null
+  | Some(s) => ReasonReact.string(s);
+
 let tapLog = a => {
   Js.log(a);
   a;

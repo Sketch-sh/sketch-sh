@@ -47,7 +47,7 @@ let make = (~noteInfo: Route.noteRouteConfig, _children) => {
                | 0 => <NotFound entity="note" />
                | _ =>
                  let note = notes[0];
-                 <div> (note##id =>> (id => str(id))) </div>;
+                 <div> (optionStr(note##id)) </div>;
                };
              }
          )
