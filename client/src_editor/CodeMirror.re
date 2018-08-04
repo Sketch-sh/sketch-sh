@@ -245,6 +245,7 @@ module Editor = {
     "on";
 
   /* comment addon */
+  [@bs.deriving abstract]
   type commentOptions = {
     [@bs.optional]
     padding: string,
