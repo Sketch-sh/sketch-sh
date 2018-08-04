@@ -33,6 +33,8 @@ let make = _children => {
         | AuthCallback(token) => <Auth.AuthCallback token />
         | AuthGithub => <Auth.AuthGithub />
         | AuthFailure => "auth failure" |. str
+        | EditorDevelopment =>
+          Utils.env == "production" ? <NotFound /> : <Editor_Note_Loader />
         | NotFound => <NotFound />
         }
       )

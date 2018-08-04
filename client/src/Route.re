@@ -15,9 +15,31 @@ type t =
   | AuthGithub
   | AuthFailure
   | AuthCallback(string)
+  | EditorDevelopment
   | NotFound;
 
 type route = t;
+
+let routeToUrl: t => string =
+  fun
+  | Home => "/"
+  | Note({username, noteId, slug}) =>
+    {j|/u/$(username)/$(noteId)/|j}
+    ++ (
+      switch (slug) {
+      | None => ""
+      | Some(slug) => slug
+      }
+    )
+  | NoteNew => "/new"
+  | AuthGithub => "/auth/github"
+  | AuthFailure => "/auth/failure"
+  | AuthCallback(token) => "/auth/callback?token=" ++ token
+  | EditorDevelopment => "/____EDITOR-DEVELOPMENT____"
+  | NotFound =>
+    raise(
+      Invalid_argument("You're trying to navigate to a not found route"),
+    );
 
 let urlToRoute: ReasonReact.Router.url => t =
   url =>
@@ -26,6 +48,7 @@ let urlToRoute: ReasonReact.Router.url => t =
     | []
     | ["/"] => Home
     | ["new"] => NoteNew
+    | ["____EDITOR-DEVELOPMENT____"] => EditorDevelopment
     | ["auth", "github"] => AuthGithub
     | ["auth", "failure"] => AuthFailure
     | ["auth", "callback"] =>
@@ -39,7 +62,8 @@ let urlToRoute: ReasonReact.Router.url => t =
       | Some(token) => AuthCallback(token)
       | None => NotFound
       };
-    | [username, noteId] => Note({username, noteId, slug: None})
-    | [username, noteId, slug] => Note({username, noteId, slug: Some(slug)})
+    | ["u", username, noteId] => Note({username, noteId, slug: None})
+    | ["u", username, noteId, slug] =>
+      Note({username, noteId, slug: Some(slug)})
     | _ => NotFound
     };

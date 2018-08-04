@@ -8,11 +8,13 @@ let make = _children => {
     <div>
       <h1> ("Coming soon" |. str) </h1>
       <p>
-        <Link href="/thangngoc89/somerandomnote">
+        <Link route=Route.EditorDevelopment>
           ("Editor development" |. str)
         </Link>
       </p>
-      <p> <Link href="/auth/github"> ("Login with Github" |. str) </Link> </p>
-      <p> <Link href="/new"> ("New note" |. str) </Link> </p>
+      <p>
+        <Link route=Route.AuthGithub> ("Login with Github" |. str) </Link>
+      </p>
+      <p> <Link route=Route.NoteNew> ("New note" |. str) </Link> </p>
     </div>,
 };

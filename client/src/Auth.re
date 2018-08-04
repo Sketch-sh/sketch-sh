@@ -33,7 +33,7 @@ module AuthCallback = {
           (
             _ =>
               Js.Global.setTimeout(
-                () => ReasonReact.Router.push("/"),
+                () => Router.push(Route.Home),
                 switch (state) {
                 | Initial
                 | Success => 1500
