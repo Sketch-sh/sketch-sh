@@ -6,7 +6,7 @@ const outputDir = path.join(__dirname, "build/");
 const isProd = process.env.NODE_ENV === "production";
 
 const base = {
-  entry: ["react-hot-loader/patch", "./src/entry.js"],
+  entry: ["react-hot-loader/patch", "./entry.js"],
   mode: isProd ? "production" : "development",
   devServer: {
     hot: true,
