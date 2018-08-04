@@ -28,11 +28,12 @@ let make = _children => {
       (
         switch (state) {
         | Home => <Home />
-        | Note(_) => <Editor_Note_Loader />
+        | Note(noteInfo) => <Note noteInfo />
         | NoteNew => <Note_New />
         | AuthCallback(token) => <Auth.AuthCallback token />
         | AuthGithub => <Auth.AuthGithub />
-        | _ => "not implemented" |. str
+        | AuthFailure => "not implemented" |. str
+        | NotFound => <NotFound />
         }
       )
     </ReasonApollo.Provider>,

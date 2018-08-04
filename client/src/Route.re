@@ -3,7 +3,7 @@
    This module contains type definition for all routes in the project
  */
 type noteRouteConfig = {
-  user: string,
+  username: string,
   noteId: string,
   slug: option(string),
 };
@@ -39,7 +39,7 @@ let urlToRoute: ReasonReact.Router.url => t =
       | Some(token) => AuthCallback(token)
       | None => NotFound
       };
-    | [user, noteId] => Note({user, noteId, slug: None})
-    | [user, noteId, slug] => Note({user, noteId, slug: Some(slug)})
+    | [username, noteId] => Note({username, noteId, slug: None})
+    | [username, noteId, slug] => Note({username, noteId, slug: Some(slug)})
     | _ => NotFound
     };
