@@ -8,7 +8,7 @@ const qs = require("querystring");
 const GitHubStrategy = require("passport-github2").Strategy;
 const checkUserInfo = require("./checkUserInfo");
 const nanoid = require("nanoid");
-const morgan = require('morgan');
+const morgan = require("morgan");
 
 passport.use(
   new GitHubStrategy(
@@ -36,7 +36,7 @@ passport.use(
               name: profile.displayName || undefined,
               email: email || undefined,
               data: { accessToken, refreshToken, profile },
-              avatar: profile.profileUrl,
+              avatar: profile._json.avatar_url,
             };
 
             const newUser = await checkUserInfo.createGithubIdentity(args);
@@ -55,7 +55,7 @@ passport.use(
 );
 
 const app = express();
-app.use(morgan(process.env.NODE_ENV === "production" ? "combined": "dev"));
+app.use(morgan(process.env.NODE_ENV === "production" ? "combined" : "dev"));
 app.use(passport.initialize());
 
 app.get("/auth/github", passport.authenticate("github"), function(req, res) {
@@ -105,21 +105,21 @@ app.get("/auth/webhook", (req, res) => {
 
   if (!token) {
     res.json({
-      "X-Hasura-Role": "public"
+      "X-Hasura-Role": "public",
     });
-    return
+    return;
   }
 
   jwt.verify(token, process.env.JWT_TOKEN, function(error, result) {
     if (error) {
       res.sendStatus(401);
-      return
+      return;
     } else {
       res.json({
         "X-Hasura-Role": result.role,
         "X-Hasura-User-Id": result.userId,
       });
-      return
+      return;
     }
   });
 });
