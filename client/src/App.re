@@ -29,6 +29,7 @@ let make = _children => {
         switch (state) {
         | Home => <Home />
         | Note(_) => <Editor_Note_Loader />
+        | NoteNew => <Note_New />
         | AuthCallback(token) => <Auth.AuthCallback token />
         | AuthGithub => <Auth.AuthGithub />
         | _ => "not implemented" |. str

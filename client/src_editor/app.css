@@ -31,25 +31,13 @@ kbd {
   margin-left: 36px;
 }
 
-.metadata__title {
-  display: flex;
-}
-
-.metadata__title-sharp {
-  font-size: 2em;
-  font-weight: 900;
-  color: #625666;
-  font-family: "Fira Code", "Ubuntu Mono", monospace;
-  padding: 8px;
-  margin-right: 11px;
-}
-
 .metadata__title-input {
+  width: 100%;
+  display: block;
   font-size: 2em;
   font-weight: 900;
   color: #625666;
   font-family: "Fira Code", "Ubuntu Mono", monospace;
-  flex: 1;
   border: none;
   outline: none;
   margin: 0;

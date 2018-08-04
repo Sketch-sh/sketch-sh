@@ -13,5 +13,6 @@ let make = _children => {
         </Link>
       </p>
       <p> <Link href="/auth/github"> ("Login with Github" |. str) </Link> </p>
+      <p> <Link href="/new"> ("New note" |. str) </Link> </p>
     </div>,
 };

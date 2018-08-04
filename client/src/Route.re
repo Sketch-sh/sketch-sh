@@ -11,6 +11,7 @@ type noteRouteConfig = {
 type t =
   | Home
   | Note(noteRouteConfig)
+  | NoteNew
   | AuthGithub
   | AuthFailure
   | AuthCallback(string)
@@ -24,6 +25,7 @@ let urlToRoute: ReasonReact.Router.url => t =
     | [""]
     | []
     | ["/"] => Home
+    | ["new"] => NoteNew
     | ["auth", "github"] => AuthGithub
     | ["auth", "failure"] => AuthFailure
     | ["auth", "callback"] =>
