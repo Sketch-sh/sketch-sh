@@ -43,12 +43,10 @@ let make = (~noteInfo: Route.noteRouteConfig, _children) => {
                <div> (ReasonReact.string(error##message)) </div>
              | Data(response) =>
                let notes = response##note;
-               switch (Array.length(notes)) {
-               | 0 => <NotFound entity="note" />
-               | _ =>
-                 let note = notes[0];
-                 <div> (optionStr(note##id)) </div>;
-               };
+               notes
+               |. arrayFirst(~empty=<NotFound entity="note" />, ~render=note =>
+                    <div> (optionStr(note##id)) </div>
+                  );
              }
          )
     </GetNoteQuery>;

@@ -25,7 +25,7 @@ let make = _children => {
                  </p>
                | Some(userId) =>
                  <div>
-                   <p> ("UserId " ++ userId |. str) </p>
+                   <UI_UserInfo userId />
                    <p>
                      <Link route=Route.AuthLogout> ("Logout" |. str) </Link>
                    </p>
