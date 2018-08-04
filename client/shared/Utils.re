@@ -96,3 +96,5 @@ let arrayFind = (array, f) => {
 let generateId = NanoId.Secure.make;
 
 let pluckAcc = ((acc, _)) => acc;
+
+external toNullable : string => Js.Nullable.t(string) = "%identity";

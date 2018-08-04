@@ -12,10 +12,11 @@ type t =
   | Home
   | Note(noteRouteConfig)
   | NoteNew
+  | EditorDevelopment
   | AuthGithub
   | AuthFailure
   | AuthCallback(string)
-  | EditorDevelopment
+  | AuthLogout
   | NotFound;
 
 type route = t;
@@ -32,10 +33,11 @@ let routeToUrl: t => string =
       }
     )
   | NoteNew => "/new"
+  | EditorDevelopment => "/____EDITOR-DEVELOPMENT____"
   | AuthGithub => "/auth/github"
   | AuthFailure => "/auth/failure"
   | AuthCallback(token) => "/auth/callback?token=" ++ token
-  | EditorDevelopment => "/____EDITOR-DEVELOPMENT____"
+  | AuthLogout => "/auth/logout"
   | NotFound =>
     raise(
       Invalid_argument("You're trying to navigate to a not found route"),
@@ -62,6 +64,7 @@ let urlToRoute: ReasonReact.Router.url => t =
       | Some(token) => AuthCallback(token)
       | None => NotFound
       };
+    | ["auth", "logout"] => AuthLogout
     | ["u", username, noteId] => Note({username, noteId, slug: None})
     | ["u", username, noteId, slug] =>
       Note({username, noteId, slug: Some(slug)})

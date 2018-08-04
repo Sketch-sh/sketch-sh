@@ -31,6 +31,7 @@ let make = _children => {
         | Note(noteInfo) => <Note noteInfo />
         | NoteNew => <Note_New />
         | AuthCallback(token) => <Auth.AuthCallback token />
+        | AuthLogout => <Auth.AuthLogout />
         | AuthGithub => <Auth.AuthGithub />
         | AuthFailure => "auth failure" |. str
         | EditorDevelopment =>

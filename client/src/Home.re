@@ -12,9 +12,28 @@ let make = _children => {
           ("Editor development" |. str)
         </Link>
       </p>
-      <p>
-        <Link route=Route.AuthGithub> ("Login with Github" |. str) </Link>
-      </p>
+      <hr />
+      <Auth.IsAuthenticated>
+        ...(
+             state =>
+               switch (state) {
+               | None =>
+                 <p>
+                   <Link route=Route.AuthGithub>
+                     ("Login with Github" |. str)
+                   </Link>
+                 </p>
+               | Some(userId) =>
+                 <div>
+                   <p> ("UserId " ++ userId |. str) </p>
+                   <p>
+                     <Link route=Route.AuthLogout> ("Logout" |. str) </Link>
+                   </p>
+                 </div>
+               }
+           )
+      </Auth.IsAuthenticated>
+      <hr />
       <p> <Link route=Route.NoteNew> ("New note" |. str) </Link> </p>
     </div>,
 };
