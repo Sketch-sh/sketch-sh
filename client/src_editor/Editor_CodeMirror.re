@@ -129,8 +129,10 @@ let make =
              let doc = editor |. CodeMirror.Editor.getDoc;
              let cursor = doc |. CodeMirror.Doc.getCursor(`head);
              switch (event |. KeyboardEvent.key) {
+             | "PageUp"
              | "ArrowUp" when cursor |. lineGet == 0 && cursor |. chGet == 0 =>
                onBlockUp()
+             | "PageDown"
              | "ArrowDown" =>
                let lastLine = (editor |. CodeMirror.Editor.lineCount) - 1;
                let lastChar =
