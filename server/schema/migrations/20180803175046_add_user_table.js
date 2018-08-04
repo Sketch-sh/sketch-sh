@@ -20,9 +20,13 @@ exports.up = function(knex, Promise) {
       table.string("user_identity_type").primary();
     }),
     knex.schema.createTable("user_identity", function(table) {
-      table.string("user_id", 21).references("user.id");
+      table
+        .string("user_id", 21)
+        .notNullable()
+        .references("user.id");
       table
         .string("identity_type")
+        .notNullable()
         .references("user_identity_type.user_identity_type");
 
       table.primary(["user_id", "identity_type"]);
@@ -36,9 +40,9 @@ exports.up = function(knex, Promise) {
 };
 
 exports.down = function(knex, Promise) {
-  return knex.raw(`
-    DROP TABLE IF EXISTS "user" CASCADE;
-    DROP TABLE IF EXISTS "user_identity" CASCADE;
-    DROP TABLE IF EXISTS "user_identity_type" CASCADE;
-  `);
+  return Promise.all([
+    knex.schema.dropTableIfExists("user"),
+    knex.schema.dropTableIfExists("user_identity"),
+    knex.schema.dropTableIfExists("user_identity_type"),
+  ]);
 };

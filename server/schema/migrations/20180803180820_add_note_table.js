@@ -2,7 +2,10 @@ exports.up = function(knex, Promise) {
   return Promise.all([
     /* Table: note */
     knex.schema.createTable("note", function(table) {
-      table.string("id", 21).primary();
+      table
+        .string("id", 21)
+        .notNullable()
+        .primary();
       table
         .string("user_id", 21)
         .notNullable()
