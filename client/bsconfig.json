@@ -5,6 +5,7 @@
   },
   "sources": [
     "src",
+    "src/components",
     "shared",
     "src_editor",
     "src_analyzer",
