@@ -1,3 +1,4 @@
+Modules.require("./Editor_Note.css");
 open Utils;
 open Editor_Types.Block;
 
@@ -11,7 +12,7 @@ type action =
 
 let component = ReasonReact.reducerComponent("Editor_Page");
 
-let make = (~blocks, ~title="", ~loading, ~onSave, _children) => {
+let make = (~blocks, ~title="", ~loading as isSaving, ~onSave, _children) => {
   ...component,
   initialState: () => {title, blocks: ref(blocks)},
   reducer: (action, state) =>
@@ -21,24 +22,60 @@ let make = (~blocks, ~title="", ~loading, ~onSave, _children) => {
       state.blocks := blocks;
       ReasonReact.NoUpdate;
     },
-  render: ({state, send}) =>
-    <div className="pageSizer">
-      <Helmet>
-        <title>
-          ((state.title == "" ? "untitled" : state.title) |. str)
-        </title>
-      </Helmet>
-      <div className="metadata">
-        <input
-          className="metadata__title-input"
-          placeholder="untitled note"
-          value=state.title
-          onChange=(event => valueFromEvent(event) |. TitleUpdate |. send)
+  render: ({state, send}) => {
+    let isSaving = true;
+    <div>
+      <aside className="EditorNav">
+        <div className="EditorNav__top">
+          <Fi.IconContext.Provider
+            value={"className": "EditorNav__button--icon"}>
+            <div className="EditorNav__button">
+              (
+                ReasonReact.cloneElement(
+                  <button
+                    className="EditorNav__button--button"
+                    onClick=(
+                      _ => onSave(~title=state.title, ~data=state.blocks^)
+                    )>
+                    (
+                      isSaving ?
+                        <Fi.Loader className="EditorNav__button--spin" /> :
+                        <Fi.Save />
+                    )
+                  </button>,
+                  ~props={
+                    "data-balloon": "Save",
+                    "data-balloon-pos": "right",
+                  },
+                  [||],
+                )
+              )
+            </div>
+          </Fi.IconContext.Provider>
+        </div>
+        <div className="EditorNav__bottom">
+          <span> ("Saving" |. str) </span>
+        </div>
+      </aside>
+      <main className="pageSizer">
+        <Helmet>
+          <title>
+            ((state.title == "" ? "untitled" : state.title) |. str)
+          </title>
+        </Helmet>
+        <div className="metadata">
+          <input
+            className="metadata__title-input"
+            placeholder="untitled note"
+            value=state.title
+            onChange=(event => valueFromEvent(event) |. TitleUpdate |. send)
+          />
+        </div>
+        <Editor_Blocks
+          blocks
+          onUpdate=(blocks => send(BlockUpdate(blocks)))
         />
-      </div>
-      <button onClick=(_ => onSave(~title=state.title, ~data=state.blocks^))>
-        (loading ? "Saving..." |. str : "Save this notebook" |. str)
-      </button>
-      <Editor_Blocks blocks onUpdate=(blocks => send(BlockUpdate(blocks))) />
-    </div>,
+      </main>
+    </div>;
+  },
 };
