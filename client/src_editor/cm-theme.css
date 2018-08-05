@@ -1,12 +1,5 @@
 @import url(/firacode/fira_code.css);
 
-.CodeMirror {
-  font-size: 16px;
-  font-family: "Fira Code", monospace;
-  font-weight: 400;
-  line-height: 1.4375;
-  background: 0 0;
-}
 .CodeMirror pre {
   padding: 0;
 }
@@ -25,142 +18,147 @@
   padding: 4px 8px;
 }
 
-.cm-s-runkit-light.CodeMirror {
+.cm-s-rtop-light.CodeMirror {
   font-family: "Fira Code", monospace;
   font-weight: 400;
+  font-size: 16px;
+  font-family: "Fira Code", monospace;
+  font-weight: 400;
+  line-height: 1.4375;
+  background: 0 0;
 }
-.cm-s-runkit-light.CodeMirror span.CodeMirror-matchingbracket,
-.cm-s-runkit-light.CodeMirror span.CodeMirror-nonmatchingbracket {
+.cm-s-rtop-light.CodeMirror span.CodeMirror-matchingbracket,
+.cm-s-rtop-light.CodeMirror span.CodeMirror-nonmatchingbracket {
   color: #33b277;
   border-color: transparent;
   border-style: none;
   border-width: 0;
   background: 0 0;
 }
-.cm-s-runkit-light.CodeMirror span.CodeMirror-nonmatchingbracket {
+.cm-s-rtop-light.CodeMirror span.CodeMirror-nonmatchingbracket {
   color: #625666;
 }
-.cm-s-runkit-light .CodeMirror-lines {
+.cm-s-rtop-light .CodeMirror-lines {
   color: #625666;
   background: #fff;
   border-color: #e8e5e8;
   border-width: 1px;
 }
-.cm-s-runkit-light .CodeMirror-linenumber {
+.cm-s-rtop-light .CodeMirror-linenumber {
   color: rgba(151, 137, 152, 0.5);
 }
-.cm-s-runkit-light .CodeMirror-cursor {
+.cm-s-rtop-light .CodeMirror-cursor {
   width: 1px;
   border: 0;
   background: #2e383b;
   z-index: 1;
 }
-.cm-s-runkit-light.CodeMirror-focused .CodeMirror-selected {
+.cm-s-rtop-light.CodeMirror-focused .CodeMirror-selected {
   background: #b6d1ef;
 }
-.cm-s-runkit-light.CodeMirror-focused .CodeMirror-lines {
+.cm-s-rtop-light.CodeMirror-focused .CodeMirror-lines {
   border-width: 1px;
   border-color: rgba(151, 137, 152, 0.7);
 }
-.cm-s-runkit-light.CodeMirror-focused .CodeMirror-linenumber {
+.cm-s-rtop-light.CodeMirror-focused .CodeMirror-linenumber {
   color: rgba(151, 137, 152, 0.7);
 }
-.cm-s-runkit-light .cm-require-end-cap::before {
+.cm-s-rtop-light .cm-require-end-cap::before {
   color: #767676;
   background: #f1f1f1;
 }
-.cm-s-runkit-light .cm-require-path ::after {
+.cm-s-rtop-light .cm-require-path ::after {
   color: #33b277;
   background: #f9f8f7 !important;
 }
-.cm-s-runkit-light .cm-negative {
+.cm-s-rtop-light .cm-negative {
   color: #2e383b;
 }
-.cm-s-runkit-light .cm-positive {
+.cm-s-rtop-light .cm-positive {
   color: #33b277;
 }
-.cm-s-runkit-light .cm-header,
-.cm-s-runkit-light .cm-quote {
+.cm-s-rtop-light .cm-header,
+.cm-s-rtop-light .cm-quote {
   color: inherit;
 }
-.cm-s-runkit-light .cm-header,
-.cm-s-runkit-light .cm-strong {
+.cm-s-rtop-light .cm-header,
+.cm-s-rtop-light .cm-strong {
   font-weight: 700;
 }
-.cm-s-runkit-light .cm-em {
+.cm-s-rtop-light .cm-em {
   font-style: italic;
 }
-.cm-s-runkit-light .cm-link,
-.cm-s-runkit-light .cm-require-path a {
+.cm-s-rtop-light .cm-link,
+.cm-s-rtop-light .cm-require-path a {
   color: #4a91e2;
 }
-.cm-s-runkit-light .cm-strikethrough {
+.cm-s-rtop-light .cm-strikethrough {
   text-decoration: line-through;
 }
-.cm-s-runkit-light .cm-keyword {
+.cm-s-rtop-light .cm-keyword {
   color: #4a91e2;
   font-weight: 400;
 }
-.cm-s-runkit-light .cm-atom {
+.cm-s-rtop-light .cm-atom {
   color: #625666;
 }
-.cm-s-runkit-light .cm-null,
-.cm-s-runkit-light .cm-undefined {
+.cm-s-rtop-light .cm-null,
+.cm-s-rtop-light .cm-undefined {
   color: #978998;
 }
-.cm-s-runkit-light .cm-boolean {
+.cm-s-rtop-light .cm-boolean {
   color: #eaad3a;
 }
-.cm-s-runkit-light .cm-number {
+.cm-s-rtop-light .cm-number {
   color: #33b277;
 }
-.cm-s-runkit-light .cm-def,
-.cm-s-runkit-light .cm-property,
-.cm-s-runkit-light .cm-punctuation {
+.cm-s-rtop-light .cm-def,
+.cm-s-rtop-light .cm-property,
+.cm-s-rtop-light .cm-punctuation {
   color: #625666;
 }
-.cm-s-runkit-light .cm-operator {
+.cm-s-rtop-light .cm-operator {
   color: #625666;
   font-weight: 400;
 }
-.cm-s-runkit-light .cm-variable {
+.cm-s-rtop-light .cm-variable {
   color: #8e85e5;
   font-weight: 400;
 }
-.cm-s-runkit-light .cm-variable-2,
-.cm-s-runkit-light .cm-variable-3 {
+.cm-s-rtop-light .cm-variable-2,
+.cm-s-rtop-light .cm-variable-3 {
   color: #8e85e5;
 }
-.cm-s-runkit-light .cm-comment {
+.cm-s-rtop-light .cm-comment {
   color: #978998;
 }
-.cm-s-runkit-light .cm-string {
+.cm-s-rtop-light .cm-string {
   color: #dd6546;
 }
-.cm-s-runkit-light .cm-string-2 {
+.cm-s-rtop-light .cm-string-2 {
   color: #cc4928;
 }
-.cm-s-runkit-light .cm-meta {
+.cm-s-rtop-light .cm-meta {
   color: #625666;
 }
-.cm-s-runkit-light .cm-qualifier {
+.cm-s-rtop-light .cm-qualifier {
   color: #8e85e5;
   font-weight: 400;
 }
-.cm-s-runkit-light .cm-attribute,
-.cm-s-runkit-light .cm-bracket,
-.cm-s-runkit-light .cm-builtin,
-.cm-s-runkit-light .cm-node,
-.cm-s-runkit-light .cm-tag {
+.cm-s-rtop-light .cm-attribute,
+.cm-s-rtop-light .cm-bracket,
+.cm-s-rtop-light .cm-builtin,
+.cm-s-rtop-light .cm-node,
+.cm-s-rtop-light .cm-tag {
   color: #625666;
 }
-.cm-s-runkit-light .cm-hr {
+.cm-s-rtop-light .cm-hr {
   color: inherit;
 }
-.cm-s-runkit-light .cm-error {
+.cm-s-rtop-light .cm-error {
   color: #2e383b;
 }
-.cm-s-runkit-light .cm-invalidchar {
+.cm-s-rtop-light .cm-invalidchar {
   color: inherit;
 }
 
@@ -169,3 +167,67 @@
   color: #aaa !important;
 }
 /* \\\\\\\\\\\\\\\ Additions */
+
+.cm-read-only .CodeMirror-cursor {
+  visibility: hidden !important;
+}
+
+.source-viewer .CodeMirror-scroll {
+  min-height: 1em;
+  max-height: 300px;
+}
+.regexp-results textarea {
+  width: 0px;
+  height: 0px;
+  display: block;
+  padding: 0;
+  margin: 0;
+  outline: 0;
+  border: 0;
+  resize: none;
+}
+.regexp-results .CodeMirror {
+  height: auto !important;
+}
+.regexp-results {
+  min-height: 30px;
+  display: block;
+  width: 100%;
+  padding: 3px 6px;
+  font-size: 14px;
+  line-height: 1.42857143;
+  color: #888;
+  background: #fff;
+  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+}
+.regex-highlight {
+  background-color: rgba(21, 179, 0, 0.3);
+}
+
+.source-editor .CodeMirror-lines {
+  border: 1px solid #e5e9ef;
+}
+.source-editor .CodeMirror-focused .CodeMirror-linenumber {
+  color: rgba(90, 163, 225, 0.63);
+}
+.source-editor .CodeMirror-focused .CodeMirror-lines {
+  border: 1px solid rgba(90, 163, 225, 0.63);
+}
+
+/* ////////////////// Additions */
+.text-editor .CodeMirror,
+.source-editor .CodeMirror {
+  height: auto !important;
+}
+
+.text-editor {
+  margin-left: 36px;
+}
+
+.text-editor .cm-header-1 {
+  font-size: 2em;
+}
+
+.text-editor .cm-header-2 {
+  font-size: 1.5em;
+}

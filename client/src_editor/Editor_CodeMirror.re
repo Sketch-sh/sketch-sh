@@ -1,17 +1,13 @@
-%bs.raw
-{|
-/* import "codemirror/mode/mllike/mllike" */
-import "./reason-mode.js"
-import "codemirror/addon/edit/matchbrackets"
-import "codemirror/addon/comment/comment"
-import "codemirror/addon/display/placeholder"
-import "codemirror/mode/gfm/gfm"
-import "codemirror/lib/codemirror.css"
-
-import "./cm-theme.css"
-import "./source-editor.css"
-import "./app.css" /* <-- Important, no semi */
-|};
+/* Modules.require("codemirror/mode/mllike/mllike"); */
+Modules.require("./reason-mode.js");
+Modules.require("codemirror/addon/edit/matchbrackets");
+Modules.require("codemirror/addon/comment/comment");
+Modules.require("codemirror/addon/display/placeholder");
+Modules.require("codemirror/mode/gfm/gfm");
+Modules.require("codemirror/lib/codemirror.css");
+Modules.require("./cm-theme.css");
+Modules.require("./source-editor.css");
+Modules.require("./app.css");
 
 /* open Utils; */
 
