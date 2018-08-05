@@ -56,7 +56,10 @@ let component = ReasonReact.reducerComponent("Editor_Page");
 
 let make = (~blocks: array(block), _children) => {
   ...component,
-  initialState: () => {blocks, focusedBlock: None},
+  initialState: () => {
+    blocks: blocks |. Editor_Blocks_Utils.syncLineNumber,
+    focusedBlock: None,
+  },
   didMount: self => {
     self.send(Block_Execute);
     ();
