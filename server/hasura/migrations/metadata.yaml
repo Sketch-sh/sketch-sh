@@ -155,7 +155,7 @@ tables:
     role: auth_service
 - array_relationships:
   - comment: null
-    name: notes
+    name: revisions
     using:
       foreign_key_constraint_on:
         column: note_id

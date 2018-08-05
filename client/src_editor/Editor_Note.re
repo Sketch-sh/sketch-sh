@@ -11,7 +11,7 @@ type action =
 
 let component = ReasonReact.reducerComponent("Editor_Page");
 
-let make = (~blocks, ~title="", ~onSave, _children) => {
+let make = (~blocks, ~title="", ~loading, ~onSave, _children) => {
   ...component,
   initialState: () => {title, blocks: ref(blocks)},
   reducer: (action, state) =>
@@ -37,7 +37,7 @@ let make = (~blocks, ~title="", ~onSave, _children) => {
         />
       </div>
       <button onClick=(_ => onSave(~title=state.title, ~data=blocks))>
-        ("Save this note book" |. str)
+        (loading ? "Saving..." |. str : "Save this notebook" |. str)
       </button>
       <Editor_Blocks blocks onUpdate=(blocks => send(BlockUpdate(blocks))) />
     </div>,

@@ -3,7 +3,7 @@ open Utils_GraphqlPpx;
 module AddNoteGql = [%graphql
   {|
     mutation ($title: String!, $data: jsonb!, $id: String!, $userId: String!) {
-      insert_note(objects: {
+      addNote: insert_note(objects: {
         title: $title,
         id: $id,
         user_id: $userId,
@@ -30,38 +30,60 @@ let blocks = [|
 |];
 
 open Utils;
-let component = ReasonReact.statelessComponent("Note_New");
+type action =
+  | Saved(string, string);
+let component = ReasonReact.reducerComponent("Note_New");
 
-let make = _children => {
+let make = _children : ReasonReact.component(unit, 'a, action) => {
   ...component,
-  render: _self =>
-    <Auth.IsAuthenticated>
+  reducer: (action, _) =>
+    switch (action) {
+    | Saved(noteId, username) =>
+      ReasonReact.SideEffects(
+        (_ => Router.push(Route.Note({username, noteId, slug: None}))),
+      )
+    },
+  render: ({send}) =>
+    <Auth.IsAuthenticatedWithUserInfo>
       ...(
            fun
            | None =>
              "TODO: Handle new document when user are not login in" |. str
-           | Some(userId) =>
+           | Some((user, userId)) =>
              <AddNoteComponent>
                ...(
                     (mutation, createNoteResult) => {
-                      Js.log(createNoteResult);
+                      let {AddNoteComponent.loading} = createNoteResult;
                       <div>
                         <Editor_Note
                           blocks
+                          loading
                           onSave=(
                             (~title, ~data) => {
+                              let noteId = Utils.generateId();
                               let newNote =
                                 AddNoteGql.make(
                                   ~title,
                                   ~data=data |. Editor_Types.JsonEncode.encode,
-                                  ~id=Utils.generateId(),
+                                  ~id=noteId,
                                   ~userId,
                                   (),
                                 );
                               Js.Promise.(
                                 mutation(~variables=newNote##variables, ())
-                                |> then_(result => Js.log(result) |> resolve)
-                                |> handleError
+                                |> then_(result => {
+                                     let a = result##data;
+
+                                     Js.log(a);
+                                     send(
+                                       Saved(
+                                         noteId,
+                                         user##username
+                                         |> Utils.optionToEmptyString,
+                                       ),
+                                     );
+                                     resolve();
+                                   })
                               )
                               |> ignore;
                             }
@@ -72,11 +94,5 @@ let make = _children => {
                   )
              </AddNoteComponent>
          )
-    </Auth.IsAuthenticated>,
+    </Auth.IsAuthenticatedWithUserInfo>,
 };
-
-/* mutation(
-     ~variables=newPokemon##variables,
-     ~refetchQueries=[|"getAllPokemons"|],
-     (),
-   ) */

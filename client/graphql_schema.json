@@ -1875,6 +1875,18 @@
               "description": null
             },
             {
+              "args": [],
+              "isDeprecated": false,
+              "deprecationReason": null,
+              "name": "owner",
+              "type": {
+                "kind": "OBJECT",
+                "name": "user_public",
+                "ofType": null
+              },
+              "description": "An object relationship"
+            },
+            {
               "args": [
                 {
                   "name": "limit",
@@ -1927,7 +1939,7 @@
               ],
               "isDeprecated": false,
               "deprecationReason": null,
-              "name": "notes",
+              "name": "revisions",
               "type": {
                 "kind": "NON_NULL",
                 "name": null,
@@ -1946,18 +1958,6 @@
                 }
               },
               "description": "An array relationship"
-            },
-            {
-              "args": [],
-              "isDeprecated": false,
-              "deprecationReason": null,
-              "name": "owner",
-              "type": {
-                "kind": "OBJECT",
-                "name": "user_public",
-                "ofType": null
-              },
-              "description": "An object relationship"
             },
             {
               "args": [],
@@ -2101,21 +2101,21 @@
               "description": null
             },
             {
-              "name": "notes",
-              "defaultValue": null,
-              "type": {
-                "kind": "INPUT_OBJECT",
-                "name": "note_revision_bool_exp",
-                "ofType": null
-              },
-              "description": null
-            },
-            {
               "name": "owner",
               "defaultValue": null,
               "type": {
                 "kind": "INPUT_OBJECT",
                 "name": "user_public_bool_exp",
+                "ofType": null
+              },
+              "description": null
+            },
+            {
+              "name": "revisions",
+              "defaultValue": null,
+              "type": {
+                "kind": "INPUT_OBJECT",
+                "name": "note_revision_bool_exp",
                 "ofType": null
               },
               "description": null

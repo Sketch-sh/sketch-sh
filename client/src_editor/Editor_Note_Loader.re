@@ -31,5 +31,6 @@ let make = _children => {
       blocks
       title="ReasonML playground"
       onSave=((~title as _, ~data as _) => ())
+      loading=false
     />,
 };

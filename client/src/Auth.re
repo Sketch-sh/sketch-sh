@@ -2,6 +2,7 @@ module Auth = {
   open Dom.Storage;
   let tokenKey = "rtop:token";
   let setToken = token => setItem(tokenKey, token, localStorage);
+  let getToken = () => getItem(tokenKey, localStorage);
   let removeToken = () => removeItem(tokenKey, localStorage);
 
   let userIdKey = "rtop:userId";
@@ -140,4 +141,39 @@ module IsAuthenticated = {
       reducer: (newState, _state) => ReasonReact.Update(newState),
       render: ({state}) => children(state),
     };
+};
+
+module IsAuthenticatedWithUserInfo = {
+  let component =
+    ReasonReact.statelessComponent("IsAuthenticatedWithUserInfo");
+
+  let make = children => {
+    ...component,
+    render: _self =>
+      <IsAuthenticated>
+        ...(
+             state =>
+               switch (state) {
+               | None => children(None)
+               | Some(userId) =>
+                 open GqlUserInfo;
+                 let query = UserInfoGql.make(~userId, ());
+                 <UserInfoComponent variables=query##variables>
+                   ...(
+                        ({result}) =>
+                          switch (result) {
+                          | Loading => children(None)
+                          | Error(_) => children(None)
+                          | Data(response) =>
+                            response##user_public
+                            |. arrayFirst(~empty=children(None), ~render=user =>
+                                 children(Some((user, userId)))
+                               )
+                          }
+                      )
+                 </UserInfoComponent>;
+               }
+           )
+      </IsAuthenticated>,
+  };
 };

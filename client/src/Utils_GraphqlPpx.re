@@ -1,1 +1,1 @@
-let json_of_jsonb = a => a |. Utils.tapLog;
+let json_of_jsonb = a => a;

@@ -1,16 +1,4 @@
-module GqlUserInfo = [%graphql
-  {|
-    query userInfo($userId: String!) {
-      user_public(where: {id: {_eq: $userId}}) {
-        name
-        username
-        avatar
-      }
-    }
-  |}
-];
-
-module GetUserInfo = ReasonApollo.CreateQuery(GqlUserInfo);
+open GqlUserInfo;
 
 open Utils;
 
@@ -18,8 +6,8 @@ let component = ReasonReact.statelessComponent("UI_UserInfo");
 let make = (~userId, _children) => {
   ...component,
   render: _ => {
-    let query = GqlUserInfo.make(~userId, ());
-    <GetUserInfo variables=query##variables>
+    let query = UserInfoGql.make(~userId, ());
+    <UserInfoComponent variables=query##variables>
       ...(
            ({result}) =>
              switch (result) {
@@ -71,6 +59,6 @@ let make = (~userId, _children) => {
                   )
              }
          )
-    </GetUserInfo>;
+    </UserInfoComponent>;
   },
 };
