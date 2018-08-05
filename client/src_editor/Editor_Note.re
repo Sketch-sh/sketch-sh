@@ -4,6 +4,7 @@ open Editor_Types.Block;
 
 type state = {
   title: string,
+  pristine: bool,
   dirty: bool,
   blocks: ref(array(block)),
   isSaving: ref(bool),
@@ -13,12 +14,15 @@ type action =
   | BlockUpdate(array(block));
 
 type saveStatus =
+  | Pristine
   | Saved
   | Saving
   | Unsaved;
 
-let deriveSaveStatus = (isSaving, dirty) =>
-  if (isSaving) {
+let deriveSaveStatus = (~pristine, ~isSaving, ~dirty) =>
+  if (pristine) {
+    Pristine;
+  } else if (isSaving) {
     Saving;
   } else if (dirty) {
     Unsaved;
@@ -32,6 +36,7 @@ let make = (~blocks, ~title="", ~loading as isSaving, ~onSave, _children) => {
   ...component,
   initialState: () => {
     title,
+    pristine: true,
     dirty: false,
     blocks: ref(blocks),
     isSaving: ref(isSaving),
@@ -39,20 +44,25 @@ let make = (~blocks, ~title="", ~loading as isSaving, ~onSave, _children) => {
   willReceiveProps: ({state}) =>
     if (state.isSaving^ != isSaving) {
       state.isSaving := isSaving;
-      {...state, dirty: false};
+      {...state, dirty: false, pristine: false};
     } else {
       state;
     },
   reducer: (action, state) =>
     switch (action) {
     | TitleUpdate(title) =>
-      ReasonReact.Update({...state, dirty: true, title})
+      ReasonReact.Update({...state, pristine: false, dirty: true, title})
     | BlockUpdate(blocks) =>
       state.blocks := blocks;
-      ReasonReact.Update({...state, dirty: true});
+      ReasonReact.Update({...state, pristine: false, dirty: true});
     },
   render: ({state, send}) => {
-    let saveStatus = deriveSaveStatus(isSaving, state.dirty);
+    let saveStatus =
+      deriveSaveStatus(
+        ~pristine=state.pristine,
+        ~isSaving,
+        ~dirty=state.dirty,
+      );
     <div>
       <aside className="EditorNav">
         <div className="EditorNav__top">
@@ -80,6 +90,7 @@ let make = (~blocks, ~title="", ~loading as isSaving, ~onSave, _children) => {
                   <button
                     disabled=(
                       switch (saveStatus) {
+                      | Pristine
                       | Saved
                       | Saving => true
                       | Unsaved => false
@@ -96,7 +107,13 @@ let make = (~blocks, ~title="", ~loading as isSaving, ~onSave, _children) => {
                     )
                   </button>,
                   ~props={
-                    "data-balloon": "Save",
+                    "data-balloon":
+                      switch (saveStatus) {
+                      | Pristine => "Nothing to save"
+                      | Saved => "Already saved !"
+                      | Saving
+                      | Unsaved => "Save"
+                      },
                     "data-balloon-pos": "right",
                   },
                   [||],
@@ -110,6 +127,7 @@ let make = (~blocks, ~title="", ~loading as isSaving, ~onSave, _children) => {
             (
               (
                 switch (saveStatus) {
+                | Pristine => ""
                 | Saved => "Saved"
                 | Saving => "Saving"
                 | Unsaved => "Unsaved"

@@ -39,6 +39,12 @@
   justify-content: center;
   align-content: center;
 
+  &:disabled {
+    cursor: not-allowed;
+  }
+  &:disabled svg {
+    opacity: 0.5;
+  }
   &:focus {
     outline: 0;
   }
