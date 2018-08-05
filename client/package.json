@@ -7,7 +7,7 @@
     "bs:start": "bsb -make-world -w",
     "bs:clean": "bsb -clean-world",
     "test": "jest",
-    "build": "bsb -make-world && NODE_ENV=production webpack && cp public/* build",
+    "build": "bsb -make-world && NODE_ENV=production webpack && cp -r public/* build",
     "deploy": "now build && now alias",
     "staging": "npm run build && now build && now alias staging.rtop.khoanguyen.me",
     "start": "webpack-dev-server",
