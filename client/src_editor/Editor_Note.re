@@ -22,13 +22,28 @@ let make = (~blocks, ~title="", ~loading as isSaving, ~onSave, _children) => {
       state.blocks := blocks;
       ReasonReact.NoUpdate;
     },
-  render: ({state, send}) => {
-    let isSaving = true;
+  render: ({state, send}) =>
     <div>
       <aside className="EditorNav">
         <div className="EditorNav__top">
           <Fi.IconContext.Provider
             value={"className": "EditorNav__button--icon"}>
+            <div className="EditorNav__button">
+              (
+                ReasonReact.cloneElement(
+                  <button
+                    className="EditorNav__button--button"
+                    onClick=(_ => Router.push(Route.Home))>
+                    <Fi.Home />
+                  </button>,
+                  ~props={
+                    "data-balloon": "Home",
+                    "data-balloon-pos": "right",
+                  },
+                  [||],
+                )
+              )
+            </div>
             <div className="EditorNav__button">
               (
                 ReasonReact.cloneElement(
@@ -54,7 +69,9 @@ let make = (~blocks, ~title="", ~loading as isSaving, ~onSave, _children) => {
           </Fi.IconContext.Provider>
         </div>
         <div className="EditorNav__bottom">
-          <span> ("Saving" |. str) </span>
+          <span className="EditorNav__button--saveIndicator ">
+            ("Saved" |. str)
+          </span>
         </div>
       </aside>
       <main className="pageSizer">
@@ -76,6 +93,5 @@ let make = (~blocks, ~title="", ~loading as isSaving, ~onSave, _children) => {
           onUpdate=(blocks => send(BlockUpdate(blocks)))
         />
       </main>
-    </div>;
-  },
+    </div>,
 };

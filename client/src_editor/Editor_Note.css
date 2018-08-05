@@ -31,7 +31,6 @@
 }
 
 .EditorNav__button--button {
-  /* border-radius: 50%; */
   padding: 8px;
   background: transparent;
   border: none;
@@ -48,6 +47,16 @@
 .EditorNav__button--icon {
   height: 32px;
   width: 32px;
-  color: #4a91e2;
+  color: #625666;
   stroke-width: 2px;
+}
+
+/* Bottom navigation */
+.EditorNav__bottom {
+  user-select: none;
+  padding: 16px 8px;
+}
+.EditorNav__button--saveIndicator {
+  color: rgb(150, 150, 150);
+  font-size: 14px;
 }

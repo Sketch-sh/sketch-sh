@@ -24,13 +24,29 @@ module Save = {
   [@bs.module "react-icons/fi"]
   external reactClass : ReasonReact.reactClass = "FiSave";
 
-  let make = children =>
-    ReasonReact.wrapJsForReason(~reactClass, ~props=Js.Obj.empty(), children);
+  let make = (~className="", children) =>
+    ReasonReact.wrapJsForReason(
+      ~reactClass,
+      ~props={"className": className},
+      children,
+    );
 };
 
 module Loader = {
   [@bs.module "react-icons/fi"]
   external reactClass : ReasonReact.reactClass = "FiLoader";
+
+  let make = (~className="", children) =>
+    ReasonReact.wrapJsForReason(
+      ~reactClass,
+      ~props={"className": className},
+      children,
+    );
+};
+
+module Home = {
+  [@bs.module "react-icons/fi"]
+  external reactClass : ReasonReact.reactClass = "FiHome";
 
   let make = (~className="", children) =>
     ReasonReact.wrapJsForReason(
