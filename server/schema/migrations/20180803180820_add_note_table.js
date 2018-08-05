@@ -3,11 +3,11 @@ exports.up = function(knex, Promise) {
     /* Table: note */
     knex.schema.createTable("note", function(table) {
       table
-        .string("id", 21)
+        .string("id", 22)
         .notNullable()
         .primary();
       table
-        .string("user_id", 21)
+        .string("user_id", 22)
         .notNullable()
         .references("user.id");
 
@@ -26,7 +26,7 @@ exports.up = function(knex, Promise) {
     /* Table: note_revision */
     knex.schema.createTable("note_revision", function(table) {
       table
-        .string("note_id", 21)
+        .string("note_id", 22)
         .notNullable()
         .references("note.id");
       table

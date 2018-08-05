@@ -114,7 +114,11 @@ let arrayFind = (array, f) => {
   loop(0);
 };
 
-let generateId = NanoId.Secure.make;
+let generateId = () =>
+  NanoId.Secure.generate(
+    "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789",
+    22,
+  );
 
 let pluckAcc = ((acc, _)) => acc;
 

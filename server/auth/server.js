@@ -7,8 +7,14 @@ const jwt = require("jsonwebtoken");
 const qs = require("querystring");
 const GitHubStrategy = require("passport-github2").Strategy;
 const checkUserInfo = require("./checkUserInfo");
-const nanoid = require("nanoid");
+const nanoidGenerate = require("nanoid/generate");
 const morgan = require("morgan");
+
+let generateId = () =>
+  nanoidGenerate(
+    "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789",
+    22
+  );
 
 passport.use(
   new GitHubStrategy(
@@ -30,7 +36,7 @@ passport.use(
               profile.emails && profile.emails[0] && profile.emails[0].value;
 
             const args = {
-              user_id: nanoid(),
+              user_id: generateId(),
               github_id: profile.id,
               username: profile.username,
               name: profile.displayName || undefined,

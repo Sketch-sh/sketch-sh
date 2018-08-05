@@ -2,7 +2,7 @@ exports.up = function(knex, Promise) {
   return Promise.all([
     /* Table: user */
     knex.schema.createTable("user", function(table) {
-      table.string("id", 21).primary();
+      table.string("id", 22).primary();
       table.text("username").notNullable();
       table.string("name");
       table.string("email");
@@ -21,7 +21,7 @@ exports.up = function(knex, Promise) {
     }),
     knex.schema.createTable("user_identity", function(table) {
       table
-        .string("user_id", 21)
+        .string("user_id", 22)
         .notNullable()
         .references("user.id");
       table

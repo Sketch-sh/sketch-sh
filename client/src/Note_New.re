@@ -71,10 +71,7 @@ let make = _children : ReasonReact.component(unit, 'a, action) => {
                                 );
                               Js.Promise.(
                                 mutation(~variables=newNote##variables, ())
-                                |> then_(result => {
-                                     let a = result##data;
-
-                                     Js.log(a);
+                                |> then_(_result => {
                                      send(
                                        Saved(
                                          noteId,
