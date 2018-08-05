@@ -4,25 +4,55 @@ open Editor_Types.Block;
 
 type state = {
   title: string,
+  dirty: bool,
   blocks: ref(array(block)),
+  isSaving: ref(bool),
 };
 type action =
   | TitleUpdate(string)
   | BlockUpdate(array(block));
 
+type saveStatus =
+  | Saved
+  | Saving
+  | Unsaved;
+
+let deriveSaveStatus = (isSaving, dirty) =>
+  if (isSaving) {
+    Saving;
+  } else if (dirty) {
+    Unsaved;
+  } else {
+    Saved;
+  };
+
 let component = ReasonReact.reducerComponent("Editor_Page");
 
 let make = (~blocks, ~title="", ~loading as isSaving, ~onSave, _children) => {
   ...component,
-  initialState: () => {title, blocks: ref(blocks)},
+  initialState: () => {
+    title,
+    dirty: false,
+    blocks: ref(blocks),
+    isSaving: ref(isSaving),
+  },
+  willReceiveProps: ({state}) =>
+    if (state.isSaving^ != isSaving) {
+      state.isSaving := isSaving;
+      {...state, dirty: false};
+    } else {
+      state;
+    },
   reducer: (action, state) =>
     switch (action) {
-    | TitleUpdate(title) => ReasonReact.Update({...state, title})
+    | TitleUpdate(title) =>
+      ReasonReact.Update({...state, dirty: true, title})
     | BlockUpdate(blocks) =>
       state.blocks := blocks;
-      ReasonReact.NoUpdate;
+      ReasonReact.Update({...state, dirty: true});
     },
-  render: ({state, send}) =>
+  render: ({state, send}) => {
+    let saveStatus = deriveSaveStatus(isSaving, state.dirty);
     <div>
       <aside className="EditorNav">
         <div className="EditorNav__top">
@@ -48,6 +78,13 @@ let make = (~blocks, ~title="", ~loading as isSaving, ~onSave, _children) => {
               (
                 ReasonReact.cloneElement(
                   <button
+                    disabled=(
+                      switch (saveStatus) {
+                      | Saved
+                      | Saving => true
+                      | Unsaved => false
+                      }
+                    )
                     className="EditorNav__button--button"
                     onClick=(
                       _ => onSave(~title=state.title, ~data=state.blocks^)
@@ -70,7 +107,16 @@ let make = (~blocks, ~title="", ~loading as isSaving, ~onSave, _children) => {
         </div>
         <div className="EditorNav__bottom">
           <span className="EditorNav__button--saveIndicator ">
-            ("Saved" |. str)
+            (
+              (
+                switch (saveStatus) {
+                | Saved => "Saved"
+                | Saving => "Saving"
+                | Unsaved => "Unsaved"
+                }
+              )
+              |. str
+            )
           </span>
         </div>
       </aside>
@@ -93,5 +139,6 @@ let make = (~blocks, ~title="", ~loading as isSaving, ~onSave, _children) => {
           onUpdate=(blocks => send(BlockUpdate(blocks)))
         />
       </main>
-    </div>,
+    </div>;
+  },
 };

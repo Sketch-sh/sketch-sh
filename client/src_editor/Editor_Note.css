@@ -54,7 +54,8 @@
 /* Bottom navigation */
 .EditorNav__bottom {
   user-select: none;
-  padding: 16px 8px;
+  padding: 16px 0;
+  text-align: center;
 }
 .EditorNav__button--saveIndicator {
   color: rgb(150, 150, 150);
