@@ -165,7 +165,9 @@ tables:
   - comment: null
     permission:
       allow_upsert: false
-      check: {}
+      check:
+        user_id:
+          _eq: X-HASURA-USER-ID
     role: user
   object_relationships:
   - comment: null
@@ -208,9 +210,7 @@ tables:
     permission:
       columns:
       - data
-      - id
       - title
-      - user_id
       filter:
         user_id:
           _eq: X-HASURA-USER-ID

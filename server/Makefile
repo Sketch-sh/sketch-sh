@@ -9,6 +9,6 @@ save:
 
 update-schema: save
 	cd ../client && \
-	./node_modules/.bin/send-introspection-query http://localhost:8081/v1alpha1/graphql
+	./node_modules/.bin/send-introspection-query http://localhost:8081/v1alpha1/graphql -H "X-Hasura-Access-Key: hasura"
 
 .PHONY: migrate save update-schema

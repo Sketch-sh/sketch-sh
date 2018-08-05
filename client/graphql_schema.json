@@ -1029,6 +1029,811 @@
           "kind": "OBJECT",
           "possibleTypes": null,
           "interfaces": [],
+          "name": "mutation_root",
+          "enumValues": null,
+          "description": "mutation root",
+          "fields": [
+            {
+              "args": [
+                {
+                  "name": "where",
+                  "defaultValue": null,
+                  "type": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "INPUT_OBJECT",
+                      "name": "note_bool_exp",
+                      "ofType": null
+                    }
+                  },
+                  "description": "filter the rows which have to be deleted"
+                }
+              ],
+              "isDeprecated": false,
+              "deprecationReason": null,
+              "name": "delete_note",
+              "type": {
+                "kind": "OBJECT",
+                "name": "note_mutation_response",
+                "ofType": null
+              },
+              "description": "delete data from the table: \"note\""
+            },
+            {
+              "args": [
+                {
+                  "name": "where",
+                  "defaultValue": null,
+                  "type": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "INPUT_OBJECT",
+                      "name": "note_revision_bool_exp",
+                      "ofType": null
+                    }
+                  },
+                  "description": "filter the rows which have to be deleted"
+                }
+              ],
+              "isDeprecated": false,
+              "deprecationReason": null,
+              "name": "delete_note_revision",
+              "type": {
+                "kind": "OBJECT",
+                "name": "note_revision_mutation_response",
+                "ofType": null
+              },
+              "description": "delete data from the table: \"note_revision\""
+            },
+            {
+              "args": [
+                {
+                  "name": "where",
+                  "defaultValue": null,
+                  "type": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "INPUT_OBJECT",
+                      "name": "user_bool_exp",
+                      "ofType": null
+                    }
+                  },
+                  "description": "filter the rows which have to be deleted"
+                }
+              ],
+              "isDeprecated": false,
+              "deprecationReason": null,
+              "name": "delete_user",
+              "type": {
+                "kind": "OBJECT",
+                "name": "user_mutation_response",
+                "ofType": null
+              },
+              "description": "delete data from the table: \"user\""
+            },
+            {
+              "args": [
+                {
+                  "name": "where",
+                  "defaultValue": null,
+                  "type": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "INPUT_OBJECT",
+                      "name": "user_identity_bool_exp",
+                      "ofType": null
+                    }
+                  },
+                  "description": "filter the rows which have to be deleted"
+                }
+              ],
+              "isDeprecated": false,
+              "deprecationReason": null,
+              "name": "delete_user_identity",
+              "type": {
+                "kind": "OBJECT",
+                "name": "user_identity_mutation_response",
+                "ofType": null
+              },
+              "description": "delete data from the table: \"user_identity\""
+            },
+            {
+              "args": [
+                {
+                  "name": "where",
+                  "defaultValue": null,
+                  "type": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "INPUT_OBJECT",
+                      "name": "user_identity_type_bool_exp",
+                      "ofType": null
+                    }
+                  },
+                  "description": "filter the rows which have to be deleted"
+                }
+              ],
+              "isDeprecated": false,
+              "deprecationReason": null,
+              "name": "delete_user_identity_type",
+              "type": {
+                "kind": "OBJECT",
+                "name": "user_identity_type_mutation_response",
+                "ofType": null
+              },
+              "description": "delete data from the table: \"user_identity_type\""
+            },
+            {
+              "args": [
+                {
+                  "name": "where",
+                  "defaultValue": null,
+                  "type": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "INPUT_OBJECT",
+                      "name": "user_public_bool_exp",
+                      "ofType": null
+                    }
+                  },
+                  "description": "filter the rows which have to be deleted"
+                }
+              ],
+              "isDeprecated": false,
+              "deprecationReason": null,
+              "name": "delete_user_public",
+              "type": {
+                "kind": "OBJECT",
+                "name": "user_public_mutation_response",
+                "ofType": null
+              },
+              "description": "delete data from the table: \"user_public\""
+            },
+            {
+              "args": [
+                {
+                  "name": "objects",
+                  "defaultValue": null,
+                  "type": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "LIST",
+                      "name": null,
+                      "ofType": {
+                        "kind": "NON_NULL",
+                        "name": null,
+                        "ofType": {
+                          "kind": "INPUT_OBJECT",
+                          "name": "note_insert_input",
+                          "ofType": null
+                        }
+                      }
+                    }
+                  },
+                  "description": "the rows to be inserted"
+                },
+                {
+                  "name": "on_conflict",
+                  "defaultValue": null,
+                  "type": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "note_on_conflict",
+                    "ofType": null
+                  },
+                  "description": "on conflict condition"
+                }
+              ],
+              "isDeprecated": false,
+              "deprecationReason": null,
+              "name": "insert_note",
+              "type": {
+                "kind": "OBJECT",
+                "name": "note_mutation_response",
+                "ofType": null
+              },
+              "description": "insert data into the table: \"note\""
+            },
+            {
+              "args": [
+                {
+                  "name": "objects",
+                  "defaultValue": null,
+                  "type": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "LIST",
+                      "name": null,
+                      "ofType": {
+                        "kind": "NON_NULL",
+                        "name": null,
+                        "ofType": {
+                          "kind": "INPUT_OBJECT",
+                          "name": "note_revision_insert_input",
+                          "ofType": null
+                        }
+                      }
+                    }
+                  },
+                  "description": "the rows to be inserted"
+                },
+                {
+                  "name": "on_conflict",
+                  "defaultValue": null,
+                  "type": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "note_revision_on_conflict",
+                    "ofType": null
+                  },
+                  "description": "on conflict condition"
+                }
+              ],
+              "isDeprecated": false,
+              "deprecationReason": null,
+              "name": "insert_note_revision",
+              "type": {
+                "kind": "OBJECT",
+                "name": "note_revision_mutation_response",
+                "ofType": null
+              },
+              "description": "insert data into the table: \"note_revision\""
+            },
+            {
+              "args": [
+                {
+                  "name": "objects",
+                  "defaultValue": null,
+                  "type": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "LIST",
+                      "name": null,
+                      "ofType": {
+                        "kind": "NON_NULL",
+                        "name": null,
+                        "ofType": {
+                          "kind": "INPUT_OBJECT",
+                          "name": "user_insert_input",
+                          "ofType": null
+                        }
+                      }
+                    }
+                  },
+                  "description": "the rows to be inserted"
+                },
+                {
+                  "name": "on_conflict",
+                  "defaultValue": null,
+                  "type": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "user_on_conflict",
+                    "ofType": null
+                  },
+                  "description": "on conflict condition"
+                }
+              ],
+              "isDeprecated": false,
+              "deprecationReason": null,
+              "name": "insert_user",
+              "type": {
+                "kind": "OBJECT",
+                "name": "user_mutation_response",
+                "ofType": null
+              },
+              "description": "insert data into the table: \"user\""
+            },
+            {
+              "args": [
+                {
+                  "name": "objects",
+                  "defaultValue": null,
+                  "type": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "LIST",
+                      "name": null,
+                      "ofType": {
+                        "kind": "NON_NULL",
+                        "name": null,
+                        "ofType": {
+                          "kind": "INPUT_OBJECT",
+                          "name": "user_identity_insert_input",
+                          "ofType": null
+                        }
+                      }
+                    }
+                  },
+                  "description": "the rows to be inserted"
+                },
+                {
+                  "name": "on_conflict",
+                  "defaultValue": null,
+                  "type": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "user_identity_on_conflict",
+                    "ofType": null
+                  },
+                  "description": "on conflict condition"
+                }
+              ],
+              "isDeprecated": false,
+              "deprecationReason": null,
+              "name": "insert_user_identity",
+              "type": {
+                "kind": "OBJECT",
+                "name": "user_identity_mutation_response",
+                "ofType": null
+              },
+              "description": "insert data into the table: \"user_identity\""
+            },
+            {
+              "args": [
+                {
+                  "name": "objects",
+                  "defaultValue": null,
+                  "type": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "LIST",
+                      "name": null,
+                      "ofType": {
+                        "kind": "NON_NULL",
+                        "name": null,
+                        "ofType": {
+                          "kind": "INPUT_OBJECT",
+                          "name": "user_identity_type_insert_input",
+                          "ofType": null
+                        }
+                      }
+                    }
+                  },
+                  "description": "the rows to be inserted"
+                },
+                {
+                  "name": "on_conflict",
+                  "defaultValue": null,
+                  "type": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "user_identity_type_on_conflict",
+                    "ofType": null
+                  },
+                  "description": "on conflict condition"
+                }
+              ],
+              "isDeprecated": false,
+              "deprecationReason": null,
+              "name": "insert_user_identity_type",
+              "type": {
+                "kind": "OBJECT",
+                "name": "user_identity_type_mutation_response",
+                "ofType": null
+              },
+              "description": "insert data into the table: \"user_identity_type\""
+            },
+            {
+              "args": [
+                {
+                  "name": "objects",
+                  "defaultValue": null,
+                  "type": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "LIST",
+                      "name": null,
+                      "ofType": {
+                        "kind": "NON_NULL",
+                        "name": null,
+                        "ofType": {
+                          "kind": "INPUT_OBJECT",
+                          "name": "user_public_insert_input",
+                          "ofType": null
+                        }
+                      }
+                    }
+                  },
+                  "description": "the rows to be inserted"
+                }
+              ],
+              "isDeprecated": false,
+              "deprecationReason": null,
+              "name": "insert_user_public",
+              "type": {
+                "kind": "OBJECT",
+                "name": "user_public_mutation_response",
+                "ofType": null
+              },
+              "description": "insert data into the table: \"user_public\""
+            },
+            {
+              "args": [
+                {
+                  "name": "_append",
+                  "defaultValue": null,
+                  "type": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "note_append_input",
+                    "ofType": null
+                  },
+                  "description": "append existing jsonb value of filtered columns with new jsonb value"
+                },
+                {
+                  "name": "_delete_at_path",
+                  "defaultValue": null,
+                  "type": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "note_delete_at_path_input",
+                    "ofType": null
+                  },
+                  "description": "delete the field or element with specified path (for JSON arrays, negative integers count from the end)"
+                },
+                {
+                  "name": "_delete_elem",
+                  "defaultValue": null,
+                  "type": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "note_delete_elem_input",
+                    "ofType": null
+                  },
+                  "description": "delete the array element with specified index (negative integers count from the end). throws an error if top level container is not an array"
+                },
+                {
+                  "name": "_delete_key",
+                  "defaultValue": null,
+                  "type": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "note_delete_key_input",
+                    "ofType": null
+                  },
+                  "description": "delete key/value pair or string element. key/value pairs are matched based on their key value"
+                },
+                {
+                  "name": "_prepend",
+                  "defaultValue": null,
+                  "type": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "note_prepend_input",
+                    "ofType": null
+                  },
+                  "description": "prepend existing jsonb value of filtered columns with new jsonb value"
+                },
+                {
+                  "name": "_set",
+                  "defaultValue": null,
+                  "type": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "note_set_input",
+                    "ofType": null
+                  },
+                  "description": "sets the columns of the filtered rows to the given values"
+                },
+                {
+                  "name": "where",
+                  "defaultValue": null,
+                  "type": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "INPUT_OBJECT",
+                      "name": "note_bool_exp",
+                      "ofType": null
+                    }
+                  },
+                  "description": "filter the rows which have to be updated"
+                }
+              ],
+              "isDeprecated": false,
+              "deprecationReason": null,
+              "name": "update_note",
+              "type": {
+                "kind": "OBJECT",
+                "name": "note_mutation_response",
+                "ofType": null
+              },
+              "description": "update data of the table: \"note\""
+            },
+            {
+              "args": [
+                {
+                  "name": "_append",
+                  "defaultValue": null,
+                  "type": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "note_revision_append_input",
+                    "ofType": null
+                  },
+                  "description": "append existing jsonb value of filtered columns with new jsonb value"
+                },
+                {
+                  "name": "_delete_at_path",
+                  "defaultValue": null,
+                  "type": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "note_revision_delete_at_path_input",
+                    "ofType": null
+                  },
+                  "description": "delete the field or element with specified path (for JSON arrays, negative integers count from the end)"
+                },
+                {
+                  "name": "_delete_elem",
+                  "defaultValue": null,
+                  "type": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "note_revision_delete_elem_input",
+                    "ofType": null
+                  },
+                  "description": "delete the array element with specified index (negative integers count from the end). throws an error if top level container is not an array"
+                },
+                {
+                  "name": "_delete_key",
+                  "defaultValue": null,
+                  "type": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "note_revision_delete_key_input",
+                    "ofType": null
+                  },
+                  "description": "delete key/value pair or string element. key/value pairs are matched based on their key value"
+                },
+                {
+                  "name": "_prepend",
+                  "defaultValue": null,
+                  "type": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "note_revision_prepend_input",
+                    "ofType": null
+                  },
+                  "description": "prepend existing jsonb value of filtered columns with new jsonb value"
+                },
+                {
+                  "name": "_set",
+                  "defaultValue": null,
+                  "type": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "note_revision_set_input",
+                    "ofType": null
+                  },
+                  "description": "sets the columns of the filtered rows to the given values"
+                },
+                {
+                  "name": "where",
+                  "defaultValue": null,
+                  "type": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "INPUT_OBJECT",
+                      "name": "note_revision_bool_exp",
+                      "ofType": null
+                    }
+                  },
+                  "description": "filter the rows which have to be updated"
+                }
+              ],
+              "isDeprecated": false,
+              "deprecationReason": null,
+              "name": "update_note_revision",
+              "type": {
+                "kind": "OBJECT",
+                "name": "note_revision_mutation_response",
+                "ofType": null
+              },
+              "description": "update data of the table: \"note_revision\""
+            },
+            {
+              "args": [
+                {
+                  "name": "_set",
+                  "defaultValue": null,
+                  "type": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "user_set_input",
+                    "ofType": null
+                  },
+                  "description": "sets the columns of the filtered rows to the given values"
+                },
+                {
+                  "name": "where",
+                  "defaultValue": null,
+                  "type": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "INPUT_OBJECT",
+                      "name": "user_bool_exp",
+                      "ofType": null
+                    }
+                  },
+                  "description": "filter the rows which have to be updated"
+                }
+              ],
+              "isDeprecated": false,
+              "deprecationReason": null,
+              "name": "update_user",
+              "type": {
+                "kind": "OBJECT",
+                "name": "user_mutation_response",
+                "ofType": null
+              },
+              "description": "update data of the table: \"user\""
+            },
+            {
+              "args": [
+                {
+                  "name": "_append",
+                  "defaultValue": null,
+                  "type": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "user_identity_append_input",
+                    "ofType": null
+                  },
+                  "description": "append existing jsonb value of filtered columns with new jsonb value"
+                },
+                {
+                  "name": "_delete_at_path",
+                  "defaultValue": null,
+                  "type": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "user_identity_delete_at_path_input",
+                    "ofType": null
+                  },
+                  "description": "delete the field or element with specified path (for JSON arrays, negative integers count from the end)"
+                },
+                {
+                  "name": "_delete_elem",
+                  "defaultValue": null,
+                  "type": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "user_identity_delete_elem_input",
+                    "ofType": null
+                  },
+                  "description": "delete the array element with specified index (negative integers count from the end). throws an error if top level container is not an array"
+                },
+                {
+                  "name": "_delete_key",
+                  "defaultValue": null,
+                  "type": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "user_identity_delete_key_input",
+                    "ofType": null
+                  },
+                  "description": "delete key/value pair or string element. key/value pairs are matched based on their key value"
+                },
+                {
+                  "name": "_prepend",
+                  "defaultValue": null,
+                  "type": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "user_identity_prepend_input",
+                    "ofType": null
+                  },
+                  "description": "prepend existing jsonb value of filtered columns with new jsonb value"
+                },
+                {
+                  "name": "_set",
+                  "defaultValue": null,
+                  "type": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "user_identity_set_input",
+                    "ofType": null
+                  },
+                  "description": "sets the columns of the filtered rows to the given values"
+                },
+                {
+                  "name": "where",
+                  "defaultValue": null,
+                  "type": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "INPUT_OBJECT",
+                      "name": "user_identity_bool_exp",
+                      "ofType": null
+                    }
+                  },
+                  "description": "filter the rows which have to be updated"
+                }
+              ],
+              "isDeprecated": false,
+              "deprecationReason": null,
+              "name": "update_user_identity",
+              "type": {
+                "kind": "OBJECT",
+                "name": "user_identity_mutation_response",
+                "ofType": null
+              },
+              "description": "update data of the table: \"user_identity\""
+            },
+            {
+              "args": [
+                {
+                  "name": "_set",
+                  "defaultValue": null,
+                  "type": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "user_identity_type_set_input",
+                    "ofType": null
+                  },
+                  "description": "sets the columns of the filtered rows to the given values"
+                },
+                {
+                  "name": "where",
+                  "defaultValue": null,
+                  "type": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "INPUT_OBJECT",
+                      "name": "user_identity_type_bool_exp",
+                      "ofType": null
+                    }
+                  },
+                  "description": "filter the rows which have to be updated"
+                }
+              ],
+              "isDeprecated": false,
+              "deprecationReason": null,
+              "name": "update_user_identity_type",
+              "type": {
+                "kind": "OBJECT",
+                "name": "user_identity_type_mutation_response",
+                "ofType": null
+              },
+              "description": "update data of the table: \"user_identity_type\""
+            },
+            {
+              "args": [
+                {
+                  "name": "_set",
+                  "defaultValue": null,
+                  "type": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "user_public_set_input",
+                    "ofType": null
+                  },
+                  "description": "sets the columns of the filtered rows to the given values"
+                },
+                {
+                  "name": "where",
+                  "defaultValue": null,
+                  "type": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "INPUT_OBJECT",
+                      "name": "user_public_bool_exp",
+                      "ofType": null
+                    }
+                  },
+                  "description": "filter the rows which have to be updated"
+                }
+              ],
+              "isDeprecated": false,
+              "deprecationReason": null,
+              "name": "update_user_public",
+              "type": {
+                "kind": "OBJECT",
+                "name": "user_public_mutation_response",
+                "ofType": null
+              },
+              "description": "update data of the table: \"user_public\""
+            }
+          ]
+        },
+        {
+          "inputFields": null,
+          "kind": "OBJECT",
+          "possibleTypes": null,
+          "interfaces": [],
           "name": "note",
           "enumValues": null,
           "description": "columns and relationships of \"note\"",
@@ -1182,6 +1987,18 @@
               "args": [],
               "isDeprecated": false,
               "deprecationReason": null,
+              "name": "user",
+              "type": {
+                "kind": "OBJECT",
+                "name": "user",
+                "ofType": null
+              },
+              "description": "An object relationship"
+            },
+            {
+              "args": [],
+              "isDeprecated": false,
+              "deprecationReason": null,
               "name": "user_id",
               "type": {
                 "kind": "SCALAR",
@@ -1191,6 +2008,27 @@
               "description": null
             }
           ]
+        },
+        {
+          "inputFields": [
+            {
+              "name": "data",
+              "defaultValue": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "jsonb",
+                "ofType": null
+              },
+              "description": null
+            }
+          ],
+          "kind": "INPUT_OBJECT",
+          "possibleTypes": null,
+          "interfaces": null,
+          "name": "note_append_input",
+          "enumValues": null,
+          "description": "append existing jsonb value of filtered columns with new jsonb value",
+          "fields": null
         },
         {
           "inputFields": [
@@ -1303,6 +2141,16 @@
               "description": null
             },
             {
+              "name": "user",
+              "defaultValue": null,
+              "type": {
+                "kind": "INPUT_OBJECT",
+                "name": "user_bool_exp",
+                "ofType": null
+              },
+              "description": null
+            },
+            {
               "name": "user_id",
               "defaultValue": null,
               "type": {
@@ -1337,6 +2185,278 @@
           ],
           "description": "unique or primary key constraints on table \"note\"",
           "fields": null
+        },
+        {
+          "inputFields": [
+            {
+              "name": "data",
+              "defaultValue": null,
+              "type": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              },
+              "description": null
+            }
+          ],
+          "kind": "INPUT_OBJECT",
+          "possibleTypes": null,
+          "interfaces": null,
+          "name": "note_delete_at_path_input",
+          "enumValues": null,
+          "description": "delete the field or element with specified path (for JSON arrays, negative integers count from the end)",
+          "fields": null
+        },
+        {
+          "inputFields": [
+            {
+              "name": "data",
+              "defaultValue": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              },
+              "description": null
+            }
+          ],
+          "kind": "INPUT_OBJECT",
+          "possibleTypes": null,
+          "interfaces": null,
+          "name": "note_delete_elem_input",
+          "enumValues": null,
+          "description": "delete the array element with specified index (negative integers count from the end). throws an error if top level container is not an array",
+          "fields": null
+        },
+        {
+          "inputFields": [
+            {
+              "name": "data",
+              "defaultValue": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "description": null
+            }
+          ],
+          "kind": "INPUT_OBJECT",
+          "possibleTypes": null,
+          "interfaces": null,
+          "name": "note_delete_key_input",
+          "enumValues": null,
+          "description": "delete key/value pair or string element. key/value pairs are matched based on their key value",
+          "fields": null
+        },
+        {
+          "inputFields": [
+            {
+              "name": "created_at",
+              "defaultValue": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "timestamptz",
+                "ofType": null
+              },
+              "description": null
+            },
+            {
+              "name": "data",
+              "defaultValue": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "jsonb",
+                "ofType": null
+              },
+              "description": null
+            },
+            {
+              "name": "id",
+              "defaultValue": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "description": null
+            },
+            {
+              "name": "title",
+              "defaultValue": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "description": null
+            },
+            {
+              "name": "updated_at",
+              "defaultValue": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "timestamptz",
+                "ofType": null
+              },
+              "description": null
+            },
+            {
+              "name": "user_id",
+              "defaultValue": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "description": null
+            }
+          ],
+          "kind": "INPUT_OBJECT",
+          "possibleTypes": null,
+          "interfaces": null,
+          "name": "note_insert_input",
+          "enumValues": null,
+          "description": "input type for inserting data into table \"note\"",
+          "fields": null
+        },
+        {
+          "inputFields": null,
+          "kind": "OBJECT",
+          "possibleTypes": null,
+          "interfaces": [],
+          "name": "note_mutation_response",
+          "enumValues": null,
+          "description": "response of any mutation on the table \"note\"",
+          "fields": [
+            {
+              "args": [],
+              "isDeprecated": false,
+              "deprecationReason": null,
+              "name": "affected_rows",
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "Int",
+                  "ofType": null
+                }
+              },
+              "description": "number of affected rows by the mutation"
+            },
+            {
+              "args": [],
+              "isDeprecated": false,
+              "deprecationReason": null,
+              "name": "returning",
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "LIST",
+                  "name": null,
+                  "ofType": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "OBJECT",
+                      "name": "note_no_rels",
+                      "ofType": null
+                    }
+                  }
+                }
+              },
+              "description": "data of the affected rows by the mutation"
+            }
+          ]
+        },
+        {
+          "inputFields": null,
+          "kind": "OBJECT",
+          "possibleTypes": null,
+          "interfaces": [],
+          "name": "note_no_rels",
+          "enumValues": null,
+          "description": "only postgres columns (no relationships) from \"note\"",
+          "fields": [
+            {
+              "args": [],
+              "isDeprecated": false,
+              "deprecationReason": null,
+              "name": "created_at",
+              "type": {
+                "kind": "SCALAR",
+                "name": "timestamptz",
+                "ofType": null
+              },
+              "description": null
+            },
+            {
+              "args": [],
+              "isDeprecated": false,
+              "deprecationReason": null,
+              "name": "data",
+              "type": {
+                "kind": "SCALAR",
+                "name": "jsonb",
+                "ofType": null
+              },
+              "description": null
+            },
+            {
+              "args": [],
+              "isDeprecated": false,
+              "deprecationReason": null,
+              "name": "id",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "description": null
+            },
+            {
+              "args": [],
+              "isDeprecated": false,
+              "deprecationReason": null,
+              "name": "title",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "description": null
+            },
+            {
+              "args": [],
+              "isDeprecated": false,
+              "deprecationReason": null,
+              "name": "updated_at",
+              "type": {
+                "kind": "SCALAR",
+                "name": "timestamptz",
+                "ofType": null
+              },
+              "description": null
+            },
+            {
+              "args": [],
+              "isDeprecated": false,
+              "deprecationReason": null,
+              "name": "user_id",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "description": null
+            }
+          ]
         },
         {
           "inputFields": [
@@ -1529,6 +2649,27 @@
           "fields": null
         },
         {
+          "inputFields": [
+            {
+              "name": "data",
+              "defaultValue": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "jsonb",
+                "ofType": null
+              },
+              "description": null
+            }
+          ],
+          "kind": "INPUT_OBJECT",
+          "possibleTypes": null,
+          "interfaces": null,
+          "name": "note_prepend_input",
+          "enumValues": null,
+          "description": "prepend existing jsonb value of filtered columns with new jsonb value",
+          "fields": null
+        },
+        {
           "inputFields": null,
           "kind": "OBJECT",
           "possibleTypes": null,
@@ -1598,6 +2739,27 @@
               "description": null
             }
           ]
+        },
+        {
+          "inputFields": [
+            {
+              "name": "data",
+              "defaultValue": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "jsonb",
+                "ofType": null
+              },
+              "description": null
+            }
+          ],
+          "kind": "INPUT_OBJECT",
+          "possibleTypes": null,
+          "interfaces": null,
+          "name": "note_revision_append_input",
+          "enumValues": null,
+          "description": "append existing jsonb value of filtered columns with new jsonb value",
+          "fields": null
         },
         {
           "inputFields": [
@@ -1714,6 +2876,234 @@
           ],
           "description": "unique or primary key constraints on table \"note_revision\"",
           "fields": null
+        },
+        {
+          "inputFields": [
+            {
+              "name": "data",
+              "defaultValue": null,
+              "type": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              },
+              "description": null
+            }
+          ],
+          "kind": "INPUT_OBJECT",
+          "possibleTypes": null,
+          "interfaces": null,
+          "name": "note_revision_delete_at_path_input",
+          "enumValues": null,
+          "description": "delete the field or element with specified path (for JSON arrays, negative integers count from the end)",
+          "fields": null
+        },
+        {
+          "inputFields": [
+            {
+              "name": "data",
+              "defaultValue": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              },
+              "description": null
+            }
+          ],
+          "kind": "INPUT_OBJECT",
+          "possibleTypes": null,
+          "interfaces": null,
+          "name": "note_revision_delete_elem_input",
+          "enumValues": null,
+          "description": "delete the array element with specified index (negative integers count from the end). throws an error if top level container is not an array",
+          "fields": null
+        },
+        {
+          "inputFields": [
+            {
+              "name": "data",
+              "defaultValue": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "description": null
+            }
+          ],
+          "kind": "INPUT_OBJECT",
+          "possibleTypes": null,
+          "interfaces": null,
+          "name": "note_revision_delete_key_input",
+          "enumValues": null,
+          "description": "delete key/value pair or string element. key/value pairs are matched based on their key value",
+          "fields": null
+        },
+        {
+          "inputFields": [
+            {
+              "name": "created_at",
+              "defaultValue": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "timestamptz",
+                "ofType": null
+              },
+              "description": null
+            },
+            {
+              "name": "data",
+              "defaultValue": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "jsonb",
+                "ofType": null
+              },
+              "description": null
+            },
+            {
+              "name": "note_id",
+              "defaultValue": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "description": null
+            },
+            {
+              "name": "title",
+              "defaultValue": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "description": null
+            }
+          ],
+          "kind": "INPUT_OBJECT",
+          "possibleTypes": null,
+          "interfaces": null,
+          "name": "note_revision_insert_input",
+          "enumValues": null,
+          "description": "input type for inserting data into table \"note_revision\"",
+          "fields": null
+        },
+        {
+          "inputFields": null,
+          "kind": "OBJECT",
+          "possibleTypes": null,
+          "interfaces": [],
+          "name": "note_revision_mutation_response",
+          "enumValues": null,
+          "description": "response of any mutation on the table \"note_revision\"",
+          "fields": [
+            {
+              "args": [],
+              "isDeprecated": false,
+              "deprecationReason": null,
+              "name": "affected_rows",
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "Int",
+                  "ofType": null
+                }
+              },
+              "description": "number of affected rows by the mutation"
+            },
+            {
+              "args": [],
+              "isDeprecated": false,
+              "deprecationReason": null,
+              "name": "returning",
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "LIST",
+                  "name": null,
+                  "ofType": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "OBJECT",
+                      "name": "note_revision_no_rels",
+                      "ofType": null
+                    }
+                  }
+                }
+              },
+              "description": "data of the affected rows by the mutation"
+            }
+          ]
+        },
+        {
+          "inputFields": null,
+          "kind": "OBJECT",
+          "possibleTypes": null,
+          "interfaces": [],
+          "name": "note_revision_no_rels",
+          "enumValues": null,
+          "description": "only postgres columns (no relationships) from \"note_revision\"",
+          "fields": [
+            {
+              "args": [],
+              "isDeprecated": false,
+              "deprecationReason": null,
+              "name": "created_at",
+              "type": {
+                "kind": "SCALAR",
+                "name": "timestamptz",
+                "ofType": null
+              },
+              "description": null
+            },
+            {
+              "args": [],
+              "isDeprecated": false,
+              "deprecationReason": null,
+              "name": "data",
+              "type": {
+                "kind": "SCALAR",
+                "name": "jsonb",
+                "ofType": null
+              },
+              "description": null
+            },
+            {
+              "args": [],
+              "isDeprecated": false,
+              "deprecationReason": null,
+              "name": "note_id",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "description": null
+            },
+            {
+              "args": [],
+              "isDeprecated": false,
+              "deprecationReason": null,
+              "name": "title",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "description": null
+            }
+          ]
         },
         {
           "inputFields": [
@@ -1855,6 +3245,149 @@
             }
           ],
           "description": "ordering options when selecting data from \"note_revision\"",
+          "fields": null
+        },
+        {
+          "inputFields": [
+            {
+              "name": "data",
+              "defaultValue": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "jsonb",
+                "ofType": null
+              },
+              "description": null
+            }
+          ],
+          "kind": "INPUT_OBJECT",
+          "possibleTypes": null,
+          "interfaces": null,
+          "name": "note_revision_prepend_input",
+          "enumValues": null,
+          "description": "prepend existing jsonb value of filtered columns with new jsonb value",
+          "fields": null
+        },
+        {
+          "inputFields": [
+            {
+              "name": "created_at",
+              "defaultValue": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "timestamptz",
+                "ofType": null
+              },
+              "description": null
+            },
+            {
+              "name": "data",
+              "defaultValue": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "jsonb",
+                "ofType": null
+              },
+              "description": null
+            },
+            {
+              "name": "note_id",
+              "defaultValue": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "description": null
+            },
+            {
+              "name": "title",
+              "defaultValue": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "description": null
+            }
+          ],
+          "kind": "INPUT_OBJECT",
+          "possibleTypes": null,
+          "interfaces": null,
+          "name": "note_revision_set_input",
+          "enumValues": null,
+          "description": "input type for updating data in table \"note_revision\"",
+          "fields": null
+        },
+        {
+          "inputFields": [
+            {
+              "name": "created_at",
+              "defaultValue": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "timestamptz",
+                "ofType": null
+              },
+              "description": null
+            },
+            {
+              "name": "data",
+              "defaultValue": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "jsonb",
+                "ofType": null
+              },
+              "description": null
+            },
+            {
+              "name": "id",
+              "defaultValue": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "description": null
+            },
+            {
+              "name": "title",
+              "defaultValue": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "description": null
+            },
+            {
+              "name": "updated_at",
+              "defaultValue": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "timestamptz",
+                "ofType": null
+              },
+              "description": null
+            },
+            {
+              "name": "user_id",
+              "defaultValue": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "description": null
+            }
+          ],
+          "kind": "INPUT_OBJECT",
+          "possibleTypes": null,
+          "interfaces": null,
+          "name": "note_set_input",
+          "enumValues": null,
+          "description": "input type for updating data in table \"note\"",
           "fields": null
         },
         {
@@ -2011,6 +3544,225 @@
                 }
               },
               "description": "fetch data from the table: \"note_revision\""
+            },
+            {
+              "args": [
+                {
+                  "name": "limit",
+                  "defaultValue": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "Int",
+                    "ofType": null
+                  },
+                  "description": "limit the nuber of rows returned"
+                },
+                {
+                  "name": "offset",
+                  "defaultValue": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "Int",
+                    "ofType": null
+                  },
+                  "description": "skip the first n rows. Use only with order_by"
+                },
+                {
+                  "name": "order_by",
+                  "defaultValue": null,
+                  "type": {
+                    "kind": "LIST",
+                    "name": null,
+                    "ofType": {
+                      "kind": "NON_NULL",
+                      "name": null,
+                      "ofType": {
+                        "kind": "ENUM",
+                        "name": "user_order_by",
+                        "ofType": null
+                      }
+                    }
+                  },
+                  "description": "sort the rows by one or more columns"
+                },
+                {
+                  "name": "where",
+                  "defaultValue": null,
+                  "type": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "user_bool_exp",
+                    "ofType": null
+                  },
+                  "description": "filter the rows returned"
+                }
+              ],
+              "isDeprecated": false,
+              "deprecationReason": null,
+              "name": "user",
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "LIST",
+                  "name": null,
+                  "ofType": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "OBJECT",
+                      "name": "user",
+                      "ofType": null
+                    }
+                  }
+                }
+              },
+              "description": "fetch data from the table: \"user\""
+            },
+            {
+              "args": [
+                {
+                  "name": "limit",
+                  "defaultValue": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "Int",
+                    "ofType": null
+                  },
+                  "description": "limit the nuber of rows returned"
+                },
+                {
+                  "name": "offset",
+                  "defaultValue": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "Int",
+                    "ofType": null
+                  },
+                  "description": "skip the first n rows. Use only with order_by"
+                },
+                {
+                  "name": "order_by",
+                  "defaultValue": null,
+                  "type": {
+                    "kind": "LIST",
+                    "name": null,
+                    "ofType": {
+                      "kind": "NON_NULL",
+                      "name": null,
+                      "ofType": {
+                        "kind": "ENUM",
+                        "name": "user_identity_order_by",
+                        "ofType": null
+                      }
+                    }
+                  },
+                  "description": "sort the rows by one or more columns"
+                },
+                {
+                  "name": "where",
+                  "defaultValue": null,
+                  "type": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "user_identity_bool_exp",
+                    "ofType": null
+                  },
+                  "description": "filter the rows returned"
+                }
+              ],
+              "isDeprecated": false,
+              "deprecationReason": null,
+              "name": "user_identity",
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "LIST",
+                  "name": null,
+                  "ofType": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "OBJECT",
+                      "name": "user_identity",
+                      "ofType": null
+                    }
+                  }
+                }
+              },
+              "description": "fetch data from the table: \"user_identity\""
+            },
+            {
+              "args": [
+                {
+                  "name": "limit",
+                  "defaultValue": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "Int",
+                    "ofType": null
+                  },
+                  "description": "limit the nuber of rows returned"
+                },
+                {
+                  "name": "offset",
+                  "defaultValue": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "Int",
+                    "ofType": null
+                  },
+                  "description": "skip the first n rows. Use only with order_by"
+                },
+                {
+                  "name": "order_by",
+                  "defaultValue": null,
+                  "type": {
+                    "kind": "LIST",
+                    "name": null,
+                    "ofType": {
+                      "kind": "NON_NULL",
+                      "name": null,
+                      "ofType": {
+                        "kind": "ENUM",
+                        "name": "user_identity_type_order_by",
+                        "ofType": null
+                      }
+                    }
+                  },
+                  "description": "sort the rows by one or more columns"
+                },
+                {
+                  "name": "where",
+                  "defaultValue": null,
+                  "type": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "user_identity_type_bool_exp",
+                    "ofType": null
+                  },
+                  "description": "filter the rows returned"
+                }
+              ],
+              "isDeprecated": false,
+              "deprecationReason": null,
+              "name": "user_identity_type",
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "LIST",
+                  "name": null,
+                  "ofType": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "OBJECT",
+                      "name": "user_identity_type",
+                      "ofType": null
+                    }
+                  }
+                }
+              },
+              "description": "fetch data from the table: \"user_identity_type\""
             },
             {
               "args": [
@@ -2241,6 +3993,225 @@
                 }
               },
               "description": "fetch data from the table: \"note_revision\""
+            },
+            {
+              "args": [
+                {
+                  "name": "limit",
+                  "defaultValue": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "Int",
+                    "ofType": null
+                  },
+                  "description": "limit the nuber of rows returned"
+                },
+                {
+                  "name": "offset",
+                  "defaultValue": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "Int",
+                    "ofType": null
+                  },
+                  "description": "skip the first n rows. Use only with order_by"
+                },
+                {
+                  "name": "order_by",
+                  "defaultValue": null,
+                  "type": {
+                    "kind": "LIST",
+                    "name": null,
+                    "ofType": {
+                      "kind": "NON_NULL",
+                      "name": null,
+                      "ofType": {
+                        "kind": "ENUM",
+                        "name": "user_order_by",
+                        "ofType": null
+                      }
+                    }
+                  },
+                  "description": "sort the rows by one or more columns"
+                },
+                {
+                  "name": "where",
+                  "defaultValue": null,
+                  "type": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "user_bool_exp",
+                    "ofType": null
+                  },
+                  "description": "filter the rows returned"
+                }
+              ],
+              "isDeprecated": false,
+              "deprecationReason": null,
+              "name": "user",
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "LIST",
+                  "name": null,
+                  "ofType": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "OBJECT",
+                      "name": "user",
+                      "ofType": null
+                    }
+                  }
+                }
+              },
+              "description": "fetch data from the table: \"user\""
+            },
+            {
+              "args": [
+                {
+                  "name": "limit",
+                  "defaultValue": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "Int",
+                    "ofType": null
+                  },
+                  "description": "limit the nuber of rows returned"
+                },
+                {
+                  "name": "offset",
+                  "defaultValue": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "Int",
+                    "ofType": null
+                  },
+                  "description": "skip the first n rows. Use only with order_by"
+                },
+                {
+                  "name": "order_by",
+                  "defaultValue": null,
+                  "type": {
+                    "kind": "LIST",
+                    "name": null,
+                    "ofType": {
+                      "kind": "NON_NULL",
+                      "name": null,
+                      "ofType": {
+                        "kind": "ENUM",
+                        "name": "user_identity_order_by",
+                        "ofType": null
+                      }
+                    }
+                  },
+                  "description": "sort the rows by one or more columns"
+                },
+                {
+                  "name": "where",
+                  "defaultValue": null,
+                  "type": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "user_identity_bool_exp",
+                    "ofType": null
+                  },
+                  "description": "filter the rows returned"
+                }
+              ],
+              "isDeprecated": false,
+              "deprecationReason": null,
+              "name": "user_identity",
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "LIST",
+                  "name": null,
+                  "ofType": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "OBJECT",
+                      "name": "user_identity",
+                      "ofType": null
+                    }
+                  }
+                }
+              },
+              "description": "fetch data from the table: \"user_identity\""
+            },
+            {
+              "args": [
+                {
+                  "name": "limit",
+                  "defaultValue": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "Int",
+                    "ofType": null
+                  },
+                  "description": "limit the nuber of rows returned"
+                },
+                {
+                  "name": "offset",
+                  "defaultValue": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "Int",
+                    "ofType": null
+                  },
+                  "description": "skip the first n rows. Use only with order_by"
+                },
+                {
+                  "name": "order_by",
+                  "defaultValue": null,
+                  "type": {
+                    "kind": "LIST",
+                    "name": null,
+                    "ofType": {
+                      "kind": "NON_NULL",
+                      "name": null,
+                      "ofType": {
+                        "kind": "ENUM",
+                        "name": "user_identity_type_order_by",
+                        "ofType": null
+                      }
+                    }
+                  },
+                  "description": "sort the rows by one or more columns"
+                },
+                {
+                  "name": "where",
+                  "defaultValue": null,
+                  "type": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "user_identity_type_bool_exp",
+                    "ofType": null
+                  },
+                  "description": "filter the rows returned"
+                }
+              ],
+              "isDeprecated": false,
+              "deprecationReason": null,
+              "name": "user_identity_type",
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "LIST",
+                  "name": null,
+                  "ofType": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "OBJECT",
+                      "name": "user_identity_type",
+                      "ofType": null
+                    }
+                  }
+                }
+              },
+              "description": "fetch data from the table: \"user_identity_type\""
             },
             {
               "args": [
@@ -2610,6 +4581,1779 @@
           "kind": "OBJECT",
           "possibleTypes": null,
           "interfaces": [],
+          "name": "user",
+          "enumValues": null,
+          "description": "columns and relationships of \"user\"",
+          "fields": [
+            {
+              "args": [],
+              "isDeprecated": false,
+              "deprecationReason": null,
+              "name": "avatar",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "description": null
+            },
+            {
+              "args": [],
+              "isDeprecated": false,
+              "deprecationReason": null,
+              "name": "created_at",
+              "type": {
+                "kind": "SCALAR",
+                "name": "timestamptz",
+                "ofType": null
+              },
+              "description": null
+            },
+            {
+              "args": [],
+              "isDeprecated": false,
+              "deprecationReason": null,
+              "name": "email",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "description": null
+            },
+            {
+              "args": [],
+              "isDeprecated": false,
+              "deprecationReason": null,
+              "name": "id",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "description": null
+            },
+            {
+              "args": [
+                {
+                  "name": "limit",
+                  "defaultValue": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "Int",
+                    "ofType": null
+                  },
+                  "description": "limit the nuber of rows returned"
+                },
+                {
+                  "name": "offset",
+                  "defaultValue": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "Int",
+                    "ofType": null
+                  },
+                  "description": "skip the first n rows. Use only with order_by"
+                },
+                {
+                  "name": "order_by",
+                  "defaultValue": null,
+                  "type": {
+                    "kind": "LIST",
+                    "name": null,
+                    "ofType": {
+                      "kind": "NON_NULL",
+                      "name": null,
+                      "ofType": {
+                        "kind": "ENUM",
+                        "name": "user_identity_order_by",
+                        "ofType": null
+                      }
+                    }
+                  },
+                  "description": "sort the rows by one or more columns"
+                },
+                {
+                  "name": "where",
+                  "defaultValue": null,
+                  "type": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "user_identity_bool_exp",
+                    "ofType": null
+                  },
+                  "description": "filter the rows returned"
+                }
+              ],
+              "isDeprecated": false,
+              "deprecationReason": null,
+              "name": "identities",
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "LIST",
+                  "name": null,
+                  "ofType": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "OBJECT",
+                      "name": "user_identity",
+                      "ofType": null
+                    }
+                  }
+                }
+              },
+              "description": "An array relationship"
+            },
+            {
+              "args": [],
+              "isDeprecated": false,
+              "deprecationReason": null,
+              "name": "name",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "description": null
+            },
+            {
+              "args": [
+                {
+                  "name": "limit",
+                  "defaultValue": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "Int",
+                    "ofType": null
+                  },
+                  "description": "limit the nuber of rows returned"
+                },
+                {
+                  "name": "offset",
+                  "defaultValue": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "Int",
+                    "ofType": null
+                  },
+                  "description": "skip the first n rows. Use only with order_by"
+                },
+                {
+                  "name": "order_by",
+                  "defaultValue": null,
+                  "type": {
+                    "kind": "LIST",
+                    "name": null,
+                    "ofType": {
+                      "kind": "NON_NULL",
+                      "name": null,
+                      "ofType": {
+                        "kind": "ENUM",
+                        "name": "note_order_by",
+                        "ofType": null
+                      }
+                    }
+                  },
+                  "description": "sort the rows by one or more columns"
+                },
+                {
+                  "name": "where",
+                  "defaultValue": null,
+                  "type": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "note_bool_exp",
+                    "ofType": null
+                  },
+                  "description": "filter the rows returned"
+                }
+              ],
+              "isDeprecated": false,
+              "deprecationReason": null,
+              "name": "notes",
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "LIST",
+                  "name": null,
+                  "ofType": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "OBJECT",
+                      "name": "note",
+                      "ofType": null
+                    }
+                  }
+                }
+              },
+              "description": "An array relationship"
+            },
+            {
+              "args": [],
+              "isDeprecated": false,
+              "deprecationReason": null,
+              "name": "updated_at",
+              "type": {
+                "kind": "SCALAR",
+                "name": "timestamptz",
+                "ofType": null
+              },
+              "description": null
+            },
+            {
+              "args": [],
+              "isDeprecated": false,
+              "deprecationReason": null,
+              "name": "username",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "description": null
+            }
+          ]
+        },
+        {
+          "inputFields": [
+            {
+              "name": "_and",
+              "defaultValue": null,
+              "type": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "user_bool_exp",
+                  "ofType": null
+                }
+              },
+              "description": null
+            },
+            {
+              "name": "_not",
+              "defaultValue": null,
+              "type": {
+                "kind": "INPUT_OBJECT",
+                "name": "user_bool_exp",
+                "ofType": null
+              },
+              "description": null
+            },
+            {
+              "name": "_or",
+              "defaultValue": null,
+              "type": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "user_bool_exp",
+                  "ofType": null
+                }
+              },
+              "description": null
+            },
+            {
+              "name": "avatar",
+              "defaultValue": null,
+              "type": {
+                "kind": "INPUT_OBJECT",
+                "name": "varchar_comparison_exp",
+                "ofType": null
+              },
+              "description": null
+            },
+            {
+              "name": "created_at",
+              "defaultValue": null,
+              "type": {
+                "kind": "INPUT_OBJECT",
+                "name": "timestamptz_comparison_exp",
+                "ofType": null
+              },
+              "description": null
+            },
+            {
+              "name": "email",
+              "defaultValue": null,
+              "type": {
+                "kind": "INPUT_OBJECT",
+                "name": "varchar_comparison_exp",
+                "ofType": null
+              },
+              "description": null
+            },
+            {
+              "name": "id",
+              "defaultValue": null,
+              "type": {
+                "kind": "INPUT_OBJECT",
+                "name": "varchar_comparison_exp",
+                "ofType": null
+              },
+              "description": null
+            },
+            {
+              "name": "identities",
+              "defaultValue": null,
+              "type": {
+                "kind": "INPUT_OBJECT",
+                "name": "user_identity_bool_exp",
+                "ofType": null
+              },
+              "description": null
+            },
+            {
+              "name": "name",
+              "defaultValue": null,
+              "type": {
+                "kind": "INPUT_OBJECT",
+                "name": "varchar_comparison_exp",
+                "ofType": null
+              },
+              "description": null
+            },
+            {
+              "name": "notes",
+              "defaultValue": null,
+              "type": {
+                "kind": "INPUT_OBJECT",
+                "name": "note_bool_exp",
+                "ofType": null
+              },
+              "description": null
+            },
+            {
+              "name": "updated_at",
+              "defaultValue": null,
+              "type": {
+                "kind": "INPUT_OBJECT",
+                "name": "timestamptz_comparison_exp",
+                "ofType": null
+              },
+              "description": null
+            },
+            {
+              "name": "username",
+              "defaultValue": null,
+              "type": {
+                "kind": "INPUT_OBJECT",
+                "name": "text_comparison_exp",
+                "ofType": null
+              },
+              "description": null
+            }
+          ],
+          "kind": "INPUT_OBJECT",
+          "possibleTypes": null,
+          "interfaces": null,
+          "name": "user_bool_exp",
+          "enumValues": null,
+          "description": "Boolean expression to filter rows from the table \"user\". All fields are combined with a logical 'AND'.",
+          "fields": null
+        },
+        {
+          "inputFields": null,
+          "kind": "ENUM",
+          "possibleTypes": null,
+          "interfaces": null,
+          "name": "user_constraint",
+          "enumValues": [
+            {
+              "isDeprecated": false,
+              "deprecationReason": null,
+              "name": "user_pkey",
+              "description": "unique or primary key constraint"
+            }
+          ],
+          "description": "unique or primary key constraints on table \"user\"",
+          "fields": null
+        },
+        {
+          "inputFields": null,
+          "kind": "OBJECT",
+          "possibleTypes": null,
+          "interfaces": [],
+          "name": "user_identity",
+          "enumValues": null,
+          "description": "columns and relationships of \"user_identity\"",
+          "fields": [
+            {
+              "args": [],
+              "isDeprecated": false,
+              "deprecationReason": null,
+              "name": "data",
+              "type": {
+                "kind": "SCALAR",
+                "name": "jsonb",
+                "ofType": null
+              },
+              "description": null
+            },
+            {
+              "args": [],
+              "isDeprecated": false,
+              "deprecationReason": null,
+              "name": "identity_id",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "description": null
+            },
+            {
+              "args": [],
+              "isDeprecated": false,
+              "deprecationReason": null,
+              "name": "identity_type",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "description": null
+            },
+            {
+              "args": [],
+              "isDeprecated": false,
+              "deprecationReason": null,
+              "name": "user",
+              "type": {
+                "kind": "OBJECT",
+                "name": "user",
+                "ofType": null
+              },
+              "description": "An object relationship"
+            },
+            {
+              "args": [],
+              "isDeprecated": false,
+              "deprecationReason": null,
+              "name": "user_id",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "description": null
+            }
+          ]
+        },
+        {
+          "inputFields": [
+            {
+              "name": "data",
+              "defaultValue": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "jsonb",
+                "ofType": null
+              },
+              "description": null
+            }
+          ],
+          "kind": "INPUT_OBJECT",
+          "possibleTypes": null,
+          "interfaces": null,
+          "name": "user_identity_append_input",
+          "enumValues": null,
+          "description": "append existing jsonb value of filtered columns with new jsonb value",
+          "fields": null
+        },
+        {
+          "inputFields": [
+            {
+              "name": "_and",
+              "defaultValue": null,
+              "type": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "user_identity_bool_exp",
+                  "ofType": null
+                }
+              },
+              "description": null
+            },
+            {
+              "name": "_not",
+              "defaultValue": null,
+              "type": {
+                "kind": "INPUT_OBJECT",
+                "name": "user_identity_bool_exp",
+                "ofType": null
+              },
+              "description": null
+            },
+            {
+              "name": "_or",
+              "defaultValue": null,
+              "type": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "user_identity_bool_exp",
+                  "ofType": null
+                }
+              },
+              "description": null
+            },
+            {
+              "name": "data",
+              "defaultValue": null,
+              "type": {
+                "kind": "INPUT_OBJECT",
+                "name": "jsonb_comparison_exp",
+                "ofType": null
+              },
+              "description": null
+            },
+            {
+              "name": "identity_id",
+              "defaultValue": null,
+              "type": {
+                "kind": "INPUT_OBJECT",
+                "name": "varchar_comparison_exp",
+                "ofType": null
+              },
+              "description": null
+            },
+            {
+              "name": "identity_type",
+              "defaultValue": null,
+              "type": {
+                "kind": "INPUT_OBJECT",
+                "name": "varchar_comparison_exp",
+                "ofType": null
+              },
+              "description": null
+            },
+            {
+              "name": "user",
+              "defaultValue": null,
+              "type": {
+                "kind": "INPUT_OBJECT",
+                "name": "user_bool_exp",
+                "ofType": null
+              },
+              "description": null
+            },
+            {
+              "name": "user_id",
+              "defaultValue": null,
+              "type": {
+                "kind": "INPUT_OBJECT",
+                "name": "varchar_comparison_exp",
+                "ofType": null
+              },
+              "description": null
+            }
+          ],
+          "kind": "INPUT_OBJECT",
+          "possibleTypes": null,
+          "interfaces": null,
+          "name": "user_identity_bool_exp",
+          "enumValues": null,
+          "description": "Boolean expression to filter rows from the table \"user_identity\". All fields are combined with a logical 'AND'.",
+          "fields": null
+        },
+        {
+          "inputFields": null,
+          "kind": "ENUM",
+          "possibleTypes": null,
+          "interfaces": null,
+          "name": "user_identity_constraint",
+          "enumValues": [
+            {
+              "isDeprecated": false,
+              "deprecationReason": null,
+              "name": "user_identity_pkey",
+              "description": "unique or primary key constraint"
+            }
+          ],
+          "description": "unique or primary key constraints on table \"user_identity\"",
+          "fields": null
+        },
+        {
+          "inputFields": [
+            {
+              "name": "data",
+              "defaultValue": null,
+              "type": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              },
+              "description": null
+            }
+          ],
+          "kind": "INPUT_OBJECT",
+          "possibleTypes": null,
+          "interfaces": null,
+          "name": "user_identity_delete_at_path_input",
+          "enumValues": null,
+          "description": "delete the field or element with specified path (for JSON arrays, negative integers count from the end)",
+          "fields": null
+        },
+        {
+          "inputFields": [
+            {
+              "name": "data",
+              "defaultValue": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              },
+              "description": null
+            }
+          ],
+          "kind": "INPUT_OBJECT",
+          "possibleTypes": null,
+          "interfaces": null,
+          "name": "user_identity_delete_elem_input",
+          "enumValues": null,
+          "description": "delete the array element with specified index (negative integers count from the end). throws an error if top level container is not an array",
+          "fields": null
+        },
+        {
+          "inputFields": [
+            {
+              "name": "data",
+              "defaultValue": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "description": null
+            }
+          ],
+          "kind": "INPUT_OBJECT",
+          "possibleTypes": null,
+          "interfaces": null,
+          "name": "user_identity_delete_key_input",
+          "enumValues": null,
+          "description": "delete key/value pair or string element. key/value pairs are matched based on their key value",
+          "fields": null
+        },
+        {
+          "inputFields": [
+            {
+              "name": "data",
+              "defaultValue": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "jsonb",
+                "ofType": null
+              },
+              "description": null
+            },
+            {
+              "name": "identity_id",
+              "defaultValue": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "description": null
+            },
+            {
+              "name": "identity_type",
+              "defaultValue": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "description": null
+            },
+            {
+              "name": "user_id",
+              "defaultValue": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "description": null
+            }
+          ],
+          "kind": "INPUT_OBJECT",
+          "possibleTypes": null,
+          "interfaces": null,
+          "name": "user_identity_insert_input",
+          "enumValues": null,
+          "description": "input type for inserting data into table \"user_identity\"",
+          "fields": null
+        },
+        {
+          "inputFields": null,
+          "kind": "OBJECT",
+          "possibleTypes": null,
+          "interfaces": [],
+          "name": "user_identity_mutation_response",
+          "enumValues": null,
+          "description": "response of any mutation on the table \"user_identity\"",
+          "fields": [
+            {
+              "args": [],
+              "isDeprecated": false,
+              "deprecationReason": null,
+              "name": "affected_rows",
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "Int",
+                  "ofType": null
+                }
+              },
+              "description": "number of affected rows by the mutation"
+            },
+            {
+              "args": [],
+              "isDeprecated": false,
+              "deprecationReason": null,
+              "name": "returning",
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "LIST",
+                  "name": null,
+                  "ofType": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "OBJECT",
+                      "name": "user_identity_no_rels",
+                      "ofType": null
+                    }
+                  }
+                }
+              },
+              "description": "data of the affected rows by the mutation"
+            }
+          ]
+        },
+        {
+          "inputFields": null,
+          "kind": "OBJECT",
+          "possibleTypes": null,
+          "interfaces": [],
+          "name": "user_identity_no_rels",
+          "enumValues": null,
+          "description": "only postgres columns (no relationships) from \"user_identity\"",
+          "fields": [
+            {
+              "args": [],
+              "isDeprecated": false,
+              "deprecationReason": null,
+              "name": "data",
+              "type": {
+                "kind": "SCALAR",
+                "name": "jsonb",
+                "ofType": null
+              },
+              "description": null
+            },
+            {
+              "args": [],
+              "isDeprecated": false,
+              "deprecationReason": null,
+              "name": "identity_id",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "description": null
+            },
+            {
+              "args": [],
+              "isDeprecated": false,
+              "deprecationReason": null,
+              "name": "identity_type",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "description": null
+            },
+            {
+              "args": [],
+              "isDeprecated": false,
+              "deprecationReason": null,
+              "name": "user_id",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "description": null
+            }
+          ]
+        },
+        {
+          "inputFields": [
+            {
+              "name": "action",
+              "defaultValue": null,
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "ENUM",
+                  "name": "conflict_action",
+                  "ofType": null
+                }
+              },
+              "description": null
+            },
+            {
+              "name": "constraint",
+              "defaultValue": null,
+              "type": {
+                "kind": "ENUM",
+                "name": "user_identity_constraint",
+                "ofType": null
+              },
+              "description": null
+            }
+          ],
+          "kind": "INPUT_OBJECT",
+          "possibleTypes": null,
+          "interfaces": null,
+          "name": "user_identity_on_conflict",
+          "enumValues": null,
+          "description": "on conflict condition type for table \"user_identity\"",
+          "fields": null
+        },
+        {
+          "inputFields": null,
+          "kind": "ENUM",
+          "possibleTypes": null,
+          "interfaces": null,
+          "name": "user_identity_order_by",
+          "enumValues": [
+            {
+              "isDeprecated": false,
+              "deprecationReason": null,
+              "name": "data_asc",
+              "description": "in the ascending order of \"data\", nulls last"
+            },
+            {
+              "isDeprecated": false,
+              "deprecationReason": null,
+              "name": "data_asc_nulls_first",
+              "description": "in the ascending order of \"data\", nulls first"
+            },
+            {
+              "isDeprecated": false,
+              "deprecationReason": null,
+              "name": "data_desc",
+              "description": "in the descending order of \"data\", nulls last"
+            },
+            {
+              "isDeprecated": false,
+              "deprecationReason": null,
+              "name": "data_desc_nulls_first",
+              "description": "in the descending order of \"data\", nulls first"
+            },
+            {
+              "isDeprecated": false,
+              "deprecationReason": null,
+              "name": "identity_id_asc",
+              "description": "in the ascending order of \"identity_id\", nulls last"
+            },
+            {
+              "isDeprecated": false,
+              "deprecationReason": null,
+              "name": "identity_id_asc_nulls_first",
+              "description": "in the ascending order of \"identity_id\", nulls first"
+            },
+            {
+              "isDeprecated": false,
+              "deprecationReason": null,
+              "name": "identity_id_desc",
+              "description": "in the descending order of \"identity_id\", nulls last"
+            },
+            {
+              "isDeprecated": false,
+              "deprecationReason": null,
+              "name": "identity_id_desc_nulls_first",
+              "description": "in the descending order of \"identity_id\", nulls first"
+            },
+            {
+              "isDeprecated": false,
+              "deprecationReason": null,
+              "name": "identity_type_asc",
+              "description": "in the ascending order of \"identity_type\", nulls last"
+            },
+            {
+              "isDeprecated": false,
+              "deprecationReason": null,
+              "name": "identity_type_asc_nulls_first",
+              "description": "in the ascending order of \"identity_type\", nulls first"
+            },
+            {
+              "isDeprecated": false,
+              "deprecationReason": null,
+              "name": "identity_type_desc",
+              "description": "in the descending order of \"identity_type\", nulls last"
+            },
+            {
+              "isDeprecated": false,
+              "deprecationReason": null,
+              "name": "identity_type_desc_nulls_first",
+              "description": "in the descending order of \"identity_type\", nulls first"
+            },
+            {
+              "isDeprecated": false,
+              "deprecationReason": null,
+              "name": "user_id_asc",
+              "description": "in the ascending order of \"user_id\", nulls last"
+            },
+            {
+              "isDeprecated": false,
+              "deprecationReason": null,
+              "name": "user_id_asc_nulls_first",
+              "description": "in the ascending order of \"user_id\", nulls first"
+            },
+            {
+              "isDeprecated": false,
+              "deprecationReason": null,
+              "name": "user_id_desc",
+              "description": "in the descending order of \"user_id\", nulls last"
+            },
+            {
+              "isDeprecated": false,
+              "deprecationReason": null,
+              "name": "user_id_desc_nulls_first",
+              "description": "in the descending order of \"user_id\", nulls first"
+            }
+          ],
+          "description": "ordering options when selecting data from \"user_identity\"",
+          "fields": null
+        },
+        {
+          "inputFields": [
+            {
+              "name": "data",
+              "defaultValue": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "jsonb",
+                "ofType": null
+              },
+              "description": null
+            }
+          ],
+          "kind": "INPUT_OBJECT",
+          "possibleTypes": null,
+          "interfaces": null,
+          "name": "user_identity_prepend_input",
+          "enumValues": null,
+          "description": "prepend existing jsonb value of filtered columns with new jsonb value",
+          "fields": null
+        },
+        {
+          "inputFields": [
+            {
+              "name": "data",
+              "defaultValue": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "jsonb",
+                "ofType": null
+              },
+              "description": null
+            },
+            {
+              "name": "identity_id",
+              "defaultValue": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "description": null
+            },
+            {
+              "name": "identity_type",
+              "defaultValue": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "description": null
+            },
+            {
+              "name": "user_id",
+              "defaultValue": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "description": null
+            }
+          ],
+          "kind": "INPUT_OBJECT",
+          "possibleTypes": null,
+          "interfaces": null,
+          "name": "user_identity_set_input",
+          "enumValues": null,
+          "description": "input type for updating data in table \"user_identity\"",
+          "fields": null
+        },
+        {
+          "inputFields": null,
+          "kind": "OBJECT",
+          "possibleTypes": null,
+          "interfaces": [],
+          "name": "user_identity_type",
+          "enumValues": null,
+          "description": "columns and relationships of \"user_identity_type\"",
+          "fields": [
+            {
+              "args": [],
+              "isDeprecated": false,
+              "deprecationReason": null,
+              "name": "user_identity_type",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "description": null
+            }
+          ]
+        },
+        {
+          "inputFields": [
+            {
+              "name": "_and",
+              "defaultValue": null,
+              "type": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "user_identity_type_bool_exp",
+                  "ofType": null
+                }
+              },
+              "description": null
+            },
+            {
+              "name": "_not",
+              "defaultValue": null,
+              "type": {
+                "kind": "INPUT_OBJECT",
+                "name": "user_identity_type_bool_exp",
+                "ofType": null
+              },
+              "description": null
+            },
+            {
+              "name": "_or",
+              "defaultValue": null,
+              "type": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "user_identity_type_bool_exp",
+                  "ofType": null
+                }
+              },
+              "description": null
+            },
+            {
+              "name": "user_identity_type",
+              "defaultValue": null,
+              "type": {
+                "kind": "INPUT_OBJECT",
+                "name": "varchar_comparison_exp",
+                "ofType": null
+              },
+              "description": null
+            }
+          ],
+          "kind": "INPUT_OBJECT",
+          "possibleTypes": null,
+          "interfaces": null,
+          "name": "user_identity_type_bool_exp",
+          "enumValues": null,
+          "description": "Boolean expression to filter rows from the table \"user_identity_type\". All fields are combined with a logical 'AND'.",
+          "fields": null
+        },
+        {
+          "inputFields": null,
+          "kind": "ENUM",
+          "possibleTypes": null,
+          "interfaces": null,
+          "name": "user_identity_type_constraint",
+          "enumValues": [
+            {
+              "isDeprecated": false,
+              "deprecationReason": null,
+              "name": "user_identity_type_pkey",
+              "description": "unique or primary key constraint"
+            }
+          ],
+          "description": "unique or primary key constraints on table \"user_identity_type\"",
+          "fields": null
+        },
+        {
+          "inputFields": [
+            {
+              "name": "user_identity_type",
+              "defaultValue": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "description": null
+            }
+          ],
+          "kind": "INPUT_OBJECT",
+          "possibleTypes": null,
+          "interfaces": null,
+          "name": "user_identity_type_insert_input",
+          "enumValues": null,
+          "description": "input type for inserting data into table \"user_identity_type\"",
+          "fields": null
+        },
+        {
+          "inputFields": null,
+          "kind": "OBJECT",
+          "possibleTypes": null,
+          "interfaces": [],
+          "name": "user_identity_type_mutation_response",
+          "enumValues": null,
+          "description": "response of any mutation on the table \"user_identity_type\"",
+          "fields": [
+            {
+              "args": [],
+              "isDeprecated": false,
+              "deprecationReason": null,
+              "name": "affected_rows",
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "Int",
+                  "ofType": null
+                }
+              },
+              "description": "number of affected rows by the mutation"
+            },
+            {
+              "args": [],
+              "isDeprecated": false,
+              "deprecationReason": null,
+              "name": "returning",
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "LIST",
+                  "name": null,
+                  "ofType": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "OBJECT",
+                      "name": "user_identity_type_no_rels",
+                      "ofType": null
+                    }
+                  }
+                }
+              },
+              "description": "data of the affected rows by the mutation"
+            }
+          ]
+        },
+        {
+          "inputFields": null,
+          "kind": "OBJECT",
+          "possibleTypes": null,
+          "interfaces": [],
+          "name": "user_identity_type_no_rels",
+          "enumValues": null,
+          "description": "only postgres columns (no relationships) from \"user_identity_type\"",
+          "fields": [
+            {
+              "args": [],
+              "isDeprecated": false,
+              "deprecationReason": null,
+              "name": "user_identity_type",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "description": null
+            }
+          ]
+        },
+        {
+          "inputFields": [
+            {
+              "name": "action",
+              "defaultValue": null,
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "ENUM",
+                  "name": "conflict_action",
+                  "ofType": null
+                }
+              },
+              "description": null
+            },
+            {
+              "name": "constraint",
+              "defaultValue": null,
+              "type": {
+                "kind": "ENUM",
+                "name": "user_identity_type_constraint",
+                "ofType": null
+              },
+              "description": null
+            }
+          ],
+          "kind": "INPUT_OBJECT",
+          "possibleTypes": null,
+          "interfaces": null,
+          "name": "user_identity_type_on_conflict",
+          "enumValues": null,
+          "description": "on conflict condition type for table \"user_identity_type\"",
+          "fields": null
+        },
+        {
+          "inputFields": null,
+          "kind": "ENUM",
+          "possibleTypes": null,
+          "interfaces": null,
+          "name": "user_identity_type_order_by",
+          "enumValues": [
+            {
+              "isDeprecated": false,
+              "deprecationReason": null,
+              "name": "user_identity_type_asc",
+              "description": "in the ascending order of \"user_identity_type\", nulls last"
+            },
+            {
+              "isDeprecated": false,
+              "deprecationReason": null,
+              "name": "user_identity_type_asc_nulls_first",
+              "description": "in the ascending order of \"user_identity_type\", nulls first"
+            },
+            {
+              "isDeprecated": false,
+              "deprecationReason": null,
+              "name": "user_identity_type_desc",
+              "description": "in the descending order of \"user_identity_type\", nulls last"
+            },
+            {
+              "isDeprecated": false,
+              "deprecationReason": null,
+              "name": "user_identity_type_desc_nulls_first",
+              "description": "in the descending order of \"user_identity_type\", nulls first"
+            }
+          ],
+          "description": "ordering options when selecting data from \"user_identity_type\"",
+          "fields": null
+        },
+        {
+          "inputFields": [
+            {
+              "name": "user_identity_type",
+              "defaultValue": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "description": null
+            }
+          ],
+          "kind": "INPUT_OBJECT",
+          "possibleTypes": null,
+          "interfaces": null,
+          "name": "user_identity_type_set_input",
+          "enumValues": null,
+          "description": "input type for updating data in table \"user_identity_type\"",
+          "fields": null
+        },
+        {
+          "inputFields": [
+            {
+              "name": "avatar",
+              "defaultValue": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "description": null
+            },
+            {
+              "name": "created_at",
+              "defaultValue": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "timestamptz",
+                "ofType": null
+              },
+              "description": null
+            },
+            {
+              "name": "email",
+              "defaultValue": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "description": null
+            },
+            {
+              "name": "id",
+              "defaultValue": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "description": null
+            },
+            {
+              "name": "name",
+              "defaultValue": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "description": null
+            },
+            {
+              "name": "updated_at",
+              "defaultValue": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "timestamptz",
+                "ofType": null
+              },
+              "description": null
+            },
+            {
+              "name": "username",
+              "defaultValue": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "description": null
+            }
+          ],
+          "kind": "INPUT_OBJECT",
+          "possibleTypes": null,
+          "interfaces": null,
+          "name": "user_insert_input",
+          "enumValues": null,
+          "description": "input type for inserting data into table \"user\"",
+          "fields": null
+        },
+        {
+          "inputFields": null,
+          "kind": "OBJECT",
+          "possibleTypes": null,
+          "interfaces": [],
+          "name": "user_mutation_response",
+          "enumValues": null,
+          "description": "response of any mutation on the table \"user\"",
+          "fields": [
+            {
+              "args": [],
+              "isDeprecated": false,
+              "deprecationReason": null,
+              "name": "affected_rows",
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "Int",
+                  "ofType": null
+                }
+              },
+              "description": "number of affected rows by the mutation"
+            },
+            {
+              "args": [],
+              "isDeprecated": false,
+              "deprecationReason": null,
+              "name": "returning",
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "LIST",
+                  "name": null,
+                  "ofType": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "OBJECT",
+                      "name": "user_no_rels",
+                      "ofType": null
+                    }
+                  }
+                }
+              },
+              "description": "data of the affected rows by the mutation"
+            }
+          ]
+        },
+        {
+          "inputFields": null,
+          "kind": "OBJECT",
+          "possibleTypes": null,
+          "interfaces": [],
+          "name": "user_no_rels",
+          "enumValues": null,
+          "description": "only postgres columns (no relationships) from \"user\"",
+          "fields": [
+            {
+              "args": [],
+              "isDeprecated": false,
+              "deprecationReason": null,
+              "name": "avatar",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "description": null
+            },
+            {
+              "args": [],
+              "isDeprecated": false,
+              "deprecationReason": null,
+              "name": "created_at",
+              "type": {
+                "kind": "SCALAR",
+                "name": "timestamptz",
+                "ofType": null
+              },
+              "description": null
+            },
+            {
+              "args": [],
+              "isDeprecated": false,
+              "deprecationReason": null,
+              "name": "email",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "description": null
+            },
+            {
+              "args": [],
+              "isDeprecated": false,
+              "deprecationReason": null,
+              "name": "id",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "description": null
+            },
+            {
+              "args": [],
+              "isDeprecated": false,
+              "deprecationReason": null,
+              "name": "name",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "description": null
+            },
+            {
+              "args": [],
+              "isDeprecated": false,
+              "deprecationReason": null,
+              "name": "updated_at",
+              "type": {
+                "kind": "SCALAR",
+                "name": "timestamptz",
+                "ofType": null
+              },
+              "description": null
+            },
+            {
+              "args": [],
+              "isDeprecated": false,
+              "deprecationReason": null,
+              "name": "username",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "description": null
+            }
+          ]
+        },
+        {
+          "inputFields": [
+            {
+              "name": "action",
+              "defaultValue": null,
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "ENUM",
+                  "name": "conflict_action",
+                  "ofType": null
+                }
+              },
+              "description": null
+            },
+            {
+              "name": "constraint",
+              "defaultValue": null,
+              "type": {
+                "kind": "ENUM",
+                "name": "user_constraint",
+                "ofType": null
+              },
+              "description": null
+            }
+          ],
+          "kind": "INPUT_OBJECT",
+          "possibleTypes": null,
+          "interfaces": null,
+          "name": "user_on_conflict",
+          "enumValues": null,
+          "description": "on conflict condition type for table \"user\"",
+          "fields": null
+        },
+        {
+          "inputFields": null,
+          "kind": "ENUM",
+          "possibleTypes": null,
+          "interfaces": null,
+          "name": "user_order_by",
+          "enumValues": [
+            {
+              "isDeprecated": false,
+              "deprecationReason": null,
+              "name": "avatar_asc",
+              "description": "in the ascending order of \"avatar\", nulls last"
+            },
+            {
+              "isDeprecated": false,
+              "deprecationReason": null,
+              "name": "avatar_asc_nulls_first",
+              "description": "in the ascending order of \"avatar\", nulls first"
+            },
+            {
+              "isDeprecated": false,
+              "deprecationReason": null,
+              "name": "avatar_desc",
+              "description": "in the descending order of \"avatar\", nulls last"
+            },
+            {
+              "isDeprecated": false,
+              "deprecationReason": null,
+              "name": "avatar_desc_nulls_first",
+              "description": "in the descending order of \"avatar\", nulls first"
+            },
+            {
+              "isDeprecated": false,
+              "deprecationReason": null,
+              "name": "created_at_asc",
+              "description": "in the ascending order of \"created_at\", nulls last"
+            },
+            {
+              "isDeprecated": false,
+              "deprecationReason": null,
+              "name": "created_at_asc_nulls_first",
+              "description": "in the ascending order of \"created_at\", nulls first"
+            },
+            {
+              "isDeprecated": false,
+              "deprecationReason": null,
+              "name": "created_at_desc",
+              "description": "in the descending order of \"created_at\", nulls last"
+            },
+            {
+              "isDeprecated": false,
+              "deprecationReason": null,
+              "name": "created_at_desc_nulls_first",
+              "description": "in the descending order of \"created_at\", nulls first"
+            },
+            {
+              "isDeprecated": false,
+              "deprecationReason": null,
+              "name": "email_asc",
+              "description": "in the ascending order of \"email\", nulls last"
+            },
+            {
+              "isDeprecated": false,
+              "deprecationReason": null,
+              "name": "email_asc_nulls_first",
+              "description": "in the ascending order of \"email\", nulls first"
+            },
+            {
+              "isDeprecated": false,
+              "deprecationReason": null,
+              "name": "email_desc",
+              "description": "in the descending order of \"email\", nulls last"
+            },
+            {
+              "isDeprecated": false,
+              "deprecationReason": null,
+              "name": "email_desc_nulls_first",
+              "description": "in the descending order of \"email\", nulls first"
+            },
+            {
+              "isDeprecated": false,
+              "deprecationReason": null,
+              "name": "id_asc",
+              "description": "in the ascending order of \"id\", nulls last"
+            },
+            {
+              "isDeprecated": false,
+              "deprecationReason": null,
+              "name": "id_asc_nulls_first",
+              "description": "in the ascending order of \"id\", nulls first"
+            },
+            {
+              "isDeprecated": false,
+              "deprecationReason": null,
+              "name": "id_desc",
+              "description": "in the descending order of \"id\", nulls last"
+            },
+            {
+              "isDeprecated": false,
+              "deprecationReason": null,
+              "name": "id_desc_nulls_first",
+              "description": "in the descending order of \"id\", nulls first"
+            },
+            {
+              "isDeprecated": false,
+              "deprecationReason": null,
+              "name": "name_asc",
+              "description": "in the ascending order of \"name\", nulls last"
+            },
+            {
+              "isDeprecated": false,
+              "deprecationReason": null,
+              "name": "name_asc_nulls_first",
+              "description": "in the ascending order of \"name\", nulls first"
+            },
+            {
+              "isDeprecated": false,
+              "deprecationReason": null,
+              "name": "name_desc",
+              "description": "in the descending order of \"name\", nulls last"
+            },
+            {
+              "isDeprecated": false,
+              "deprecationReason": null,
+              "name": "name_desc_nulls_first",
+              "description": "in the descending order of \"name\", nulls first"
+            },
+            {
+              "isDeprecated": false,
+              "deprecationReason": null,
+              "name": "updated_at_asc",
+              "description": "in the ascending order of \"updated_at\", nulls last"
+            },
+            {
+              "isDeprecated": false,
+              "deprecationReason": null,
+              "name": "updated_at_asc_nulls_first",
+              "description": "in the ascending order of \"updated_at\", nulls first"
+            },
+            {
+              "isDeprecated": false,
+              "deprecationReason": null,
+              "name": "updated_at_desc",
+              "description": "in the descending order of \"updated_at\", nulls last"
+            },
+            {
+              "isDeprecated": false,
+              "deprecationReason": null,
+              "name": "updated_at_desc_nulls_first",
+              "description": "in the descending order of \"updated_at\", nulls first"
+            },
+            {
+              "isDeprecated": false,
+              "deprecationReason": null,
+              "name": "username_asc",
+              "description": "in the ascending order of \"username\", nulls last"
+            },
+            {
+              "isDeprecated": false,
+              "deprecationReason": null,
+              "name": "username_asc_nulls_first",
+              "description": "in the ascending order of \"username\", nulls first"
+            },
+            {
+              "isDeprecated": false,
+              "deprecationReason": null,
+              "name": "username_desc",
+              "description": "in the descending order of \"username\", nulls last"
+            },
+            {
+              "isDeprecated": false,
+              "deprecationReason": null,
+              "name": "username_desc_nulls_first",
+              "description": "in the descending order of \"username\", nulls first"
+            }
+          ],
+          "description": "ordering options when selecting data from \"user\"",
+          "fields": null
+        },
+        {
+          "inputFields": null,
+          "kind": "OBJECT",
+          "possibleTypes": null,
+          "interfaces": [],
           "name": "user_public",
           "enumValues": null,
           "description": "columns and relationships of \"user_public\"",
@@ -2798,6 +6542,211 @@
           "fields": null
         },
         {
+          "inputFields": [
+            {
+              "name": "avatar",
+              "defaultValue": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "description": null
+            },
+            {
+              "name": "created_at",
+              "defaultValue": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "timestamptz",
+                "ofType": null
+              },
+              "description": null
+            },
+            {
+              "name": "id",
+              "defaultValue": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "description": null
+            },
+            {
+              "name": "name",
+              "defaultValue": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "description": null
+            },
+            {
+              "name": "updated_at",
+              "defaultValue": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "timestamptz",
+                "ofType": null
+              },
+              "description": null
+            },
+            {
+              "name": "username",
+              "defaultValue": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "description": null
+            }
+          ],
+          "kind": "INPUT_OBJECT",
+          "possibleTypes": null,
+          "interfaces": null,
+          "name": "user_public_insert_input",
+          "enumValues": null,
+          "description": "input type for inserting data into table \"user_public\"",
+          "fields": null
+        },
+        {
+          "inputFields": null,
+          "kind": "OBJECT",
+          "possibleTypes": null,
+          "interfaces": [],
+          "name": "user_public_mutation_response",
+          "enumValues": null,
+          "description": "response of any mutation on the table \"user_public\"",
+          "fields": [
+            {
+              "args": [],
+              "isDeprecated": false,
+              "deprecationReason": null,
+              "name": "affected_rows",
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "Int",
+                  "ofType": null
+                }
+              },
+              "description": "number of affected rows by the mutation"
+            },
+            {
+              "args": [],
+              "isDeprecated": false,
+              "deprecationReason": null,
+              "name": "returning",
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "LIST",
+                  "name": null,
+                  "ofType": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "OBJECT",
+                      "name": "user_public_no_rels",
+                      "ofType": null
+                    }
+                  }
+                }
+              },
+              "description": "data of the affected rows by the mutation"
+            }
+          ]
+        },
+        {
+          "inputFields": null,
+          "kind": "OBJECT",
+          "possibleTypes": null,
+          "interfaces": [],
+          "name": "user_public_no_rels",
+          "enumValues": null,
+          "description": "only postgres columns (no relationships) from \"user_public\"",
+          "fields": [
+            {
+              "args": [],
+              "isDeprecated": false,
+              "deprecationReason": null,
+              "name": "avatar",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "description": null
+            },
+            {
+              "args": [],
+              "isDeprecated": false,
+              "deprecationReason": null,
+              "name": "created_at",
+              "type": {
+                "kind": "SCALAR",
+                "name": "timestamptz",
+                "ofType": null
+              },
+              "description": null
+            },
+            {
+              "args": [],
+              "isDeprecated": false,
+              "deprecationReason": null,
+              "name": "id",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "description": null
+            },
+            {
+              "args": [],
+              "isDeprecated": false,
+              "deprecationReason": null,
+              "name": "name",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "description": null
+            },
+            {
+              "args": [],
+              "isDeprecated": false,
+              "deprecationReason": null,
+              "name": "updated_at",
+              "type": {
+                "kind": "SCALAR",
+                "name": "timestamptz",
+                "ofType": null
+              },
+              "description": null
+            },
+            {
+              "args": [],
+              "isDeprecated": false,
+              "deprecationReason": null,
+              "name": "username",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "description": null
+            }
+          ]
+        },
+        {
           "inputFields": null,
           "kind": "ENUM",
           "possibleTypes": null,
@@ -2950,6 +6899,158 @@
             }
           ],
           "description": "ordering options when selecting data from \"user_public\"",
+          "fields": null
+        },
+        {
+          "inputFields": [
+            {
+              "name": "avatar",
+              "defaultValue": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "description": null
+            },
+            {
+              "name": "created_at",
+              "defaultValue": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "timestamptz",
+                "ofType": null
+              },
+              "description": null
+            },
+            {
+              "name": "id",
+              "defaultValue": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "description": null
+            },
+            {
+              "name": "name",
+              "defaultValue": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "description": null
+            },
+            {
+              "name": "updated_at",
+              "defaultValue": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "timestamptz",
+                "ofType": null
+              },
+              "description": null
+            },
+            {
+              "name": "username",
+              "defaultValue": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "description": null
+            }
+          ],
+          "kind": "INPUT_OBJECT",
+          "possibleTypes": null,
+          "interfaces": null,
+          "name": "user_public_set_input",
+          "enumValues": null,
+          "description": "input type for updating data in table \"user_public\"",
+          "fields": null
+        },
+        {
+          "inputFields": [
+            {
+              "name": "avatar",
+              "defaultValue": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "description": null
+            },
+            {
+              "name": "created_at",
+              "defaultValue": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "timestamptz",
+                "ofType": null
+              },
+              "description": null
+            },
+            {
+              "name": "email",
+              "defaultValue": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "description": null
+            },
+            {
+              "name": "id",
+              "defaultValue": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "description": null
+            },
+            {
+              "name": "name",
+              "defaultValue": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "description": null
+            },
+            {
+              "name": "updated_at",
+              "defaultValue": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "timestamptz",
+                "ofType": null
+              },
+              "description": null
+            },
+            {
+              "name": "username",
+              "defaultValue": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "description": null
+            }
+          ],
+          "kind": "INPUT_OBJECT",
+          "possibleTypes": null,
+          "interfaces": null,
+          "name": "user_set_input",
+          "enumValues": null,
+          "description": "input type for updating data in table \"user\"",
           "fields": null
         },
         {
@@ -3122,7 +7223,9 @@
           "fields": null
         }
       ],
-      "mutationType": null
+      "mutationType": {
+        "name": "mutation_root"
+      }
     }
   }
 }

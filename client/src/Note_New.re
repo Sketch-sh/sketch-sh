@@ -1,3 +1,27 @@
+open Utils_GraphqlPpx;
+
+module AddNoteGql = [%graphql
+  {|
+    mutation ($title: String!, $data: jsonb!, $id: String!, $userId: String!) {
+      insert_note(objects: {
+        title: $title,
+        id: $id,
+        user_id: $userId,
+        data: $data
+      }) {
+        returning {
+          id
+          updated_at
+          title
+          data
+        }
+      }
+    }
+  |}
+];
+
+module AddNoteComponent = ReasonApollo.CreateMutation(AddNoteGql);
+
 let blocks = [|
   {
     Editor_Types.Block.b_id: Utils.generateId(),
@@ -5,9 +29,54 @@ let blocks = [|
   },
 |];
 
+open Utils;
 let component = ReasonReact.statelessComponent("Note_New");
 
 let make = _children => {
   ...component,
-  render: _self => <Editor_Note blocks />,
+  render: _self =>
+    <Auth.IsAuthenticated>
+      ...(
+           fun
+           | None =>
+             "TODO: Handle new document when user are not login in" |. str
+           | Some(userId) =>
+             <AddNoteComponent>
+               ...(
+                    (mutation, createNoteResult) => {
+                      Js.log(createNoteResult);
+                      <div>
+                        <Editor_Note
+                          blocks
+                          onSave=(
+                            (~title, ~data) => {
+                              let newNote =
+                                AddNoteGql.make(
+                                  ~title,
+                                  ~data=data |. Editor_Types.JsonEncode.encode,
+                                  ~id=Utils.generateId(),
+                                  ~userId,
+                                  (),
+                                );
+                              Js.Promise.(
+                                mutation(~variables=newNote##variables, ())
+                                |> then_(result => Js.log(result) |> resolve)
+                                |> handleError
+                              )
+                              |> ignore;
+                            }
+                          )
+                        />
+                      </div>;
+                    }
+                  )
+             </AddNoteComponent>
+         )
+    </Auth.IsAuthenticated>,
 };
+
+/* mutation(
+     ~variables=newPokemon##variables,
+     ~refetchQueries=[|"getAllPokemons"|],
+     (),
+   ) */

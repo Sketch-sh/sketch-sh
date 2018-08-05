@@ -26,5 +26,10 @@ let component = ReasonReact.statelessComponent("Editor_Entry_Loader");
 
 let make = _children => {
   ...component,
-  render: _self => <Editor_Note blocks title="ReasonML playground" />,
+  render: _self =>
+    <Editor_Note
+      blocks
+      title="ReasonML playground"
+      onSave=((~title as _, ~data as _) => ())
+    />,
 };
