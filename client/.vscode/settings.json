@@ -5,5 +5,8 @@
     "src_editor/*.js": true,
     "src_analyzer/*.js": true,
     "lib": true
+  },
+  "files.associations": {
+    "*.css": "postcss"
   }
 }

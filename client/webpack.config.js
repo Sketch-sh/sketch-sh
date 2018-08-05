@@ -1,6 +1,8 @@
 const webpack = require("webpack");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const path = require("path");
+const postcssPresetEnv = require("postcss-preset-env");
+
 const outputDir = path.join(__dirname, "build/");
 
 const isProd = process.env.NODE_ENV === "production";
@@ -39,7 +41,24 @@ const base = {
       },
       {
         test: /\.css$/,
-        use: ["style-loader", "css-loader"],
+        use: [
+          "style-loader",
+          { loader: "css-loader" },
+          {
+            loader: "postcss-loader",
+            options: {
+              ident: "postcss",
+              plugins: () => [
+                postcssPresetEnv({
+                  stage: 4,
+                  features: {
+                    "nesting-rules": true,
+                  },
+                }),
+              ],
+            },
+          },
+        ],
       },
     ],
   },

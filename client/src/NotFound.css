@@ -1,4 +1,4 @@
-.NotFound__main {
+.NotFound {
   position: absolute;
   top: 0;
   left: 0;
@@ -6,54 +6,54 @@
   bottom: 0;
   display: flex;
   flex-direction: column;
-}
 
-main,
-section {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
-}
-main {
-  height: 100%;
-}
-
-section span {
-  font-size: 24px;
-  font-weight: 500;
-  display: block;
-  border-bottom: 1px solid #eaeaea;
-  text-align: center;
-  padding-bottom: 20px;
-  width: 100px;
-}
-section p {
-  font-size: 14px;
-  font-weight: 400;
-}
-section span + p {
-  margin: 20px 0 0 0;
-}
-
-@media (min-width: 768px) {
-  section {
-    height: 40px;
-    flex-direction: row;
+  & main,
+  & section {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
   }
-  section span,
-  section p {
+  & main {
     height: 100%;
-    line-height: 40px;
   }
-  section span {
-    border-bottom: 0;
-    border-right: 1px solid #eaeaea;
-    padding: 0 20px 0 0;
-    width: auto;
+
+  & section span {
+    font-size: 24px;
+    font-weight: 500;
+    display: block;
+    border-bottom: 1px solid #eaeaea;
+    text-align: center;
+    padding-bottom: 20px;
+    width: 100px;
   }
-  section span + p {
-    margin: 0;
-    padding-left: 20px;
+  & section p {
+    font-size: 14px;
+    font-weight: 400;
+  }
+  & section span + p {
+    margin: 20px 0 0 0;
+  }
+
+  @media (min-width: 768px) {
+    & section {
+      height: 40px;
+      flex-direction: row;
+    }
+    & section span,
+    & section p {
+      height: 100%;
+      line-height: 40px;
+    }
+    & section span {
+      border-bottom: 0;
+      border-right: 1px solid #eaeaea;
+      padding: 0 20px 0 0;
+      width: auto;
+    }
+    & section span + p {
+      margin: 0;
+      padding-left: 20px;
+    }
   }
 }
