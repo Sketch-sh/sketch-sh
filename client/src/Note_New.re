@@ -64,7 +64,10 @@ let make = _children : ReasonReact.component(unit, 'a, action) => {
                               let newNote =
                                 AddNoteGql.make(
                                   ~title,
-                                  ~data=data |. Editor_Types.JsonEncode.encode,
+                                  ~data=
+                                    data
+                                    |. Editor_Types.JsonEncode.encode
+                                    |. Utils.tapLog,
                                   ~id=noteId,
                                   ~userId,
                                   (),

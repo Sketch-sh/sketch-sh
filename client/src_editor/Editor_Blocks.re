@@ -72,6 +72,7 @@ let make = (~blocks: array(block), ~onUpdate, _children) => {
      parent's state. But block handling is complicated and should be isolated
      */
     let blocks = newSelf.state.blocks;
+
     onUpdate(blocks);
   },
   reducer: (action, state) =>

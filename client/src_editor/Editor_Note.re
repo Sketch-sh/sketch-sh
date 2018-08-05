@@ -36,7 +36,7 @@ let make = (~blocks, ~title="", ~loading, ~onSave, _children) => {
           onChange=(event => valueFromEvent(event) |. TitleUpdate |. send)
         />
       </div>
-      <button onClick=(_ => onSave(~title=state.title, ~data=blocks))>
+      <button onClick=(_ => onSave(~title=state.title, ~data=state.blocks^))>
         (loading ? "Saving..." |. str : "Save this notebook" |. str)
       </button>
       <Editor_Blocks blocks onUpdate=(blocks => send(BlockUpdate(blocks))) />
