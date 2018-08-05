@@ -49,6 +49,7 @@ exports.up = function(knex, Promise) {
         if old.title <> new.title or old."data" <> new."data" then
             insert into note_revision (note_id, created_at, title, "data")
             values (old.id, old.updated_at, old.title, old."data");
+            new.updated_at = now();
         end if;
         -- Return the NEW record so that update can carry on as usual
         return new;
