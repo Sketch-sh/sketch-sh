@@ -1,16 +1,25 @@
 open Utils;
-type state = {title: string};
+open Editor_Types.Block;
+
+type state = {
+  title: string,
+  blocks: ref(array(block)),
+};
 type action =
-  | TitleUpdate(string);
+  | TitleUpdate(string)
+  | BlockUpdate(array(block));
 
 let component = ReasonReact.reducerComponent("Editor_Page");
 
 let make = (~blocks, ~title="", _children) => {
   ...component,
-  initialState: () => {title: title},
-  reducer: (action, _state) =>
+  initialState: () => {title, blocks: ref(blocks)},
+  reducer: (action, state) =>
     switch (action) {
-    | TitleUpdate(title) => ReasonReact.Update({title: title})
+    | TitleUpdate(title) => ReasonReact.Update({...state, title})
+    | BlockUpdate(blocks) =>
+      state.blocks := blocks;
+      ReasonReact.NoUpdate;
     },
   render: ({state, send}) =>
     <div className="pageSizer">
@@ -27,6 +36,6 @@ let make = (~blocks, ~title="", _children) => {
           onChange=(event => valueFromEvent(event) |. TitleUpdate |. send)
         />
       </div>
-      <Editor_Blocks blocks />
+      <Editor_Blocks blocks onUpdate=(blocks => send(BlockUpdate(blocks))) />
     </div>,
 };

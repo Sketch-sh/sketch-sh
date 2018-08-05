@@ -54,7 +54,7 @@ let blockHint = send =>
 
 let component = ReasonReact.reducerComponent("Editor_Page");
 
-let make = (~blocks: array(block), _children) => {
+let make = (~blocks: array(block), ~onUpdate, _children) => {
   ...component,
   initialState: () => {
     blocks: blocks |. Editor_Blocks_Utils.syncLineNumber,
@@ -63,6 +63,16 @@ let make = (~blocks: array(block), _children) => {
   didMount: self => {
     self.send(Block_Execute);
     ();
+  },
+  didUpdate: ({oldSelf: _, newSelf}) => {
+    /*
+     TODO: fix me
+     This is a really BAD pattern
+     In React.js best pratice, state.blocks should be moved up to
+     parent's state. But block handling is complicated and should be isolated
+     */
+    let blocks = newSelf.state.blocks;
+    onUpdate(blocks);
   },
   reducer: (action, state) =>
     switch (action) {
