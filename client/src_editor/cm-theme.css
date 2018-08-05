@@ -1,10 +1,8 @@
 @import url(/firacode/fira_code.css);
 
-.CodeMirror,
-.source-editor .prerender,
-.source-viewer .prerender {
+.CodeMirror {
   font-size: 16px;
-  font-family: "Fira Code", "Ubuntu Mono", monospace;
+  font-family: "Fira Code", monospace;
   font-weight: 400;
   line-height: 1.4375;
   background: 0 0;
@@ -26,66 +24,9 @@
 .CodeMirror-lines {
   padding: 4px 8px;
 }
-.inside-gutter .CodeMirror-linenumbers {
-  width: inherit;
-}
-.inside-gutter .CodeMirror-linenumber {
-  margin-left: 0;
-}
-.inside-gutter .CodeMirror {
-  border-style: solid;
-  border-width: 1px;
-  border-radius: 4px 4px 0 0;
-}
-.inside-gutter .CodeMirror-focused .CodeMirror-lines,
-.inside-gutter .CodeMirror-lines {
-  border: 0;
-  border-radius: 0;
-}
-.source-editor .prerender,
-.source-viewer .prerender {
-  border-width: 1px;
-  border-style: solid;
-  border-color: #e8e5e8;
-  padding: 4px 8px;
-  margin-bottom: 0;
-  white-space: pre;
-  overflow-x: hidden;
-  color: #625666;
-  background-color: #fff;
-}
-.outside-gutter .source-editor .prerender,
-.outside-gutter .source-viewer .prerender {
-  margin-left: 36px;
-}
-.embedded-notebook .source-editor .CodeMirror-lines,
-.embedded-notebook .source-editor .CodeMirror-scroll,
-.embedded-notebook .source-editor .prerender,
-.embedded-notebook .source-viewer .prerender {
-  min-height: 94.25px;
-}
-.embedded-notebook .inside-gutter .source-editor .gutter,
-.embedded-notebook .inside-gutter .source-editor .prerender,
-.embedded-notebook .inside-gutter .source-viewer .gutter,
-.embedded-notebook .inside-gutter .source-viewer .prerender {
-  border-color: #e8e5e8;
-  border-style: solid;
-}
-.embedded-notebook .inside-gutter .source-editor .gutter,
-.embedded-notebook .inside-gutter .source-viewer .gutter {
-  border-radius: 4px 0 0 0;
-  background-color: #f9f8f7;
-  border-width: 1px 0 1px 1px;
-  width: 36px;
-}
-.embedded-notebook .inside-gutter .source-editor .prerender,
-.embedded-notebook .inside-gutter .source-viewer .prerender {
-  margin-left: 36px;
-  border-radius: 0 4px 0 0;
-  border-width: 1px 1px 1px 0;
-}
+
 .cm-s-runkit-light.CodeMirror {
-  font-family: "Fira Code", "Ubuntu Mono", monospace;
+  font-family: "Fira Code", monospace;
   font-weight: 400;
 }
 .cm-s-runkit-light.CodeMirror span.CodeMirror-matchingbracket,
@@ -221,37 +162,6 @@
 }
 .cm-s-runkit-light .cm-invalidchar {
   color: inherit;
-}
-.monospace {
-  font-family: "Ubuntu Mono", monospace;
-}
-.proportional {
-  font-family: fira-sans, sans-serif;
-}
-.inside-gutter .cm-s-runkit-light .CodeMirror-lines,
-.regexp-results .cm-s-runkit-light.CodeMirror {
-  border: 0;
-}
-.inside-gutter .cm-s-runkit-light .CodeMirror-linenumber {
-  margin: 0;
-}
-.inside-gutter .cm-s-runkit-light .CodeMirror-linenumbers {
-  background-color: #f9f8f7;
-  padding: 0 8px 0 6px;
-}
-.inside-gutter .cm-s-runkit-light.CodeMirror {
-  border-style: solid;
-  border-width: 1px;
-  border-color: #e8e5e8;
-}
-.inside-gutter .cm-s-runkit-light.CodeMirror-focused {
-  border-color: rgba(151, 137, 152, 0.7);
-}
-.string-viewer .cm-s-runkit-light.CodeMirror {
-  border: 0;
-}
-.string-viewer .cm-s-runkit-light.CodeMirror .CodeMirror-lines {
-  border-radius: 0 0 4px 4px;
 }
 
 /* /////////////// Additions */
