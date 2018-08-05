@@ -1,3 +1,4 @@
+Modules.require("./App.css");
 open Utils;
 open Route;
 
