@@ -1,6 +1,5 @@
 type t;
 
-[@bs.send]
-external decode : (t, string) => Js.Nullable.t(Js.Json.t) = "decode";
+[@bs.send] external decode : (t, string) => Js.Json.t = "default";
 
-let async: unit => Js.Promise.t(t) = () => Modules.import("jsonwebtoken");
+let async: unit => Js.Promise.t(t) = () => Modules.import("jwt-decode");

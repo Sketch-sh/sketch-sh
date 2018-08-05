@@ -55,17 +55,13 @@ module AuthCallback = {
         Jwt.async()
         |> then_(jwt => resolve(jwt |. Jwt.decode(token)))
         |> then_(decoded => {
-             switch (decoded |. Js.Nullable.toOption) {
-             | None => send(ChangeState(Failure("Invalid auth token")))
-             | Some(decoded) =>
-               Auth.setToken(token);
-               Auth.setUserId(Auth.decodeUserId(decoded));
-               send(ChangeState(Success));
-             };
+             Auth.setToken(token);
+             Auth.setUserId(Auth.decodeUserId(decoded));
+             send(ChangeState(Success));
              resolve();
            })
         |> catch(error => {
-             send(ChangeState(Failure("Unknown")));
+             send(ChangeState(Failure("Invalid auth token")));
              resolve(Js.log(error));
            })
       )
