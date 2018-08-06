@@ -81,17 +81,32 @@ Server implementations contains 2 microserives: auth, hasura's graphql engine
 
 // TODO: deploy a staging server for local development
 
-You need to have these installed
+- You need to have these installed
 
-- `docker`: // TODO: find a link for installing docker
-- `docker-compose`: Head over to [docker-compose's release page](https://github.com/docker/compose/releases). Choose the latest release and follow the instruction.
+  - `docker`: // TODO: find a link for installing docker
+  - `docker-compose`: Head over to [docker-compose's release page](https://github.com/docker/compose/releases). Choose the latest release and follow the instruction.
+
+- Github OAuth apps
+
+  - Go to https://github.com/settings/developers
+  - Create a new app
+  - Set `Authorization callback URL` to `http://localhost:3001/auth/github/callback`
+  - Save `Client ID` and `Client Secret`
 
 ## Starting development server
+
+- Copying `.env.example` to `.env`
+
+```sh
+~/rtop-ui/server: > cp .env.example .env
+```
+
+- Open it `.env` and add `GITHUB_CLIENT_ID` and `GITHUB_CLIENT_SECRET`
 
 - Start docker-compose in detach mode
 
 ```sh
-~/rtop-ui: > cd server && docker-compose up -d
+~/rtop-ui/server: > && docker-compose up -d
 ```
 
 - Migrate to latest database schema
