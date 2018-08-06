@@ -16,6 +16,10 @@ const base = {
     host: "0.0.0.0",
     port: 3000,
     historyApiFallback: true,
+    disableHostCheck: true,
+    proxy: {
+      "/graphql": "http://localhost:8081/v1alpha1",
+    },
   },
   output: {
     path: outputDir,
