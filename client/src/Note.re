@@ -3,13 +3,11 @@ open Utils_GraphqlPpx;
 module GetNote = [%graphql
   {|
     query getNote (
-      $noteId: String!,
-      $username: String!
+      $noteId: String!
     ) {
       note (
         where: {
-          id : {_eq: $noteId},
-          owner: {username: {_eq: $username}}
+          id : {_eq: $noteId}
         }
       ) {
         id
@@ -56,8 +54,7 @@ let component = ReasonReact.statelessComponent("Note");
 let make = (~noteInfo: Route.noteRouteConfig, _children) => {
   ...component,
   render: _self => {
-    let noteQuery =
-      GetNote.make(~noteId=noteInfo.noteId, ~username=noteInfo.username, ());
+    let noteQuery = GetNote.make(~noteId=noteInfo.noteId, ());
     <GetNoteComponent variables=noteQuery##variables>
       ...(
            ({result}) =>

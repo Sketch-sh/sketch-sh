@@ -6,3 +6,5 @@ let authDomain =
 let graphqlEndpoint =
   env == "production" ?
     "https://rtop-server.herokuapp.com/v1alpha1/graphql" : "/graphql";
+
+let anonymousUserId = "anonymous";
