@@ -9,5 +9,5 @@ exports.up = function(knex, Promise) {
 };
 
 exports.down = function(knex, Promise) {
-  return knex.raw(`DROP VIEW IF EXISTS user_public`);
+  return knex.raw(`DROP VIEW IF EXISTS user_public;`);
 };

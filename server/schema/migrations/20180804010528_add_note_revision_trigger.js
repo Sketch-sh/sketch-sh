@@ -10,6 +10,6 @@ exports.up = function(knex, Promise) {
 
 exports.down = function(knex, Promise) {
   return knex.raw(`
-  DROP TRIGGER IF EXISTS trigger_note_revision ON note 
+    DROP TRIGGER IF EXISTS trigger_note_revision ON note;
   `);
 };

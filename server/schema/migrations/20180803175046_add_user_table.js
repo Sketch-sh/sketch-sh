@@ -40,9 +40,9 @@ exports.up = function(knex, Promise) {
 };
 
 exports.down = function(knex, Promise) {
-  return Promise.all([
-    knex.schema.dropTableIfExists("user"),
-    knex.schema.dropTableIfExists("user_identity"),
-    knex.schema.dropTableIfExists("user_identity_type"),
-  ]);
+  return knex.raw(`
+    DROP TABLE IF EXISTS "user" CASCADE; 
+    DROP TABLE IF EXISTS "user_identity" CASCADE; 
+    DROP TABLE IF EXISTS "user_identity_type" CASCADE; 
+  `);
 };
