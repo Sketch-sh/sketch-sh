@@ -2,7 +2,7 @@
   "name": "rtop",
   "type": "static",
   "public": true,
-  "alias": "staging.rtop.khoanguyen.me",
+  "alias": "rtop.khoa.xyz",
   "static": {
     "rewrites": [{ "source": "**", "destination": "/index.html" }]
   }
