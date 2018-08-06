@@ -7,10 +7,9 @@
     "bs:start": "bsb -make-world -w",
     "bs:clean": "bsb -clean-world",
     "test": "jest",
-    "build": "bsb -make-world && NODE_ENV=production webpack && cp public/* build",
+    "build": "bsb -make-world && NODE_ENV=production webpack && cp -r public/* build",
     "deploy": "now build && now alias",
     "staging": "npm run build && now build && now alias staging.rtop.khoanguyen.me",
-    "start:terminal": "TERMINAL_UI=1 webpack-dev-server",
     "start": "webpack-dev-server",
     "ci:build": "bsb -clean-world && npm run build"
   },
@@ -19,19 +18,33 @@
   "dependencies": {
     "@glennsl/bs-json": "^2.0.0",
     "@thangngoc89/ocaml-re": "^1.0.0",
+    "apollo-cache-inmemory": "^1.2.6",
+    "apollo-client": "^2.3.7",
+    "apollo-link": "^1.2.2",
+    "apollo-link-context": "^1.0.8",
+    "apollo-link-error": "^1.1.0",
+    "apollo-link-http": "^1.5.4",
+    "apollo-link-ws": "^1.0.8",
     "bs-css": "^7.0.1",
     "bs-json": "^1.0.1",
     "bs-webapi": "^0.10.0",
     "codemirror": "^5.39.2",
     "comlink": "^3.0.3",
+    "graphql": "^0.13.2",
+    "graphql-tag": "^2.9.2",
     "install": "^0.12.1",
+    "jwt-decode": "^2.2.0",
     "nanoid": "^1.1.0",
     "npm": "^6.2.0",
     "react": "^16.4.1",
+    "react-apollo": "^2.1.9",
     "react-dom": "^16.4.1",
     "react-helmet": "^5.2.0",
+    "react-icons": "^3.0.4",
     "react-textarea-autosize": "^7.0.3",
-    "reason-react": "^0.4.2"
+    "reason-apollo": "^0.12.0",
+    "reason-react": "^0.4.2",
+    "subscriptions-transport-ws": "^0.9.14"
   },
   "devDependencies": {
     "@glennsl/bs-jest": "^0.4.2",
@@ -39,9 +52,12 @@
     "babel-preset-env": "^1.7.0",
     "bs-platform": "^4.0.1",
     "css-loader": "^1.0.0",
+    "graphql_ppx": "^0.2.6",
     "html-webpack-plugin": "^3.0.6",
     "husky": "^1.0.0-rc.13",
     "lint-staged": "^7.2.0",
+    "postcss-loader": "^2.1.6",
+    "postcss-preset-env": "^5.3.0",
     "react-hot-loader": "^3.1.3",
     "style-loader": "^0.21.0",
     "webpack": "^4.0.1",
@@ -66,5 +82,8 @@
       "refmt --in-place",
       "git add"
     ]
-  }
+  },
+  "browserslist": [
+    "last 2 version"
+  ]
 }

@@ -13,10 +13,10 @@ matrix:
     script:
       - npm run ci:build
       # - npm run test
-    before_deploy: npm install -g now
-    deploy:
-      - provider: script
-        script: cp ../now.json build/now.json && cd build && now --token $NOW_TOKEN && now alias --token $NOW_TOKEN staging.rtop.khoanguyen.me
-        skip_cleanup: true
-        on:
-          master: true
+    # before_deploy: npm install -g now
+    # deploy:
+    #   - provider: script
+    #     script: cp ../now.json build/now.json && cd build && now --token $NOW_TOKEN && now alias --token $NOW_TOKEN staging.rtop.khoanguyen.me
+    #     skip_cleanup: true
+    #     on:
+    #       master: true

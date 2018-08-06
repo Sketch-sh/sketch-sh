@@ -1,4 +1,30 @@
+[@bs.val] external warn : 'a => unit = "console.warn";
+[@bs.val] external warn2 : ('a, 'b) => unit = "console.warn";
+
 let str = ReasonReact.string;
+let optionStr =
+  fun
+  | None => ReasonReact.null
+  | Some(s) => ReasonReact.string(s);
+
+let optionToEmptyString =
+  fun
+  | None => ""
+  | Some(s) => s;
+/* Render first element of a result array */
+let arrayFirst = (array, ~empty, ~render) =>
+  switch (Array.length(array)) {
+  | 0 => empty
+  | 1 => render(array[0])
+  | _ =>
+    warn2("This array contains more than 1 element", array);
+    render(array[0]);
+  };
+
+/*
+ Tap log: Log and return the value
+ Extremely useful when piping
+ */
 let tapLog = a => {
   Js.log(a);
   a;
@@ -88,6 +114,12 @@ let arrayFind = (array, f) => {
   loop(0);
 };
 
-let generateId = NanoId.Secure.make;
+let generateId = () =>
+  NanoId.Secure.generate(
+    "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789",
+    22,
+  );
 
 let pluckAcc = ((acc, _)) => acc;
+
+external toNullable : string => Js.Nullable.t(string) = "%identity";

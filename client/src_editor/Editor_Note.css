@@ -1,0 +1,69 @@
+.EditorNav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 60px;
+}
+
+.EditorNav__top {
+  flex: 1;
+}
+.EditorNav__button {
+  padding: calc((60px - 48px) / 2);
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(359deg);
+  }
+}
+
+.EditorNav__button--spin {
+  animation: spin 2s infinite linear;
+}
+
+.EditorNav__button--button {
+  padding: 8px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-content: center;
+
+  &:disabled {
+    cursor: not-allowed;
+  }
+  &:disabled svg {
+    opacity: 0.5;
+  }
+  &:focus {
+    outline: 0;
+  }
+}
+
+.EditorNav__button--icon {
+  height: 32px;
+  width: 32px;
+  color: #625666;
+  stroke-width: 2px;
+}
+
+/* Bottom navigation */
+.EditorNav__bottom {
+  user-select: none;
+  padding: 16px 0;
+  text-align: center;
+}
+.EditorNav__button--saveIndicator {
+  color: rgb(150, 150, 150);
+  font-size: 14px;
+}

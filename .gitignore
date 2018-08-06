@@ -6,3 +6,4 @@ lib
 
 client/build
 client/src/*.js
+!client/src/entry.js

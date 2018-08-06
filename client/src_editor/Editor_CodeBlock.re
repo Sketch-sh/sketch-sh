@@ -145,7 +145,7 @@ let make =
       options=(
         CodeMirror.EditorConfiguration.make(
           ~mode="reason",
-          ~theme="runkit-light",
+          ~theme="rtop-light",
           ~lineNumbers=true,
           ~viewportMargin=infinity,
           ~matchBrackets=true,

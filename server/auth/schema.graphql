@@ -1,0 +1,1157 @@
+schema {
+  query: query_root
+  mutation: mutation_root
+  subscription: subscription_root
+}
+
+# conflict action
+enum conflict_action {
+  # ignore the insert on this row
+  ignore
+
+  # update the row with the given values
+  update
+}
+
+scalar jsonb
+
+# expression to compare columns of type jsonb. All fields are combined with logical 'AND'.
+input jsonb_comparison_exp {
+  _eq: jsonb
+  _gt: jsonb
+  _gte: jsonb
+  _in: [jsonb]
+  _is_null: Boolean
+  _lt: jsonb
+  _lte: jsonb
+  _neq: jsonb
+  _nin: [jsonb]
+}
+
+# mutation root
+type mutation_root {
+  # delete data from the table: "note"
+  delete_note(
+    # filter the rows which have to be deleted
+    where: note_bool_exp!
+  ): note_mutation_response
+
+  # delete data from the table: "note_revision"
+  delete_note_revision(
+    # filter the rows which have to be deleted
+    where: note_revision_bool_exp!
+  ): note_revision_mutation_response
+
+  # delete data from the table: "user"
+  delete_user(
+    # filter the rows which have to be deleted
+    where: user_bool_exp!
+  ): user_mutation_response
+
+  # delete data from the table: "user_identity"
+  delete_user_identity(
+    # filter the rows which have to be deleted
+    where: user_identity_bool_exp!
+  ): user_identity_mutation_response
+
+  # delete data from the table: "user_identity_type"
+  delete_user_identity_type(
+    # filter the rows which have to be deleted
+    where: user_identity_type_bool_exp!
+  ): user_identity_type_mutation_response
+
+  # insert data into the table: "note"
+  insert_note(
+    # the rows to be inserted
+    objects: [note_insert_input!]!
+
+    # on conflict condition
+    on_conflict: note_on_conflict
+  ): note_mutation_response
+
+  # insert data into the table: "note_revision"
+  insert_note_revision(
+    # the rows to be inserted
+    objects: [note_revision_insert_input!]!
+
+    # on conflict condition
+    on_conflict: note_revision_on_conflict
+  ): note_revision_mutation_response
+
+  # insert data into the table: "user"
+  insert_user(
+    # the rows to be inserted
+    objects: [user_insert_input!]!
+
+    # on conflict condition
+    on_conflict: user_on_conflict
+  ): user_mutation_response
+
+  # insert data into the table: "user_identity"
+  insert_user_identity(
+    # the rows to be inserted
+    objects: [user_identity_insert_input!]!
+
+    # on conflict condition
+    on_conflict: user_identity_on_conflict
+  ): user_identity_mutation_response
+
+  # insert data into the table: "user_identity_type"
+  insert_user_identity_type(
+    # the rows to be inserted
+    objects: [user_identity_type_insert_input!]!
+
+    # on conflict condition
+    on_conflict: user_identity_type_on_conflict
+  ): user_identity_type_mutation_response
+
+  # update data of the table: "note"
+  update_note(
+    # append existing jsonb value of filtered columns with new jsonb value
+    _append: note_append_input
+
+    # delete the field or element with specified path (for JSON arrays, negative integers count from the end)
+    _delete_at_path: note_delete_at_path_input
+
+    # delete the array element with specified index (negative integers count from
+    # the end). throws an error if top level container is not an array
+    _delete_elem: note_delete_elem_input
+
+    # delete key/value pair or string element. key/value pairs are matched based on their key value
+    _delete_key: note_delete_key_input
+
+    # prepend existing jsonb value of filtered columns with new jsonb value
+    _prepend: note_prepend_input
+
+    # sets the columns of the filtered rows to the given values
+    _set: note_set_input
+
+    # filter the rows which have to be updated
+    where: note_bool_exp!
+  ): note_mutation_response
+
+  # update data of the table: "note_revision"
+  update_note_revision(
+    # append existing jsonb value of filtered columns with new jsonb value
+    _append: note_revision_append_input
+
+    # delete the field or element with specified path (for JSON arrays, negative integers count from the end)
+    _delete_at_path: note_revision_delete_at_path_input
+
+    # delete the array element with specified index (negative integers count from
+    # the end). throws an error if top level container is not an array
+    _delete_elem: note_revision_delete_elem_input
+
+    # delete key/value pair or string element. key/value pairs are matched based on their key value
+    _delete_key: note_revision_delete_key_input
+
+    # prepend existing jsonb value of filtered columns with new jsonb value
+    _prepend: note_revision_prepend_input
+
+    # sets the columns of the filtered rows to the given values
+    _set: note_revision_set_input
+
+    # filter the rows which have to be updated
+    where: note_revision_bool_exp!
+  ): note_revision_mutation_response
+
+  # update data of the table: "user"
+  update_user(
+    # sets the columns of the filtered rows to the given values
+    _set: user_set_input
+
+    # filter the rows which have to be updated
+    where: user_bool_exp!
+  ): user_mutation_response
+
+  # update data of the table: "user_identity"
+  update_user_identity(
+    # append existing jsonb value of filtered columns with new jsonb value
+    _append: user_identity_append_input
+
+    # delete the field or element with specified path (for JSON arrays, negative integers count from the end)
+    _delete_at_path: user_identity_delete_at_path_input
+
+    # delete the array element with specified index (negative integers count from
+    # the end). throws an error if top level container is not an array
+    _delete_elem: user_identity_delete_elem_input
+
+    # delete key/value pair or string element. key/value pairs are matched based on their key value
+    _delete_key: user_identity_delete_key_input
+
+    # prepend existing jsonb value of filtered columns with new jsonb value
+    _prepend: user_identity_prepend_input
+
+    # sets the columns of the filtered rows to the given values
+    _set: user_identity_set_input
+
+    # filter the rows which have to be updated
+    where: user_identity_bool_exp!
+  ): user_identity_mutation_response
+
+  # update data of the table: "user_identity_type"
+  update_user_identity_type(
+    # sets the columns of the filtered rows to the given values
+    _set: user_identity_type_set_input
+
+    # filter the rows which have to be updated
+    where: user_identity_type_bool_exp!
+  ): user_identity_type_mutation_response
+}
+
+# columns and relationships of "note"
+type note {
+  created_at: timestamptz
+  data: jsonb
+  id: String
+
+  # An array relationship
+  notes(
+    # limit the nuber of rows returned
+    limit: Int
+
+    # skip the first n rows. Use only with order_by
+    offset: Int
+
+    # sort the rows by one or more columns
+    order_by: [note_revision_order_by!]
+
+    # filter the rows returned
+    where: note_revision_bool_exp
+  ): [note_revision!]!
+  title: String
+  updated_at: timestamptz
+
+  # An object relationship
+  user: user
+  user_id: String
+}
+
+# append existing jsonb value of filtered columns with new jsonb value
+input note_append_input {
+  data: jsonb
+}
+
+# Boolean expression to filter rows from the table "note". All fields are combined with a logical 'AND'.
+input note_bool_exp {
+  _and: [note_bool_exp]
+  _not: note_bool_exp
+  _or: [note_bool_exp]
+  created_at: timestamptz_comparison_exp
+  data: jsonb_comparison_exp
+  id: varchar_comparison_exp
+  notes: note_revision_bool_exp
+  title: text_comparison_exp
+  updated_at: timestamptz_comparison_exp
+  user: user_bool_exp
+  user_id: varchar_comparison_exp
+}
+
+# unique or primary key constraints on table "note"
+enum note_constraint {
+  # unique or primary key constraint
+  note_pkey
+}
+
+# delete the field or element with specified path (for JSON arrays, negative integers count from the end)
+input note_delete_at_path_input {
+  data: [String]
+}
+
+# delete the array element with specified index (negative integers count from the
+# end). throws an error if top level container is not an array
+input note_delete_elem_input {
+  data: Int
+}
+
+# delete key/value pair or string element. key/value pairs are matched based on their key value
+input note_delete_key_input {
+  data: String
+}
+
+# input type for inserting data into table "note"
+input note_insert_input {
+  created_at: timestamptz
+  data: jsonb
+  id: String
+  title: String
+  updated_at: timestamptz
+  user_id: String
+}
+
+# response of any mutation on the table "note"
+type note_mutation_response {
+  # number of affected rows by the mutation
+  affected_rows: Int!
+
+  # data of the affected rows by the mutation
+  returning: [note_no_rels!]!
+}
+
+# only postgres columns (no relationships) from "note"
+type note_no_rels {
+  created_at: timestamptz
+  data: jsonb
+  id: String
+  title: String
+  updated_at: timestamptz
+  user_id: String
+}
+
+# on conflict condition type for table "note"
+input note_on_conflict {
+  action: conflict_action!
+  constraint: note_constraint
+}
+
+# ordering options when selecting data from "note"
+enum note_order_by {
+  # in the ascending order of "created_at", nulls last
+  created_at_asc
+
+  # in the ascending order of "created_at", nulls first
+  created_at_asc_nulls_first
+
+  # in the descending order of "created_at", nulls last
+  created_at_desc
+
+  # in the descending order of "created_at", nulls first
+  created_at_desc_nulls_first
+
+  # in the ascending order of "data", nulls last
+  data_asc
+
+  # in the ascending order of "data", nulls first
+  data_asc_nulls_first
+
+  # in the descending order of "data", nulls last
+  data_desc
+
+  # in the descending order of "data", nulls first
+  data_desc_nulls_first
+
+  # in the ascending order of "id", nulls last
+  id_asc
+
+  # in the ascending order of "id", nulls first
+  id_asc_nulls_first
+
+  # in the descending order of "id", nulls last
+  id_desc
+
+  # in the descending order of "id", nulls first
+  id_desc_nulls_first
+
+  # in the ascending order of "title", nulls last
+  title_asc
+
+  # in the ascending order of "title", nulls first
+  title_asc_nulls_first
+
+  # in the descending order of "title", nulls last
+  title_desc
+
+  # in the descending order of "title", nulls first
+  title_desc_nulls_first
+
+  # in the ascending order of "updated_at", nulls last
+  updated_at_asc
+
+  # in the ascending order of "updated_at", nulls first
+  updated_at_asc_nulls_first
+
+  # in the descending order of "updated_at", nulls last
+  updated_at_desc
+
+  # in the descending order of "updated_at", nulls first
+  updated_at_desc_nulls_first
+
+  # in the ascending order of "user_id", nulls last
+  user_id_asc
+
+  # in the ascending order of "user_id", nulls first
+  user_id_asc_nulls_first
+
+  # in the descending order of "user_id", nulls last
+  user_id_desc
+
+  # in the descending order of "user_id", nulls first
+  user_id_desc_nulls_first
+}
+
+# prepend existing jsonb value of filtered columns with new jsonb value
+input note_prepend_input {
+  data: jsonb
+}
+
+# columns and relationships of "note_revision"
+type note_revision {
+  created_at: timestamptz
+  data: jsonb
+
+  # An object relationship
+  note: note
+  note_id: String
+  title: String
+}
+
+# append existing jsonb value of filtered columns with new jsonb value
+input note_revision_append_input {
+  data: jsonb
+}
+
+# Boolean expression to filter rows from the table "note_revision". All fields are combined with a logical 'AND'.
+input note_revision_bool_exp {
+  _and: [note_revision_bool_exp]
+  _not: note_revision_bool_exp
+  _or: [note_revision_bool_exp]
+  created_at: timestamptz_comparison_exp
+  data: jsonb_comparison_exp
+  note: note_bool_exp
+  note_id: varchar_comparison_exp
+  title: text_comparison_exp
+}
+
+# unique or primary key constraints on table "note_revision"
+enum note_revision_constraint {
+  # unique or primary key constraint
+  note_revision_pkey
+}
+
+# delete the field or element with specified path (for JSON arrays, negative integers count from the end)
+input note_revision_delete_at_path_input {
+  data: [String]
+}
+
+# delete the array element with specified index (negative integers count from the
+# end). throws an error if top level container is not an array
+input note_revision_delete_elem_input {
+  data: Int
+}
+
+# delete key/value pair or string element. key/value pairs are matched based on their key value
+input note_revision_delete_key_input {
+  data: String
+}
+
+# input type for inserting data into table "note_revision"
+input note_revision_insert_input {
+  created_at: timestamptz
+  data: jsonb
+  note_id: String
+  title: String
+}
+
+# response of any mutation on the table "note_revision"
+type note_revision_mutation_response {
+  # number of affected rows by the mutation
+  affected_rows: Int!
+
+  # data of the affected rows by the mutation
+  returning: [note_revision_no_rels!]!
+}
+
+# only postgres columns (no relationships) from "note_revision"
+type note_revision_no_rels {
+  created_at: timestamptz
+  data: jsonb
+  note_id: String
+  title: String
+}
+
+# on conflict condition type for table "note_revision"
+input note_revision_on_conflict {
+  action: conflict_action!
+  constraint: note_revision_constraint
+}
+
+# ordering options when selecting data from "note_revision"
+enum note_revision_order_by {
+  # in the ascending order of "created_at", nulls last
+  created_at_asc
+
+  # in the ascending order of "created_at", nulls first
+  created_at_asc_nulls_first
+
+  # in the descending order of "created_at", nulls last
+  created_at_desc
+
+  # in the descending order of "created_at", nulls first
+  created_at_desc_nulls_first
+
+  # in the ascending order of "data", nulls last
+  data_asc
+
+  # in the ascending order of "data", nulls first
+  data_asc_nulls_first
+
+  # in the descending order of "data", nulls last
+  data_desc
+
+  # in the descending order of "data", nulls first
+  data_desc_nulls_first
+
+  # in the ascending order of "note_id", nulls last
+  note_id_asc
+
+  # in the ascending order of "note_id", nulls first
+  note_id_asc_nulls_first
+
+  # in the descending order of "note_id", nulls last
+  note_id_desc
+
+  # in the descending order of "note_id", nulls first
+  note_id_desc_nulls_first
+
+  # in the ascending order of "title", nulls last
+  title_asc
+
+  # in the ascending order of "title", nulls first
+  title_asc_nulls_first
+
+  # in the descending order of "title", nulls last
+  title_desc
+
+  # in the descending order of "title", nulls first
+  title_desc_nulls_first
+}
+
+# prepend existing jsonb value of filtered columns with new jsonb value
+input note_revision_prepend_input {
+  data: jsonb
+}
+
+# input type for updating data in table "note_revision"
+input note_revision_set_input {
+  created_at: timestamptz
+  data: jsonb
+  note_id: String
+  title: String
+}
+
+# input type for updating data in table "note"
+input note_set_input {
+  created_at: timestamptz
+  data: jsonb
+  id: String
+  title: String
+  updated_at: timestamptz
+  user_id: String
+}
+
+# query root
+type query_root {
+  # fetch data from the table: "note"
+  note(
+    # limit the nuber of rows returned
+    limit: Int
+
+    # skip the first n rows. Use only with order_by
+    offset: Int
+
+    # sort the rows by one or more columns
+    order_by: [note_order_by!]
+
+    # filter the rows returned
+    where: note_bool_exp
+  ): [note!]!
+
+  # fetch data from the table: "note_revision"
+  note_revision(
+    # limit the nuber of rows returned
+    limit: Int
+
+    # skip the first n rows. Use only with order_by
+    offset: Int
+
+    # sort the rows by one or more columns
+    order_by: [note_revision_order_by!]
+
+    # filter the rows returned
+    where: note_revision_bool_exp
+  ): [note_revision!]!
+
+  # fetch data from the table: "user"
+  user(
+    # limit the nuber of rows returned
+    limit: Int
+
+    # skip the first n rows. Use only with order_by
+    offset: Int
+
+    # sort the rows by one or more columns
+    order_by: [user_order_by!]
+
+    # filter the rows returned
+    where: user_bool_exp
+  ): [user!]!
+
+  # fetch data from the table: "user_identity"
+  user_identity(
+    # limit the nuber of rows returned
+    limit: Int
+
+    # skip the first n rows. Use only with order_by
+    offset: Int
+
+    # sort the rows by one or more columns
+    order_by: [user_identity_order_by!]
+
+    # filter the rows returned
+    where: user_identity_bool_exp
+  ): [user_identity!]!
+
+  # fetch data from the table: "user_identity_type"
+  user_identity_type(
+    # limit the nuber of rows returned
+    limit: Int
+
+    # skip the first n rows. Use only with order_by
+    offset: Int
+
+    # sort the rows by one or more columns
+    order_by: [user_identity_type_order_by!]
+
+    # filter the rows returned
+    where: user_identity_type_bool_exp
+  ): [user_identity_type!]!
+}
+
+# subscription root
+type subscription_root {
+  # fetch data from the table: "note"
+  note(
+    # limit the nuber of rows returned
+    limit: Int
+
+    # skip the first n rows. Use only with order_by
+    offset: Int
+
+    # sort the rows by one or more columns
+    order_by: [note_order_by!]
+
+    # filter the rows returned
+    where: note_bool_exp
+  ): [note!]!
+
+  # fetch data from the table: "note_revision"
+  note_revision(
+    # limit the nuber of rows returned
+    limit: Int
+
+    # skip the first n rows. Use only with order_by
+    offset: Int
+
+    # sort the rows by one or more columns
+    order_by: [note_revision_order_by!]
+
+    # filter the rows returned
+    where: note_revision_bool_exp
+  ): [note_revision!]!
+
+  # fetch data from the table: "user"
+  user(
+    # limit the nuber of rows returned
+    limit: Int
+
+    # skip the first n rows. Use only with order_by
+    offset: Int
+
+    # sort the rows by one or more columns
+    order_by: [user_order_by!]
+
+    # filter the rows returned
+    where: user_bool_exp
+  ): [user!]!
+
+  # fetch data from the table: "user_identity"
+  user_identity(
+    # limit the nuber of rows returned
+    limit: Int
+
+    # skip the first n rows. Use only with order_by
+    offset: Int
+
+    # sort the rows by one or more columns
+    order_by: [user_identity_order_by!]
+
+    # filter the rows returned
+    where: user_identity_bool_exp
+  ): [user_identity!]!
+
+  # fetch data from the table: "user_identity_type"
+  user_identity_type(
+    # limit the nuber of rows returned
+    limit: Int
+
+    # skip the first n rows. Use only with order_by
+    offset: Int
+
+    # sort the rows by one or more columns
+    order_by: [user_identity_type_order_by!]
+
+    # filter the rows returned
+    where: user_identity_type_bool_exp
+  ): [user_identity_type!]!
+}
+
+# expression to compare columns of type text. All fields are combined with logical 'AND'.
+input text_comparison_exp {
+  _eq: String
+  _gt: String
+  _gte: String
+  _ilike: String
+  _in: [String]
+  _is_null: Boolean
+  _like: String
+  _lt: String
+  _lte: String
+  _neq: String
+  _nilike: String
+  _nin: [String]
+  _nlike: String
+  _nsimilar: String
+  _similar: String
+}
+
+scalar timestamptz
+
+# expression to compare columns of type timestamptz. All fields are combined with logical 'AND'.
+input timestamptz_comparison_exp {
+  _eq: timestamptz
+  _gt: timestamptz
+  _gte: timestamptz
+  _in: [timestamptz]
+  _is_null: Boolean
+  _lt: timestamptz
+  _lte: timestamptz
+  _neq: timestamptz
+  _nin: [timestamptz]
+}
+
+# columns and relationships of "user"
+type user {
+  avatar: String
+  created_at: timestamptz
+  email: String
+  id: String
+
+  # An array relationship
+  identities(
+    # limit the nuber of rows returned
+    limit: Int
+
+    # skip the first n rows. Use only with order_by
+    offset: Int
+
+    # sort the rows by one or more columns
+    order_by: [user_identity_order_by!]
+
+    # filter the rows returned
+    where: user_identity_bool_exp
+  ): [user_identity!]!
+  name: String
+
+  # An array relationship
+  notes(
+    # limit the nuber of rows returned
+    limit: Int
+
+    # skip the first n rows. Use only with order_by
+    offset: Int
+
+    # sort the rows by one or more columns
+    order_by: [note_order_by!]
+
+    # filter the rows returned
+    where: note_bool_exp
+  ): [note!]!
+  updated_at: timestamptz
+  username: String
+}
+
+# Boolean expression to filter rows from the table "user". All fields are combined with a logical 'AND'.
+input user_bool_exp {
+  _and: [user_bool_exp]
+  _not: user_bool_exp
+  _or: [user_bool_exp]
+  avatar: varchar_comparison_exp
+  created_at: timestamptz_comparison_exp
+  email: varchar_comparison_exp
+  id: varchar_comparison_exp
+  identities: user_identity_bool_exp
+  name: varchar_comparison_exp
+  notes: note_bool_exp
+  updated_at: timestamptz_comparison_exp
+  username: text_comparison_exp
+}
+
+# unique or primary key constraints on table "user"
+enum user_constraint {
+  # unique or primary key constraint
+  user_pkey
+}
+
+# columns and relationships of "user_identity"
+type user_identity {
+  data: jsonb
+  identity_id: String
+  identity_type: String
+
+  # An object relationship
+  user: user
+  user_id: String
+}
+
+# append existing jsonb value of filtered columns with new jsonb value
+input user_identity_append_input {
+  data: jsonb
+}
+
+# Boolean expression to filter rows from the table "user_identity". All fields are combined with a logical 'AND'.
+input user_identity_bool_exp {
+  _and: [user_identity_bool_exp]
+  _not: user_identity_bool_exp
+  _or: [user_identity_bool_exp]
+  data: jsonb_comparison_exp
+  identity_id: varchar_comparison_exp
+  identity_type: varchar_comparison_exp
+  user: user_bool_exp
+  user_id: varchar_comparison_exp
+}
+
+# unique or primary key constraints on table "user_identity"
+enum user_identity_constraint {
+  # unique or primary key constraint
+  user_identity_pkey
+}
+
+# delete the field or element with specified path (for JSON arrays, negative integers count from the end)
+input user_identity_delete_at_path_input {
+  data: [String]
+}
+
+# delete the array element with specified index (negative integers count from the
+# end). throws an error if top level container is not an array
+input user_identity_delete_elem_input {
+  data: Int
+}
+
+# delete key/value pair or string element. key/value pairs are matched based on their key value
+input user_identity_delete_key_input {
+  data: String
+}
+
+# input type for inserting data into table "user_identity"
+input user_identity_insert_input {
+  data: jsonb
+  identity_id: String
+  identity_type: String
+  user_id: String
+}
+
+# response of any mutation on the table "user_identity"
+type user_identity_mutation_response {
+  # number of affected rows by the mutation
+  affected_rows: Int!
+
+  # data of the affected rows by the mutation
+  returning: [user_identity_no_rels!]!
+}
+
+# only postgres columns (no relationships) from "user_identity"
+type user_identity_no_rels {
+  data: jsonb
+  identity_id: String
+  identity_type: String
+  user_id: String
+}
+
+# on conflict condition type for table "user_identity"
+input user_identity_on_conflict {
+  action: conflict_action!
+  constraint: user_identity_constraint
+}
+
+# ordering options when selecting data from "user_identity"
+enum user_identity_order_by {
+  # in the ascending order of "data", nulls last
+  data_asc
+
+  # in the ascending order of "data", nulls first
+  data_asc_nulls_first
+
+  # in the descending order of "data", nulls last
+  data_desc
+
+  # in the descending order of "data", nulls first
+  data_desc_nulls_first
+
+  # in the ascending order of "identity_id", nulls last
+  identity_id_asc
+
+  # in the ascending order of "identity_id", nulls first
+  identity_id_asc_nulls_first
+
+  # in the descending order of "identity_id", nulls last
+  identity_id_desc
+
+  # in the descending order of "identity_id", nulls first
+  identity_id_desc_nulls_first
+
+  # in the ascending order of "identity_type", nulls last
+  identity_type_asc
+
+  # in the ascending order of "identity_type", nulls first
+  identity_type_asc_nulls_first
+
+  # in the descending order of "identity_type", nulls last
+  identity_type_desc
+
+  # in the descending order of "identity_type", nulls first
+  identity_type_desc_nulls_first
+
+  # in the ascending order of "user_id", nulls last
+  user_id_asc
+
+  # in the ascending order of "user_id", nulls first
+  user_id_asc_nulls_first
+
+  # in the descending order of "user_id", nulls last
+  user_id_desc
+
+  # in the descending order of "user_id", nulls first
+  user_id_desc_nulls_first
+}
+
+# prepend existing jsonb value of filtered columns with new jsonb value
+input user_identity_prepend_input {
+  data: jsonb
+}
+
+# input type for updating data in table "user_identity"
+input user_identity_set_input {
+  data: jsonb
+  identity_id: String
+  identity_type: String
+  user_id: String
+}
+
+# columns and relationships of "user_identity_type"
+type user_identity_type {
+  user_identity_type: String
+}
+
+# Boolean expression to filter rows from the table "user_identity_type". All fields are combined with a logical 'AND'.
+input user_identity_type_bool_exp {
+  _and: [user_identity_type_bool_exp]
+  _not: user_identity_type_bool_exp
+  _or: [user_identity_type_bool_exp]
+  user_identity_type: varchar_comparison_exp
+}
+
+# unique or primary key constraints on table "user_identity_type"
+enum user_identity_type_constraint {
+  # unique or primary key constraint
+  user_identity_type_pkey
+}
+
+# input type for inserting data into table "user_identity_type"
+input user_identity_type_insert_input {
+  user_identity_type: String
+}
+
+# response of any mutation on the table "user_identity_type"
+type user_identity_type_mutation_response {
+  # number of affected rows by the mutation
+  affected_rows: Int!
+
+  # data of the affected rows by the mutation
+  returning: [user_identity_type_no_rels!]!
+}
+
+# only postgres columns (no relationships) from "user_identity_type"
+type user_identity_type_no_rels {
+  user_identity_type: String
+}
+
+# on conflict condition type for table "user_identity_type"
+input user_identity_type_on_conflict {
+  action: conflict_action!
+  constraint: user_identity_type_constraint
+}
+
+# ordering options when selecting data from "user_identity_type"
+enum user_identity_type_order_by {
+  # in the ascending order of "user_identity_type", nulls last
+  user_identity_type_asc
+
+  # in the ascending order of "user_identity_type", nulls first
+  user_identity_type_asc_nulls_first
+
+  # in the descending order of "user_identity_type", nulls last
+  user_identity_type_desc
+
+  # in the descending order of "user_identity_type", nulls first
+  user_identity_type_desc_nulls_first
+}
+
+# input type for updating data in table "user_identity_type"
+input user_identity_type_set_input {
+  user_identity_type: String
+}
+
+# input type for inserting data into table "user"
+input user_insert_input {
+  avatar: String
+  created_at: timestamptz
+  email: String
+  id: String
+  name: String
+  updated_at: timestamptz
+  username: String
+}
+
+# response of any mutation on the table "user"
+type user_mutation_response {
+  # number of affected rows by the mutation
+  affected_rows: Int!
+
+  # data of the affected rows by the mutation
+  returning: [user_no_rels!]!
+}
+
+# only postgres columns (no relationships) from "user"
+type user_no_rels {
+  avatar: String
+  created_at: timestamptz
+  email: String
+  id: String
+  name: String
+  updated_at: timestamptz
+  username: String
+}
+
+# on conflict condition type for table "user"
+input user_on_conflict {
+  action: conflict_action!
+  constraint: user_constraint
+}
+
+# ordering options when selecting data from "user"
+enum user_order_by {
+  # in the ascending order of "avatar", nulls last
+  avatar_asc
+
+  # in the ascending order of "avatar", nulls first
+  avatar_asc_nulls_first
+
+  # in the descending order of "avatar", nulls last
+  avatar_desc
+
+  # in the descending order of "avatar", nulls first
+  avatar_desc_nulls_first
+
+  # in the ascending order of "created_at", nulls last
+  created_at_asc
+
+  # in the ascending order of "created_at", nulls first
+  created_at_asc_nulls_first
+
+  # in the descending order of "created_at", nulls last
+  created_at_desc
+
+  # in the descending order of "created_at", nulls first
+  created_at_desc_nulls_first
+
+  # in the ascending order of "email", nulls last
+  email_asc
+
+  # in the ascending order of "email", nulls first
+  email_asc_nulls_first
+
+  # in the descending order of "email", nulls last
+  email_desc
+
+  # in the descending order of "email", nulls first
+  email_desc_nulls_first
+
+  # in the ascending order of "id", nulls last
+  id_asc
+
+  # in the ascending order of "id", nulls first
+  id_asc_nulls_first
+
+  # in the descending order of "id", nulls last
+  id_desc
+
+  # in the descending order of "id", nulls first
+  id_desc_nulls_first
+
+  # in the ascending order of "name", nulls last
+  name_asc
+
+  # in the ascending order of "name", nulls first
+  name_asc_nulls_first
+
+  # in the descending order of "name", nulls last
+  name_desc
+
+  # in the descending order of "name", nulls first
+  name_desc_nulls_first
+
+  # in the ascending order of "updated_at", nulls last
+  updated_at_asc
+
+  # in the ascending order of "updated_at", nulls first
+  updated_at_asc_nulls_first
+
+  # in the descending order of "updated_at", nulls last
+  updated_at_desc
+
+  # in the descending order of "updated_at", nulls first
+  updated_at_desc_nulls_first
+
+  # in the ascending order of "username", nulls last
+  username_asc
+
+  # in the ascending order of "username", nulls first
+  username_asc_nulls_first
+
+  # in the descending order of "username", nulls last
+  username_desc
+
+  # in the descending order of "username", nulls first
+  username_desc_nulls_first
+}
+
+# input type for updating data in table "user"
+input user_set_input {
+  avatar: String
+  created_at: timestamptz
+  email: String
+  id: String
+  name: String
+  updated_at: timestamptz
+  username: String
+}
+
+# expression to compare columns of type varchar. All fields are combined with logical 'AND'.
+input varchar_comparison_exp {
+  _eq: String
+  _gt: String
+  _gte: String
+  _ilike: String
+  _in: [String]
+  _is_null: Boolean
+  _like: String
+  _lt: String
+  _lte: String
+  _neq: String
+  _nilike: String
+  _nin: [String]
+  _nlike: String
+  _nsimilar: String
+  _similar: String
+}
+
