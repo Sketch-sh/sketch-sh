@@ -26,7 +26,7 @@ module GetNote = [%graphql
   |}
 ];
 
-module GetNoteQuery = ReasonApollo.CreateQuery(GetNote);
+module GetNoteComponent = ReasonApollo.CreateQuery(GetNote);
 
 module UpdateNoteGql = [%graphql
   {|
@@ -58,7 +58,7 @@ let make = (~noteInfo: Route.noteRouteConfig, _children) => {
   render: _self => {
     let noteQuery =
       GetNote.make(~noteId=noteInfo.noteId, ~username=noteInfo.username, ());
-    <GetNoteQuery variables=noteQuery##variables>
+    <GetNoteComponent variables=noteQuery##variables>
       ...(
            ({result}) =>
              switch (result) {
@@ -110,6 +110,6 @@ let make = (~noteInfo: Route.noteRouteConfig, _children) => {
                   );
              }
          )
-    </GetNoteQuery>;
+    </GetNoteComponent>;
   },
 };
