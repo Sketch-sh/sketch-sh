@@ -1,31 +1,4 @@
 open Utils_GraphqlPpx;
-module GetNote = [%graphql
-  {|
-    query getNote (
-      $noteId: String!,
-      $username: String!
-    ) {
-      note (
-        where: {
-          id : {_eq: $noteId},
-          owner: {username: {_eq: $username}}
-        }
-      ) {
-        id
-        title
-        data @bsDecoder(fn: "decodeBlockData")
-        updated_at
-        owner {
-          id
-          username
-          avatar
-        }
-      }
-    }
-  |}
-];
-
-module GetNoteComponent = ReasonApollo.CreateQuery(GetNote);
 
 module AddNoteGql = [%graphql
   {|
@@ -92,8 +65,10 @@ module NoteSave = {
     reducer: (action, _state) =>
       switch (action) {
       | SavedNewNote(id) =>
-        /* TODO: side effects of transition to new url */
-        ReasonReact.Update({kind: Old(id)})
+        ReasonReact.UpdateWithSideEffects(
+          {kind: Old(id)},
+          (_self => Router.pushSilent(Route.Note({noteId: id, data: None}))),
+        )
       },
     render: ({state, send}) =>
       switch (state.kind) {

@@ -59,6 +59,9 @@ let make = (~noteInfo: Route.noteRouteConfig, _children) => {
                                ...(
                                     (~loading, ~onSave) =>
                                       <Editor_Note
+                                        title=(
+                                          note##title |. optionToEmptyString
+                                        )
                                         blocks=(
                                           switch (note##data) {
                                           | None => [||]

@@ -14,6 +14,22 @@ let redirect: string => unit = [%bs.raw
 let pushUnsafe = url => ReasonReact.Router.push(url);
 let push = route => pushUnsafe(Route.routeToUrl(route));
 
+[@bs.send]
+external pushState :
+  (Dom.history, [@bs.as {json|null|json}] _, [@bs.as ""] _, ~href: string) =>
+  unit =
+  "";
+
+let pushSilentUnsafe = path =>
+  switch ([%external history], [%external window]) {
+  | (None, _)
+  | (_, None) => ()
+  | (Some((history: Dom.history)), Some(_)) =>
+    pushState(history, ~href=path)
+  };
+
+let pushSilent = route => pushSilentUnsafe(Route.routeToUrl(route));
+
 [@bs.deriving abstract]
 type linkProps = {
   [@bs.optional]
