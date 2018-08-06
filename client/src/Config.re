@@ -1,6 +1,8 @@
 open Utils;
 
 let authDomain =
-  env == "production" ? "http://localhost:3001" : "http://localhost:3001";
+  env == "production" ? "https://rtop-api.khoa.xyz" : "http://localhost:3001";
 
-let graphqlEndpoint = "/graphql";
+let graphqlEndpoint =
+  env == "production" ?
+    "https://rtop-server.herokuapp.com/v1alpha1/graphql" : "/graphql";

@@ -1,0 +1,17 @@
+{
+  "name": "rtop-server",
+  "public": true,
+  "type": "docker",
+  "alias": "rtop-api.khoa.xyz",
+  "env": {
+    "NODE_ENV": "production",
+    "JWT_TOKEN": "@rtop-jwt-token",
+    "HASURA_ENDPOINT": "https://rtop-server.herokuapp.com/v1alpha1/graphql",
+    "FRONTEND_URL": "https://rtop.khoa.xyz",
+    "FRONTEND_AUTH_CALLBACK": "https://rtop.khoa.xyz/auth/callback",
+    "FRONTEND_AUTH_FAILURE": "https://rtop.khoa.xyz/auth/failure",
+    "GITHUB_CALLBACK_URL": "https://rtop-api.khoa.xyz/auth/github/callback",
+    "GITHUB_CLIENT_ID": "@rtop-gh-id",
+    "GITHUB_CLIENT_SECRET": "@rtop-gh-secret"
+  }
+}
