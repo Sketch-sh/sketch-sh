@@ -42,7 +42,9 @@ let make =
         firstLineNumber: {
           if (state.firstLineNumber != firstLineNumber) {
             editor
-            |. CodeMirror.Editor.setOption("firstLineNumber", firstLineNumber);
+            ->(
+                CodeMirror.Editor.setOption("firstLineNumber", firstLineNumber)
+              );
           };
           firstLineNumber;
         },
@@ -51,77 +53,89 @@ let make =
             let cachedLineWidgets = state.lineWidgets^;
 
             cachedLineWidgets
-            |. Belt.List.forEachU((. lw)
-                 /* TODO: should I remove the domNode ?
-                    Potential memory leaks? */
-                 => lw |. CodeMirror.LineWidget.clear);
+            ->(
+                Belt.List.forEachU((. lw)
+                  /* TODO: should I remove the domNode ?
+                     Potential memory leaks? */
+                  => lw->CodeMirror.LineWidget.clear)
+              );
 
             state.lineWidgets :=
               widgets
-              |. Belt.Array.reduceU(
-                   [],
-                   (. acc, w) => {
-                     open Editor_CodeBlockTypes.Widget;
-                     open Editor_CodeBlockLineWidget;
-                     let {lw_line: line, lw_data} = w;
-                     let newLineWidget =
-                       switch (lw_data) {
-                       | Lw_Error(content) =>
-                         editor
-                         |. CodeMirror.Editor.addLineWidget(
-                              ~line,
-                              ~element=createErrorWidget(content),
-                              ~options=
-                                CodeMirror.LineWidget.options(
-                                  ~coverGutter=true,
-                                  ~noHScroll=false,
-                                  ~above=false,
-                                  ~showIfHidden=false,
-                                ),
+              ->(
+                  Belt.Array.reduceU(
+                    [],
+                    (. acc, w) => {
+                      open Editor_CodeBlockTypes.Widget;
+                      open Editor_CodeBlockLineWidget;
+                      let {lw_line: line, lw_data} = w;
+                      let newLineWidget =
+                        switch (lw_data) {
+                        | Lw_Error(content) =>
+                          editor
+                          ->(
+                              CodeMirror.Editor.addLineWidget(
+                                ~line,
+                                ~element=createErrorWidget(content),
+                                ~options=
+                                  CodeMirror.LineWidget.options(
+                                    ~coverGutter=true,
+                                    ~noHScroll=false,
+                                    ~above=false,
+                                    ~showIfHidden=false,
+                                  ),
+                              )
                             )
-                       | Lw_Warning(content) =>
-                         editor
-                         |. CodeMirror.Editor.addLineWidget(
-                              ~line,
-                              ~element=createWarningWidget(content),
-                              ~options=
-                                CodeMirror.LineWidget.options(
-                                  ~coverGutter=true,
-                                  ~noHScroll=false,
-                                  ~above=false,
-                                  ~showIfHidden=false,
-                                ),
+                        | Lw_Warning(content) =>
+                          editor
+                          ->(
+                              CodeMirror.Editor.addLineWidget(
+                                ~line,
+                                ~element=createWarningWidget(content),
+                                ~options=
+                                  CodeMirror.LineWidget.options(
+                                    ~coverGutter=true,
+                                    ~noHScroll=false,
+                                    ~above=false,
+                                    ~showIfHidden=false,
+                                  ),
+                              )
                             )
-                       | Lw_Value(content) =>
-                         editor
-                         |. CodeMirror.Editor.addLineWidget(
-                              ~line,
-                              ~element=createValueWidget(content),
-                              ~options=
-                                CodeMirror.LineWidget.options(
-                                  ~coverGutter=false,
-                                  ~noHScroll=false,
-                                  ~above=false,
-                                  ~showIfHidden=false,
-                                ),
+                        | Lw_Value(content) =>
+                          editor
+                          ->(
+                              CodeMirror.Editor.addLineWidget(
+                                ~line,
+                                ~element=createValueWidget(content),
+                                ~options=
+                                  CodeMirror.LineWidget.options(
+                                    ~coverGutter=false,
+                                    ~noHScroll=false,
+                                    ~above=false,
+                                    ~showIfHidden=false,
+                                  ),
+                              )
                             )
-                       | Lw_Stdout(content) =>
-                         editor
-                         |. CodeMirror.Editor.addLineWidget(
-                              ~line,
-                              ~element=createStdoutWidget(content),
-                              ~options=
-                                CodeMirror.LineWidget.options(
-                                  ~coverGutter=false,
-                                  ~noHScroll=false,
-                                  ~above=false,
-                                  ~showIfHidden=false,
-                                ),
+                        | Lw_Stdout(content) =>
+                          editor
+                          ->(
+                              CodeMirror.Editor.addLineWidget(
+                                ~line,
+                                ~element=createStdoutWidget(content),
+                                ~options=
+                                  CodeMirror.LineWidget.options(
+                                    ~coverGutter=false,
+                                    ~noHScroll=false,
+                                    ~above=false,
+                                    ~showIfHidden=false,
+                                  ),
+                              )
                             )
-                       };
-                     [newLineWidget, ...acc];
-                   },
-                 );
+                        };
+                      [newLineWidget, ...acc];
+                    },
+                  )
+                );
           };
           widgets;
         },
@@ -154,15 +168,17 @@ let make =
           ~extraKeys={
             let key = Js.Dict.empty();
             key
-            |. Js.Dict.set("Tab", cm => {
-                 let spaces =
-                   String.make(
-                     cm |. CodeMirror.Editor.GetOption.indentUnit,
-                     ' ',
-                   );
-                 cm |. CodeMirror.Editor.replaceSelection(spaces);
-               });
-            key |. Js.Dict.set("Shift-Enter", _cm => onExecute());
+            ->(
+                Js.Dict.set("Tab", cm => {
+                  let spaces =
+                    String.make(
+                      cm->CodeMirror.Editor.GetOption.indentUnit,
+                      ' ',
+                    );
+                  cm->(CodeMirror.Editor.replaceSelection(spaces));
+                })
+              );
+            key->(Js.Dict.set("Shift-Enter", _cm => onExecute()));
             key;
           },
           (),

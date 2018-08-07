@@ -10,11 +10,11 @@ let make = (~entity="path", _children) => {
     <div className="NotFound">
       <main>
         <section>
-          <span> ("404" |. str) </span>
+          <span> "404"->str </span>
           <p>
-            ("The requested " |. str)
-            <strong> (entity |. str) </strong>
-            (" could not be found" |. str)
+            "The requested "->str
+            <strong> entity->str </strong>
+            " could not be found"->str
           </p>
         </section>
       </main>

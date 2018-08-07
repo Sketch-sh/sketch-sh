@@ -15,7 +15,7 @@ let pushUnsafe = url => ReasonReact.Router.push(url);
 let push = route => pushUnsafe(Route.routeToUrl(route));
 
 [@bs.send]
-external pushState :
+external pushState:
   (Dom.history, [@bs.as {json|null|json}] _, [@bs.as ""] _, ~href: string) =>
   unit =
   "";
@@ -30,41 +30,24 @@ let pushSilentUnsafe = path =>
 
 let pushSilent = route => pushSilentUnsafe(Route.routeToUrl(route));
 
-[@bs.deriving abstract]
-type linkProps = {
-  [@bs.optional]
-  className: string,
-  [@bs.optional]
-  title: string,
-  href: string,
-  onClick: ReactEventRe.Mouse.t => unit,
-};
-
-external hack : linkProps => Js.t({..}) = "%identity";
-
 module LinkUnsafe = {
   let component = ReasonReact.statelessComponent("LinkUnsafe");
 
   let make = (~href, ~className=?, ~title=?, children) => {
     ...component,
     render: self =>
-      ReasonReact.createDomElement(
-        "a",
-        ~props=
-          linkProps(
-            ~className?,
-            ~title?,
-            ~href,
-            ~onClick=
-              self.handle((event, _self) => {
-                ReactEventRe.Mouse.preventDefault(event);
-                ReasonReact.Router.push(href);
-              }),
-            (),
-          )
-          |. hack,
-        children,
-      ),
+      <a
+        ?className
+        ?title
+        href
+        onClick=(
+          self.handle((event, _self) => {
+            event->ReactEvent.Mouse.preventDefault;
+            ReasonReact.Router.push(href);
+          })
+        )>
+        ...children
+      </a>,
   };
 };
 
@@ -73,25 +56,9 @@ module Link = {
 
   let make = (~route: Route.t, ~className=?, ~title=?, children) => {
     ...component,
-    render: self => {
+    render: _self => {
       let href = Route.routeToUrl(route);
-      ReasonReact.createDomElement(
-        "a",
-        ~props=
-          linkProps(
-            ~className?,
-            ~title?,
-            ~href,
-            ~onClick=
-              self.handle((event, _self) => {
-                ReactEventRe.Mouse.preventDefault(event);
-                ReasonReact.Router.push(href);
-              }),
-            (),
-          )
-          |. hack,
-        children,
-      );
+      <LinkUnsafe href ?className ?title> ...children </LinkUnsafe>;
     },
   };
 };

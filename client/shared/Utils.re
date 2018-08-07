@@ -1,5 +1,5 @@
-[@bs.val] external warn : 'a => unit = "console.warn";
-[@bs.val] external warn2 : ('a, 'b) => unit = "console.warn";
+[@bs.val] external warn: 'a => unit = "console.warn";
+[@bs.val] external warn2: ('a, 'b) => unit = "console.warn";
 
 let str = ReasonReact.string;
 let optionStr =
@@ -30,10 +30,7 @@ let tapLog = a => {
   a;
 };
 
-let valueFromEvent = evt : string => {
-  let obj = evt |> ReactEventRe.Form.target |> ReactDOMRe.domElementToObj;
-  obj##value;
-};
+let valueFromEvent = event: string => event->ReactEvent.Form.target##value;
 
 let (=>>) = (value, render) =>
   switch (value) {
@@ -41,7 +38,7 @@ let (=>>) = (value, render) =>
   | Some(value) => render(value)
   };
 
-let handleError = Js.Promise.(catch(error => Js.log(error) |. resolve));
+let handleError = Js.Promise.(catch(error => Js.log(error)->resolve));
 
 let splitOnChar = (sep, s) => {
   let j = ref(String.length(s));
@@ -80,7 +77,7 @@ let js_countLine = s => s |> Js.String.split("\n") |> Js.Array.length;
 
 let min = (min, value) => value < min ? min : value;
 
-[@bs.val] external env : string = "process.env.NODE_ENV";
+[@bs.val] external env: string = "process.env.NODE_ENV";
 
 let arrayFindIndex = (array, f) => {
   let length = Array.length(array);
@@ -122,4 +119,4 @@ let generateId = () =>
 
 let pluckAcc = ((acc, _)) => acc;
 
-external toNullable : string => Js.Nullable.t(string) = "%identity";
+external toNullable: string => Js.Nullable.t(string) = "%identity";

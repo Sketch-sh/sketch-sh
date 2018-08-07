@@ -1,5 +1,5 @@
 [@bs.send]
-external concat :
+external concat:
   (ReasonApolloTypes.apolloLink, ReasonApolloTypes.apolloLink) =>
   ReasonApolloTypes.apolloLink =
   "concat";
@@ -22,7 +22,7 @@ let authLink =
     };
   });
 
-let link = authLink |. concat(httpLink);
+let link = authLink->(concat(httpLink));
 
 let instance =
   ReasonApollo.createApolloClient(~link, ~cache=inMemoryCache, ());

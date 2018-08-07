@@ -54,21 +54,25 @@ let make =
         | None => ()
         | Some(typ) =>
           open Editor_Types.Block;
-          editor |. CodeMirror.Editor.focus;
+          editor->CodeMirror.Editor.focus;
           switch (typ) {
           | FcTyp_BlockFocusDown =>
-            let doc = editor |. CodeMirror.Editor.getDoc;
+            let doc = editor->CodeMirror.Editor.getDoc;
             doc
-            |. CodeMirror.Doc.setCursor(
-                 CodeMirror.Position.make(~line=0, ~ch=0, ()),
-               );
+            ->(
+                CodeMirror.Doc.setCursor(
+                  CodeMirror.Position.make(~line=0, ~ch=0, ()),
+                )
+              );
           | FcTyp_BlockFocusUp =>
-            let doc = editor |. CodeMirror.Editor.getDoc;
-            let lastLinePlusOne = editor |. CodeMirror.Editor.lineCount;
+            let doc = editor->CodeMirror.Editor.getDoc;
+            let lastLinePlusOne = editor->CodeMirror.Editor.lineCount;
             doc
-            |. CodeMirror.Doc.setCursor(
-                 CodeMirror.Position.make(~line=lastLinePlusOne, ~ch=0, ()),
-               );
+            ->(
+                CodeMirror.Doc.setCursor(
+                  CodeMirror.Position.make(~line=lastLinePlusOne, ~ch=0, ()),
+                )
+              );
           | FcTyp_EditorFocus => ()
           };
         };
@@ -76,8 +80,8 @@ let make =
           ...state,
           value: {
             if (state.value != value
-                && value != (editor |. CodeMirror.Editor.getValue)) {
-              editor |. CodeMirror.Editor.setValue(value);
+                && value != editor->CodeMirror.Editor.getValue) {
+              editor->(CodeMirror.Editor.setValue(value));
             };
             value;
           },
@@ -93,62 +97,65 @@ let make =
       | None => ()
       | Some(setEditor) => setEditor(editor)
       };
-      editor |. CodeMirror.Editor.setValue(value);
+      editor->(CodeMirror.Editor.setValue(value));
 
       switch (onChange) {
       | None => ()
       | Some(onChange) =>
         editor
-        |. CodeMirror.Editor.onChange((editor, diff) => {
-             let currentEditorValue = editor |. CodeMirror.Editor.getValue;
-             onChange(currentEditorValue, diff);
-           })
+        ->(
+            CodeMirror.Editor.onChange((editor, diff) => {
+              let currentEditorValue = editor->CodeMirror.Editor.getValue;
+              onChange(currentEditorValue, diff);
+            })
+          )
       };
 
       switch (onBlur) {
       | None => ()
       | Some(onBlur) =>
-        editor |. CodeMirror.Editor.onBlur((_editor, _event) => onBlur())
+        editor->(CodeMirror.Editor.onBlur((_editor, _event) => onBlur()))
       };
 
       switch (onFocus) {
       | None => ()
       | Some(onFocus) =>
-        editor |. CodeMirror.Editor.onFocus((_editor, _event) => onFocus())
+        editor->(CodeMirror.Editor.onFocus((_editor, _event) => onFocus()))
       };
       open Webapi.Dom;
       switch (onBlockUp, onBlockDown) {
       | (Some(onBlockUp), Some(onBlockDown)) =>
         editor
-        |. CodeMirror.Editor.onKeydown((editor, event) => {
-             open CodeMirror.Position;
-             let doc = editor |. CodeMirror.Editor.getDoc;
-             let cursor = doc |. CodeMirror.Doc.getCursor(`head);
-             switch (event |. KeyboardEvent.key) {
-             | "PageUp"
-             | "ArrowUp" when cursor |. lineGet == 0 && cursor |. chGet == 0 =>
-               onBlockUp()
-             | "PageDown"
-             | "ArrowDown" =>
-               let lastLine = (editor |. CodeMirror.Editor.lineCount) - 1;
-               let lastChar =
-                 editor
-                 |. CodeMirror.Editor.getLine(lastLine)
-                 |. Js.String.length;
-               if (lineGet(cursor) == lastLine
-                   && lastChar == (cursor |. chGet)) {
-                 onBlockDown();
-               };
-             | "/" =>
-               if (event |. KeyboardEvent.ctrlKey) {
-                 event |. KeyboardEventRe.preventDefault;
-                 editor |. CodeMirror.Editor.toggleComment();
-               } else {
-                 ();
-               }
-             | _ => ()
-             };
-           })
+        ->(
+            CodeMirror.Editor.onKeydown((editor, event) => {
+              open CodeMirror.Position;
+              let doc = editor->CodeMirror.Editor.getDoc;
+              let cursor = doc->(CodeMirror.Doc.getCursor(`head));
+              switch (event->KeyboardEvent.key) {
+              | "PageUp"
+              | "ArrowUp" when cursor->lineGet == 0 && cursor->chGet == 0 =>
+                onBlockUp()
+              | "PageDown"
+              | "ArrowDown" =>
+                let lastLine = editor->CodeMirror.Editor.lineCount - 1;
+                let lastChar =
+                  editor
+                  ->(CodeMirror.Editor.getLine(lastLine))
+                  ->Js.String.length;
+                if (lineGet(cursor) == lastLine && lastChar == cursor->chGet) {
+                  onBlockDown();
+                };
+              | "/" =>
+                if (event->KeyboardEvent.ctrlKey) {
+                  event->KeyboardEventRe.preventDefault;
+                  editor->(CodeMirror.Editor.toggleComment());
+                } else {
+                  ();
+                }
+              | _ => ()
+              };
+            })
+          )
       | _ => ()
       };
 

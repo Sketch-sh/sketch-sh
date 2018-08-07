@@ -126,7 +126,7 @@ module EditorConfiguration = {
 };
 
 [@bs.module]
-external make : (Dom.element, EditorConfiguration.t) => editor = "codemirror";
+external make: (Dom.element, EditorConfiguration.t) => editor = "codemirror";
 
 module Position = {
   [@bs.deriving abstract]
@@ -143,11 +143,11 @@ module LineWidget = {
   type t;
   /**
     Removes the widget.
-  */ [@bs.send] external clear : t => unit = "";
+  */ [@bs.send] external clear: t => unit = "";
   /** Call this if you made some change to the widget's DOM node that might affect its height.
   It'll force CodeMirror to update the height of the line that contains the widget. */
   [@bs.send]
-  external changed : t => unit = "";
+  external changed: t => unit = "";
   [@bs.deriving abstract]
   type options = {
     /** Whether the widget should cover the gutter. */
@@ -186,28 +186,28 @@ module Doc = {
     Omitting the argument is the same as passing "head".A { line , ch } object will be returned.
   */
   [@bs.send]
-  external getCursor :
+  external getCursor:
     (t, [@bs.string] [ | `start | [@bs.as "end"] `end_ | `head | `anchor]) =>
     Position.t =
     "";
 
-  [@bs.send] external setCursor : (t, Position.t) => unit = "";
+  [@bs.send] external setCursor: (t, Position.t) => unit = "";
 };
 
 module Editor = {
-  [@bs.send] external getValue : editor => string = "";
-  [@bs.send] external setValue : (editor, string) => unit = "";
-  [@bs.send] external setOption : (editor, string, 'a) => unit = "";
-  [@bs.send] external getOption : (editor, string) => 'a = "";
+  [@bs.send] external getValue: editor => string = "";
+  [@bs.send] external setValue: (editor, string) => unit = "";
+  [@bs.send] external setOption: (editor, string, 'a) => unit = "";
+  [@bs.send] external getOption: (editor, string) => 'a = "";
   module GetOption = {
     [@bs.send]
-    external indentUnit : (editor, [@bs.as "indentUnit"] _) => int =
+    external indentUnit: (editor, [@bs.as "indentUnit"] _) => int =
       "getOption";
   };
 
-  [@bs.send] external replaceSelection : (editor, string) => unit = "";
+  [@bs.send] external replaceSelection: (editor, string) => unit = "";
   [@bs.send]
-  external addLineWidget :
+  external addLineWidget:
     (
       editor,
       ~line: int,
@@ -217,30 +217,30 @@ module Editor = {
     LineWidget.t =
     "";
 
-  [@bs.send] external getDoc : editor => Doc.t = "";
-  [@bs.send] external hasFocus : editor => bool = "";
-  [@bs.send] external focus : editor => unit = "";
+  [@bs.send] external getDoc: editor => Doc.t = "";
+  [@bs.send] external hasFocus: editor => bool = "";
+  [@bs.send] external focus: editor => unit = "";
 
-  [@bs.send] external getLine : (editor, int) => string = "";
-  [@bs.send] external lineCount : editor => int = "";
+  [@bs.send] external getLine: (editor, int) => string = "";
+  [@bs.send] external lineCount: editor => int = "";
 
   [@bs.send]
-  external onChange :
+  external onChange:
     (editor, [@bs.as "change"] _, (editor, EditorChange.t) => unit) => unit =
     "on";
 
   [@bs.send]
-  external onFocus :
+  external onFocus:
     (editor, [@bs.as "focus"] _, (editor, Dom.event) => unit) => unit =
     "on";
 
   [@bs.send]
-  external onBlur :
+  external onBlur:
     (editor, [@bs.as "blur"] _, (editor, Dom.event) => unit) => unit =
     "on";
 
   [@bs.send]
-  external onKeydown :
+  external onKeydown:
     (editor, [@bs.as "keydown"] _, (editor, Dom.keyboardEvent) => unit) => unit =
     "on";
 
@@ -262,7 +262,7 @@ module Editor = {
   };
 
   [@bs.send]
-  external toggleComment :
+  external toggleComment:
     (
       editor,
       ~from: Position.t=?,
