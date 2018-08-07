@@ -1,20 +1,27 @@
-.EditorNav {
-  position: fixed;
-  top: 0;
-  left: 0;
-  bottom: 0;
-  z-index: 100;
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  width: 60px;
+.EditorNote {
+  min-width: 768px;
+  max-width: 1100px;
+  padding: calc(var(--topbar-height) + var(--space4)) var(--space4)
+    var(--space3) var(--space4);
+  margin: auto;
 }
 
-.EditorNav__top {
-  flex: 1;
+.metadata {
+  margin-left: var(--cm-gutter-width);
 }
-.EditorNav__button {
-  padding: calc((60px - 48px) / 2);
+
+.metadata__title-input {
+  width: 100%;
+  display: block;
+  font-size: var(--f2);
+  font-weight: 900;
+  color: var(--cm-text);
+  font-family: var(--font-monospace);
+  border: none;
+  outline: none;
+  margin: 0 0 0 8px;
+  padding: 0;
+  background-color: transparent;
 }
 
 @keyframes spin {
@@ -30,40 +37,11 @@
   animation: spin 2s infinite linear;
 }
 
-.EditorNav__button--button {
-  padding: 8px;
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  display: flex;
-  justify-content: center;
-  align-content: center;
-
-  &:disabled {
-    cursor: not-allowed;
-  }
-  &:disabled svg {
-    opacity: 0.5;
-  }
-  &:focus {
-    outline: 0;
-  }
-}
-
-.EditorNav__button--icon {
-  height: 32px;
-  width: 32px;
-  color: var(--cm-text);
-  stroke-width: 2px;
-}
-
-/* Bottom navigation */
-.EditorNav__bottom {
-  user-select: none;
-  padding: 16px 0;
-  text-align: center;
-}
-.EditorNav__button--saveIndicator {
+.EditorNote__saveStatus {
   color: rgb(150, 150, 150);
-  font-size: 14px;
+  font-size: var(--f6);
+  position: fixed;
+  bottom: var(--space3);
+  left: var(--space3);
+  z-index: 1;
 }

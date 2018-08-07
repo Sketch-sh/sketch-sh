@@ -7,7 +7,6 @@ Modules.require("codemirror/addon/selection/active-line");
 Modules.require("codemirror/mode/gfm/gfm");
 Modules.require("codemirror/lib/codemirror.css");
 Modules.require("./cm-theme.css");
-Modules.require("./app.css");
 
 /* open Utils; */
 

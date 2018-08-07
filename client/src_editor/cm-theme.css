@@ -29,7 +29,8 @@
   /* Spacing and decorations */
   --cm-padding-v: 0;
   --cm-padding-h: var(--space2);
-  --cm-gutter-width: var(--space4);
+  /* Default CodeMirror value for gutter. Don't touch it */
+  --cm-gutter-width: 30px;
   --cm-linenumber: var(--hue-2);
   --cm-border-color: var(--mono-2);
 }
@@ -146,10 +147,6 @@ div.CodeMirror span.CodeMirror-nonmatchingbracket {
 .CodeMirror-activeline-background {
   background: #e8f2ff;
 }
-.CodeMirror-activeline .CodeMirror-linenumber {
-  background: #e8f2ff;
-}
-
 /* \\\\\\\\\\\\\\\\\\\ End of theme \\\\\\\\\\\\\\ */
 
 /* ////////////////// Additions */

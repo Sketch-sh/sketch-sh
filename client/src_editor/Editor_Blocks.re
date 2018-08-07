@@ -1,4 +1,6 @@
 [%%debugger.chrome];
+Modules.require("./Editor_Blocks.css");
+
 open Utils;
 open Editor_CodeBlockTypes;
 open Editor_Types.Block;

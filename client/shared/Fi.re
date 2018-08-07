@@ -54,3 +54,39 @@ module Home = {
       children,
     );
 };
+
+module Github = {
+  [@bs.module "react-icons/fi"]
+  external reactClass: ReasonReact.reactClass = "FiGithub";
+
+  let make = (~className="", children) =>
+    ReasonReact.wrapJsForReason(
+      ~reactClass,
+      ~props={"className": className},
+      children,
+    );
+};
+
+module GitBranch = {
+  [@bs.module "react-icons/fi"]
+  external reactClass: ReasonReact.reactClass = "FiGitBranch";
+
+  let make = (~className="", children) =>
+    ReasonReact.wrapJsForReason(
+      ~reactClass,
+      ~props={"className": className},
+      children,
+    );
+};
+
+module Terminal = {
+  [@bs.module "react-icons/fi"]
+  external reactClass: ReasonReact.reactClass = "FiTerminal";
+
+  let make = (~className="", children) =>
+    ReasonReact.wrapJsForReason(
+      ~reactClass,
+      ~props={"className": className},
+      children,
+    );
+};
