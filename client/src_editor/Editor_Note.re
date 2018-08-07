@@ -69,56 +69,45 @@ let make = (~blocks, ~title="", ~loading as isSaving, ~onSave, _children) => {
           <Fi.IconContext.Provider
             value={"className": "EditorNav__button--icon"}>
             <div className="EditorNav__button">
-              (
-                ReasonReact.cloneElement(
-                  <button
-                    className="EditorNav__button--button"
-                    onClick=(_ => Router.push(Route.Home))>
-                    <Fi.Home />
-                  </button>,
-                  ~props={
-                    "data-balloon": "Home",
-                    "data-balloon-pos": "right",
-                  },
-                  [||],
-                )
-              )
+              <UI_Balloon position=Right message="Home">
+                ...<button
+                     className="EditorNav__button--button"
+                     onClick=(_ => Router.push(Route.Home))>
+                     <Fi.Home />
+                   </button>
+              </UI_Balloon>
             </div>
             <div className="EditorNav__button">
-              (
-                ReasonReact.cloneElement(
-                  <button
-                    disabled=(
-                      switch (saveStatus) {
-                      | Pristine
-                      | Saved
-                      | Saving => true
-                      | Unsaved => false
-                      }
-                    )
-                    className="EditorNav__button--button"
-                    onClick=(
-                      _ => onSave(~title=state.title, ~data=state.blocks^)
-                    )>
-                    (
-                      isSaving ?
-                        <Fi.Loader className="EditorNav__button--spin" /> :
-                        <Fi.Save />
-                    )
-                  </button>,
-                  ~props={
-                    "data-balloon":
-                      switch (saveStatus) {
-                      | Pristine => "Nothing to save"
-                      | Saved => "Already saved !"
-                      | Saving
-                      | Unsaved => "Save"
-                      },
-                    "data-balloon-pos": "right",
-                  },
-                  [||],
-                )
-              )
+              <UI_Balloon
+                position=Right
+                message=(
+                  switch (saveStatus) {
+                  | Pristine => "Nothing to save"
+                  | Saved => "Already saved !"
+                  | Saving
+                  | Unsaved => "Save"
+                  }
+                )>
+                ...<button
+                     disabled=(
+                       switch (saveStatus) {
+                       | Pristine
+                       | Saved
+                       | Saving => true
+                       | Unsaved => false
+                       }
+                     )
+                     className="EditorNav__button--button"
+                     onClick=(
+                       _ => onSave(~title=state.title, ~data=state.blocks^)
+                     )>
+                     (
+                       isSaving ?
+                         <Fi.Loader className="EditorNav__button--spin" /> :
+                         <Fi.Save />
+                     )
+                   </button>
+              </UI_Balloon>
             </div>
           </Fi.IconContext.Provider>
         </div>

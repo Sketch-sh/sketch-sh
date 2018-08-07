@@ -3,9 +3,8 @@
    This module contains type definition for all routes in the project
  */
 type noteRouteConfig = {
-  username: string,
   noteId: string,
-  slug: option(string),
+  data: option(string),
 };
 
 type t =
@@ -24,12 +23,12 @@ type route = t;
 let routeToUrl: t => string =
   fun
   | Home => "/"
-  | Note({username, noteId, slug}) =>
-    {j|/u/$(username)/$(noteId)/|j}
+  | Note({noteId, data}) =>
+    {j|/s/$(noteId)/|j}
     ++ (
-      switch (slug) {
+      switch (data) {
       | None => ""
-      | Some(slug) => slug
+      | Some(data) => data
       }
     )
   | NoteNew => "/new"
@@ -65,8 +64,7 @@ let urlToRoute: ReasonReact.Router.url => t =
       | None => NotFound
       };
     | ["auth", "logout"] => AuthLogout
-    | ["u", username, noteId] => Note({username, noteId, slug: None})
-    | ["u", username, noteId, slug] =>
-      Note({username, noteId, slug: Some(slug)})
+    | ["s", noteId] => Note({noteId, data: None})
+    | ["s", noteId, data] => Note({noteId, data: Some(data)})
     | _ => NotFound
     };

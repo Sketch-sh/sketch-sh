@@ -1,8 +1,8 @@
 {
   "files.exclude": {
-    // "src/*.js": true,
-    // "shared/*.js": true,
-    // "src_editor/*.js": true,
+    "src/*.js": true,
+    "shared/*.js": true,
+    "src_editor/*.js": true,
     "src_analyzer/*.js": true,
     "lib": true
   }

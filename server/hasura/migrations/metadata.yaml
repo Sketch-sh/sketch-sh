@@ -169,6 +169,13 @@ tables:
         user_id:
           _eq: X-HASURA-USER-ID
     role: user
+  - comment: null
+    permission:
+      allow_upsert: false
+      check:
+        user_id:
+          _eq: anonymous
+    role: public
   object_relationships:
   - comment: null
     name: user
