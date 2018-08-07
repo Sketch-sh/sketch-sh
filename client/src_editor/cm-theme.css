@@ -1,218 +1,163 @@
-@import url(/firacode/fira_code.css);
+/* Rtop theme */
 
-.CodeMirror pre {
+:root {
+  --mono-1: #444;
+  --mono-2: #686b77;
+  --mono-3: #978998;
+  --hue-1: #0184bb;
+  --hue-2: #4078f2;
+  --hue-3: #a626a4;
+  --hue-4: #50a14f;
+  --hue-5: #e45649;
+  --hue-5-2: #c91243;
+  --hue-6: #986801;
+  --hue-6-2: #c18401;
+
+  --cm-text: var(--mono-1);
+  --cm-quote: var(--mono-3);
+  --cm-comment: var(--mono-3);
+  --cm-property: var(--hue-6-2);
+  --cm-variable: var(--hue-2);
+  --cm-variable-2: var(--hue-2);
+  --cm-header: var(--mono-1);
+  --cm-operator: var(--mono-1);
+  --cm-string: var(--hue-4);
+  --cm-keyword: var(--hue-5);
+  --cm-number: var(--hue-6);
+
+  /* Spacing and decorations */
+  --cm-padding-v: var(--space1);
+  --cm-padding-h: var(--space2);
+  --cm-gutter-width: var(--space4);
+  --cm-linenumber: var(--hue-2);
+  --cm-border-color: var(--mono-2);
+}
+
+.cm-s-rtop.CodeMirror {
+  font-family: var(--font-monospace);
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--cm-text);
+}
+
+.cm-s-rtop .cm-header {
+  color: var(--cm-mono-1);
+}
+.cm-s-rtop .cm-quote {
+  color: var(--cm-quote);
+  font-style: italic;
+}
+
+.cm-s-rtop .cm-keyword {
+  color: var(--cm-keyword);
+}
+.cm-s-rtop .cm-atom {
+  color: #219;
+}
+.cm-s-rtop .cm-number {
+  color: var(--cm-hue-6);
+}
+.cm-s-rtop .cm-def {
+  color: #00f;
+}
+.cm-s-rtop .cm-punctuation,
+.cm-s-rtop .cm-property {
+  color: var(--cm-property);
+}
+
+.cm-s-rtop .cm-variable {
+  color: var(--cm-variable);
+}
+.cm-s-rtop .cm-variable-2 {
+  color: var(--cm-variable-2);
+}
+.cm-s-rtop .cm-variable-3,
+.cm-s-rtop .cm-type {
+  color: #085;
+}
+
+.cm-s-rtop .cm-operator {
+  color: var(--cm-operator);
+}
+
+.cm-s-rtop .cm-comment {
+  color: var(--cm-comment);
+}
+.cm-s-rtop .cm-string {
+  color: var(--cm-string);
+}
+.cm-s-rtop .cm-string-2 {
+  color: #f50;
+}
+.cm-s-rtop .cm-meta {
+  color: #555;
+}
+.cm-s-rtop .cm-qualifier {
+  color: #555;
+}
+.cm-s-rtop .cm-builtin {
+  color: #30a;
+}
+.cm-s-rtop .cm-bracket {
+  color: #997;
+}
+.cm-s-rtop .cm-tag {
+  color: #170;
+}
+.cm-s-rtop .cm-attribute {
+  color: #00c;
+}
+.cm-s-rtop .cm-hr {
+  color: #999;
+}
+.cm-s-rtop .cm-link {
+  color: var(--cm-variable-2);
+}
+
+.cm-s-rtop .cm-error {
+  color: #f00;
+}
+
+.cm-s-rtop .CodeMirror-gutters {
+  background: transparent;
+  border: 0;
+}
+
+/* //////////// Sizing ////////////////// */
+
+.cm-s-rtop.CodeMirror pre {
   padding: 0;
 }
-.CodeMirror-gutters {
+.cm-s-rtop .CodeMirror-gutters {
   border: 0;
   background-color: transparent;
 }
-.CodeMirror-linenumber {
+.cm-s-rtop .CodeMirror-linenumber {
   padding: 0;
   margin-left: -17px;
 }
-.CodeMirror-linenumbers {
-  width: 35px;
+.cm-s-rtop .CodeMirror-linenumbers {
+  width: var(--cm-gutter-width);
 }
-.CodeMirror-lines {
-  padding: 4px 8px;
-}
-
-.cm-s-rtop-light.CodeMirror {
-  font-family: "Fira Code", monospace;
-  font-weight: 400;
-  font-size: 16px;
-  font-family: "Fira Code", monospace;
-  font-weight: 400;
-  line-height: 1.4375;
-  background: 0 0;
-}
-.cm-s-rtop-light.CodeMirror span.CodeMirror-matchingbracket,
-.cm-s-rtop-light.CodeMirror span.CodeMirror-nonmatchingbracket {
-  color: #33b277;
-  border-color: transparent;
-  border-style: none;
-  border-width: 0;
-  background: 0 0;
-}
-.cm-s-rtop-light.CodeMirror span.CodeMirror-nonmatchingbracket {
-  color: #625666;
-}
-.cm-s-rtop-light .CodeMirror-lines {
-  color: #625666;
-  background: #fff;
-  border-color: #e8e5e8;
-  border-width: 1px;
-}
-.cm-s-rtop-light .CodeMirror-linenumber {
-  color: rgba(151, 137, 152, 0.5);
-}
-.cm-s-rtop-light .CodeMirror-cursor {
-  width: 1px;
-  border: 0;
-  background: #2e383b;
-  z-index: 1;
-}
-.cm-s-rtop-light.CodeMirror-focused .CodeMirror-selected {
-  background: #b6d1ef;
-}
-.cm-s-rtop-light.CodeMirror-focused .CodeMirror-lines {
-  border-width: 1px;
-  border-color: rgba(151, 137, 152, 0.7);
-}
-.cm-s-rtop-light.CodeMirror-focused .CodeMirror-linenumber {
-  color: rgba(151, 137, 152, 0.7);
-}
-.cm-s-rtop-light .cm-require-end-cap::before {
-  color: #767676;
-  background: #f1f1f1;
-}
-.cm-s-rtop-light .cm-require-path ::after {
-  color: #33b277;
-  background: #f9f8f7 !important;
-}
-.cm-s-rtop-light .cm-negative {
-  color: #2e383b;
-}
-.cm-s-rtop-light .cm-positive {
-  color: #33b277;
-}
-.cm-s-rtop-light .cm-header,
-.cm-s-rtop-light .cm-quote {
-  color: inherit;
-}
-.cm-s-rtop-light .cm-header,
-.cm-s-rtop-light .cm-strong {
-  font-weight: 700;
-}
-.cm-s-rtop-light .cm-em {
-  font-style: italic;
-}
-.cm-s-rtop-light .cm-link,
-.cm-s-rtop-light .cm-require-path a {
-  color: #4a91e2;
-}
-.cm-s-rtop-light .cm-strikethrough {
-  text-decoration: line-through;
-}
-.cm-s-rtop-light .cm-keyword {
-  color: #4a91e2;
-  font-weight: 400;
-}
-.cm-s-rtop-light .cm-atom {
-  color: #625666;
-}
-.cm-s-rtop-light .cm-null,
-.cm-s-rtop-light .cm-undefined {
-  color: #978998;
-}
-.cm-s-rtop-light .cm-boolean {
-  color: #eaad3a;
-}
-.cm-s-rtop-light .cm-number {
-  color: #33b277;
-}
-.cm-s-rtop-light .cm-def,
-.cm-s-rtop-light .cm-property,
-.cm-s-rtop-light .cm-punctuation {
-  color: #625666;
-}
-.cm-s-rtop-light .cm-operator {
-  color: #625666;
-  font-weight: 400;
-}
-.cm-s-rtop-light .cm-variable {
-  color: #8e85e5;
-  font-weight: 400;
-}
-.cm-s-rtop-light .cm-variable-2,
-.cm-s-rtop-light .cm-variable-3 {
-  color: #8e85e5;
-}
-.cm-s-rtop-light .cm-comment {
-  color: #978998;
-}
-.cm-s-rtop-light .cm-string {
-  color: #dd6546;
-}
-.cm-s-rtop-light .cm-string-2 {
-  color: #cc4928;
-}
-.cm-s-rtop-light .cm-meta {
-  color: #625666;
-}
-.cm-s-rtop-light .cm-qualifier {
-  color: #8e85e5;
-  font-weight: 400;
-}
-.cm-s-rtop-light .cm-attribute,
-.cm-s-rtop-light .cm-bracket,
-.cm-s-rtop-light .cm-builtin,
-.cm-s-rtop-light .cm-node,
-.cm-s-rtop-light .cm-tag {
-  color: #625666;
-}
-.cm-s-rtop-light .cm-hr {
-  color: inherit;
-}
-.cm-s-rtop-light .cm-error {
-  color: #2e383b;
-}
-.cm-s-rtop-light .cm-invalidchar {
-  color: inherit;
+.cm-s-rtop .CodeMirror-lines {
+  padding: var(--cm-padding-v) var(--cm-padding-h);
 }
 
-/* /////////////// Additions */
-.CodeMirror-placeholder {
-  color: #aaa !important;
+/* Default styles for common addons */
+div.CodeMirror span.CodeMirror-matchingbracket {
+  color: #0b0;
 }
-/* \\\\\\\\\\\\\\\ Additions */
-
-.cm-read-only .CodeMirror-cursor {
-  visibility: hidden !important;
+div.CodeMirror span.CodeMirror-nonmatchingbracket {
+  color: #a22;
 }
-
-.source-viewer .CodeMirror-scroll {
-  min-height: 1em;
-  max-height: 300px;
+.CodeMirror-matchingtag {
+  background: rgba(255, 150, 0, 0.3);
 }
-.regexp-results textarea {
-  width: 0px;
-  height: 0px;
-  display: block;
-  padding: 0;
-  margin: 0;
-  outline: 0;
-  border: 0;
-  resize: none;
-}
-.regexp-results .CodeMirror {
-  height: auto !important;
-}
-.regexp-results {
-  min-height: 30px;
-  display: block;
-  width: 100%;
-  padding: 3px 6px;
-  font-size: 14px;
-  line-height: 1.42857143;
-  color: #888;
-  background: #fff;
-  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
-}
-.regex-highlight {
-  background-color: rgba(21, 179, 0, 0.3);
+.CodeMirror-activeline-background {
+  background: #e8f2ff;
 }
 
-.source-editor .CodeMirror-lines {
-  border: 1px solid #e5e9ef;
-}
-.source-editor .CodeMirror-focused .CodeMirror-linenumber {
-  color: rgba(90, 163, 225, 0.63);
-}
-.source-editor .CodeMirror-focused .CodeMirror-lines {
-  border: 1px solid rgba(90, 163, 225, 0.63);
-}
+/* \\\\\\\\\\\\\\\\\\\ End of theme \\\\\\\\\\\\\\ */
 
 /* ////////////////// Additions */
 .text-editor .CodeMirror,
@@ -220,14 +165,25 @@
   height: auto !important;
 }
 
+/* Border around the code */
+.source-editor .CodeMirror-lines {
+  border: 1px solid #e5e9ef;
+}
+.source-editor .CodeMirror-focused .CodeMirror-linenumber {
+  color: var(--cm-border-color);
+}
+.source-editor .CodeMirror-focused .CodeMirror-lines {
+  border: 1px solid var(--cm-border-color);
+}
+
 .text-editor {
-  margin-left: 36px;
+  margin-left: var(--cm-gutter-width);
 }
 
 .text-editor .cm-header-1 {
-  font-size: 2em;
+  font-size: var(--f1);
 }
 
 .text-editor .cm-header-2 {
-  font-size: 1.5em;
+  font-size: var(--f2);
 }

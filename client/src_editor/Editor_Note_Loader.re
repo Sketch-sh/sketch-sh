@@ -4,14 +4,10 @@ let blocks = [|
 |];
 
 let blocks =
-  if (Utils.env == "production") {
-    Belt.Array.concat(
-      [|{"kind": "text", "value": Editor_Loremipsum.text1}|],
-      blocks,
-    );
-  } else {
-    blocks;
-  };
+  Belt.Array.concat(
+    [|{"kind": "text", "value": Editor_Loremipsum.text1}|],
+    blocks,
+  );
 
 external toJson: 'a => Js.Json.t = "%identity";
 

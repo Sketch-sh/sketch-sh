@@ -1,3 +1,5 @@
+import "./createLineWidget.css";
+
 const createLintWidget = (modifier, html) => {
   const widget = document.createElement("div");
   widget.className = "widget__lint widget__lint-" + modifier;

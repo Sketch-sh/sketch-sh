@@ -40,7 +40,7 @@ let make =
       options=(
         CodeMirror.EditorConfiguration.make(
           ~mode="gfm",
-          ~theme="rtop-light",
+          ~theme=Config.cmTheme,
           ~placeholder="Add your thoughts here",
           ~lineNumbers=false,
           ~viewportMargin=infinity,

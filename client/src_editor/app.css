@@ -6,16 +6,16 @@
 }
 
 .metadata {
-  margin-left: 36px;
+  margin-left: var(--cm-gutter-width);
 }
 
 .metadata__title-input {
   width: 100%;
   display: block;
-  font-size: 2em;
+  font-size: var(--f1);
   font-weight: 900;
   color: #625666;
-  font-family: "Fira Code", "Ubuntu Mono", monospace;
+  font-family: var(--font-monospace);
   border: none;
   outline: none;
   margin: 0 0 0 8px;
@@ -67,64 +67,3 @@
   cursor: pointer;
 }
 /* \\\\\\\\\\\\\\\\\\\\\\ Cells \\\\\\\\\\\\\\\ */
-
-/* ///////////////////// Widgets ////////////// */
-
-.widget__lint-error {
-  --main-color: #eb5656;
-  --background-color: #fdeeee;
-}
-.widget__lint-warning {
-  --main-color: #9f6000;
-  --background-color: #feefb3;
-}
-.widget__lint .wrapper {
-  background-color: var(--background-color);
-  color: var(--main-color);
-  overflow: hidden;
-  position: relative;
-  left: 28px;
-  width: calc(100% - 26px);
-  min-height: 2em;
-  margin-left: -8px;
-  border-left: 6px solid var(--main-color);
-  display: flex;
-  align-items: center;
-}
-
-.widget__lint .wrapper::before {
-  content: " ";
-  position: absolute;
-  top: 0;
-  left: 1px;
-  right: 0;
-  bottom: 0;
-  border-left: 2px solid var(--main-color);
-}
-
-.widget__lint .content {
-  padding-left: 10px;
-  white-space: pre;
-}
-
-.widget__value {
-  color: #868e96;
-  height: 2em;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  width: 80%;
-  opacity: 0.6;
-  transition: opacity 50ms ease-in-out;
-}
-.widget__value:hover {
-  opacity: 1;
-}
-
-.widget__stdout {
-  color: #495057;
-  background-color: #e9ecef;
-  white-space: pre;
-  padding: 0.5em;
-}
-/* \\\\\\\\\\\\\\\\\\\\\ Widgets \\\\\\\\\\\\\ */

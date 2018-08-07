@@ -119,6 +119,8 @@ module EditorConfiguration = {
     placeholder: string,
     [@bs.optional]
     matchBrackets: bool,
+    [@bs.optional]
+    styleActiveLine: bool,
   };
 
   type t = editorConfiguration;

@@ -159,8 +159,9 @@ let make =
       options=(
         CodeMirror.EditorConfiguration.make(
           ~mode="reason",
-          ~theme="rtop-light",
+          ~theme=Config.cmTheme,
           ~lineNumbers=true,
+          ~styleActiveLine=true,
           ~viewportMargin=infinity,
           ~matchBrackets=true,
           ~lineWrapping=true,
