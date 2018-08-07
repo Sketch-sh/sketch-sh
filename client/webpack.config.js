@@ -2,6 +2,9 @@ const webpack = require("webpack");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const path = require("path");
 const postcssPresetEnv = require("postcss-preset-env");
+const UglifyJsPlugin = require("uglifyjs-webpack-plugin");
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+const OptimizeCSSAssetsPlugin = require("optimize-css-assets-webpack-plugin");
 
 const outputDir = path.join(__dirname, "build/");
 
@@ -24,7 +27,7 @@ const base = {
   output: {
     path: outputDir,
     publicPath: "/",
-    filename: "[name].js",
+    filename: isProd ? "[name].[chunkhash].js" : "[name].js",
     globalObject: "this",
   },
   node: {
@@ -35,7 +38,21 @@ const base = {
     new HtmlWebpackPlugin({
       template: path.join(__dirname, "src", "index.html"),
     }),
+    new MiniCssExtractPlugin({
+      filename: isProd ? "[name].[contenthash].css" : "[name].css",
+      chunkFilename: isProd ? "[id].[contenthash].css" : "[id].css",
+    }),
   ],
+  optimization: {
+    minimizer: [
+      new UglifyJsPlugin({
+        cache: true,
+        parallel: true,
+        sourceMap: false,
+      }),
+      new OptimizeCSSAssetsPlugin({}),
+    ],
+  },
   module: {
     rules: [
       {
@@ -46,8 +63,13 @@ const base = {
       {
         test: /\.css$/,
         use: [
-          "style-loader",
-          { loader: "css-loader" },
+          isProd ? MiniCssExtractPlugin.loader : "style-loader",
+          {
+            loader: "css-loader",
+            options: {
+              importLoaders: 1,
+            },
+          },
           {
             loader: "postcss-loader",
             options: {
