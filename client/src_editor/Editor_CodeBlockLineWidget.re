@@ -1,11 +1,11 @@
 [@bs.module "./createLineWidget.js"]
-external createErrorWidget : string => Dom.element = "";
+external createErrorWidget: string => Dom.element = "";
 
 [@bs.module "./createLineWidget.js"]
-external createWarningWidget : string => Dom.element = "";
+external createWarningWidget: string => Dom.element = "";
 
 [@bs.module "./createLineWidget.js"]
-external createValueWidget : string => Dom.element = "";
+external createValueWidget: string => Dom.element = "";
 
 [@bs.module "./createLineWidget.js"]
-external createStdoutWidget : string => Dom.element = "";
+external createStdoutWidget: string => Dom.element = "";

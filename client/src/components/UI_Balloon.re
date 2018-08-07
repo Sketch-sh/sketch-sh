@@ -36,7 +36,7 @@ type balloon = {
   length: string,
 };
 
-external hackType : balloon => Js.t('a) = "%identity";
+external hackType: balloon => Js.t('a) = "%identity";
 
 let make = (~message, ~position, ~visible=?, ~length=?, children) => {
   ...component,
@@ -48,10 +48,10 @@ let make = (~message, ~position, ~visible=?, ~length=?, children) => {
           ~message,
           ~position=positionToString(position),
           ~visible?,
-          ~length=?Belt.Option.map(length, a => a |. lengthToString),
+          ~length=?Belt.Option.map(length, a => a->lengthToString),
           (),
         )
-        |. hackType,
+        ->hackType,
       [||],
     ),
 };

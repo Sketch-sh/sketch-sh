@@ -13,14 +13,15 @@ let blocks =
     blocks;
   };
 
-external toJson : 'a => Js.Json.t = "%identity";
+external toJson: 'a => Js.Json.t = "%identity";
 
+let wrapInBlocks = blocks => {"blocks": blocks};
 let blocks =
   blocks
-  |. Belt.Array.mapU((. data) => {"id": Utils.generateId(), "data": data})
-  |. (blocks => {"blocks": blocks})
-  |. toJson
-  |. Editor_Types.JsonDecode.decode;
+  ->(Belt.Array.mapU((. data) => {"id": Utils.generateId(), "data": data}))
+  ->wrapInBlocks
+  ->toJson
+  ->Editor_Types.JsonDecode.decode;
 
 let component = ReasonReact.statelessComponent("Editor_Entry_Loader");
 

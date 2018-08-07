@@ -113,24 +113,26 @@ let make = (~blocks, ~title="", ~loading as isSaving, ~onSave, _children) => {
         </div>
         <div className="EditorNav__bottom">
           <span className="EditorNav__button--saveIndicator ">
-            (
-              (
+            {
+              let status =
                 switch (saveStatus) {
                 | Pristine => ""
                 | Saved => "Saved"
                 | Saving => "Saving"
                 | Unsaved => "Unsaved"
-                }
-              )
-              |. str
-            )
+                };
+              status->str;
+            }
           </span>
         </div>
       </aside>
       <main className="pageSizer">
         <Helmet>
           <title>
-            ((state.title == "" ? "untitled" : state.title) |. str)
+            {
+              let title = state.title == "" ? "untitled" : state.title;
+              title->str;
+            }
           </title>
         </Helmet>
         <div className="metadata">
@@ -138,7 +140,7 @@ let make = (~blocks, ~title="", ~loading as isSaving, ~onSave, _children) => {
             className="metadata__title-input"
             placeholder="untitled note"
             value=state.title
-            onChange=(event => valueFromEvent(event) |. TitleUpdate |. send)
+            onChange=(event => valueFromEvent(event)->TitleUpdate->send)
           />
         </div>
         <Editor_Blocks

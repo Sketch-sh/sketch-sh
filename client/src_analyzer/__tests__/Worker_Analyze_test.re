@@ -127,11 +127,11 @@ describe("valid", () => {
     let code = "let a = 1; let b = a + a;";
     let result = exe(code);
     test("buffer", () =>
-      expect(result |. Belt.Array.map(block => block.buffer))
+      expect(result->(Belt.Array.map(block => block.buffer)))
       == [|"let a = 1;", "let b = a + a;"|]
     );
     test("location ", () =>
-      expect(result |. Belt.Array.map(block => pos_show(block.pos)))
+      expect(result->(Belt.Array.map(block => pos_show(block.pos))))
       == [|
            pos_show(({line: 0, col: 0}, {line: 0, col: 10})),
            pos_show(({line: 0, col: 11}, {line: 0, col: 25})),
@@ -144,11 +144,11 @@ describe("valid", () => {
 
     let result = exe(code);
     test("buffer", () =>
-      expect(result |. Belt.Array.map(block => block.buffer))
+      expect(result->(Belt.Array.map(block => block.buffer)))
       == [|"let a = 1;", "let b = a + a;"|]
     );
     test("location ", () =>
-      expect(result |. Belt.Array.map(block => pos_show(block.pos)))
+      expect(result->(Belt.Array.map(block => pos_show(block.pos))))
       == [|
            pos_show(({line: 0, col: 0}, {line: 0, col: 10})),
            pos_show(({line: 1, col: 0}, {line: 1, col: 14})),
@@ -163,11 +163,11 @@ print_endline("awesome");|};
 
     let result = exe(code);
     test("buffer", () =>
-      expect(result |. Belt.Array.map(block => block.buffer))
+      expect(result->(Belt.Array.map(block => block.buffer)))
       == [|"let a = 1;", "let b = a + 1;", {|print_endline("awesome");|}|]
     );
     test("location ", () =>
-      expect(result |. Belt.Array.map(block => pos_show(block.pos)))
+      expect(result->(Belt.Array.map(block => pos_show(block.pos))))
       == [|
            pos_show(({line: 0, col: 0}, {line: 0, col: 10})),
            pos_show(({line: 1, col: 0}, {line: 1, col: 14})),
@@ -201,7 +201,7 @@ Printf.sprintf("%i", sum(myTree));|};
     let result = exe(code);
 
     test("buffer", () =>
-      expect(result |. Belt.Array.map(block => block.buffer))
+      expect(result->(Belt.Array.map(block => block.buffer)))
       == [|
            "type tree = Leaf | Node(int, tree, tree);",
            "let rec sum = (item) => {\n  switch (item) {\n  | Leaf => 0\n  | Node(value, left, right) => value + sum(left) + sum(right);\n  }\n};",
@@ -210,7 +210,7 @@ Printf.sprintf("%i", sum(myTree));|};
          |]
     );
     test("location ", () =>
-      expect(result |. Belt.Array.map(block => pos_show(block.pos)))
+      expect(result->(Belt.Array.map(block => pos_show(block.pos))))
       == [|
            pos_show(({line: 0, col: 0}, {line: 0, col: 41})),
            pos_show(({line: 2, col: 0}, {line: 7, col: 2})),

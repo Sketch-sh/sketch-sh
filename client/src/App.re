@@ -12,17 +12,17 @@ let component = ReasonReact.reducerComponent("Rtop");
 let make = _children => {
   ...component,
   initialState: () =>
-    ReasonReact.Router.dangerouslyGetInitialUrl() |. Route.urlToRoute,
+    ReasonReact.Router.dangerouslyGetInitialUrl()->Route.urlToRoute,
   reducer: (action, _state) =>
     switch (action) {
     | ChangeView(view) => ReasonReact.Update(view)
     },
-  didMount: self => {
+  didMount: ({send, onUnmount}) => {
     let watcherID =
       ReasonReact.Router.watchUrl(url =>
-        Route.urlToRoute(url) |. ChangeView |. self.send
+        Route.urlToRoute(url)->ChangeView->send
       );
-    self.onUnmount(() => ReasonReact.Router.unwatchUrl(watcherID));
+    onUnmount(() => ReasonReact.Router.unwatchUrl(watcherID));
   },
   render: ({state}) =>
     <ReasonApollo.Provider client=GqlClient.instance>
@@ -34,7 +34,7 @@ let make = _children => {
         | AuthCallback(token) => <Auth.AuthCallback token />
         | AuthLogout => <Auth.AuthLogout />
         | AuthGithub => <Auth.AuthGithub />
-        | AuthFailure => "auth failure" |. str
+        | AuthFailure => "auth failure"->str
         | EditorDevelopment =>
           Utils.env == "production" ? <NotFound /> : <Editor_Note_Loader />
         | NotFound => <NotFound />

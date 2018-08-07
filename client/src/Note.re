@@ -53,27 +53,27 @@ let make = (~noteInfo: Route.noteRouteConfig, _children) => {
                       | Data(response) =>
                         let notes = response##note;
                         notes
-                        |. arrayFirst(
-                             ~empty=<NotFound entity="note" />, ~render=note =>
-                             <NoteSave noteKind=(Old(noteInfo.noteId))>
-                               ...(
-                                    (~loading, ~onSave) =>
-                                      <Editor_Note
-                                        title=(
-                                          note##title |. optionToEmptyString
-                                        )
-                                        blocks=(
-                                          switch (note##data) {
-                                          | None => [||]
-                                          | Some(blocks) => blocks
-                                          }
-                                        )
-                                        loading
-                                        onSave=(onSave(~userId))
-                                      />
-                                  )
-                             </NoteSave>
-                           );
+                        ->(
+                            arrayFirst(
+                              ~empty=<NotFound entity="note" />, ~render=note =>
+                              <NoteSave noteKind=(Old(noteInfo.noteId))>
+                                ...(
+                                     (~loading, ~onSave) =>
+                                       <Editor_Note
+                                         title=note##title->optionToEmptyString
+                                         blocks=(
+                                           switch (note##data) {
+                                           | None => [||]
+                                           | Some(blocks) => blocks
+                                           }
+                                         )
+                                         loading
+                                         onSave=(onSave(~userId))
+                                       />
+                                   )
+                              </NoteSave>
+                            )
+                          );
                       }
                   )
              </GetNoteComponent>;

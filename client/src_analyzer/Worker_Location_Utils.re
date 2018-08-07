@@ -34,8 +34,7 @@ let compilerErrorMessageToAbsolutePos =
 };
 
 let compilerErrorMessageToErrorMessage =
-    (content: CompilerErrorMessage.content)
-    : ErrorMessage.content => {
+    (content: CompilerErrorMessage.content): ErrorMessage.content => {
   errMsg_content: content.o_content,
   errMsg_pos: content.o_pos |> compilerPosToPos,
 };
@@ -51,7 +50,7 @@ let compilerErrorMessageToErrorMessage =
 let findLowerIndexInRange: (int, array(int)) => int =
   (value, array) => {
     let length = array |> Array.length;
-    if (value >= array[length - 1]) {
+    if (value >= array[(length - 1)]) {
       length - 1;
     } else {
       let rec loop = (min, max) => {
@@ -59,7 +58,7 @@ let findLowerIndexInRange: (int, array(int)) => int =
 
         if (value < array[mid]) {
           loop(min, mid - 1);
-        } else if (value >= array[mid + 1]) {
+        } else if (value >= array[(mid + 1)]) {
           loop(mid + 1, max);
         } else {
           mid;

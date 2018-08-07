@@ -57,9 +57,9 @@ let urlToRoute: ReasonReact.Router.url => t =
        NOTE: Move querystring parsing outside if there are more
        branches use it
        */
-      let parsedQueryString = url.search |. URLSearchParams.make;
+      let parsedQueryString = url.search->URLSearchParams.make;
 
-      switch (parsedQueryString |. URLSearchParams.get("token")) {
+      switch (parsedQueryString->(URLSearchParams.get("token"))) {
       | Some(token) => AuthCallback(token)
       | None => NotFound
       };

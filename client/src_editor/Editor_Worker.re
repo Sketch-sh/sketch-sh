@@ -2,7 +2,7 @@ open Worker_Binding;
 
 module RtopWorker = {
   [@bs.new] [@bs.module]
-  external make : unit => Worker.t = "../src_analyzer/Worker_Index.bs.js";
+  external make: unit => Worker.t = "../src_analyzer/Worker_Index.bs.js";
 };
 
 [@bs.deriving abstract]
@@ -21,8 +21,8 @@ type rtop = {
 };
 let worker = RtopWorker.make();
 
-let rtop: rtop = Comlink.comlink |. Comlink.proxy(worker);
+let rtop: rtop = Comlink.comlink->(Comlink.proxy(worker));
 
-let execute = rtop |. executeGet;
+let execute = rtop->executeGet;
 
-let executeMany = rtop |. executeManyGet;
+let executeMany = rtop->executeManyGet;

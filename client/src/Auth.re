@@ -14,7 +14,7 @@ module Auth = {
 
   let decodeUserId = json => Json.Decode.(json |> field("userId", string));
 
-  external toStorageEvent : Dom.event => Webapi.Dom.StorageEvent.t =
+  external toStorageEvent: Dom.event => Webapi.Dom.StorageEvent.t =
     "%identity";
 };
 open Utils;
@@ -47,14 +47,14 @@ module AuthCallback = {
                 | Failure(_) => 3000
                 },
               )
-              |. ignore
+              ->ignore
           ),
         )
       },
     didMount: ({send}) =>
       Js.Promise.(
         Jwt.async()
-        |> then_(jwt => resolve(jwt |. Jwt.decode(token)))
+        |> then_(jwt => resolve(jwt->(Jwt.decode(token))))
         |> then_(decoded => {
              Auth.setToken(token);
              Auth.setUserId(Auth.decodeUserId(decoded));
@@ -78,7 +78,7 @@ module AuthCallback = {
           ++ "\n"
           ++ "Redirecting..."
         };
-      message |. str;
+      message->str;
     },
   };
 };
@@ -86,25 +86,25 @@ module AuthCallback = {
 module AuthGithub = {
   let component = ReasonReact.reducerComponent("AuthGithub");
 
-  let make = _children : ReasonReact.component(unit, 'a, unit) => {
+  let make = _children: ReasonReact.component(unit, 'a, unit) => {
     ...component,
     didMount: _ => Router.redirect(Auth.githubLoginRedirect),
-    render: _self => "Redirecting to Github..." |. str,
+    render: _self => "Redirecting to Github..."->str,
   };
 };
 
 module AuthLogout = {
   let component = ReasonReact.reducerComponent("AuthGithub");
 
-  let make = _children : ReasonReact.component(unit, 'a, unit) => {
+  let make = _children: ReasonReact.component(unit, 'a, unit) => {
     ...component,
     didMount: _ => {
       open Auth;
       removeToken();
       removeUserId();
-      Js.Global.setTimeout(() => Router.push(Route.Home), 0) |. ignore;
+      Js.Global.setTimeout(() => Router.push(Route.Home), 0)->ignore;
     },
-    render: _self => "Logging out..." |. str,
+    render: _self => "Logging out..."->str,
   };
 };
 
@@ -126,10 +126,10 @@ module IsAuthenticated = {
 
         let listener = event => {
           let event = Auth.toStorageEvent(event);
-          let key = event |. StorageEvent.key;
+          let key = event->StorageEvent.key;
           if (key == Auth.userIdKey) {
-            let newValue = event |. StorageEvent.newValue |. Utils.toNullable;
-            self.send(newValue |. Js.Nullable.toOption);
+            let newValue = event->StorageEvent.newValue->Utils.toNullable;
+            self.send(newValue->Js.Nullable.toOption);
           };
         };
         window |> Window.addEventListener("storage", listener);
@@ -166,9 +166,11 @@ module IsAuthenticatedWithUserInfo = {
                           | Error(_) => children(None)
                           | Data(response) =>
                             response##user_public
-                            |. arrayFirst(~empty=children(None), ~render=user =>
-                                 children(Some((user, userId)))
-                               )
+                            ->(
+                                arrayFirst(~empty=children(None), ~render=user =>
+                                  children(Some((user, userId)))
+                                )
+                              )
                           }
                       )
                  </UserInfoComponent>;

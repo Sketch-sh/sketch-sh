@@ -8,7 +8,7 @@ module Make = (ESig: Worker_Evaluator.EvaluatorSig) => {
       switch (stderr) {
       | None => false
       | Some(stderr) =>
-        ! (
+        !(
           stderr
           |> Js.String.indexOf("Syntax error") == (-1)
           && stderr
@@ -16,10 +16,10 @@ module Make = (ESig: Worker_Evaluator.EvaluatorSig) => {
           && stderr
           |> Js.String.indexOf("String literal not terminated") == (-1)
           && stderr
-          |>
-          Js.String.indexOf(
-            "This comment contains an unterminated string literal",
-          ) == (-1)
+          |> Js.String.indexOf(
+               "This comment contains an unterminated string literal",
+             )
+          == (-1)
           && stderr
           |> Js.String.indexOf("String literal begins here") == (-1)
         )
@@ -131,61 +131,68 @@ module Make = (ESig: Worker_Evaluator.EvaluatorSig) => {
 
   let parseAndCorrectStderrPos = (stderr, blockPos) =>
     stderr
-    |. Belt.Option.map(stderr =>
-         stderr
-         |. Worker_ParseLocation.parse
-         /* TODO: Investigating this
-              This is a hack.
-              Toplevel won't stop evaluating if it encounters an error
-              This will simply remove all warnings/errors after enountering
-              an error
-            */
-         |. Belt.Array.reduce(
-              ([], false), ((acc, hasError), error: CompilerErrorMessage.t) =>
-              if (hasError) {
-                (acc, hasError);
-              } else {
+    ->(
+        Belt.Option.map(stderr =>
+          stderr
+          ->Worker_ParseLocation.parse
+          /* TODO: Investigating this
+               This is a hack.
+               Toplevel won't stop evaluating if it encounters an error
+               This will simply remove all warnings/errors after enountering
+               an error
+             */
+          ->(
+              Belt.Array.reduce(
+                ([], false),
+                ((acc, hasError), error: CompilerErrorMessage.t) =>
+                if (hasError) {
+                  (acc, hasError);
+                } else {
+                  switch (error) {
+                  | Err_Unknown(string) => (
+                      [CompilerErrorMessage.Err_Unknown(string), ...acc],
+                      false,
+                    )
+                  | Err_Warning(content) => (
+                      [Err_Warning(content), ...acc],
+                      false,
+                    )
+                  | Err_Error(content) => (
+                      [Err_Error(content), ...acc],
+                      true,
+                    )
+                  };
+                }
+              )
+            )
+          /* TODO:
+             Return hasError to stop executing the next code block
+             */
+          ->Utils.pluckAcc
+          ->Belt.List.toArray
+          ->(
+              Belt.Array.map((error: CompilerErrorMessage.t) =>
                 switch (error) {
-                | Err_Unknown(string) => (
-                    [CompilerErrorMessage.Err_Unknown(string), ...acc],
-                    false,
+                | Err_Unknown(string) => ErrorMessage.Err_Unknown(string)
+                | Err_Warning(content) =>
+                  Err_Warning(
+                    Worker_Location_Utils.(
+                      compilerErrorMessageToAbsolutePos(content, blockPos)
+                      ->compilerErrorMessageToErrorMessage
+                    ),
                   )
-                | Err_Warning(content) => (
-                    [Err_Warning(content), ...acc],
-                    false,
+                | Err_Error(content) =>
+                  Err_Error(
+                    Worker_Location_Utils.(
+                      compilerErrorMessageToAbsolutePos(content, blockPos)
+                      ->compilerErrorMessageToErrorMessage
+                    ),
                   )
-                | Err_Error(content) => (
-                    [Err_Error(content), ...acc],
-                    true,
-                  )
-                };
-              }
+                }
+              )
             )
-         /* TODO:
-            Return hasError to stop executing the next code block
-            */
-         |. (((acc, _hasError)) => acc)
-         |. Belt.List.toArray
-         |. Belt.Array.map((error: CompilerErrorMessage.t) =>
-              switch (error) {
-              | Err_Unknown(string) => ErrorMessage.Err_Unknown(string)
-              | Err_Warning(content) =>
-                Err_Warning(
-                  Worker_Location_Utils.(
-                    compilerErrorMessageToAbsolutePos(content, blockPos)
-                    |. compilerErrorMessageToErrorMessage
-                  ),
-                )
-              | Err_Error(content) =>
-                Err_Error(
-                  Worker_Location_Utils.(
-                    compilerErrorMessageToAbsolutePos(content, blockPos)
-                    |. compilerErrorMessageToErrorMessage
-                  ),
-                )
-              }
-            )
-       );
+        )
+      );
   let execute: (. bool, string) => list(blockData) =
     (. reset, code) => {
       if (reset) {
@@ -196,21 +203,24 @@ module Make = (ESig: Worker_Evaluator.EvaluatorSig) => {
       /* Parse and correct stderr error location */
       let result =
         result
-        |. Belt.List.map(blockData => {
-             let executeResult = blockData.executeResult;
+        ->(
+            Belt.List.map(blockData => {
+              let executeResult = blockData.executeResult;
 
-             let stderr =
-               executeResult.stderr |. parseAndCorrectStderrPos(blockData.pos);
-             {
-               block_content: blockData.buffer,
-               block_result: {
-                 blockResult_evaluate: executeResult.evaluate,
-                 blockResult_stdout: executeResult.stdout,
-                 blockResult_stderr: stderr,
-               },
-               block_pos: blockData.pos,
-             };
-           });
+              let stderr =
+                executeResult.stderr
+                ->(parseAndCorrectStderrPos(blockData.pos));
+              {
+                block_content: blockData.buffer,
+                block_result: {
+                  blockResult_evaluate: executeResult.evaluate,
+                  blockResult_stdout: executeResult.stdout,
+                  blockResult_stderr: stderr,
+                },
+                block_pos: blockData.pos,
+              };
+            })
+          );
       result;
     };
 
@@ -219,6 +229,6 @@ module Make = (ESig: Worker_Evaluator.EvaluatorSig) => {
     (. codeMap) => {
       /* Reset before evaluating several blocks */
       Evaluator.reset();
-      codeMap |. Belt.Map.String.map(code => execute(. false, code));
+      codeMap->(Belt.Map.String.map(code => execute(. false, code)));
     };
 };

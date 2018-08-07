@@ -5,8 +5,7 @@ module IconContext = {
     [@bs.as "Provider"]
     provider: ReasonReact.reactClass,
   };
-  [@bs.module "react-icons"]
-  external iconContext : iconContext = "IconContext";
+  [@bs.module "react-icons"] external iconContext: iconContext = "IconContext";
 
   module Provider = {
     let reactClass = providerGet(iconContext);
@@ -22,7 +21,7 @@ module IconContext = {
 
 module Save = {
   [@bs.module "react-icons/fi"]
-  external reactClass : ReasonReact.reactClass = "FiSave";
+  external reactClass: ReasonReact.reactClass = "FiSave";
 
   let make = (~className="", children) =>
     ReasonReact.wrapJsForReason(
@@ -34,7 +33,7 @@ module Save = {
 
 module Loader = {
   [@bs.module "react-icons/fi"]
-  external reactClass : ReasonReact.reactClass = "FiLoader";
+  external reactClass: ReasonReact.reactClass = "FiLoader";
 
   let make = (~className="", children) =>
     ReasonReact.wrapJsForReason(
@@ -46,7 +45,7 @@ module Loader = {
 
 module Home = {
   [@bs.module "react-icons/fi"]
-  external reactClass : ReasonReact.reactClass = "FiHome";
+  external reactClass: ReasonReact.reactClass = "FiHome";
 
   let make = (~className="", children) =>
     ReasonReact.wrapJsForReason(

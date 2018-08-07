@@ -84,7 +84,7 @@ module NoteSave = {
                      let newNote =
                        AddNoteGql.make(
                          ~title,
-                         ~data=data |. Editor_Types.JsonEncode.encode,
+                         ~data=data->Editor_Types.JsonEncode.encode,
                          ~id=noteId,
                          ~userId,
                          (),
@@ -92,7 +92,7 @@ module NoteSave = {
                      Js.Promise.(
                        mutation(~variables=newNote##variables, ())
                        |> then_(_result =>
-                            send(SavedNewNote(noteId)) |. resolve
+                            send(SavedNewNote(noteId))->resolve
                           )
                      )
                      |> ignore;
@@ -112,7 +112,7 @@ module NoteSave = {
                      let updatedNote =
                        UpdateNoteGql.make(
                          ~title,
-                         ~data=data |. Editor_Types.JsonEncode.encode,
+                         ~data=data->Editor_Types.JsonEncode.encode,
                          ~noteId,
                          (),
                        );
