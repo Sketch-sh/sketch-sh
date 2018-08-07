@@ -69,8 +69,8 @@ module JsonEncode = {
         (
           "blocks",
           blocks
-          |. Belt.Array.mapU((. block) => block |> blockEncoder)
-          |. jsonArray,
+          ->(Belt.Array.mapU((. block) => block |> blockEncoder))
+          ->jsonArray,
         ),
       ]);
 };
