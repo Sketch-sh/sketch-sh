@@ -165,15 +165,10 @@ div.CodeMirror span.CodeMirror-nonmatchingbracket {
   height: auto !important;
 }
 
-/* Border around the code */
-.source-editor .CodeMirror-lines {
-  border: 1px solid #e5e9ef;
-}
-.source-editor .CodeMirror-focused .CodeMirror-linenumber {
-  color: var(--cm-border-color);
-}
-.source-editor .CodeMirror-focused .CodeMirror-lines {
-  border: 1px solid var(--cm-border-color);
+.source-editor .CodeMirror {
+  background: #f7f8fa;
+  padding: var(--space3);
+  border-radius: var(--space2);
 }
 
 .text-editor {

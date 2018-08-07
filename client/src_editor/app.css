@@ -14,7 +14,7 @@
   display: block;
   font-size: var(--f1);
   font-weight: 900;
-  color: #625666;
+  color: var(--cm-text);
   font-family: var(--font-monospace);
   border: none;
   outline: none;

@@ -53,7 +53,7 @@
 .EditorNav__button--icon {
   height: 32px;
   width: 32px;
-  color: #625666;
+  color: var(--cm-text);
   stroke-width: 2px;
 }
 
