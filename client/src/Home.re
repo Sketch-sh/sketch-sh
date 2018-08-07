@@ -17,9 +17,19 @@ let make = _children => {
                switch (state) {
                | None =>
                  <p>
-                   <Link route=Route.AuthGithub>
-                     "Login with Github"->str
-                   </Link>
+                   {
+                     let href = Route.routeToUrl(Route.AuthGithub);
+                     <a
+                       href
+                       onClick=(
+                         event => {
+                           event->ReactEvent.Mouse.preventDefault;
+                           Popup.openPopup(href);
+                         }
+                       )>
+                       "Login with Github"->str
+                     </a>;
+                   }
                  </p>
                | Some(userId) =>
                  <div>
