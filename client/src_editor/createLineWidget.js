@@ -5,10 +5,10 @@ const createLintWidget = (modifier, html) => {
   widget.className = "widget__lint widget__lint-" + modifier;
 
   const wrapper = widget.appendChild(document.createElement("div"));
-  wrapper.className = "wrapper";
+  wrapper.className = "widget__lint--wrapper";
 
   const content = wrapper.appendChild(document.createElement("span"));
-  content.className = "content";
+  content.className = "wrapper__link--content";
   content.innerHTML = html;
 
   return widget;

@@ -45,17 +45,13 @@ body {
 }
 
 kbd {
+  padding: 2px 6px;
+  border-radius: 4px;
+  box-shadow: 0 2px 0 rgba(0, 0, 0, 0.2), 0 0 0 1px #fff inset;
+  background: #fafafa;
+  border: 1px solid #ccc;
+  border-bottom: medium none #fff;
+  color: #444;
+  white-space: nowrap;
   display: inline-block;
-  margin: 0 0.1em;
-  padding: 0.1em 0.6em;
-  font-size: 0.86em;
-  color: inherit;
-  line-height: 1.4;
-  text-shadow: 0 1px 0 #fff;
-  font-family: inherit;
-  background: #ffffff;
-  background: linear-gradient(to bottom, #ffffff 0%, #f4f4f4 100%);
-  border: 1px solid #adb3b9;
-  border-radius: 3px;
-  box-shadow: 0 1px 0 rgba(12, 13, 14, 0.2), 0 0 0 2px #fff inset;
 }

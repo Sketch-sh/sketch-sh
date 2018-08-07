@@ -24,9 +24,10 @@
   --cm-string: var(--hue-4);
   --cm-keyword: var(--hue-5);
   --cm-number: var(--hue-6);
+  --cm-header: var(--cm-mono-1);
 
   /* Spacing and decorations */
-  --cm-padding-v: var(--space1);
+  --cm-padding-v: 0;
   --cm-padding-h: var(--space2);
   --cm-gutter-width: var(--space4);
   --cm-linenumber: var(--hue-2);
@@ -39,9 +40,14 @@
   line-height: 1.5;
   color: var(--cm-text);
 }
-
 .cm-s-rtop .cm-header {
-  color: var(--cm-mono-1);
+  color: var(--cm-header);
+}
+.cm-s-rtop .cm-header-1 {
+  font-size: var(--f2);
+}
+.cm-s-rtop .cm-header-2 {
+  font-size: var(--f3);
 }
 .cm-s-rtop .cm-quote {
   color: var(--cm-quote);
@@ -120,26 +126,10 @@
 
 .cm-s-rtop .CodeMirror-gutters {
   background: transparent;
-  border: 0;
 }
 
-/* //////////// Sizing ////////////////// */
-
-.cm-s-rtop.CodeMirror pre {
-  padding: 0;
-}
-.cm-s-rtop .CodeMirror-gutters {
-  border: 0;
-  background-color: transparent;
-}
-.cm-s-rtop .CodeMirror-linenumber {
-  padding: 0;
-  margin-left: -17px;
-}
-.cm-s-rtop .CodeMirror-linenumbers {
-  width: var(--cm-gutter-width);
-}
-.cm-s-rtop .CodeMirror-lines {
+/* Sizing */
+.CodeMirror pre {
   padding: var(--cm-padding-v) var(--cm-padding-h);
 }
 
@@ -156,6 +146,9 @@ div.CodeMirror span.CodeMirror-nonmatchingbracket {
 .CodeMirror-activeline-background {
   background: #e8f2ff;
 }
+.CodeMirror-activeline .CodeMirror-linenumber {
+  background: #e8f2ff;
+}
 
 /* \\\\\\\\\\\\\\\\\\\ End of theme \\\\\\\\\\\\\\ */
 
@@ -165,20 +158,6 @@ div.CodeMirror span.CodeMirror-nonmatchingbracket {
   height: auto !important;
 }
 
-.source-editor .CodeMirror {
-  background: #f7f8fa;
-  padding: var(--space3);
-  border-radius: var(--space2);
-}
-
 .text-editor {
   margin-left: var(--cm-gutter-width);
-}
-
-.text-editor .cm-header-1 {
-  font-size: var(--f1);
-}
-
-.text-editor .cm-header-2 {
-  font-size: var(--f2);
 }
