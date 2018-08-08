@@ -59,12 +59,6 @@ let make =
     };
   },
   didUpdate: ({oldSelf, newSelf}) =>
-    /*
-     TODO: fix me
-     This is a really BAD pattern
-     In React.js best pratice, state.blocks should be moved up to
-     parent's state. But block handling is complicated and should be isolated
-     */
     if (oldSelf.state.blocks !== newSelf.state.blocks) {
       switch (newSelf.state.stateUpdateReason) {
       | None => ()
