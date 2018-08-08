@@ -72,3 +72,15 @@ kbd {
 .Layout__withHeader {
   margin-top: calc(var(--topbar-height) + var(--space4));
 }
+
+.warning-staging-server {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  color: #9f6000;
+  background-color: #feefb3;
+  border-top: 2px solid #9f6000;
+  padding: var(--space2) var(--space3);
+}
