@@ -82,7 +82,7 @@ let make = (~blocks, ~title="", ~loading as isSaving, ~onSave, _children) => {
                  <UI_Balloon
                    position=Down
                    length=Fit
-                   message="Execute code (Shift + Enter)">
+                   message="Execute code (Shift+Enter)">
                    ...<button
                         className=buttonClassName
                         onClick=(
@@ -101,10 +101,10 @@ let make = (~blocks, ~title="", ~loading as isSaving, ~onSave, _children) => {
                    length=Fit
                    message=(
                      switch (saveStatus) {
-                     | Pristine => "Nothing to save (Ctrl + S)"
-                     | Saved => "Saved (Ctrl + S)"
+                     | Pristine => "Nothing to save (Ctrl+S)"
+                     | Saved => "Saved (Ctrl+S)"
                      | Saving
-                     | Unsaved => "Save modified changes (Ctrl + S)"
+                     | Unsaved => "Save modified changes (Ctrl+S)"
                      }
                    )>
                    ...<button
@@ -118,7 +118,13 @@ let make = (~blocks, ~title="", ~loading as isSaving, ~onSave, _children) => {
                         )
                         className=buttonClassName
                         onClick=(
-                          _ => onSave(~title=state.title, ~data=state.blocks^)
+                          _ => {
+                            onSave(~title=state.title, ~data=state.blocks^);
+                            switch (state.executeCallback) {
+                            | None => ()
+                            | Some(callback) => callback()
+                            };
+                          }
                         )>
                         (
                           isSaving ?
