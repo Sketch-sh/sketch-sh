@@ -49,7 +49,7 @@ let replaceNoteRoute = (~noteId, ~json, ~title) =>
     |> then_(lzstring =>
          (
            lzstring->(LzString.URI.compress(title))
-           ++ "_._"
+           ++ "---"
            ++ lzstring->LzString.URI.compress(Js.Json.stringify(json))
          )
          ->resolve
