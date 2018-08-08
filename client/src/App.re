@@ -26,22 +26,21 @@ let make = _children => {
   },
   render: ({state}) =>
     <ReasonApollo.Provider client=GqlClient.instance>
-      <AuthStatus.Provider>
-        (
-          switch (state) {
-          | Home => <Home />
-          | Note(noteInfo) => <Note noteInfo />
-          | NoteNew => <Note_New />
-          | AuthCallback(token) => <Auth.AuthCallback token />
-          | AuthLogout => <Auth.AuthLogout />
-          | AuthGithub => <Auth.AuthGithub />
-          | AuthFailure => "auth failure"->str
-          | EditorDevelopment =>
-            Utils.env == "production" ? <NotFound /> : <Editor_Note_Loader />
-          | NotFound => <NotFound />
-          }
-        )
-      </AuthStatus.Provider>
+      <AuthStatus.Provider />
+      (
+        switch (state) {
+        | Home => <Home />
+        | Note(noteInfo) => <Note noteInfo />
+        | NoteNew => <Note_New />
+        | AuthCallback(token) => <Auth.AuthCallback token />
+        | AuthLogout => <Auth.AuthLogout />
+        | AuthGithub => <Auth.AuthGithub />
+        | AuthFailure => "auth failure"->str
+        | EditorDevelopment =>
+          Utils.env == "production" ? <NotFound /> : <Editor_Note_Loader />
+        | NotFound => <NotFound />
+        }
+      )
     </ReasonApollo.Provider>,
 };
 

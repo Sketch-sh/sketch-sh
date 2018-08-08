@@ -2,23 +2,27 @@ open Utils;
 module Auth = Auth.Auth;
 let getCurrentState = Auth.getUserId;
 
-type state = option(string);
-type action =
-  | UpdateAuthState(state);
+type state = option(int);
 
 module Store = {
-  let subscribers = ref([]);
-  let subscribe = subscriber => subscribers := [subscriber, ...subscribers^];
+  module MI = Belt.Map.Int;
+  let subscribers = ref(MI.empty);
+  let nextId = ref(0);
+  let subscribe = subscriber => {
+    nextId := nextId^ + 1;
+    subscribers := (subscribers^)->(MI.set(nextId^, subscriber));
+    nextId^;
+  };
+  let unsubscribe = id => subscribers := (subscribers^)->MI.remove(id);
+
   let broadcast = newValue =>
-    Belt.List.forEach(subscribers^, subscriber =>
-      subscriber(UpdateAuthState(newValue))
-    );
+    MI.forEach(subscribers^, (_key, subscriber) => subscriber(newValue));
 };
 
 module Provider = {
   let component = ReasonReact.reducerComponent("AuthStatus.Provider");
 
-  let make = children: ReasonReact.component(unit, 'a, unit) => {
+  let make = _children: ReasonReact.component(unit, 'a, unit) => {
     ...component,
     didMount: self => {
       open Webapi.Dom;
@@ -37,7 +41,7 @@ module Provider = {
         Window.removeEventListener("storage", listener) |> ignore
       );
     },
-    render: _self => children->ReasonReact.array,
+    render: _self => ReasonReact.null,
   };
 };
 
@@ -46,11 +50,11 @@ module IsAuthenticated = {
   let make = children => {
     ...component,
     initialState: () => getCurrentState(),
-    reducer: (action, _state) =>
-      switch (action) {
-      | UpdateAuthState(state) => ReasonReact.Update(state)
-      },
-    didMount: ({send}) => Store.subscribe(send)->ignore,
+    reducer: (newStatus, _state) => ReasonReact.Update(newStatus),
+    didMount: ({send, onUnmount}) => {
+      let id = Store.subscribe(send);
+      onUnmount(() => Store.unsubscribe(id));
+    },
     render: ({state}) => children(state),
   };
 };
