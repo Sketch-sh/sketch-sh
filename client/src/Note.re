@@ -34,7 +34,7 @@ let make = (~noteInfo: Route.noteRouteConfig, _children) => {
   ...component,
   render: _self => {
     let noteQuery = GetNote.make(~noteId=noteInfo.noteId, ());
-    <Auth.IsAuthenticated>
+    <AuthStatus.IsAuthenticated>
       ...(
            isLogin => {
              let userId =
@@ -79,6 +79,6 @@ let make = (~noteInfo: Route.noteRouteConfig, _children) => {
              </GetNoteComponent>;
            }
          )
-    </Auth.IsAuthenticated>;
+    </AuthStatus.IsAuthenticated>;
   },
 };

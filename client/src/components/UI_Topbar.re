@@ -33,7 +33,7 @@ module WithToolbar = {
           </div>
         </div>
         <div className="Topbar__right">
-          <Auth.IsAuthenticatedWithUserInfo>
+          <AuthStatus.UserInfo>
             ...(
                  user =>
                    switch (user) {
@@ -41,7 +41,7 @@ module WithToolbar = {
                    | Some((user, _userId)) => <UI_TopbarUserInfo user />
                    }
                )
-          </Auth.IsAuthenticatedWithUserInfo>
+          </AuthStatus.UserInfo>
         </div>
       </header>,
   };

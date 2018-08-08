@@ -10,7 +10,7 @@ let component = ReasonReact.statelessComponent("Note_New");
 let make = _children => {
   ...component,
   render: _self =>
-    <Auth.IsAuthenticated>
+    <AuthStatus.IsAuthenticated>
       ...(
            isLogin => {
              let userId =
@@ -26,5 +26,5 @@ let make = _children => {
              </NoteSave>;
            }
          )
-    </Auth.IsAuthenticated>,
+    </AuthStatus.IsAuthenticated>,
 };

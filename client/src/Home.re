@@ -11,7 +11,7 @@ let make = _children => {
         <Link route=Route.EditorDevelopment> "Editor development"->str </Link>
       </p>
       <hr />
-      <Auth.IsAuthenticated>
+      <AuthStatus.IsAuthenticated>
         ...(
              state =>
                switch (state) {
@@ -38,7 +38,7 @@ let make = _children => {
                  </div>
                }
            )
-      </Auth.IsAuthenticated>
+      </AuthStatus.IsAuthenticated>
       <hr />
       <p> <Link route=Route.NoteNew> "New note"->str </Link> </p>
     </div>,
