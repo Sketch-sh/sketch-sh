@@ -1,3 +1,4 @@
+Modules.require("./Balloon.css");
 let component = ReasonReact.statelessComponent("UI_Balloon");
 
 type position =

@@ -1,25 +1,9 @@
 [%%debugger.chrome];
+Modules.require("./Editor_Blocks.css");
+
 open Utils;
 open Editor_CodeBlockTypes;
 open Editor_Types.Block;
-
-type stateUpdateReason =
-  | S_Initial
-  | S_Block_Add
-  | S_Block_Execute
-  | S_Block_Delete
-  | S_Block_Focus
-  | S_Block_Blur
-  | S_Block_UpdateValue
-  | S_Block_AddWidgets
-  | S_Block_FocusUp
-  | S_Block_FocusDown;
-
-type state = {
-  blocks: array(block),
-  stateUpdateReason,
-  focusedBlock: option((id, blockTyp, focusChangeType)),
-};
 
 type action =
   | Block_Add(id, blockData)
@@ -31,6 +15,12 @@ type action =
   | Block_AddWidgets(id, array(Widget.t))
   | Block_FocusUp(id)
   | Block_FocusDown(id);
+
+type state = {
+  blocks: array(block),
+  stateUpdateReason: option(action),
+  focusedBlock: option((id, blockTyp, focusChangeType)),
+};
 
 let blockControlsButtons = (b_id, send) =>
   <div className="cell__controls-buttons">
@@ -51,52 +41,39 @@ let blockControlsButtons = (b_id, send) =>
     </button>
   </div>;
 
-let blockHint = send =>
-  <div className="cell__controls-hint">
-    <button
-      onClick=(_ => send(Block_Execute)) className="cell__controls-hint--run">
-      "run"->str
-    </button>
-    <span>
-      " or press "->str
-      <kbd> "Shift"->str </kbd>
-      " + "->str
-      <kbd> "Enter"->str </kbd>
-    </span>
-  </div>;
-
 let component = ReasonReact.reducerComponent("Editor_Page");
 
-let make = (~blocks: array(block), ~onUpdate, _children) => {
+let make =
+    (~blocks: array(block), ~onUpdate, ~registerExecuteCallback=?, _children) => {
   ...component,
   initialState: () => {
     blocks: blocks->Editor_Blocks_Utils.syncLineNumber,
-    stateUpdateReason: S_Initial,
+    stateUpdateReason: None,
     focusedBlock: None,
   },
   didMount: self => {
     self.send(Block_Execute);
-    ();
+    switch (registerExecuteCallback) {
+    | None => ()
+    | Some(register) => register(() => self.send(Block_Execute))
+    };
   },
   didUpdate: ({oldSelf, newSelf}) =>
-    /*
-     TODO: fix me
-     This is a really BAD pattern
-     In React.js best pratice, state.blocks should be moved up to
-     parent's state. But block handling is complicated and should be isolated
-     */
     if (oldSelf.state.blocks !== newSelf.state.blocks) {
       switch (newSelf.state.stateUpdateReason) {
-      | S_Initial
-      | S_Block_Focus
-      | S_Block_Blur
-      | S_Block_AddWidgets
-      | S_Block_FocusUp
-      | S_Block_FocusDown
-      | S_Block_Execute => ()
-      | S_Block_Add
-      | S_Block_Delete
-      | S_Block_UpdateValue => onUpdate(newSelf.state.blocks)
+      | None => ()
+      | Some(action) =>
+        switch (action) {
+        | Block_Focus(_, _)
+        | Block_Blur(_)
+        | Block_AddWidgets(_, _)
+        | Block_FocusUp(_)
+        | Block_FocusDown(_)
+        | Block_Execute => ()
+        | Block_Add(_, _)
+        | Block_Delete(_)
+        | Block_UpdateValue(_, _, _) => onUpdate(newSelf.state.blocks)
+        }
       };
     },
   reducer: (action, state) =>
@@ -104,7 +81,7 @@ let make = (~blocks: array(block), ~onUpdate, _children) => {
     | Block_AddWidgets(blockId, widgets) =>
       ReasonReact.Update({
         ...state,
-        stateUpdateReason: S_Block_AddWidgets,
+        stateUpdateReason: Some(action),
         blocks:
           state.blocks
           ->(
@@ -172,7 +149,7 @@ let make = (~blocks: array(block), ~onUpdate, _children) => {
 
       ReasonReact.Update({
         ...state,
-        stateUpdateReason: S_Block_UpdateValue,
+        stateUpdateReason: Some(action),
         blocks:
           state.blocks
           ->(
@@ -228,7 +205,7 @@ let make = (~blocks: array(block), ~onUpdate, _children) => {
         };
         ReasonReact.Update({
           blocks: [|new_block|],
-          stateUpdateReason: S_Block_Delete,
+          stateUpdateReason: Some(action),
           focusedBlock: None,
         });
       } else {
@@ -237,7 +214,7 @@ let make = (~blocks: array(block), ~onUpdate, _children) => {
             state.blocks
             ->(Belt.Array.keepU((. {b_id}) => b_id != blockId))
             ->Editor_Blocks_Utils.syncLineNumber,
-          stateUpdateReason: S_Block_Delete,
+          stateUpdateReason: Some(action),
           focusedBlock:
             switch (state.focusedBlock) {
             | None => None
@@ -249,7 +226,7 @@ let make = (~blocks: array(block), ~onUpdate, _children) => {
     | Block_Focus(blockId, blockTyp) =>
       ReasonReact.Update({
         ...state,
-        stateUpdateReason: S_Block_Focus,
+        stateUpdateReason: Some(action),
         focusedBlock: Some((blockId, blockTyp, FcTyp_EditorFocus)),
       })
     | Block_Blur(blockId) =>
@@ -259,7 +236,7 @@ let make = (~blocks: array(block), ~onUpdate, _children) => {
         focusedBlockId == blockId ?
           ReasonReact.Update({
             ...state,
-            stateUpdateReason: S_Block_Blur,
+            stateUpdateReason: Some(action),
             focusedBlock: None,
           }) :
           ReasonReact.NoUpdate
@@ -267,7 +244,7 @@ let make = (~blocks: array(block), ~onUpdate, _children) => {
     | Block_Add(afterBlockId, blockType) =>
       ReasonReact.Update({
         ...state,
-        stateUpdateReason: S_Block_Add,
+        stateUpdateReason: Some(action),
         blocks:
           state.blocks
           ->(
@@ -315,7 +292,7 @@ let make = (~blocks: array(block), ~onUpdate, _children) => {
       | Some((upperBlockId, blockTyp)) =>
         ReasonReact.Update({
           ...state,
-          stateUpdateReason: S_Block_FocusUp,
+          stateUpdateReason: Some(action),
           focusedBlock: Some((upperBlockId, blockTyp, FcTyp_BlockFocusUp)),
         })
       };
@@ -344,95 +321,72 @@ let make = (~blocks: array(block), ~onUpdate, _children) => {
       | Some((lowerBlockId, blockTyp)) =>
         ReasonReact.Update({
           ...state,
-          stateUpdateReason: S_Block_FocusDown,
+          stateUpdateReason: Some(action),
           focusedBlock: Some((lowerBlockId, blockTyp, FcTyp_BlockFocusDown)),
         })
       };
     },
-  render: ({send, state}) => {
-    let lastCodeBlockId = Editor_Blocks_Utils.findLastCodeBlock(state.blocks);
+  render: ({send, state}) =>
     <Fragment>
       state.blocks
       ->(
           Belt.Array.mapU((. {b_id, b_data}) =>
-            switch (b_data) {
-            | B_Code({bc_value, bc_widgets, bc_firstLineNumber}) =>
-              <div key=b_id id=b_id className="cell__container">
-                <div className="source-editor">
-                  <Editor_CodeBlock
-                    value=bc_value
-                    focused=(
-                      switch (state.focusedBlock) {
-                      | None => None
-                      | Some((id, _blockTyp, changeTyp)) =>
-                        id == b_id ? Some(changeTyp) : None
-                      }
-                    )
-                    onChange=(
-                      (newValue, diff) =>
-                        send(Block_UpdateValue(b_id, newValue, diff))
-                    )
-                    onExecute=(() => send(Block_Execute))
-                    onFocus=(() => send(Block_Focus(b_id, BTyp_Code)))
-                    onBlur=(() => send(Block_Blur(b_id)))
-                    onBlockUp=(() => send(Block_FocusUp(b_id)))
-                    onBlockDown=(() => send(Block_FocusDown(b_id)))
-                    widgets=bc_widgets
-                    firstLineNumber=bc_firstLineNumber
-                  />
-                </div>
-                <div className="cell__controls">
-                  (blockControlsButtons(b_id, send))
-                  (
-                    /*
-                     Display hint on focusedBlock or last CodeBlock
-                     If there are no CodeBlock then don't display anything
-                     */
-                    switch (state.focusedBlock) {
-                    | Some((focusedBlock, BTyp_Code, _)) =>
-                      focusedBlock == b_id ?
-                        blockHint(send) : ReasonReact.null
-                    | _ =>
-                      lastCodeBlockId
-                      =>> (
-                        last_b_id =>
-                          last_b_id == b_id ?
-                            blockHint(send) : ReasonReact.null
+            <div key=b_id id=b_id className="cell__container">
+              (
+                switch (b_data) {
+                | B_Code({bc_value, bc_widgets, bc_firstLineNumber}) =>
+                  <div className="source-editor">
+                    <Editor_CodeBlock
+                      value=bc_value
+                      focused=(
+                        switch (state.focusedBlock) {
+                        | None => None
+                        | Some((id, _blockTyp, changeTyp)) =>
+                          id == b_id ? Some(changeTyp) : None
+                        }
                       )
-                    }
-                  )
-                </div>
+                      onChange=(
+                        (newValue, diff) =>
+                          send(Block_UpdateValue(b_id, newValue, diff))
+                      )
+                      onExecute=(() => send(Block_Execute))
+                      onFocus=(() => send(Block_Focus(b_id, BTyp_Code)))
+                      onBlur=(() => send(Block_Blur(b_id)))
+                      onBlockUp=(() => send(Block_FocusUp(b_id)))
+                      onBlockDown=(() => send(Block_FocusDown(b_id)))
+                      widgets=bc_widgets
+                      firstLineNumber=bc_firstLineNumber
+                    />
+                  </div>
+                | B_Text(text) =>
+                  <div className="text-editor">
+                    <Editor_TextBlock
+                      value=text
+                      focused=(
+                        switch (state.focusedBlock) {
+                        | None => None
+                        | Some((id, _blockTyp, changeTyp)) =>
+                          id == b_id ? Some(changeTyp) : None
+                        }
+                      )
+                      onFocus=(() => send(Block_Focus(b_id, BTyp_Text)))
+                      onBlur=(() => send(Block_Blur(b_id)))
+                      onBlockUp=(() => send(Block_FocusUp(b_id)))
+                      onBlockDown=(() => send(Block_FocusDown(b_id)))
+                      onChange=(
+                        (newValue, diff) =>
+                          send(Block_UpdateValue(b_id, newValue, diff))
+                      )
+                    />
+                  </div>
+                }
+              )
+              <div className="cell__controls">
+                (blockControlsButtons(b_id, send))
               </div>
-            | B_Text(text) =>
-              <div key=b_id id=b_id className="cell__container">
-                <div className="text-editor">
-                  <Editor_TextBlock
-                    value=text
-                    focused=(
-                      switch (state.focusedBlock) {
-                      | None => None
-                      | Some((id, _blockTyp, changeTyp)) =>
-                        id == b_id ? Some(changeTyp) : None
-                      }
-                    )
-                    onFocus=(() => send(Block_Focus(b_id, BTyp_Text)))
-                    onBlur=(() => send(Block_Blur(b_id)))
-                    onBlockUp=(() => send(Block_FocusUp(b_id)))
-                    onBlockDown=(() => send(Block_FocusDown(b_id)))
-                    onChange=(
-                      (newValue, diff) =>
-                        send(Block_UpdateValue(b_id, newValue, diff))
-                    )
-                  />
-                </div>
-                <div className="cell__controls">
-                  (blockControlsButtons(b_id, send))
-                </div>
-              </div>
-            }
+            </div>
           )
         )
       ->ReasonReact.array
-    </Fragment>;
-  },
+    </Fragment>,
 };

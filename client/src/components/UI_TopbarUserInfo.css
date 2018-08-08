@@ -1,0 +1,29 @@
+.Topbar__userInfo {
+  margin-right: var(--space3);
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.Topbar__userInfo--content {
+  margin-right: var(--space2);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.Topbar__userInfo--name,
+.Topbar__userInfo--username {
+  font-weight: 500;
+}
+
+.Topbar__userInfo--name + .Topbar__userInfo--username {
+  color: var(--c-text-sub2);
+  font-weight: 400;
+  font-size: var(--f6);
+}
+
+.Topbar__userInfo--avatar {
+  border-radius: 4px;
+}

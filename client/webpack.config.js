@@ -76,7 +76,7 @@ const base = {
               ident: "postcss",
               plugins: () => [
                 postcssPresetEnv({
-                  stage: 4,
+                  stage: 2,
                   features: {
                     "nesting-rules": true,
                   },

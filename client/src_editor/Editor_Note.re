@@ -8,10 +8,12 @@ type state = {
   dirty: bool,
   blocks: ref(array(block)),
   isSaving: ref(bool),
+  executeCallback: option(unit => unit),
 };
 type action =
   | TitleUpdate(string)
-  | BlockUpdate(array(block));
+  | BlockUpdate(array(block))
+  | RegisterExecuteCallback(unit => unit);
 
 type saveStatus =
   | Pristine
@@ -40,6 +42,7 @@ let make = (~blocks, ~title="", ~loading as isSaving, ~onSave, _children) => {
     dirty: false,
     blocks: ref(blocks),
     isSaving: ref(isSaving),
+    executeCallback: None,
   },
   willReceiveProps: ({state}) =>
     if (state.isSaving^ != isSaving) {
@@ -52,6 +55,8 @@ let make = (~blocks, ~title="", ~loading as isSaving, ~onSave, _children) => {
     switch (action) {
     | TitleUpdate(title) =>
       ReasonReact.Update({...state, pristine: false, dirty: true, title})
+    | RegisterExecuteCallback(callback) =>
+      ReasonReact.Update({...state, executeCallback: Some(callback)})
     | BlockUpdate(blocks) =>
       state.blocks := blocks;
       ReasonReact.Update({...state, pristine: false, dirty: true});
@@ -63,70 +68,90 @@ let make = (~blocks, ~title="", ~loading as isSaving, ~onSave, _children) => {
         ~isSaving,
         ~dirty=state.dirty,
       );
-    <div>
-      <aside className="EditorNav">
-        <div className="EditorNav__top">
-          <Fi.IconContext.Provider
-            value={"className": "EditorNav__button--icon"}>
-            <div className="EditorNav__button">
-              <UI_Balloon position=Right message="Home">
-                ...<button
-                     className="EditorNav__button--button"
-                     onClick=(_ => Router.push(Route.Home))>
-                     <Fi.Home />
-                   </button>
-              </UI_Balloon>
-            </div>
-            <div className="EditorNav__button">
-              <UI_Balloon
-                position=Right
-                message=(
-                  switch (saveStatus) {
-                  | Pristine => "Nothing to save"
-                  | Saved => "Already saved !"
-                  | Saving
-                  | Unsaved => "Save"
-                  }
-                )>
-                ...<button
-                     disabled=(
-                       switch (saveStatus) {
-                       | Pristine
-                       | Saved
-                       | Saving => true
-                       | Unsaved => false
-                       }
-                     )
-                     className="EditorNav__button--button"
-                     onClick=(
-                       _ => onSave(~title=state.title, ~data=state.blocks^)
-                     )>
-                     (
-                       isSaving ?
-                         <Fi.Loader className="EditorNav__button--spin" /> :
-                         <Fi.Save />
-                     )
-                   </button>
-              </UI_Balloon>
-            </div>
-          </Fi.IconContext.Provider>
-        </div>
-        <div className="EditorNav__bottom">
-          <span className="EditorNav__button--saveIndicator ">
-            {
-              let status =
-                switch (saveStatus) {
-                | Pristine => ""
-                | Saved => "Saved"
-                | Saving => "Saving"
-                | Unsaved => "Unsaved"
-                };
-              status->str;
-            }
-          </span>
-        </div>
-      </aside>
-      <main className="pageSizer">
+    <>
+      <UI_Topbar.WithToolbar>
+        ...(
+             (~buttonClassName) =>
+               <>
+                 <UI_Balloon position=Down message="Not implemented">
+                   ...<button className=buttonClassName disabled=true>
+                        <Fi.GitBranch />
+                        "Fork"->str
+                      </button>
+                 </UI_Balloon>
+                 <UI_Balloon
+                   position=Down
+                   length=Fit
+                   message="Execute code (Shift+Enter)">
+                   ...<button
+                        className=buttonClassName
+                        onClick=(
+                          _ =>
+                            switch (state.executeCallback) {
+                            | None => ()
+                            | Some(callback) => callback()
+                            }
+                        )>
+                        <Fi.Terminal />
+                        "Run"->str
+                      </button>
+                 </UI_Balloon>
+                 <UI_Balloon
+                   position=Down
+                   length=Fit
+                   message=(
+                     switch (saveStatus) {
+                     | Pristine => "Nothing to save (Ctrl+S)"
+                     | Saved => "Saved (Ctrl+S)"
+                     | Saving
+                     | Unsaved => "Save modified changes (Ctrl+S)"
+                     }
+                   )>
+                   ...<button
+                        disabled=(
+                          switch (saveStatus) {
+                          | Pristine
+                          | Saved
+                          | Saving => true
+                          | Unsaved => false
+                          }
+                        )
+                        className=buttonClassName
+                        onClick=(
+                          _ => {
+                            onSave(~title=state.title, ~data=state.blocks^);
+                            switch (state.executeCallback) {
+                            | None => ()
+                            | Some(callback) => callback()
+                            };
+                          }
+                        )>
+                        (
+                          isSaving ?
+                            <>
+                              <Fi.Loader className="EditorNav__button--spin" />
+                              "Saving"->str
+                            </> :
+                            <> <Fi.Save /> "Save"->str </>
+                        )
+                      </button>
+                 </UI_Balloon>
+               </>
+           )
+      </UI_Topbar.WithToolbar>
+      <div className="EditorNote__saveStatus">
+        {
+          let status =
+            switch (saveStatus) {
+            | Pristine => ""
+            | Saved => "Saved"
+            | Saving => "Saving"
+            | Unsaved => "Unsaved"
+            };
+          status->str;
+        }
+      </div>
+      <main className="EditorNote">
         <Helmet>
           <title>
             {
@@ -145,9 +170,12 @@ let make = (~blocks, ~title="", ~loading as isSaving, ~onSave, _children) => {
         </div>
         <Editor_Blocks
           blocks
+          registerExecuteCallback=(
+            callback => send(RegisterExecuteCallback(callback))
+          )
           onUpdate=(blocks => send(BlockUpdate(blocks)))
         />
       </main>
-    </div>;
+    </>;
   },
 };
