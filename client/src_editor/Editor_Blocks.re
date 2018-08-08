@@ -53,20 +53,6 @@ let blockControlsButtons = (b_id, send) =>
     </button>
   </div>;
 
-let blockHint = send =>
-  <div className="cell__controls-hint">
-    <button
-      onClick=(_ => send(Block_Execute)) className="cell__controls-hint--run">
-      "run"->str
-    </button>
-    <span>
-      " or press "->str
-      <kbd> "Shift"->str </kbd>
-      " + "->str
-      <kbd> "Enter"->str </kbd>
-    </span>
-  </div>;
-
 let component = ReasonReact.reducerComponent("Editor_Page");
 
 let make =
@@ -355,90 +341,67 @@ let make =
         })
       };
     },
-  render: ({send, state}) => {
-    let lastCodeBlockId = Editor_Blocks_Utils.findLastCodeBlock(state.blocks);
+  render: ({send, state}) =>
     <Fragment>
       state.blocks
       ->(
           Belt.Array.mapU((. {b_id, b_data}) =>
-            switch (b_data) {
-            | B_Code({bc_value, bc_widgets, bc_firstLineNumber}) =>
-              <div key=b_id id=b_id className="cell__container">
-                <div className="source-editor">
-                  <Editor_CodeBlock
-                    value=bc_value
-                    focused=(
-                      switch (state.focusedBlock) {
-                      | None => None
-                      | Some((id, _blockTyp, changeTyp)) =>
-                        id == b_id ? Some(changeTyp) : None
-                      }
-                    )
-                    onChange=(
-                      (newValue, diff) =>
-                        send(Block_UpdateValue(b_id, newValue, diff))
-                    )
-                    onExecute=(() => send(Block_Execute))
-                    onFocus=(() => send(Block_Focus(b_id, BTyp_Code)))
-                    onBlur=(() => send(Block_Blur(b_id)))
-                    onBlockUp=(() => send(Block_FocusUp(b_id)))
-                    onBlockDown=(() => send(Block_FocusDown(b_id)))
-                    widgets=bc_widgets
-                    firstLineNumber=bc_firstLineNumber
-                  />
-                </div>
-                <div className="cell__controls">
-                  (blockControlsButtons(b_id, send))
-                  (
-                    /*
-                     Display hint on focusedBlock or last CodeBlock
-                     If there are no CodeBlock then don't display anything
-                     */
-                    switch (state.focusedBlock) {
-                    | Some((focusedBlock, BTyp_Code, _)) =>
-                      focusedBlock == b_id ?
-                        blockHint(send) : ReasonReact.null
-                    | _ =>
-                      lastCodeBlockId
-                      =>> (
-                        last_b_id =>
-                          last_b_id == b_id ?
-                            blockHint(send) : ReasonReact.null
+            <div key=b_id id=b_id className="cell__container">
+              (
+                switch (b_data) {
+                | B_Code({bc_value, bc_widgets, bc_firstLineNumber}) =>
+                  <div className="source-editor">
+                    <Editor_CodeBlock
+                      value=bc_value
+                      focused=(
+                        switch (state.focusedBlock) {
+                        | None => None
+                        | Some((id, _blockTyp, changeTyp)) =>
+                          id == b_id ? Some(changeTyp) : None
+                        }
                       )
-                    }
-                  )
-                </div>
+                      onChange=(
+                        (newValue, diff) =>
+                          send(Block_UpdateValue(b_id, newValue, diff))
+                      )
+                      onExecute=(() => send(Block_Execute))
+                      onFocus=(() => send(Block_Focus(b_id, BTyp_Code)))
+                      onBlur=(() => send(Block_Blur(b_id)))
+                      onBlockUp=(() => send(Block_FocusUp(b_id)))
+                      onBlockDown=(() => send(Block_FocusDown(b_id)))
+                      widgets=bc_widgets
+                      firstLineNumber=bc_firstLineNumber
+                    />
+                  </div>
+                | B_Text(text) =>
+                  <div className="text-editor">
+                    <Editor_TextBlock
+                      value=text
+                      focused=(
+                        switch (state.focusedBlock) {
+                        | None => None
+                        | Some((id, _blockTyp, changeTyp)) =>
+                          id == b_id ? Some(changeTyp) : None
+                        }
+                      )
+                      onFocus=(() => send(Block_Focus(b_id, BTyp_Text)))
+                      onBlur=(() => send(Block_Blur(b_id)))
+                      onBlockUp=(() => send(Block_FocusUp(b_id)))
+                      onBlockDown=(() => send(Block_FocusDown(b_id)))
+                      onChange=(
+                        (newValue, diff) =>
+                          send(Block_UpdateValue(b_id, newValue, diff))
+                      )
+                    />
+                  </div>
+                }
+              )
+              <div className="cell__controls">
+                (blockControlsButtons(b_id, send))
               </div>
-            | B_Text(text) =>
-              <div key=b_id id=b_id className="cell__container">
-                <div className="text-editor">
-                  <Editor_TextBlock
-                    value=text
-                    focused=(
-                      switch (state.focusedBlock) {
-                      | None => None
-                      | Some((id, _blockTyp, changeTyp)) =>
-                        id == b_id ? Some(changeTyp) : None
-                      }
-                    )
-                    onFocus=(() => send(Block_Focus(b_id, BTyp_Text)))
-                    onBlur=(() => send(Block_Blur(b_id)))
-                    onBlockUp=(() => send(Block_FocusUp(b_id)))
-                    onBlockDown=(() => send(Block_FocusDown(b_id)))
-                    onChange=(
-                      (newValue, diff) =>
-                        send(Block_UpdateValue(b_id, newValue, diff))
-                    )
-                  />
-                </div>
-                <div className="cell__controls">
-                  (blockControlsButtons(b_id, send))
-                </div>
-              </div>
-            }
+            </div>
           )
         )
       ->ReasonReact.array
-    </Fragment>;
-  },
+    </Fragment>,
 };
