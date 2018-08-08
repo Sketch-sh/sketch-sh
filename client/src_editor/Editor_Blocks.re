@@ -5,24 +5,6 @@ open Utils;
 open Editor_CodeBlockTypes;
 open Editor_Types.Block;
 
-type stateUpdateReason =
-  | S_Initial
-  | S_Block_Add
-  | S_Block_Execute
-  | S_Block_Delete
-  | S_Block_Focus
-  | S_Block_Blur
-  | S_Block_UpdateValue
-  | S_Block_AddWidgets
-  | S_Block_FocusUp
-  | S_Block_FocusDown;
-
-type state = {
-  blocks: array(block),
-  stateUpdateReason,
-  focusedBlock: option((id, blockTyp, focusChangeType)),
-};
-
 type action =
   | Block_Add(id, blockData)
   | Block_Execute
@@ -33,6 +15,12 @@ type action =
   | Block_AddWidgets(id, array(Widget.t))
   | Block_FocusUp(id)
   | Block_FocusDown(id);
+
+type state = {
+  blocks: array(block),
+  stateUpdateReason: option(action),
+  focusedBlock: option((id, blockTyp, focusChangeType)),
+};
 
 let blockControlsButtons = (b_id, send) =>
   <div className="cell__controls-buttons">
@@ -60,7 +48,7 @@ let make =
   ...component,
   initialState: () => {
     blocks: blocks->Editor_Blocks_Utils.syncLineNumber,
-    stateUpdateReason: S_Initial,
+    stateUpdateReason: None,
     focusedBlock: None,
   },
   didMount: self => {
@@ -79,16 +67,19 @@ let make =
      */
     if (oldSelf.state.blocks !== newSelf.state.blocks) {
       switch (newSelf.state.stateUpdateReason) {
-      | S_Initial
-      | S_Block_Focus
-      | S_Block_Blur
-      | S_Block_AddWidgets
-      | S_Block_FocusUp
-      | S_Block_FocusDown
-      | S_Block_Execute => ()
-      | S_Block_Add
-      | S_Block_Delete
-      | S_Block_UpdateValue => onUpdate(newSelf.state.blocks)
+      | None => ()
+      | Some(action) =>
+        switch (action) {
+        | Block_Focus(_, _)
+        | Block_Blur(_)
+        | Block_AddWidgets(_, _)
+        | Block_FocusUp(_)
+        | Block_FocusDown(_)
+        | Block_Execute => ()
+        | Block_Add(_, _)
+        | Block_Delete(_)
+        | Block_UpdateValue(_, _, _) => onUpdate(newSelf.state.blocks)
+        }
       };
     },
   reducer: (action, state) =>
@@ -96,7 +87,7 @@ let make =
     | Block_AddWidgets(blockId, widgets) =>
       ReasonReact.Update({
         ...state,
-        stateUpdateReason: S_Block_AddWidgets,
+        stateUpdateReason: Some(action),
         blocks:
           state.blocks
           ->(
@@ -164,7 +155,7 @@ let make =
 
       ReasonReact.Update({
         ...state,
-        stateUpdateReason: S_Block_UpdateValue,
+        stateUpdateReason: Some(action),
         blocks:
           state.blocks
           ->(
@@ -220,7 +211,7 @@ let make =
         };
         ReasonReact.Update({
           blocks: [|new_block|],
-          stateUpdateReason: S_Block_Delete,
+          stateUpdateReason: Some(action),
           focusedBlock: None,
         });
       } else {
@@ -229,7 +220,7 @@ let make =
             state.blocks
             ->(Belt.Array.keepU((. {b_id}) => b_id != blockId))
             ->Editor_Blocks_Utils.syncLineNumber,
-          stateUpdateReason: S_Block_Delete,
+          stateUpdateReason: Some(action),
           focusedBlock:
             switch (state.focusedBlock) {
             | None => None
@@ -241,7 +232,7 @@ let make =
     | Block_Focus(blockId, blockTyp) =>
       ReasonReact.Update({
         ...state,
-        stateUpdateReason: S_Block_Focus,
+        stateUpdateReason: Some(action),
         focusedBlock: Some((blockId, blockTyp, FcTyp_EditorFocus)),
       })
     | Block_Blur(blockId) =>
@@ -251,7 +242,7 @@ let make =
         focusedBlockId == blockId ?
           ReasonReact.Update({
             ...state,
-            stateUpdateReason: S_Block_Blur,
+            stateUpdateReason: Some(action),
             focusedBlock: None,
           }) :
           ReasonReact.NoUpdate
@@ -259,7 +250,7 @@ let make =
     | Block_Add(afterBlockId, blockType) =>
       ReasonReact.Update({
         ...state,
-        stateUpdateReason: S_Block_Add,
+        stateUpdateReason: Some(action),
         blocks:
           state.blocks
           ->(
@@ -307,7 +298,7 @@ let make =
       | Some((upperBlockId, blockTyp)) =>
         ReasonReact.Update({
           ...state,
-          stateUpdateReason: S_Block_FocusUp,
+          stateUpdateReason: Some(action),
           focusedBlock: Some((upperBlockId, blockTyp, FcTyp_BlockFocusUp)),
         })
       };
@@ -336,7 +327,7 @@ let make =
       | Some((lowerBlockId, blockTyp)) =>
         ReasonReact.Update({
           ...state,
-          stateUpdateReason: S_Block_FocusDown,
+          stateUpdateReason: Some(action),
           focusedBlock: Some((lowerBlockId, blockTyp, FcTyp_BlockFocusDown)),
         })
       };
