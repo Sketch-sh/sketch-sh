@@ -43,6 +43,18 @@ module UpdateNoteGql = [%graphql
 
 module UpdateNoteComponent = ReasonApollo.CreateMutation(UpdateNoteGql);
 
+let replaceNoteRoute = (id, json) =>
+  Js.Promise.(
+    LzString.async()
+    |> then_(lzstring =>
+         lzstring->(LzString.URI.compress(Js.Json.stringify(json)))->resolve
+       )
+    |> then_(compressed =>
+         Router.pushSilent(Route.Note({noteId: id, data: Some(compressed)}))
+         ->resolve
+       )
+    |> Utils.handleError
+  );
 module NoteSave = {
   type id = string;
   type noteKind =
@@ -52,7 +64,8 @@ module NoteSave = {
   type state = {kind: noteKind};
 
   type action =
-    | SavedNewNote(id);
+    | SavedNewNote(id, Js.Json.t)
+    | SavedOldNote(id, Js.Json.t);
 
   /* TODO:
      When receive the mutation result,
@@ -64,10 +77,14 @@ module NoteSave = {
     initialState: () => {kind: noteKind},
     reducer: (action, _state) =>
       switch (action) {
-      | SavedNewNote(id) =>
+      | SavedNewNote(noteId, json) =>
         ReasonReact.UpdateWithSideEffects(
-          {kind: Old(id)},
-          (_self => Router.pushSilent(Route.Note({noteId: id, data: None}))),
+          {kind: Old(noteId)},
+          (_self => replaceNoteRoute(noteId, json)->ignore),
+        )
+      | SavedOldNote(noteId, json) =>
+        ReasonReact.SideEffects(
+          (_self => replaceNoteRoute(noteId, json)->ignore),
         )
       },
     render: ({state, send}) =>
@@ -92,7 +109,13 @@ module NoteSave = {
                      Js.Promise.(
                        mutation(~variables=newNote##variables, ())
                        |> then_(_result =>
-                            send(SavedNewNote(noteId))->resolve
+                            send(
+                              SavedNewNote(
+                                noteId,
+                                data->Editor_Types.JsonEncode.encode,
+                              ),
+                            )
+                            ->resolve
                           )
                      )
                      |> ignore;
@@ -109,17 +132,18 @@ module NoteSave = {
                  children(
                    ~loading,
                    ~onSave=(~title, ~data, ~userId as _) => {
+                     let data = data->Editor_Types.JsonEncode.encode;
                      let updatedNote =
-                       UpdateNoteGql.make(
-                         ~title,
-                         ~data=data->Editor_Types.JsonEncode.encode,
-                         ~noteId,
+                       UpdateNoteGql.make(~title, ~data, ~noteId, ());
+                     Js.Promise.(
+                       mutation(
+                         ~variables=updatedNote##variables,
+                         ~refetchQueries=[|"getNote"|],
                          (),
-                       );
-                     mutation(
-                       ~variables=updatedNote##variables,
-                       ~refetchQueries=[|"getNote"|],
-                       (),
+                       )
+                       |> then_(_data =>
+                            SavedOldNote(noteId, data)->send->resolve
+                          )
                      )
                      |> ignore;
                    },

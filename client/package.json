@@ -34,6 +34,7 @@
     "graphql-tag": "^2.9.2",
     "install": "^0.12.1",
     "jwt-decode": "^2.2.0",
+    "lz-string": "^1.4.4",
     "nanoid": "^1.1.0",
     "npm": "^6.2.0",
     "react": "^16.4.1",
