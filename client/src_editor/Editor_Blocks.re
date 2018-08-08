@@ -69,7 +69,8 @@ let blockHint = send =>
 
 let component = ReasonReact.reducerComponent("Editor_Page");
 
-let make = (~blocks: array(block), ~onUpdate, _children) => {
+let make =
+    (~blocks: array(block), ~onUpdate, ~registerExecuteCallback=?, _children) => {
   ...component,
   initialState: () => {
     blocks: blocks->Editor_Blocks_Utils.syncLineNumber,
@@ -78,7 +79,10 @@ let make = (~blocks: array(block), ~onUpdate, _children) => {
   },
   didMount: self => {
     self.send(Block_Execute);
-    ();
+    switch (registerExecuteCallback) {
+    | None => ()
+    | Some(register) => register(() => self.send(Block_Execute))
+    };
   },
   didUpdate: ({oldSelf, newSelf}) =>
     /*

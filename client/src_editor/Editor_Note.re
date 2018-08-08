@@ -8,10 +8,12 @@ type state = {
   dirty: bool,
   blocks: ref(array(block)),
   isSaving: ref(bool),
+  executeCallback: option(unit => unit),
 };
 type action =
   | TitleUpdate(string)
-  | BlockUpdate(array(block));
+  | BlockUpdate(array(block))
+  | RegisterExecuteCallback(unit => unit);
 
 type saveStatus =
   | Pristine
@@ -40,6 +42,7 @@ let make = (~blocks, ~title="", ~loading as isSaving, ~onSave, _children) => {
     dirty: false,
     blocks: ref(blocks),
     isSaving: ref(isSaving),
+    executeCallback: None,
   },
   willReceiveProps: ({state}) =>
     if (state.isSaving^ != isSaving) {
@@ -52,6 +55,8 @@ let make = (~blocks, ~title="", ~loading as isSaving, ~onSave, _children) => {
     switch (action) {
     | TitleUpdate(title) =>
       ReasonReact.Update({...state, pristine: false, dirty: true, title})
+    | RegisterExecuteCallback(callback) =>
+      ReasonReact.Update({...state, executeCallback: Some(callback)})
     | BlockUpdate(blocks) =>
       state.blocks := blocks;
       ReasonReact.Update({...state, pristine: false, dirty: true});
@@ -68,22 +73,38 @@ let make = (~blocks, ~title="", ~loading as isSaving, ~onSave, _children) => {
         ...(
              (~buttonClassName) =>
                <>
-                 <button className=buttonClassName>
-                   <Fi.GitBranch />
-                   "Fork"->str
-                 </button>
-                 <button className=buttonClassName>
-                   <Fi.Terminal />
-                   "Run"->str
-                 </button>
+                 <UI_Balloon position=Down message="Not implemented">
+                   ...<button className=buttonClassName disabled=true>
+                        <Fi.GitBranch />
+                        "Fork"->str
+                      </button>
+                 </UI_Balloon>
                  <UI_Balloon
                    position=Down
+                   length=Fit
+                   message="Execute code (Shift + Enter)">
+                   ...<button
+                        className=buttonClassName
+                        onClick=(
+                          _ =>
+                            switch (state.executeCallback) {
+                            | None => ()
+                            | Some(callback) => callback()
+                            }
+                        )>
+                        <Fi.Terminal />
+                        "Run"->str
+                      </button>
+                 </UI_Balloon>
+                 <UI_Balloon
+                   position=Down
+                   length=Fit
                    message=(
                      switch (saveStatus) {
-                     | Pristine => "Nothing to save"
-                     | Saved => "Saved"
+                     | Pristine => "Nothing to save (Ctrl + S)"
+                     | Saved => "Saved (Ctrl + S)"
                      | Saving
-                     | Unsaved => "Save modified changes"
+                     | Unsaved => "Save modified changes (Ctrl + S)"
                      }
                    )>
                    ...<button
@@ -101,7 +122,10 @@ let make = (~blocks, ~title="", ~loading as isSaving, ~onSave, _children) => {
                         )>
                         (
                           isSaving ?
-                            <Fi.Loader className="EditorNav__button--spin" /> :
+                            <>
+                              <Fi.Loader className="EditorNav__button--spin" />
+                              "Saving"->str
+                            </> :
                             <> <Fi.Save /> "Save"->str </>
                         )
                       </button>
@@ -140,6 +164,9 @@ let make = (~blocks, ~title="", ~loading as isSaving, ~onSave, _children) => {
         </div>
         <Editor_Blocks
           blocks
+          registerExecuteCallback=(
+            callback => send(RegisterExecuteCallback(callback))
+          )
           onUpdate=(blocks => send(BlockUpdate(blocks)))
         />
       </main>
