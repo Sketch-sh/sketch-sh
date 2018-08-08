@@ -43,14 +43,19 @@ module UpdateNoteGql = [%graphql
 
 module UpdateNoteComponent = ReasonApollo.CreateMutation(UpdateNoteGql);
 
-let replaceNoteRoute = (id, json) =>
+let replaceNoteRoute = (~noteId, ~json, ~title) =>
   Js.Promise.(
     LzString.async()
     |> then_(lzstring =>
-         lzstring->(LzString.URI.compress(Js.Json.stringify(json)))->resolve
+         (
+           lzstring->(LzString.URI.compress(title))
+           ++ "_._"
+           ++ lzstring->LzString.URI.compress(Js.Json.stringify(json))
+         )
+         ->resolve
        )
     |> then_(compressed =>
-         Router.pushSilent(Route.Note({noteId: id, data: Some(compressed)}))
+         Router.pushSilent(Route.Note({noteId, data: Some(compressed)}))
          ->resolve
        )
     |> Utils.handleError
@@ -64,8 +69,8 @@ module NoteSave = {
   type state = {kind: noteKind};
 
   type action =
-    | SavedNewNote(id, Js.Json.t)
-    | SavedOldNote(id, Js.Json.t);
+    | SavedNewNote(id, string, Js.Json.t)
+    | SavedOldNote(id, string, Js.Json.t);
 
   /* TODO:
      When receive the mutation result,
@@ -77,14 +82,14 @@ module NoteSave = {
     initialState: () => {kind: noteKind},
     reducer: (action, _state) =>
       switch (action) {
-      | SavedNewNote(noteId, json) =>
+      | SavedNewNote(noteId, title, json) =>
         ReasonReact.UpdateWithSideEffects(
           {kind: Old(noteId)},
-          (_self => replaceNoteRoute(noteId, json)->ignore),
+          (_self => replaceNoteRoute(~noteId, ~json, ~title)->ignore),
         )
-      | SavedOldNote(noteId, json) =>
+      | SavedOldNote(noteId, title, json) =>
         ReasonReact.SideEffects(
-          (_self => replaceNoteRoute(noteId, json)->ignore),
+          (_self => replaceNoteRoute(~noteId, ~json, ~title)->ignore),
         )
       },
     render: ({state, send}) =>
@@ -112,6 +117,7 @@ module NoteSave = {
                             send(
                               SavedNewNote(
                                 noteId,
+                                title,
                                 data->Editor_Types.JsonEncode.encode,
                               ),
                             )
@@ -142,7 +148,7 @@ module NoteSave = {
                          (),
                        )
                        |> then_(_data =>
-                            SavedOldNote(noteId, data)->send->resolve
+                            SavedOldNote(noteId, title, data)->send->resolve
                           )
                      )
                      |> ignore;

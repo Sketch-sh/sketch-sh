@@ -48,7 +48,15 @@ module EnsureUrlEncodedData = {
       switch (action) {
       | NoteLoaded(json) =>
         ReasonReact.SideEffects(
-          (_ => NoteSave.replaceNoteRoute(noteId, json)->ignore),
+          (
+            _ =>
+              NoteSave.replaceNoteRoute(
+                ~noteId,
+                ~json,
+                ~title=note##title->optionToEmptyString,
+              )
+              ->ignore
+          ),
         )
       },
     render: _send =>
