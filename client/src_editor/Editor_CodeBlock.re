@@ -83,6 +83,7 @@ let make =
                                     ~noHScroll=false,
                                     ~above=false,
                                     ~showIfHidden=false,
+                                    ~handleMouseEvents=true,
                                   ),
                               )
                             )
@@ -98,6 +99,7 @@ let make =
                                     ~noHScroll=false,
                                     ~above=false,
                                     ~showIfHidden=false,
+                                    ~handleMouseEvents=true,
                                   ),
                               )
                             )
@@ -113,6 +115,7 @@ let make =
                                     ~noHScroll=false,
                                     ~above=false,
                                     ~showIfHidden=false,
+                                    ~handleMouseEvents=true,
                                   ),
                               )
                             )
@@ -128,6 +131,7 @@ let make =
                                     ~noHScroll=false,
                                     ~above=false,
                                     ~showIfHidden=false,
+                                    ~handleMouseEvents=true,
                                   ),
                               )
                             )

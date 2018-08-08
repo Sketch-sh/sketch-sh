@@ -77,7 +77,8 @@ module EditorConfiguration = {
     dragDrop: bool,
     [@bs.optional] /** When given , this will be called when the editor is handling a dragenter , dragover , or drop event.
         It will be passed the editor instance and the event object as arguments.
-        The callback can choose to handle the event itself , in which case it should return true to indicate that CodeMirror should not do anything further. */ /* TODO */ /* onDragEvent?: (instance: CodeMirror.Editor, event: Event) => boolean; */ /** This provides a rather low - level hook into CodeMirror's key handling.
+        The callback can choose to handle the event itself , in which case it should return true to indicate that CodeMirror should not do anything further. */ /* TODO */ /* onDragEvent?: (instance: CodeMirror.Editor, event: Event) => boolean; */
+                                                                    /** This provides a rather low - level hook into CodeMirror's key handling.
         If provided, this function will be called on every keydown, keyup, and keypress event that CodeMirror captures.
         It will be passed two arguments, the editor instance and the key event.
         This key event is pretty much the raw key event, except that a stop() method is always added to it.
@@ -160,6 +161,7 @@ module LineWidget = {
     above: bool,
     /** When true, will cause the widget to be rendered even if the line it is associated with is hidden. */
     showIfHidden: bool,
+    handleMouseEvents: bool,
   };
 };
 
