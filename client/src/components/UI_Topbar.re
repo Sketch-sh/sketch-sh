@@ -33,6 +33,13 @@ module WithToolbar = {
           </div>
         </div>
         <div className="Topbar__right">
+          <UI_Balloon position=Down message="New note">
+            ...<button
+                 className="Topbar__action Topbar__action--highlight"
+                 onClick=(_ => Router.push(Route.NoteNew))>
+                 <Fi.Plus />
+               </button>
+          </UI_Balloon>
           <AuthStatus.UserInfo>
             ...(
                  user =>

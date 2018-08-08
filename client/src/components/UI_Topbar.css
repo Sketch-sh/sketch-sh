@@ -44,7 +44,7 @@
 }
 
 .Topbar__action {
-  transition: border-color 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  transition: border-color color 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
   flex-direction: row;
   align-items: center;
   vertical-align: middle;
@@ -61,10 +61,16 @@
   justify-content: center;
   align-content: center;
   padding: 0 var(--space3);
+  outline: none;
+  color: var(--c-text-sub);
 }
 
+.Topbar__action--highlight {
+  color: var(--topbar-c-primary);
+}
 .Topbar__action:hover {
   border-color: var(--topbar-c-primary);
+  color: var(--c-text);
 }
 
 .Topbar__action:disabled {
