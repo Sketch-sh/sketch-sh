@@ -1,4 +1,4 @@
-FROM node:10
+FROM node:10.8.0
 RUN npm -g config set user root
 RUN npm install -g bs-platform@4.0.3
 WORKDIR /usr/src
