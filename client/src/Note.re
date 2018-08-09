@@ -90,8 +90,8 @@ let make = (~noteInfo: Route.noteRouteConfig, _children) => {
            isLogin => {
              let userId =
                switch (isLogin) {
-               | None => Config.anonymousUserId
-               | Some(userId) => userId
+               | Anonymous => Config.anonymousUserId
+               | Login(userId) => userId
                };
              <GetNoteComponent variables=noteQuery##variables>
                ...(

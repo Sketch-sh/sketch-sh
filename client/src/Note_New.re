@@ -15,8 +15,8 @@ let make = _children => {
            isLogin => {
              let userId =
                switch (isLogin) {
-               | None => Config.anonymousUserId
-               | Some(userId) => userId
+               | Anonymous => Config.anonymousUserId
+               | Login(userId) => userId
                };
              <NoteSave noteKind=New>
                ...(

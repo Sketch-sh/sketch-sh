@@ -23,6 +23,15 @@ module Auth = {
       let key = "rtop:editToken";
     });
 
+  let getOrCreateEditToken = () =>
+    switch (EditToken.get()) {
+    | None =>
+      let newToken = Utils.generateId();
+      EditToken.set(newToken);
+      newToken;
+    | Some(editToken) => editToken
+    };
+
   let githubLoginRedirect = Config.authDomain ++ "/auth/github";
 
   let decodeUserId = json => Json.Decode.(json |> field("userId", string));

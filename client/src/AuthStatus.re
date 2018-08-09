@@ -2,7 +2,14 @@ open Utils;
 module Auth = Auth.Auth;
 let getCurrentState = Auth.UserId.get;
 
-type state = option(int);
+type state =
+  | Anonymous
+  | Login(string);
+
+let localStorageDataToState =
+  fun
+  | None => Anonymous
+  | Some(id) => Login(id);
 
 module Store = {
   module MI = Belt.Map.Int;
@@ -47,8 +54,15 @@ module Provider = {
         let event = Auth.toStorageEvent(event);
         let key = event->StorageEvent.key;
         if (key == Auth.UserId.key) {
-          let newValue = event->StorageEvent.newValue->Utils.toNullable;
-          Store.broadcast(newValue->Js.Nullable.toOption);
+          let newValue =
+            localStorageDataToState(
+              event
+              ->StorageEvent.newValue
+              ->Utils.toNullable
+              ->Js.Nullable.toOption,
+            );
+
+          Store.broadcast(newValue);
         };
       };
       window |> Window.addEventListener("storage", listener);
@@ -63,9 +77,9 @@ module Provider = {
 
 module IsAuthenticated = {
   let component = ReasonReact.reducerComponent("AuthStatus.IsAuthenticated");
-  let make = children => {
+  let make = children: ReasonReact.component(state, 'a, state) => {
     ...component,
-    initialState: () => getCurrentState(),
+    initialState: () => getCurrentState()->localStorageDataToState,
     reducer: (newStatus, _state) => ReasonReact.Update(newStatus),
     didMount: ({send, onUnmount}) => {
       let id = Store.subscribe(send);
@@ -85,8 +99,8 @@ module UserInfo = {
         ...(
              state =>
                switch (state) {
-               | None => children(None)
-               | Some(userId) =>
+               | Anonymous => children(None)
+               | Login(userId) =>
                  open GqlUserInfo;
                  let query = UserInfoGql.make(~userId, ());
                  <UserInfoComponent variables=query##variables>

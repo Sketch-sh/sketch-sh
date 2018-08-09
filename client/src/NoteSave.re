@@ -61,13 +61,7 @@ let replaceNoteRoute = (~noteId, ~json, ~title) =>
     |> Utils.handleError
   );
 module NoteSave = {
-  type id = string;
-  type noteKind =
-    | New
-    | Old(id);
-
-  type state = {kind: noteKind};
-
+  open NoteSave_Types;
   type action =
     | SavedNewNote(id, string, Js.Json.t)
     | SavedOldNote(id, string, Js.Json.t);
@@ -93,71 +87,89 @@ module NoteSave = {
         )
       },
     render: ({state, send}) =>
-      switch (state.kind) {
-      | New =>
-        <AddNoteComponent>
-          ...(
-               (mutation, createNoteResult) => {
-                 let {AddNoteComponent.loading} = createNoteResult;
-                 children(
-                   ~loading,
-                   ~onSave=(~title, ~data, ~userId) => {
-                     let noteId = Utils.generateId();
-                     let newNote =
-                       AddNoteGql.make(
-                         ~title,
-                         ~data=data->Editor_Types.JsonEncode.encode,
-                         ~id=noteId,
-                         ~userId,
-                         (),
-                       );
-                     Js.Promise.(
-                       mutation(~variables=newNote##variables, ())
-                       |> then_(_result =>
-                            send(
-                              SavedNewNote(
-                                noteId,
-                                title,
-                                data->Editor_Types.JsonEncode.encode,
-                              ),
-                            )
-                            ->resolve
-                          )
-                     )
-                     |> ignore;
-                   },
-                 );
+      <AuthStatus.IsAuthenticated>
+        ...(
+             user =>
+               switch (user) {
+               | Anonymous => ReasonReact.null
+               | Login(userId) =>
+                 switch (state.kind) {
+                 | New =>
+                   <AddNoteComponent>
+                     ...(
+                          (mutation, createNoteResult) => {
+                            let {AddNoteComponent.loading} = createNoteResult;
+                            children(
+                              ~loading,
+                              ~onSave=(~title, ~data, ~userId) => {
+                                let noteId = Utils.generateId();
+                                let newNote =
+                                  AddNoteGql.make(
+                                    ~title,
+                                    ~data=data->Editor_Types.JsonEncode.encode,
+                                    ~id=noteId,
+                                    ~userId,
+                                    (),
+                                  );
+                                Js.Promise.(
+                                  mutation(~variables=newNote##variables, ())
+                                  |> then_(_result =>
+                                       send(
+                                         SavedNewNote(
+                                           noteId,
+                                           title,
+                                           data
+                                           ->Editor_Types.JsonEncode.encode,
+                                         ),
+                                       )
+                                       ->resolve
+                                     )
+                                )
+                                |> ignore;
+                              },
+                            );
+                          }
+                        )
+                   </AddNoteComponent>
+                 | Old(noteId) =>
+                   <UpdateNoteComponent>
+                     ...(
+                          (mutation, updateNoteResult) => {
+                            let {UpdateNoteComponent.loading} = updateNoteResult;
+                            children(
+                              ~loading,
+                              ~onSave=(~title, ~data, ~userId as _) => {
+                                let data =
+                                  data->Editor_Types.JsonEncode.encode;
+                                let updatedNote =
+                                  UpdateNoteGql.make(
+                                    ~title,
+                                    ~data,
+                                    ~noteId,
+                                    (),
+                                  );
+                                Js.Promise.(
+                                  mutation(
+                                    ~variables=updatedNote##variables,
+                                    ~refetchQueries=[|"getNote"|],
+                                    (),
+                                  )
+                                  |> then_(_data =>
+                                       SavedOldNote(noteId, title, data)
+                                       ->send
+                                       ->resolve
+                                     )
+                                )
+                                |> ignore;
+                              },
+                            );
+                          }
+                        )
+                   </UpdateNoteComponent>
+                 }
                }
-             )
-        </AddNoteComponent>
-      | Old(noteId) =>
-        <UpdateNoteComponent>
-          ...(
-               (mutation, updateNoteResult) => {
-                 let {UpdateNoteComponent.loading} = updateNoteResult;
-                 children(
-                   ~loading,
-                   ~onSave=(~title, ~data, ~userId as _) => {
-                     let data = data->Editor_Types.JsonEncode.encode;
-                     let updatedNote =
-                       UpdateNoteGql.make(~title, ~data, ~noteId, ());
-                     Js.Promise.(
-                       mutation(
-                         ~variables=updatedNote##variables,
-                         ~refetchQueries=[|"getNote"|],
-                         (),
-                       )
-                       |> then_(_data =>
-                            SavedOldNote(noteId, title, data)->send->resolve
-                          )
-                     )
-                     |> ignore;
-                   },
-                 );
-               }
-             )
-        </UpdateNoteComponent>
-      },
+           )
+      </AuthStatus.IsAuthenticated>,
   };
 };
 
