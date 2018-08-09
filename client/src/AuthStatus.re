@@ -1,6 +1,6 @@
 open Utils;
 module Auth = Auth.Auth;
-let getCurrentState = Auth.getUserId;
+let getCurrentState = Auth.UserId.get;
 
 type state = option(int);
 
@@ -30,7 +30,7 @@ module Provider = {
       let listener = event => {
         let event = Auth.toStorageEvent(event);
         let key = event->StorageEvent.key;
-        if (key == Auth.userIdKey) {
+        if (key == Auth.UserId.key) {
           let newValue = event->StorageEvent.newValue->Utils.toNullable;
           Store.broadcast(newValue->Js.Nullable.toOption);
         };

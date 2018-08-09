@@ -1,14 +1,22 @@
-module Auth = {
+module type LocalStorageKey = {let key: string;};
+module LocalStorageOperaton = (K: LocalStorageKey) => {
   open Dom.Storage;
-  let tokenKey = "rtop:token";
-  let setToken = token => setItem(tokenKey, token, localStorage);
-  let getToken = () => getItem(tokenKey, localStorage);
-  let removeToken = () => removeItem(tokenKey, localStorage);
+  let key = K.key;
+  let set = value => setItem(K.key, value, localStorage);
+  let get = () => getItem(K.key, localStorage);
+  let remove = () => removeItem(K.key, localStorage);
+};
 
-  let userIdKey = "rtop:userId";
-  let setUserId = userId => setItem(userIdKey, userId, localStorage);
-  let getUserId = () => getItem(userIdKey, localStorage);
-  let removeUserId = () => removeItem(userIdKey, localStorage);
+module Auth = {
+  module Token =
+    LocalStorageOperaton({
+      let key = "rtop:token";
+    });
+
+  module UserId =
+    LocalStorageOperaton({
+      let key = "rtop:userId";
+    });
 
   let githubLoginRedirect = Config.authDomain ++ "/auth/github";
 
@@ -63,8 +71,8 @@ module AuthCallback = {
         Jwt.async()
         |> then_(jwt => resolve(jwt->(Jwt.decode(token))))
         |> then_(decoded => {
-             Auth.setToken(token);
-             Auth.setUserId(Auth.decodeUserId(decoded));
+             Auth.Token.set(token);
+             Auth.UserId.set(Auth.decodeUserId(decoded));
              send(ChangeState(Success));
              resolve();
            })
@@ -107,8 +115,8 @@ module AuthLogout = {
     ...component,
     didMount: _ => {
       open Auth;
-      removeToken();
-      removeUserId();
+      Token.remove();
+      UserId.remove();
       Js.Global.setTimeout(() => Router.push(Route.Home), 0)->ignore;
     },
     render: _self => "Logging out..."->str,

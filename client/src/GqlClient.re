@@ -11,7 +11,7 @@ let httpLink = ApolloLinks.createHttpLink(~uri=Config.graphqlEndpoint, ());
 
 let authLink =
   ApolloLinks.createContextLink(() => {
-    let token = Auth.Auth.getToken();
+    let token = Auth.Auth.Token.get();
     switch (token) {
     | None => Js.Obj.empty()
     | Some(token) => {
