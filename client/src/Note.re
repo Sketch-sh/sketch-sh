@@ -3,11 +3,7 @@ module GetNote = [%graphql
     query getNote (
       $noteId: String!
     ) {
-      note (
-        where: {
-          id : {_eq: $noteId}
-        }
-      ) {
+      note (where: {id : {_eq: $noteId}}) {
         id
         title
         data
@@ -17,6 +13,9 @@ module GetNote = [%graphql
           username
           avatar
         }
+      }
+      note_edit_token(where: {note_id: {_eq: $noteId}}) {
+        note_id
       }
     }
   |}
