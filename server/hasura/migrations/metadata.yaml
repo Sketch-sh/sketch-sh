@@ -44,6 +44,18 @@ tables:
   update_permissions: []
 - array_relationships: []
   delete_permissions: []
+  insert_permissions:
+  - comment: null
+    permission:
+      allow_upsert: false
+      check: {}
+    role: public
+  object_relationships: []
+  select_permissions: []
+  table: note_edit_token
+  update_permissions: []
+- array_relationships: []
+  delete_permissions: []
   insert_permissions: []
   object_relationships: []
   select_permissions:
@@ -160,6 +172,12 @@ tables:
       foreign_key_constraint_on:
         column: note_id
         table: note_revision
+  - comment: null
+    name: edit_tokens
+    using:
+      foreign_key_constraint_on:
+        column: note_id
+        table: note_edit_token
   delete_permissions: []
   insert_permissions:
   - comment: null
@@ -222,3 +240,13 @@ tables:
         user_id:
           _eq: X-HASURA-USER-ID
     role: user
+  - comment: null
+    permission:
+      columns:
+      - data
+      - title
+      filter:
+        edit_tokens:
+          token:
+            _eq: X-Hasura-Edit-Token
+    role: public
