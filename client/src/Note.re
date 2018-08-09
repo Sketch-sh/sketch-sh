@@ -34,9 +34,7 @@ module EnsureUrlEncodedData = {
     | NoteLoaded(Js.Json.t);
   let component = ReasonReact.reducerComponent("Note_EnsureUrlEncodedData");
 
-  let make =
-      (~note, ~noteEditToken, ~noteKind, ~noteId, _children)
-      : React.component(unit, 'a, action) => {
+  let make = (~note, ~noteId, children): React.component(unit, 'a, action) => {
     ...component,
     didMount: ({send}) =>
       switch (note##data) {
@@ -58,45 +56,7 @@ module EnsureUrlEncodedData = {
           ),
         )
       },
-    render: _send =>
-      <NoteSave noteKind>
-        ...(
-             (~noteSaveStatus, ~user, ~onSave) => {
-               let noteOwnerId =
-                 switch (note##owner) {
-                 | None => None
-                 | Some(owner) =>
-                   switch (owner##id) {
-                   | None => None
-                   | Some(id) => Some(id)
-                   }
-                 };
-
-               let isEditable =
-                 switch (user) {
-                 | Login(currentUserId) =>
-                   switch (noteOwnerId) {
-                   | None => false
-                   | Some(noteOwnerId) => noteOwnerId == currentUserId
-                   }
-                 | Anonymous => noteEditToken->Array.length > 0
-                 };
-               <Editor_Note
-                 title=note##title->optionToEmptyString
-                 isEditable
-                 ?noteOwnerId
-                 blocks=(
-                   switch (note##data) {
-                   | None => [||]
-                   | Some(blocks) => blocks->Editor_Types.JsonDecode.decode
-                   }
-                 )
-                 noteSaveStatus
-                 onSave
-               />;
-             }
-           )
-      </NoteSave>,
+    render: _send => children,
   };
 };
 
@@ -119,12 +79,50 @@ let make = (~noteInfo: Route.noteRouteConfig, _children) => {
                notes
                ->(
                    arrayFirst(~empty=<NotFound entity="note" />, ~render=note =>
-                     <EnsureUrlEncodedData
-                       noteId=noteInfo.noteId
-                       note
-                       noteEditToken=response##note_edit_token
-                       noteKind=(Old(noteInfo.noteId))
-                     />
+                     <EnsureUrlEncodedData noteId=noteInfo.noteId note>
+                       ...<NoteSave noteKind=(Old(noteInfo.noteId))>
+                            ...(
+                                 (~noteSaveStatus, ~user, ~onSave) => {
+                                   let noteOwnerId =
+                                     switch (note##owner) {
+                                     | None => None
+                                     | Some(owner) =>
+                                       switch (owner##id) {
+                                       | None => None
+                                       | Some(id) => Some(id)
+                                       }
+                                     };
+
+                                   let isEditable =
+                                     switch (user) {
+                                     | Login(currentUserId) =>
+                                       switch (noteOwnerId) {
+                                       | None => false
+                                       | Some(noteOwnerId) =>
+                                         noteOwnerId == currentUserId
+                                       }
+                                     | Anonymous =>
+                                       response##note_edit_token->Array.length
+                                       > 0
+                                     };
+                                   <Editor_Note
+                                     title=note##title->optionToEmptyString
+                                     isEditable
+                                     ?noteOwnerId
+                                     blocks=(
+                                       switch (note##data) {
+                                       | None => [||]
+                                       | Some(blocks) =>
+                                         blocks->Editor_Types.JsonDecode.decode
+                                       }
+                                     )
+                                     noteSaveStatus
+                                     onSave
+                                   />;
+                                 }
+                               )
+                          </NoteSave>
+                     </EnsureUrlEncodedData>
                    )
                  );
              }
