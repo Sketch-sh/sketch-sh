@@ -1,252 +1,274 @@
 query_templates: []
 tables:
-- array_relationships: []
-  delete_permissions: []
-  insert_permissions: []
-  object_relationships:
-  - comment: null
-    name: note
-    using:
-      foreign_key_constraint_on: note_id
-  select_permissions:
-  - comment: null
-    permission:
-      columns:
-      - note_id
-      - created_at
-      - title
-      - data
-      filter: {}
-    role: public
-  - comment: null
-    permission:
-      columns:
-      - data
-      - note_id
-      - created_at
-      - title
-      filter: {}
-    role: user
-  table: note_revision
-  update_permissions: []
-- array_relationships: []
-  delete_permissions: []
-  insert_permissions: []
-  object_relationships: []
-  select_permissions:
-  - comment: null
-    permission:
-      columns:
-      - user_identity_type
-      filter: {}
-    role: auth_service
-  table: user_identity_type
-  update_permissions: []
-- array_relationships: []
-  delete_permissions: []
-  insert_permissions:
-  - comment: null
-    permission:
-      allow_upsert: false
-      check: {}
-    role: public
-  object_relationships: []
-  select_permissions: []
-  table: note_edit_token
-  update_permissions: []
-- array_relationships: []
-  delete_permissions: []
-  insert_permissions: []
-  object_relationships: []
-  select_permissions:
-  - comment: null
-    permission:
-      columns:
-      - id
-      - username
-      - name
-      - avatar
-      - created_at
-      - updated_at
-      filter: {}
-    role: user
-  - comment: null
-    permission:
-      columns:
-      - created_at
-      - updated_at
-      - id
-      - username
-      - name
-      - avatar
-      filter: {}
-    role: public
-  table: user_public
-  update_permissions: []
-- array_relationships: []
-  delete_permissions: []
-  insert_permissions:
-  - comment: null
-    permission:
-      allow_upsert: true
-      check: {}
-    role: auth_service
-  object_relationships:
-  - comment: null
-    name: user
-    using:
-      foreign_key_constraint_on: user_id
-  select_permissions:
-  - comment: null
-    permission:
-      columns:
-      - identity_type
-      - user_id
-      - data
-      - identity_id
-      filter: {}
-    role: auth_service
-  table: user_identity
-  update_permissions:
-  - comment: null
-    permission:
-      columns:
-      - identity_type
-      - user_id
-      - data
-      - identity_id
-      filter: {}
-    role: auth_service
-- array_relationships:
-  - comment: null
-    name: notes
-    using:
-      foreign_key_constraint_on:
-        column: user_id
-        table: note
-  - comment: null
-    name: identities
-    using:
-      foreign_key_constraint_on:
-        column: user_id
-        table: user_identity
-  delete_permissions: []
-  insert_permissions:
-  - comment: null
-    permission:
-      allow_upsert: false
-      check: {}
-    role: auth_service
-  object_relationships: []
-  select_permissions:
-  - comment: null
-    permission:
-      columns:
-      - id
-      - username
-      - name
-      - email
-      - avatar
-      - created_at
-      - updated_at
-      filter: {}
-    role: auth_service
-  table: user
-  update_permissions:
-  - comment: null
-    permission:
-      columns:
-      - username
-      - name
-      - email
-      - avatar
-      - created_at
-      - updated_at
-      - id
-      filter: {}
-    role: auth_service
-- array_relationships:
-  - comment: null
-    name: revisions
-    using:
-      foreign_key_constraint_on:
-        column: note_id
-        table: note_revision
-  - comment: null
-    name: edit_tokens
-    using:
-      foreign_key_constraint_on:
-        column: note_id
-        table: note_edit_token
-  delete_permissions: []
-  insert_permissions:
-  - comment: null
-    permission:
-      allow_upsert: false
-      check:
-        user_id:
-          _eq: X-HASURA-USER-ID
-    role: user
-  - comment: null
-    permission:
-      allow_upsert: false
-      check:
-        user_id:
-          _eq: anonymous
-    role: public
-  object_relationships:
-  - comment: null
-    name: user
-    using:
-      foreign_key_constraint_on: user_id
-  - comment: null
-    name: owner
-    using:
-      manual_configuration:
-        column_mapping:
-          user_id: id
-        remote_table: user_public
-  select_permissions:
-  - comment: null
-    permission:
-      columns:
-      - id
-      - user_id
-      - title
-      - data
-      - created_at
-      - updated_at
-      filter: {}
-    role: public
-  - comment: null
-    permission:
-      columns:
-      - updated_at
-      - user_id
-      - id
-      - title
-      - data
-      - created_at
-      filter: {}
-    role: user
-  table: note
-  update_permissions:
-  - comment: null
-    permission:
-      columns:
-      - data
-      - title
-      filter:
-        user_id:
-          _eq: X-HASURA-USER-ID
-    role: user
-  - comment: null
-    permission:
-      columns:
-      - data
-      - title
-      filter:
-        edit_tokens:
-          token:
-            _eq: X-Hasura-Edit-Token
-    role: public
+  - array_relationships: []
+    delete_permissions: []
+    insert_permissions: []
+    object_relationships:
+      - comment: null
+        name: note
+        using:
+          foreign_key_constraint_on: note_id
+    select_permissions:
+      - comment: null
+        permission:
+          columns:
+            - note_id
+            - created_at
+            - title
+            - data
+          filter: {}
+        role: public
+      - comment: null
+        permission:
+          columns:
+            - data
+            - note_id
+            - created_at
+            - title
+          filter: {}
+        role: user
+    table: note_revision
+    update_permissions: []
+  - array_relationships: []
+    delete_permissions: []
+    insert_permissions: []
+    object_relationships: []
+    select_permissions:
+      - comment: null
+        permission:
+          columns:
+            - user_identity_type
+          filter: {}
+        role: auth_service
+    table: user_identity_type
+    update_permissions: []
+  - array_relationships: []
+    delete_permissions: []
+    insert_permissions:
+      - comment: null
+        permission:
+          allow_upsert: false
+          check: {}
+        role: public
+    object_relationships:
+      - comment: null
+        name: note
+        using:
+          foreign_key_constraint_on: note_id
+    select_permissions:
+      - comment: null
+        permission:
+          columns:
+            - note_id
+          filter:
+            token:
+              _eq: X-Hasura-Edit-Token
+          limit: 30
+        role: public
+      - comment: null
+        permission:
+          columns:
+            - note_id
+          filter:
+            token:
+              _eq: X-Hasura-Edit-Token
+          limit: 30
+        role: user
+    table: note_edit_token
+    update_permissions: []
+  - array_relationships: []
+    delete_permissions: []
+    insert_permissions: []
+    object_relationships: []
+    select_permissions:
+      - comment: null
+        permission:
+          columns:
+            - id
+            - username
+            - name
+            - avatar
+            - created_at
+            - updated_at
+          filter: {}
+        role: user
+      - comment: null
+        permission:
+          columns:
+            - created_at
+            - updated_at
+            - id
+            - username
+            - name
+            - avatar
+          filter: {}
+        role: public
+    table: user_public
+    update_permissions: []
+  - array_relationships: []
+    delete_permissions: []
+    insert_permissions:
+      - comment: null
+        permission:
+          allow_upsert: true
+          check: {}
+        role: auth_service
+    object_relationships:
+      - comment: null
+        name: user
+        using:
+          foreign_key_constraint_on: user_id
+    select_permissions:
+      - comment: null
+        permission:
+          columns:
+            - identity_type
+            - user_id
+            - data
+            - identity_id
+          filter: {}
+        role: auth_service
+    table: user_identity
+    update_permissions:
+      - comment: null
+        permission:
+          columns:
+            - identity_type
+            - user_id
+            - data
+            - identity_id
+          filter: {}
+        role: auth_service
+  - array_relationships:
+      - comment: null
+        name: notes
+        using:
+          foreign_key_constraint_on:
+            column: user_id
+            table: note
+      - comment: null
+        name: identities
+        using:
+          foreign_key_constraint_on:
+            column: user_id
+            table: user_identity
+    delete_permissions: []
+    insert_permissions:
+      - comment: null
+        permission:
+          allow_upsert: false
+          check: {}
+        role: auth_service
+    object_relationships: []
+    select_permissions:
+      - comment: null
+        permission:
+          columns:
+            - id
+            - username
+            - name
+            - email
+            - avatar
+            - created_at
+            - updated_at
+          filter: {}
+        role: auth_service
+    table: user
+    update_permissions:
+      - comment: null
+        permission:
+          columns:
+            - username
+            - name
+            - email
+            - avatar
+            - created_at
+            - updated_at
+            - id
+          filter: {}
+        role: auth_service
+  - array_relationships:
+      - comment: null
+        name: revisions
+        using:
+          foreign_key_constraint_on:
+            column: note_id
+            table: note_revision
+      - comment: null
+        name: edit_tokens
+        using:
+          foreign_key_constraint_on:
+            column: note_id
+            table: note_edit_token
+    delete_permissions: []
+    insert_permissions:
+      - comment: null
+        permission:
+          allow_upsert: false
+          check:
+            user_id:
+              _eq: X-HASURA-USER-ID
+        role: user
+      - comment: null
+        permission:
+          allow_upsert: false
+          check:
+            user_id:
+              _eq: anonymous
+        role: public
+    object_relationships:
+      - comment: null
+        name: user
+        using:
+          foreign_key_constraint_on: user_id
+      - comment: null
+        name: owner
+        using:
+          manual_configuration:
+            column_mapping:
+              user_id: id
+            remote_table: user_public
+    select_permissions:
+      - comment: null
+        permission:
+          columns:
+            - id
+            - user_id
+            - title
+            - data
+            - created_at
+            - updated_at
+          filter: {}
+        role: public
+      - comment: null
+        permission:
+          columns:
+            - updated_at
+            - user_id
+            - id
+            - title
+            - data
+            - created_at
+          filter: {}
+        role: user
+    table: note
+    update_permissions:
+      - comment: null
+        permission:
+          columns:
+            - data
+            - title
+          filter:
+            user_id:
+              _eq: X-HASURA-USER-ID
+        role: user
+      - comment: null
+        permission:
+          columns:
+            - data
+            - title
+          filter:
+            edit_tokens:
+              token:
+                _eq: X-Hasura-Edit-Token
+        role: public
