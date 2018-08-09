@@ -62,7 +62,7 @@ module EnsureUrlEncodedData = {
       <NoteSave noteKind>
         ...(
              (~noteSaveStatus, ~userId, ~onSave) => {
-               let noteOwner =
+               let noteOwnerId =
                  switch (note##owner) {
                  | None => None
                  | Some(owner) =>
@@ -73,8 +73,8 @@ module EnsureUrlEncodedData = {
                  };
                <Editor_Note
                  title=note##title->optionToEmptyString
-                 userId
-                 ?noteOwner
+                 isEditable=false
+                 ?noteOwnerId
                  blocks=(
                    switch (note##data) {
                    | None => [||]

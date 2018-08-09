@@ -13,7 +13,7 @@ let make = _children => {
     <NoteSave noteKind=New>
       ...(
            (~noteSaveStatus, ~userId, ~onSave) =>
-             <Editor_Note blocks noteSaveStatus onSave userId />
+             <Editor_Note blocks noteSaveStatus onSave isEditable=true />
          )
     </NoteSave>,
 };

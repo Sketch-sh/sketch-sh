@@ -37,10 +37,10 @@ let component = ReasonReact.reducerComponent("Editor_Page");
 let make =
     (
       ~blocks,
-      ~userId,
-      ~noteOwner=?,
+      ~noteOwnerId=?,
       ~title="",
       ~noteSaveStatus: NoteSave_Types.noteSaveStatus,
+      ~isEditable,
       ~onSave,
       _children,
     ) => {
@@ -182,6 +182,7 @@ let make =
             placeholder="untitled note"
             value=state.title
             onChange=(event => valueFromEvent(event)->TitleUpdate->send)
+            readOnly=(!isEditable)
           />
         </div>
         <Editor_Blocks
@@ -190,6 +191,7 @@ let make =
             callback => send(RegisterExecuteCallback(callback))
           )
           onUpdate=(blocks => send(BlockUpdate(blocks)))
+          readOnly=(!isEditable)
         />
       </main>
     </>;
