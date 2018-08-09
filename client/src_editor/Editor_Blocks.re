@@ -6,7 +6,7 @@ open Editor_CodeBlockTypes;
 open Editor_Types.Block;
 
 type action =
-  | Block_Add(id, blockData)
+  | Block_Add(id, blockTyp)
   | Block_Execute
   | Block_Delete(id)
   | Block_Focus(id, blockTyp)
@@ -27,16 +27,10 @@ let blockControlsButtons = (b_id, send) =>
     <button onClick=(_ => send(Block_Delete(b_id)))>
       "Delete block"->str
     </button>
-    <button
-      onClick=(
-        _ => send(Block_Add(b_id, Editor_Blocks_Utils.emptyTextBlock()))
-      )>
+    <button onClick=(_ => send(Block_Add(b_id, BTyp_Text)))>
       "Add text block"->str
     </button>
-    <button
-      onClick=(
-        _ => send(Block_Add(b_id, Editor_Blocks_Utils.emptyCodeBlock()))
-      )>
+    <button onClick=(_ => send(Block_Add(b_id, BTyp_Code)))>
       "Add code block"->str
     </button>
   </div>;
@@ -241,10 +235,11 @@ let make =
           }) :
           ReasonReact.NoUpdate
       }
-    | Block_Add(afterBlockId, blockType) =>
+    | Block_Add(afterBlockId, blockTyp) =>
+      let newBlockId = Utils.generateId();
       ReasonReact.Update({
-        ...state,
         stateUpdateReason: Some(action),
+        focusedBlock: Some((newBlockId, blockTyp, FcTyp_BlockNew)),
         blocks:
           state.blocks
           ->(
@@ -259,7 +254,14 @@ let make =
                       acc,
                       [|
                         block,
-                        {b_id: Utils.generateId(), b_data: blockType},
+                        {
+                          b_id: newBlockId,
+                          b_data:
+                            switch (blockTyp) {
+                            | BTyp_Text => Editor_Blocks_Utils.emptyTextBlock()
+                            | BTyp_Code => Editor_Blocks_Utils.emptyCodeBlock()
+                            },
+                        },
                       |],
                     );
                   };
@@ -267,7 +269,7 @@ let make =
               )
             )
           ->Editor_Blocks_Utils.syncLineNumber,
-      })
+      });
     | Block_FocusUp(blockId) =>
       let upperBlock = {
         let rec loop = i =>

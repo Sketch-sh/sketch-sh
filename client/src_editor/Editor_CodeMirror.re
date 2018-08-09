@@ -72,6 +72,7 @@ let make =
                   CodeMirror.Position.make(~line=lastLinePlusOne, ~ch=0, ()),
                 )
               );
+          | FcTyp_BlockNew
           | FcTyp_EditorFocus => ()
           };
         };

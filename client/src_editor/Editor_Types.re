@@ -22,6 +22,7 @@ module Block = {
 
   type focusChangeType =
     | FcTyp_EditorFocus
+    | FcTyp_BlockNew
     | FcTyp_BlockFocusUp
     | FcTyp_BlockFocusDown;
 };
