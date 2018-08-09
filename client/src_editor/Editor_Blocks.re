@@ -38,7 +38,13 @@ let blockControlsButtons = (b_id, send) =>
 let component = ReasonReact.reducerComponent("Editor_Page");
 
 let make =
-    (~blocks: array(block), ~onUpdate, ~registerExecuteCallback=?, _children) => {
+    (
+      ~blocks: array(block),
+      ~readOnly=?,
+      ~onUpdate,
+      ~registerExecuteCallback=?,
+      _children,
+    ) => {
   ...component,
   initialState: () => {
     blocks: blocks->Editor_Blocks_Utils.syncLineNumber,
@@ -357,6 +363,7 @@ let make =
                       onBlockUp=(() => send(Block_FocusUp(b_id)))
                       onBlockDown=(() => send(Block_FocusDown(b_id)))
                       widgets=bc_widgets
+                      ?readOnly
                       firstLineNumber=bc_firstLineNumber
                     />
                   </div>
@@ -379,6 +386,7 @@ let make =
                         (newValue, diff) =>
                           send(Block_UpdateValue(b_id, newValue, diff))
                       )
+                      ?readOnly
                     />
                   </div>
                 }
