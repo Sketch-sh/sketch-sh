@@ -54,7 +54,7 @@ let make = (~kind, ~userId, ~onSaveNewNote, ~onSaveOldNote, children) => {
 
                    | NotCalled => NoteSave_Done
                    },
-                 ~userId,
+                 ~user=AuthStatus.Login(userId),
                  ~onSave=(~title, ~data) => {
                    let data = data->Editor_Types.JsonEncode.encode;
                    let noteId = Utils.generateId();
@@ -101,7 +101,7 @@ let make = (~kind, ~userId, ~onSaveNewNote, ~onSaveOldNote, children) => {
 
                    | NotCalled => NoteSave_Done
                    },
-                 ~userId,
+                 ~user=AuthStatus.Login(userId),
                  ~onSave=(~title, ~data) => {
                    let data = data->Editor_Types.JsonEncode.encode;
                    let updatedNote =

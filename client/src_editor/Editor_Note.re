@@ -112,35 +112,61 @@ let make =
                         "Run"->str
                       </button>
                  </UI_Balloon>
-                 <UI_Balloon position=Down length=Fit message="Save">
-                   /* switch (saveStatus) {
-                      | Pristine => "Nothing to save (Ctrl+S)"
-                      | Saved => "Saved (Ctrl+S)"
-                      | Saving
-                      | Unsaved => "Save modified changes (Ctrl+S)"
-                      } */
-                   /* switch (saveStatus) {
-                      | Pristine
-                      | Saved
-                      | Saving => true
-                      | Unsaved => false
-                      } */
+                 (
+                   isEditable ?
+                     <UI_Balloon position=Down length=Fit message="Save">
+                       /* switch (saveStatus) {
+                          | Pristine => "Nothing to save (Ctrl+S)"
+                          | Saved => "Saved (Ctrl+S)"
+                          | Saving
+                          | Unsaved => "Save modified changes (Ctrl+S)"
+                          } */
+                       /* switch (saveStatus) {
+                          | Pristine
+                          | Saved
+                          | Saving => true
+                          | Unsaved => false
+                          } */
 
-                     ...<button
-                          disabled=false
-                          className=buttonClassName
-                          onClick=(
-                            _ => {
-                              onSave(~title=state.title, ~data=state.blocks^);
-                              switch (state.executeCallback) {
-                              | None => ()
-                              | Some(callback) => callback()
-                              };
-                            }
-                          )>
-                          <> <Fi.Save /> "Save"->str </>
-                        </button>
-                   </UI_Balloon>
+                         ...<button
+                              disabled=false
+                              className=buttonClassName
+                              onClick=(
+                                _ => {
+                                  onSave(
+                                    ~title=state.title,
+                                    ~data=state.blocks^,
+                                  );
+                                  switch (state.executeCallback) {
+                                  | None => ()
+                                  | Some(callback) => callback()
+                                  };
+                                }
+                              )>
+                              <> <Fi.Save /> "Save"->str </>
+                            </button>
+                       </UI_Balloon> :
+                     <UI_Balloon
+                       position=Down message="Fork this note to edit">
+                       ...<button
+                            disabled=true
+                            className=buttonClassName
+                            onClick=(
+                              _ => {
+                                onSave(
+                                  ~title=state.title,
+                                  ~data=state.blocks^,
+                                );
+                                switch (state.executeCallback) {
+                                | None => ()
+                                | Some(callback) => callback()
+                                };
+                              }
+                            )>
+                            <> <Fi.Save /> "Save"->str </>
+                          </button>
+                     </UI_Balloon>
+                 )
                  /* (
                       isSaving ?
                         <>

@@ -26,7 +26,17 @@ type action =
    check with the original data to see if they are matched */
 let component = ReasonReact.reducerComponent("NoteSave");
 
-let make = (~noteKind: noteKind, children) => {
+let make =
+    (
+      ~noteKind: noteKind,
+      children:
+        (
+          ~noteSaveStatus: NoteSave_Types.noteSaveStatus,
+          ~user: AuthStatus.state,
+          ~onSave: 'a
+        ) =>
+        ReasonReact.reactElement,
+    ) => {
   ...component,
   initialState: () => {kind: noteKind},
   reducer: (action, _state) =>

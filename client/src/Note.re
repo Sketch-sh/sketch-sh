@@ -35,7 +35,7 @@ module EnsureUrlEncodedData = {
   let component = ReasonReact.reducerComponent("Note_EnsureUrlEncodedData");
 
   let make =
-      (~note, ~noteKind, ~noteId, _children)
+      (~note, ~noteEditToken, ~noteKind, ~noteId, _children)
       : React.component(unit, 'a, action) => {
     ...component,
     didMount: ({send}) =>
@@ -61,7 +61,7 @@ module EnsureUrlEncodedData = {
     render: _send =>
       <NoteSave noteKind>
         ...(
-             (~noteSaveStatus, ~userId, ~onSave) => {
+             (~noteSaveStatus, ~user, ~onSave) => {
                let noteOwnerId =
                  switch (note##owner) {
                  | None => None
@@ -71,9 +71,19 @@ module EnsureUrlEncodedData = {
                    | Some(id) => Some(id)
                    }
                  };
+
+               let isEditable =
+                 switch (user) {
+                 | Login(currentUserId) =>
+                   switch (noteOwnerId) {
+                   | None => false
+                   | Some(noteOwnerId) => noteOwnerId == currentUserId
+                   }
+                 | Anonymous => noteEditToken->Array.length > 0
+                 };
                <Editor_Note
                  title=note##title->optionToEmptyString
-                 isEditable=false
+                 isEditable
                  ?noteOwnerId
                  blocks=(
                    switch (note##data) {
@@ -112,6 +122,7 @@ let make = (~noteInfo: Route.noteRouteConfig, _children) => {
                      <EnsureUrlEncodedData
                        noteId=noteInfo.noteId
                        note
+                       noteEditToken=response##note_edit_token
                        noteKind=(Old(noteInfo.noteId))
                      />
                    )

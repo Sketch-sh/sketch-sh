@@ -12,7 +12,7 @@ let make = _children => {
   render: _self =>
     <NoteSave noteKind=New>
       ...(
-           (~noteSaveStatus, ~userId, ~onSave) =>
+           (~noteSaveStatus, ~user as _, ~onSave) =>
              <Editor_Note blocks noteSaveStatus onSave isEditable=true />
          )
     </NoteSave>,
