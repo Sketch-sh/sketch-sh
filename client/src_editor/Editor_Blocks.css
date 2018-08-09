@@ -16,28 +16,3 @@
   display: flex;
   flex-direction: row-reverse;
 }
-
-.cell__controls-hint {
-  flex: 0 0 50%;
-  color: rgb(136, 136, 136);
-  font-size: 13px;
-  font-style: italic;
-  display: flex;
-  align-items: center;
-}
-
-.cell__controls-hint--run {
-  font-style: italic;
-  border: 0;
-  color: white;
-  padding: 0 5px;
-  font-weight: bold;
-  margin: 0;
-  height: 25px;
-  line-height: 25px;
-  font-size: 13px;
-  transform: scale(0.9, 0.9);
-  background: #00c72b;
-  text-shadow: 0px 1px 0 #11b53c;
-  cursor: pointer;
-}
