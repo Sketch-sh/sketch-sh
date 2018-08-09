@@ -110,15 +110,10 @@ app.get("/auth/webhook", (req, res) => {
   const token = jwtTokenFromHeader(req);
 
   if (!token) {
-    let returnValues = {
+    res.json({
       "X-Hasura-Role": "public",
-    };
-    if (req.header("X-Hasura-Edit-Token")) {
-      returnValues = Object.assign(returnValues, {
-        "X-Hasura-Edit-Token": req.header("X-Hasura-Edit-Token"),
-      });
-    }
-    res.json(returnValues);
+      "X-Hasura-Edit-Token": req.header("X-Hasura-Edit-Token") || "",
+    });
     return;
   }
 
@@ -130,6 +125,7 @@ app.get("/auth/webhook", (req, res) => {
       res.json({
         "X-Hasura-Role": result.role,
         "X-Hasura-User-Id": result.userId,
+        "X-Hasura-Edit-Token": "",
       });
       return;
     }
