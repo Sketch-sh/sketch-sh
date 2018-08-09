@@ -26,8 +26,9 @@ let make = _children => {
   render: _self =>
     <Editor_Note
       blocks
+      userId=""
       title="ReasonML playground"
       onSave=((~title as _, ~data as _) => ())
-      loading=false
+      noteSaveStatus=NoteSave_Types.NoteSave_Done
     />,
 };

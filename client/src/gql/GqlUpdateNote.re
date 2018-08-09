@@ -3,7 +3,7 @@ open Utils_GraphqlPpx;
 module UpdateNoteGql = [%graphql
   {|
     mutation ($noteId: String!, $data: jsonb!, $title: String!) {
-      update_note(
+      mutate: update_note(
         where: {
           id: {_eq: $noteId}
         }
@@ -11,9 +11,7 @@ module UpdateNoteGql = [%graphql
         title: $title,
         data: $data
       }) {
-        returning {
-          updated_at
-        }
+        affected_rows
       }
     }
   |}

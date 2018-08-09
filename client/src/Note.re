@@ -36,7 +36,7 @@ module EnsureUrlEncodedData = {
   let component = ReasonReact.reducerComponent("Note_EnsureUrlEncodedData");
 
   let make =
-      (~note, ~noteKind, ~noteId, ~userId, _children)
+      (~note, ~noteKind, ~noteId, _children)
       : React.component(unit, 'a, action) => {
     ...component,
     didMount: ({send}) =>
@@ -62,18 +62,30 @@ module EnsureUrlEncodedData = {
     render: _send =>
       <NoteSave noteKind>
         ...(
-             (~loading, ~onSave) =>
+             (~noteSaveStatus, ~userId, ~onSave) => {
+               let noteOwner =
+                 switch (note##owner) {
+                 | None => None
+                 | Some(owner) =>
+                   switch (owner##id) {
+                   | None => None
+                   | Some(id) => Some(id)
+                   }
+                 };
                <Editor_Note
                  title=note##title->optionToEmptyString
+                 userId
+                 ?noteOwner
                  blocks=(
                    switch (note##data) {
                    | None => [||]
                    | Some(blocks) => blocks->Editor_Types.JsonDecode.decode
                    }
                  )
-                 loading
-                 onSave=(onSave(~userId))
-               />
+                 noteSaveStatus
+                 onSave
+               />;
+             }
            )
       </NoteSave>,
   };
@@ -85,41 +97,28 @@ let make = (~noteInfo: Route.noteRouteConfig, _children) => {
   ...component,
   render: _self => {
     let noteQuery = GetNote.make(~noteId=noteInfo.noteId, ());
-    <AuthStatus.IsAuthenticated>
+
+    <GetNoteComponent variables=noteQuery##variables>
       ...(
-           isLogin => {
-             let userId =
-               switch (isLogin) {
-               | Anonymous => Config.anonymousUserId
-               | Login(userId) => userId
-               };
-             <GetNoteComponent variables=noteQuery##variables>
-               ...(
-                    ({result}) =>
-                      switch (result) {
-                      | Loading =>
-                        <div> (ReasonReact.string("Loading")) </div>
-                      | Error(error) =>
-                        <div> (ReasonReact.string(error##message)) </div>
-                      | Data(response) =>
-                        let notes = response##note;
-                        notes
-                        ->(
-                            arrayFirst(
-                              ~empty=<NotFound entity="note" />, ~render=note =>
-                              <EnsureUrlEncodedData
-                                noteId=noteInfo.noteId
-                                note
-                                noteKind=(Old(noteInfo.noteId))
-                                userId
-                              />
-                            )
-                          );
-                      }
-                  )
-             </GetNoteComponent>;
-           }
+           ({result}) =>
+             switch (result) {
+             | Loading => <div> (ReasonReact.string("Loading")) </div>
+             | Error(error) =>
+               <div> (ReasonReact.string(error##message)) </div>
+             | Data(response) =>
+               let notes = response##note;
+               notes
+               ->(
+                   arrayFirst(~empty=<NotFound entity="note" />, ~render=note =>
+                     <EnsureUrlEncodedData
+                       noteId=noteInfo.noteId
+                       note
+                       noteKind=(Old(noteInfo.noteId))
+                     />
+                   )
+                 );
+             }
          )
-    </AuthStatus.IsAuthenticated>;
+    </GetNoteComponent>;
   },
 };

@@ -10,23 +10,19 @@ module AddNoteAnonymousGql = [%graphql
       $title: String!,
       $data: jsonb!
     ) {
-
-      insert_note_edit_token(objects:{
-        note_id: $noteId
-        token: $editToken
-      }) {
-        affected_rows
-      }
-
-      insert_note(objects: {
+      mutate: insert_note(objects: {
         title: $title,
         id: $noteId,
         user_id: $userId,
         data: $data
       }) {
-        returning {
-          updated_at
-        }
+        affected_rows
+      }
+      insert_note_edit_token(objects:{
+        note_id: $noteId
+        token: $editToken
+      }) {
+        affected_rows
       }
     }
   |}
@@ -39,38 +35,52 @@ open NoteSave_Types;
 
 let component = ReasonReact.statelessComponent("NoteSave_Anonymous");
 
-let make = (~kind, ~user, ~onSaveNewNote, ~onSaveOldNote, children) => {
+let make = (~kind, ~onSaveNewNote, ~onSaveOldNote, children) => {
   ...component,
-  render: _self =>
+  render: _self => {
+    let userId = Config.anonymousUserId;
     switch (kind) {
     | New =>
       <AddNoteAnonymousComponent>
         ...(
              (mutation, createNoteResult) => {
-               let {AddNoteAnonymousComponent.loading} = createNoteResult;
+               let {AddNoteAnonymousComponent.result} = createNoteResult;
+
                children(
-                 ~loading,
-                 ~user,
+                 ~noteSaveStatus=
+                   switch (result) {
+                   | Loading => NoteSave_Loading
+                   | Error(_apolloError) => NoteSave_Error
+                   | Data(data) =>
+                     switch (data##mutate) {
+                     | None => NoteSave_Error
+                     | Some(mutate) =>
+                       if (mutate##affected_rows > 0) {
+                         NoteSave_Done;
+                       } else {
+                         NoteSave_Error;
+                       }
+                     }
+
+                   | NotCalled => NoteSave_Done
+                   },
+                 ~userId,
                  ~onSave=(~title, ~data) => {
+                   let data = data->Editor_Types.JsonEncode.encode;
                    let noteId = Utils.generateId();
                    let newNote =
                      AddNoteAnonymousGql.make(
                        ~title,
-                       ~data=data->Editor_Types.JsonEncode.encode,
+                       ~data,
                        ~noteId,
-                       ~userId=Config.anonymousUserId,
+                       ~userId,
                        ~editToken=Auth.Auth.getOrCreateEditToken(),
                        (),
                      );
                    Js.Promise.(
                      mutation(~variables=newNote##variables, ())
                      |> then_(_result =>
-                          onSaveNewNote(
-                            noteId,
-                            title,
-                            data->Editor_Types.JsonEncode.encode,
-                          )
-                          ->resolve
+                          onSaveNewNote(noteId, title, data)->resolve
                         )
                    )
                    |> ignore;
@@ -83,10 +93,26 @@ let make = (~kind, ~user, ~onSaveNewNote, ~onSaveOldNote, children) => {
       <UpdateNoteComponent>
         ...(
              (mutation, updateNoteResult) => {
-               let {UpdateNoteComponent.loading} = updateNoteResult;
+               let {UpdateNoteComponent.result} = updateNoteResult;
                children(
-                 ~loading,
-                 ~user,
+                 ~noteSaveStatus=
+                   switch (result) {
+                   | Loading => NoteSave_Loading
+                   | Error(_apolloError) => NoteSave_Error
+                   | Data(data) =>
+                     switch (data##mutate) {
+                     | None => NoteSave_Error
+                     | Some(mutate) =>
+                       if (mutate##affected_rows > 0) {
+                         NoteSave_Done;
+                       } else {
+                         NoteSave_Error;
+                       }
+                     }
+
+                   | NotCalled => NoteSave_Done
+                   },
+                 ~userId,
                  ~onSave=(~title, ~data) => {
                    let data = data->Editor_Types.JsonEncode.encode;
                    let updatedNote =
@@ -94,19 +120,7 @@ let make = (~kind, ~user, ~onSaveNewNote, ~onSaveOldNote, children) => {
                    Js.Promise.(
                      mutation(
                        ~variables=updatedNote##variables,
-                       ~refetchQueries=[|
-                         {
-                           "query": "getNote",
-                           "variables": {
-                             "where": {
-                               "id": {
-                                 "_eq": noteId,
-                               },
-                             },
-                           },
-                         }
-                         ->Utils_GraphqlPpx.hackRefetchQueries,
-                       |],
+                       ~refetchQueries=[|"getNote"|],
                        (),
                      )
                      |> then_(_data =>
@@ -119,5 +133,6 @@ let make = (~kind, ~user, ~onSaveNewNote, ~onSaveOldNote, children) => {
              }
            )
       </UpdateNoteComponent>
-    },
+    };
+  },
 };

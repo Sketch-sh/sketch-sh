@@ -10,21 +10,10 @@ let component = ReasonReact.statelessComponent("Note_New");
 let make = _children => {
   ...component,
   render: _self =>
-    <AuthStatus.IsAuthenticated>
+    <NoteSave noteKind=New>
       ...(
-           isLogin => {
-             let userId =
-               switch (isLogin) {
-               | Anonymous => Config.anonymousUserId
-               | Login(userId) => userId
-               };
-             <NoteSave noteKind=New>
-               ...(
-                    (~loading, ~onSave) =>
-                      <Editor_Note blocks loading onSave=(onSave(~userId)) />
-                  )
-             </NoteSave>;
-           }
+           (~noteSaveStatus, ~userId, ~onSave) =>
+             <Editor_Note blocks noteSaveStatus onSave userId />
          )
-    </AuthStatus.IsAuthenticated>,
+    </NoteSave>,
 };

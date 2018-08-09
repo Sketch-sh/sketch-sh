@@ -34,23 +34,32 @@ let deriveSaveStatus = (~pristine, ~isSaving, ~dirty) =>
 
 let component = ReasonReact.reducerComponent("Editor_Page");
 
-let make = (~blocks, ~title="", ~loading as isSaving, ~onSave, _children) => {
+let make =
+    (
+      ~blocks,
+      ~userId,
+      ~noteOwner=?,
+      ~title="",
+      ~noteSaveStatus: NoteSave_Types.noteSaveStatus,
+      ~onSave,
+      _children,
+    ) => {
   ...component,
   initialState: () => {
     title,
     pristine: true,
     dirty: false,
     blocks: ref(blocks),
-    isSaving: ref(isSaving),
+    isSaving: ref(false),
     executeCallback: None,
   },
-  willReceiveProps: ({state}) =>
-    if (state.isSaving^ != isSaving) {
-      state.isSaving := isSaving;
-      {...state, dirty: false, pristine: false};
-    } else {
-      state;
-    },
+  /* willReceiveProps: ({state}) =>
+     if (state.isSaving^ != isSaving) {
+       state.isSaving := isSaving;
+       {...state, dirty: false, pristine: false};
+     } else {
+       state;
+     }, */
   reducer: (action, state) =>
     switch (action) {
     | TitleUpdate(title) =>
@@ -62,13 +71,20 @@ let make = (~blocks, ~title="", ~loading as isSaving, ~onSave, _children) => {
       ReasonReact.Update({...state, pristine: false, dirty: true});
     },
   render: ({state, send}) => {
-    let saveStatus =
-      deriveSaveStatus(
-        ~pristine=state.pristine,
-        ~isSaving,
-        ~dirty=state.dirty,
-      );
+    Js.log(
+      switch (noteSaveStatus) {
+      | NoteSave_Done => "note save done"
+      | NoteSave_Loading => "note save loading"
+      | NoteSave_Error => "note save error"
+      },
+    );
     <>
+      /* let saveStatus =
+         deriveSaveStatus(
+           ~pristine=state.pristine,
+           ~isSaving,
+           ~dirty=state.dirty,
+         ); */
       <UI_Topbar.WithToolbar>
         ...(
              (~buttonClassName) =>
@@ -96,61 +112,61 @@ let make = (~blocks, ~title="", ~loading as isSaving, ~onSave, _children) => {
                         "Run"->str
                       </button>
                  </UI_Balloon>
-                 <UI_Balloon
-                   position=Down
-                   length=Fit
-                   message=(
-                     switch (saveStatus) {
-                     | Pristine => "Nothing to save (Ctrl+S)"
-                     | Saved => "Saved (Ctrl+S)"
-                     | Saving
-                     | Unsaved => "Save modified changes (Ctrl+S)"
-                     }
-                   )>
-                   ...<button
-                        disabled=(
-                          switch (saveStatus) {
-                          | Pristine
-                          | Saved
-                          | Saving => true
-                          | Unsaved => false
-                          }
-                        )
-                        className=buttonClassName
-                        onClick=(
-                          _ => {
-                            onSave(~title=state.title, ~data=state.blocks^);
-                            switch (state.executeCallback) {
-                            | None => ()
-                            | Some(callback) => callback()
-                            };
-                          }
-                        )>
-                        (
-                          isSaving ?
-                            <>
-                              <Fi.Loader className="EditorNav__button--spin" />
-                              "Saving"->str
-                            </> :
-                            <> <Fi.Save /> "Save"->str </>
-                        )
-                      </button>
-                 </UI_Balloon>
+                 <UI_Balloon position=Down length=Fit message="Save">
+                   /* switch (saveStatus) {
+                      | Pristine => "Nothing to save (Ctrl+S)"
+                      | Saved => "Saved (Ctrl+S)"
+                      | Saving
+                      | Unsaved => "Save modified changes (Ctrl+S)"
+                      } */
+                   /* switch (saveStatus) {
+                      | Pristine
+                      | Saved
+                      | Saving => true
+                      | Unsaved => false
+                      } */
+
+                     ...<button
+                          disabled=false
+                          className=buttonClassName
+                          onClick=(
+                            _ => {
+                              onSave(~title=state.title, ~data=state.blocks^);
+                              switch (state.executeCallback) {
+                              | None => ()
+                              | Some(callback) => callback()
+                              };
+                            }
+                          )>
+                          <> <Fi.Save /> "Save"->str </>
+                        </button>
+                   </UI_Balloon>
+                 /* (
+                      isSaving ?
+                        <>
+                          <Fi.Loader
+                            className="EditorNav__button--spin"
+                          />
+                          "Saving"->str
+                        </> :
+                        <> <Fi.Save /> "Save"->str </>
+                    ) */
                </>
            )
       </UI_Topbar.WithToolbar>
-      <div className="EditorNote__saveStatus">
-        {
-          let status =
-            switch (saveStatus) {
-            | Pristine => ""
-            | Saved => "Saved"
-            | Saving => "Saving"
-            | Unsaved => "Unsaved"
-            };
-          status->str;
-        }
-      </div>
+      <div
+        className="EditorNote__saveStatus"
+        /* {
+             let status =
+               switch (saveStatus) {
+               | Pristine => ""
+               | Saved => "Saved"
+               | Saving => "Saving"
+               | Unsaved => "Unsaved"
+               };
+             status->str;
+           } */
+      />
       <main className="EditorNote">
         <Helmet>
           <title>

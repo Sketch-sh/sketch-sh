@@ -6,6 +6,11 @@ type state =
   | Anonymous
   | Login(string);
 
+let authStateToUserId =
+  fun
+  | Anonymous => Config.anonymousUserId
+  | Login(id) => id;
+
 let localStorageDataToState =
   fun
   | None => Anonymous
