@@ -2,9 +2,9 @@ module type LocalStorageKey = {let key: string;};
 module LocalStorageOperaton = (K: LocalStorageKey) => {
   open Dom.Storage;
   let key = K.key;
-  let set = value => setItem(K.key, value, localStorage);
-  let get = () => getItem(K.key, localStorage);
-  let remove = () => removeItem(K.key, localStorage);
+  let set = value => setItem(key, value, localStorage);
+  let get = () => getItem(key, localStorage);
+  let remove = () => removeItem(key, localStorage);
 };
 
 module Auth = {
@@ -16,6 +16,11 @@ module Auth = {
   module UserId =
     LocalStorageOperaton({
       let key = "rtop:userId";
+    });
+
+  module EditToken =
+    LocalStorageOperaton({
+      let key = "rtop:editToken";
     });
 
   let githubLoginRedirect = Config.authDomain ++ "/auth/github";

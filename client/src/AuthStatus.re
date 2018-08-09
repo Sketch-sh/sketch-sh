@@ -25,6 +25,22 @@ module Provider = {
   let make = _children: ReasonReact.component(unit, 'a, unit) => {
     ...component,
     didMount: self => {
+      let _ =
+        Auth.(
+          /*
+           * This set edit token on initial load
+           * only if user is not login
+           * AND token is empty
+           */
+          switch (UserId.get()) {
+          | Some(_) => ()
+          | None =>
+            switch (EditToken.get()) {
+            | None => EditToken.set(Utils.generateId())
+            | Some(_) => ()
+            }
+          }
+        );
       open Webapi.Dom;
 
       let listener = event => {
