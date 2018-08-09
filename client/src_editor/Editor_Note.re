@@ -113,7 +113,9 @@ let make =
                       </button>
                  </UI_Balloon>
                  (
-                   isEditable ?
+                   !isEditable ?
+                     /* aka readOnly */
+                     ReasonReact.null :
                      <UI_Balloon position=Down length=Fit message="Save">
                        /* switch (saveStatus) {
                           | Pristine => "Nothing to save (Ctrl+S)"
@@ -145,27 +147,7 @@ let make =
                               )>
                               <> <Fi.Save /> "Save"->str </>
                             </button>
-                       </UI_Balloon> :
-                     <UI_Balloon
-                       position=Down message="Fork this note to edit">
-                       ...<button
-                            disabled=true
-                            className=buttonClassName
-                            onClick=(
-                              _ => {
-                                onSave(
-                                  ~title=state.title,
-                                  ~data=state.blocks^,
-                                );
-                                switch (state.executeCallback) {
-                                | None => ()
-                                | Some(callback) => callback()
-                                };
-                              }
-                            )>
-                            <> <Fi.Save /> "Save"->str </>
-                          </button>
-                     </UI_Balloon>
+                       </UI_Balloon>
                  )
                  /* (
                       isSaving ?
