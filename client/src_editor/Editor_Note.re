@@ -48,10 +48,8 @@ let make =
       | NoteSave_Loading => {...state, editorContentStatus: Ec_Saving}
       | NoteSave_Done => {...state, editorContentStatus: Ec_Saved}
       | NoteSave_Error =>
-        /*
-         * TODO: Show global error message
-         */
-        {...state, editorContentStatus: Ec_Dirty}
+        UI_Notification.notify("Save error");
+        {...state, editorContentStatus: Ec_Dirty};
       };
     } else {
       state;
