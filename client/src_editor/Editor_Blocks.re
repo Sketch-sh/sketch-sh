@@ -111,18 +111,17 @@ let make =
             ),
       })
     | Block_Execute =>
-      module MS = Belt.Map.String;
-
       let allCodeBlocks =
         state.blocks
         ->(
-            Belt.Array.reduceU(MS.empty, (. map, {b_id, b_data}) =>
+            Belt.Array.reduceU([], (. acc, {b_id, b_data}) =>
               switch (b_data) {
-              | B_Text(_) => map
-              | B_Code({bc_value}) => map->(MS.set(b_id, bc_value))
+              | B_Text(_) => acc
+              | B_Code({bc_value}) => [(b_id, bc_value), ...acc]
               }
             )
-          );
+          )
+        ->Belt.List.reverse;
 
       /* Clear all widgets and execute all blocks */
       ReasonReact.SideEffects(
@@ -133,7 +132,7 @@ let make =
               |> then_(results => {
                    results
                    ->(
-                       MS.forEachU((. blockId, result) => {
+                       Belt.List.forEachU((. (blockId, result)) => {
                          let widgets =
                            Editor_Blocks_Utils.executeResultToWidget(result);
                          self.send(Block_AddWidgets(blockId, widgets));

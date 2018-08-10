@@ -225,10 +225,16 @@ module Make = (ESig: Worker_Evaluator.EvaluatorSig) => {
     };
 
   let executeMany:
-    (. Belt.Map.String.t(string)) => Belt.Map.String.t(list(blockData)) =
-    (. codeMap) => {
+    (. list((string, string))) => list((string, list(blockData))) =
+    (. codeBlocks) => {
       /* Reset before evaluating several blocks */
       Evaluator.reset();
-      codeMap->(Belt.Map.String.map(code => execute(. false, code)));
+      codeBlocks
+      ->(
+          Belt.List.mapU((. (id, code)) => {
+            Js.log(code);
+            (id, execute(. false, code));
+          })
+        );
     };
 };

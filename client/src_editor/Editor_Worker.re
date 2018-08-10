@@ -16,8 +16,8 @@ type js_executeResult = {
 type rtop = {
   execute: (. bool, string) => Js.Promise.t(list(Worker_Types.blockData)),
   executeMany:
-    (. Belt.Map.String.t(string)) =>
-    Js.Promise.t(Belt.Map.String.t(list(Worker_Types.blockData))),
+    (. list((string, string))) =>
+    Js.Promise.t(list((string, list(Worker_Types.blockData)))),
 };
 let worker = RtopWorker.make();
 
