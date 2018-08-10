@@ -1,18 +1,15 @@
-.cell__container {
-  margin-top: 25px;
+.block__container {
+  margin-top: var(--space4);
   padding: 0px;
   position: relative;
 }
 
-.cell__controls {
-  margin-top: 4px;
-  margin-left: 36px;
+.block__controls {
+  margin-top: var(--space2);
   display: flex;
   flex-direction: row-reverse;
 }
 
-.cell__controls-buttons {
-  flex: 0 0 50%;
+.block__controls--buttons {
   display: flex;
-  flex-direction: row-reverse;
 }

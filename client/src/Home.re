@@ -13,9 +13,9 @@ let make = _children => {
       <hr />
       <AuthStatus.IsAuthenticated>
         ...(
-             state =>
-               switch (state) {
-               | None =>
+             user =>
+               switch (user) {
+               | Anonymous =>
                  <p>
                    {
                      let href = Route.routeToUrl(Route.AuthGithub);
@@ -31,7 +31,7 @@ let make = _children => {
                      </a>;
                    }
                  </p>
-               | Some(userId) =>
+               | Login(userId) =>
                  <div>
                    <UI_UserInfo userId />
                    <p> <Link route=Route.AuthLogout> "Logout"->str </Link> </p>

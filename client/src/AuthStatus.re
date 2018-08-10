@@ -1,8 +1,20 @@
 open Utils;
 module Auth = Auth.Auth;
-let getCurrentState = Auth.getUserId;
+let getCurrentState = Auth.UserId.get;
 
-type state = option(int);
+type state =
+  | Anonymous
+  | Login(string);
+
+let authStateToUserId =
+  fun
+  | Anonymous => Config.anonymousUserId
+  | Login(id) => id;
+
+let localStorageDataToState =
+  fun
+  | None => Anonymous
+  | Some(id) => Login(id);
 
 module Store = {
   module MI = Belt.Map.Int;
@@ -25,14 +37,37 @@ module Provider = {
   let make = _children: ReasonReact.component(unit, 'a, unit) => {
     ...component,
     didMount: self => {
+      let _ =
+        Auth.(
+          /*
+           * This set edit token on initial load
+           * only if user is not login
+           * AND token is empty
+           */
+          switch (UserId.get()) {
+          | Some(_) => ()
+          | None =>
+            switch (EditToken.get()) {
+            | None => EditToken.set(Utils.generateId())
+            | Some(_) => ()
+            }
+          }
+        );
       open Webapi.Dom;
 
       let listener = event => {
         let event = Auth.toStorageEvent(event);
         let key = event->StorageEvent.key;
-        if (key == Auth.userIdKey) {
-          let newValue = event->StorageEvent.newValue->Utils.toNullable;
-          Store.broadcast(newValue->Js.Nullable.toOption);
+        if (key == Auth.UserId.key) {
+          let newValue =
+            localStorageDataToState(
+              event
+              ->StorageEvent.newValue
+              ->Utils.toNullable
+              ->Js.Nullable.toOption,
+            );
+
+          Store.broadcast(newValue);
         };
       };
       window |> Window.addEventListener("storage", listener);
@@ -47,9 +82,9 @@ module Provider = {
 
 module IsAuthenticated = {
   let component = ReasonReact.reducerComponent("AuthStatus.IsAuthenticated");
-  let make = children => {
+  let make = children: ReasonReact.component(state, 'a, state) => {
     ...component,
-    initialState: () => getCurrentState(),
+    initialState: () => getCurrentState()->localStorageDataToState,
     reducer: (newStatus, _state) => ReasonReact.Update(newStatus),
     didMount: ({send, onUnmount}) => {
       let id = Store.subscribe(send);
@@ -69,8 +104,8 @@ module UserInfo = {
         ...(
              state =>
                switch (state) {
-               | None => children(None)
-               | Some(userId) =>
+               | Anonymous => children(None)
+               | Login(userId) =>
                  open GqlUserInfo;
                  let query = UserInfoGql.make(~userId, ());
                  <UserInfoComponent variables=query##variables>

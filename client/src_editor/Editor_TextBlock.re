@@ -17,6 +17,7 @@ let make =
       ~onBlur=?,
       ~onBlockUp=?,
       ~onBlockDown=?,
+      ~readOnly=?,
       _children,
     )
     : ReasonReact.component(state, _, unit) => {
@@ -45,6 +46,7 @@ let make =
           ~lineNumbers=false,
           ~viewportMargin=infinity,
           ~lineWrapping=true,
+          ~readOnly?,
           (),
         )
       )

@@ -160,9 +160,10 @@ let make =
       };
 
       state.editor := Some(editor);
-      %bs.raw
-      {|window.editor = editor|};
-      ();
+      if (Utils.env != "production") {
+        %bs.raw
+        {|window.editor = editor|};
+      };
     },
   render: ({handle, state: _}) =>
     <div ?className ref=(handle(setDivRef)) />,

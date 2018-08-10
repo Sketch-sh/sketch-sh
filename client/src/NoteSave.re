@@ -1,48 +1,3 @@
-open Utils_GraphqlPpx;
-
-module AddNoteGql = [%graphql
-  {|
-    mutation ($title: String!, $data: jsonb!, $id: String!, $userId: String!) {
-      addNote: insert_note(objects: {
-        title: $title,
-        id: $id,
-        user_id: $userId,
-        data: $data
-      }) {
-        returning {
-          id
-          updated_at
-          title
-          data
-        }
-      }
-    }
-  |}
-];
-
-module AddNoteComponent = ReasonApollo.CreateMutation(AddNoteGql);
-
-module UpdateNoteGql = [%graphql
-  {|
-    mutation ($noteId: String!, $data: jsonb!, $title: String!) {
-      update_note(
-        where: {
-          id: {_eq: $noteId}
-        }
-        _set: {
-        title: $title,
-        data: $data
-      }) {
-        returning {
-          updated_at
-        }
-      }
-    }
-  |}
-];
-
-module UpdateNoteComponent = ReasonApollo.CreateMutation(UpdateNoteGql);
-
 let replaceNoteRoute = (~noteId, ~json, ~title) =>
   Js.Promise.(
     LzString.async()
@@ -60,105 +15,75 @@ let replaceNoteRoute = (~noteId, ~json, ~title) =>
        )
     |> Utils.handleError
   );
-module NoteSave = {
-  type id = string;
-  type noteKind =
-    | New
-    | Old(id);
 
-  type state = {kind: noteKind};
+open NoteSave_Types;
+type action =
+  | SavedNewNote(id, string, Js.Json.t)
+  | SavedOldNote(id, string, Js.Json.t);
 
-  type action =
-    | SavedNewNote(id, string, Js.Json.t)
-    | SavedOldNote(id, string, Js.Json.t);
+/* TODO:
+   When receive the mutation result,
+   check with the original data to see if they are matched */
+let component = ReasonReact.reducerComponent("NoteSave");
 
-  /* TODO:
-     When receive the mutation result,
-     check with the original data to see if they are matched */
-  let component = ReasonReact.reducerComponent("NoteSave");
-
-  let make = (~noteKind: noteKind, children) => {
-    ...component,
-    initialState: () => {kind: noteKind},
-    reducer: (action, _state) =>
-      switch (action) {
-      | SavedNewNote(noteId, title, json) =>
-        ReasonReact.UpdateWithSideEffects(
-          {kind: Old(noteId)},
-          (_self => replaceNoteRoute(~noteId, ~json, ~title)->ignore),
-        )
-      | SavedOldNote(noteId, title, json) =>
-        ReasonReact.SideEffects(
-          (_self => replaceNoteRoute(~noteId, ~json, ~title)->ignore),
-        )
-      },
-    render: ({state, send}) =>
-      switch (state.kind) {
-      | New =>
-        <AddNoteComponent>
-          ...(
-               (mutation, createNoteResult) => {
-                 let {AddNoteComponent.loading} = createNoteResult;
-                 children(
-                   ~loading,
-                   ~onSave=(~title, ~data, ~userId) => {
-                     let noteId = Utils.generateId();
-                     let newNote =
-                       AddNoteGql.make(
-                         ~title,
-                         ~data=data->Editor_Types.JsonEncode.encode,
-                         ~id=noteId,
-                         ~userId,
-                         (),
-                       );
-                     Js.Promise.(
-                       mutation(~variables=newNote##variables, ())
-                       |> then_(_result =>
-                            send(
-                              SavedNewNote(
-                                noteId,
-                                title,
-                                data->Editor_Types.JsonEncode.encode,
-                              ),
-                            )
-                            ->resolve
-                          )
-                     )
-                     |> ignore;
-                   },
-                 );
-               }
-             )
-        </AddNoteComponent>
-      | Old(noteId) =>
-        <UpdateNoteComponent>
-          ...(
-               (mutation, updateNoteResult) => {
-                 let {UpdateNoteComponent.loading} = updateNoteResult;
-                 children(
-                   ~loading,
-                   ~onSave=(~title, ~data, ~userId as _) => {
-                     let data = data->Editor_Types.JsonEncode.encode;
-                     let updatedNote =
-                       UpdateNoteGql.make(~title, ~data, ~noteId, ());
-                     Js.Promise.(
-                       mutation(
-                         ~variables=updatedNote##variables,
-                         ~refetchQueries=[|"getNote"|],
-                         (),
-                       )
-                       |> then_(_data =>
-                            SavedOldNote(noteId, title, data)->send->resolve
-                          )
-                     )
-                     |> ignore;
-                   },
-                 );
-               }
-             )
-        </UpdateNoteComponent>
-      },
-  };
+let make =
+    (
+      ~noteKind: noteKind,
+      children:
+        (
+          ~noteSaveStatus: NoteSave_Types.noteSaveStatus,
+          ~user: AuthStatus.state,
+          ~onSave: 'a
+        ) =>
+        ReasonReact.reactElement,
+    ) => {
+  ...component,
+  initialState: () => {kind: noteKind},
+  reducer: (action, _state) =>
+    switch (action) {
+    | SavedNewNote(noteId, title, json) =>
+      ReasonReact.UpdateWithSideEffects(
+        {kind: Old(noteId)},
+        (_self => replaceNoteRoute(~noteId, ~json, ~title)->ignore),
+      )
+    | SavedOldNote(noteId, title, json) =>
+      ReasonReact.SideEffects(
+        (_self => replaceNoteRoute(~noteId, ~json, ~title)->ignore),
+      )
+    },
+  render: ({state, send}) =>
+    <AuthStatus.IsAuthenticated>
+      ...(
+           user =>
+             switch (user) {
+             | Anonymous =>
+               <NoteSave_Anonymous
+                 kind=state.kind
+                 onSaveNewNote=(
+                   (noteId, title, data) =>
+                     SavedNewNote(noteId, title, data)->send
+                 )
+                 onSaveOldNote=(
+                   (noteId, title, data) =>
+                     SavedOldNote(noteId, title, data)->send
+                 )>
+                 ...children
+               </NoteSave_Anonymous>
+             | Login(userId) =>
+               <NoteSave_Login
+                 kind=state.kind
+                 userId
+                 onSaveNewNote=(
+                   (noteId, title, data) =>
+                     SavedNewNote(noteId, title, data)->send
+                 )
+                 onSaveOldNote=(
+                   (noteId, title, data) =>
+                     SavedOldNote(noteId, title, data)->send
+                 )>
+                 ...children
+               </NoteSave_Login>
+             }
+         )
+    </AuthStatus.IsAuthenticated>,
 };
-
-include NoteSave;

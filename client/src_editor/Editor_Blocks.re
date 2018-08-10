@@ -23,22 +23,28 @@ type state = {
 };
 
 let blockControlsButtons = (b_id, send) =>
-  <div className="cell__controls-buttons">
-    <button onClick=(_ => send(Block_Delete(b_id)))>
-      "Delete block"->str
+  <div className="block__controls--buttons">
+    <button onClick=(_ => send(Block_Add(b_id, BTyp_Code)))>
+      "Add code block"->str
     </button>
     <button onClick=(_ => send(Block_Add(b_id, BTyp_Text)))>
       "Add text block"->str
     </button>
-    <button onClick=(_ => send(Block_Add(b_id, BTyp_Code)))>
-      "Add code block"->str
+    <button onClick=(_ => send(Block_Delete(b_id)))>
+      "Delete block"->str
     </button>
   </div>;
 
 let component = ReasonReact.reducerComponent("Editor_Page");
 
 let make =
-    (~blocks: array(block), ~onUpdate, ~registerExecuteCallback=?, _children) => {
+    (
+      ~blocks: array(block),
+      ~readOnly=false,
+      ~onUpdate,
+      ~registerExecuteCallback=?,
+      _children,
+    ) => {
   ...component,
   initialState: () => {
     blocks: blocks->Editor_Blocks_Utils.syncLineNumber,
@@ -333,7 +339,7 @@ let make =
       state.blocks
       ->(
           Belt.Array.mapU((. {b_id, b_data}) =>
-            <div key=b_id id=b_id className="cell__container">
+            <div key=b_id id=b_id className="block__container">
               (
                 switch (b_data) {
                 | B_Code({bc_value, bc_widgets, bc_firstLineNumber}) =>
@@ -357,6 +363,7 @@ let make =
                       onBlockUp=(() => send(Block_FocusUp(b_id)))
                       onBlockDown=(() => send(Block_FocusDown(b_id)))
                       widgets=bc_widgets
+                      readOnly
                       firstLineNumber=bc_firstLineNumber
                     />
                   </div>
@@ -379,13 +386,18 @@ let make =
                         (newValue, diff) =>
                           send(Block_UpdateValue(b_id, newValue, diff))
                       )
+                      readOnly
                     />
                   </div>
                 }
               )
-              <div className="cell__controls">
-                (blockControlsButtons(b_id, send))
-              </div>
+              (
+                readOnly ?
+                  React.null :
+                  <div className="block__controls">
+                    (blockControlsButtons(b_id, send))
+                  </div>
+              )
             </div>
           )
         )

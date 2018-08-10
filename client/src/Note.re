@@ -3,11 +3,7 @@ module GetNote = [%graphql
     query getNote (
       $noteId: String!
     ) {
-      note (
-        where: {
-          id : {_eq: $noteId}
-        }
-      ) {
+      note (where: {id : {_eq: $noteId}}) {
         id
         title
         data
@@ -17,6 +13,9 @@ module GetNote = [%graphql
           username
           avatar
         }
+      }
+      note_edit_token(where: {note_id: {_eq: $noteId}}) {
+        note_id
       }
     }
   |}
@@ -35,9 +34,7 @@ module EnsureUrlEncodedData = {
     | NoteLoaded(Js.Json.t);
   let component = ReasonReact.reducerComponent("Note_EnsureUrlEncodedData");
 
-  let make =
-      (~note, ~noteKind, ~noteId, ~userId, _children)
-      : React.component(unit, 'a, action) => {
+  let make = (~note, ~noteId, children): React.component(unit, 'a, action) => {
     ...component,
     didMount: ({send}) =>
       switch (note##data) {
@@ -59,23 +56,7 @@ module EnsureUrlEncodedData = {
           ),
         )
       },
-    render: _send =>
-      <NoteSave noteKind>
-        ...(
-             (~loading, ~onSave) =>
-               <Editor_Note
-                 title=note##title->optionToEmptyString
-                 blocks=(
-                   switch (note##data) {
-                   | None => [||]
-                   | Some(blocks) => blocks->Editor_Types.JsonDecode.decode
-                   }
-                 )
-                 loading
-                 onSave=(onSave(~userId))
-               />
-           )
-      </NoteSave>,
+    render: _send => children,
   };
 };
 
@@ -85,41 +66,67 @@ let make = (~noteInfo: Route.noteRouteConfig, _children) => {
   ...component,
   render: _self => {
     let noteQuery = GetNote.make(~noteId=noteInfo.noteId, ());
-    <AuthStatus.IsAuthenticated>
+
+    <GetNoteComponent variables=noteQuery##variables>
       ...(
-           isLogin => {
-             let userId =
-               switch (isLogin) {
-               | None => Config.anonymousUserId
-               | Some(userId) => userId
-               };
-             <GetNoteComponent variables=noteQuery##variables>
-               ...(
-                    ({result}) =>
-                      switch (result) {
-                      | Loading =>
-                        <div> (ReasonReact.string("Loading")) </div>
-                      | Error(error) =>
-                        <div> (ReasonReact.string(error##message)) </div>
-                      | Data(response) =>
-                        let notes = response##note;
-                        notes
-                        ->(
-                            arrayFirst(
-                              ~empty=<NotFound entity="note" />, ~render=note =>
-                              <EnsureUrlEncodedData
-                                noteId=noteInfo.noteId
-                                note
-                                noteKind=(Old(noteInfo.noteId))
-                                userId
-                              />
-                            )
-                          );
-                      }
-                  )
-             </GetNoteComponent>;
-           }
+           ({result}) =>
+             switch (result) {
+             | Loading => <div> (ReasonReact.string("Loading")) </div>
+             | Error(error) =>
+               <div> (ReasonReact.string(error##message)) </div>
+             | Data(response) =>
+               let notes = response##note;
+               notes
+               ->(
+                   arrayFirst(~empty=<NotFound entity="note" />, ~render=note =>
+                     <EnsureUrlEncodedData noteId=noteInfo.noteId note>
+                       ...<NoteSave noteKind=(Old(noteInfo.noteId))>
+                            ...(
+                                 (~noteSaveStatus, ~user, ~onSave) => {
+                                   let noteOwnerId =
+                                     switch (note##owner) {
+                                     | None => None
+                                     | Some(owner) =>
+                                       switch (owner##id) {
+                                       | None => None
+                                       | Some(id) => Some(id)
+                                       }
+                                     };
+
+                                   let isEditable =
+                                     switch (user) {
+                                     | Login(currentUserId) =>
+                                       switch (noteOwnerId) {
+                                       | None => false
+                                       | Some(noteOwnerId) =>
+                                         noteOwnerId == currentUserId
+                                       }
+                                     | Anonymous =>
+                                       response##note_edit_token->Array.length
+                                       > 0
+                                     };
+                                   <Editor_Note
+                                     title=note##title->optionToEmptyString
+                                     isEditable
+                                     ?noteOwnerId
+                                     blocks=(
+                                       switch (note##data) {
+                                       | None => [||]
+                                       | Some(blocks) =>
+                                         blocks->Editor_Types.JsonDecode.decode
+                                       }
+                                     )
+                                     noteSaveStatus
+                                     onSave
+                                   />;
+                                 }
+                               )
+                          </NoteSave>
+                     </EnsureUrlEncodedData>
+                   )
+                 );
+             }
          )
-    </AuthStatus.IsAuthenticated>;
+    </GetNoteComponent>;
   },
 };

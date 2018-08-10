@@ -76,9 +76,17 @@ const base = {
               ident: "postcss",
               plugins: () => [
                 postcssPresetEnv({
-                  stage: 2,
+                  stage: 3,
                   features: {
                     "nesting-rules": true,
+                    "custom-media-queries": {
+                      extensions: {
+                        "--sm": "screen and (min-width: 35.5rem)",
+                        "--md": "screen and (min-width: 48rem)",
+                        "--lg": "screen and (min-width: 64rem)",
+                        "--xl": "screen and (min-width: 80rem)",
+                      },
+                    },
                   },
                 }),
               ],

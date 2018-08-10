@@ -112,6 +112,7 @@ app.get("/auth/webhook", (req, res) => {
   if (!token) {
     res.json({
       "X-Hasura-Role": "public",
+      "X-Hasura-Edit-Token": req.header("X-Hasura-Edit-Token") || "",
     });
     return;
   }
@@ -124,6 +125,7 @@ app.get("/auth/webhook", (req, res) => {
       res.json({
         "X-Hasura-Role": result.role,
         "X-Hasura-User-Id": result.userId,
+        "X-Hasura-Edit-Token": "",
       });
       return;
     }

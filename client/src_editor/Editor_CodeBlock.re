@@ -25,6 +25,7 @@ let make =
       ~onBlockUp=?,
       ~onBlockDown=?,
       ~onExecute,
+      ~readOnly=?,
       _children,
     )
     : ReasonReact.component(state, _, unit) => {
@@ -79,7 +80,7 @@ let make =
                                 ~element=createErrorWidget(content),
                                 ~options=
                                   CodeMirror.LineWidget.options(
-                                    ~coverGutter=true,
+                                    ~coverGutter=false,
                                     ~noHScroll=false,
                                     ~above=false,
                                     ~showIfHidden=false,
@@ -95,7 +96,7 @@ let make =
                                 ~element=createWarningWidget(content),
                                 ~options=
                                   CodeMirror.LineWidget.options(
-                                    ~coverGutter=true,
+                                    ~coverGutter=false,
                                     ~noHScroll=false,
                                     ~above=false,
                                     ~showIfHidden=false,
@@ -170,6 +171,7 @@ let make =
           ~matchBrackets=true,
           ~lineWrapping=true,
           ~firstLineNumber,
+          ~readOnly?,
           ~extraKeys={
             let key = Js.Dict.empty();
             key
