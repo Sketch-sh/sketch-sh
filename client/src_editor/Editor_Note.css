@@ -41,7 +41,7 @@
   color: rgb(150, 150, 150);
   font-size: var(--f6);
   position: fixed;
-  bottom: var(--space3);
+  bottom: var(--space5);
   left: var(--space3);
   z-index: 1;
 }

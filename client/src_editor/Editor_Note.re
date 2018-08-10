@@ -2,42 +2,31 @@ Modules.require("./Editor_Note.css");
 open Utils;
 open Editor_Types.Block;
 
+type editorContentStatus =
+  | Ec_Pristine
+  | Ec_Dirty
+  | Ec_Saving
+  | Ec_Saved;
+
 type state = {
   title: string,
-  pristine: bool,
-  dirty: bool,
+  editorContentStatus,
+  noteSaveStatus: ref(NoteSave_Types.noteSaveStatus),
   blocks: ref(array(block)),
-  isSaving: ref(bool),
   executeCallback: option(unit => unit),
 };
+
 type action =
   | TitleUpdate(string)
   | BlockUpdate(array(block))
   | RegisterExecuteCallback(unit => unit);
-
-type saveStatus =
-  | Pristine
-  | Saved
-  | Saving
-  | Unsaved;
-
-let deriveSaveStatus = (~pristine, ~isSaving, ~dirty) =>
-  if (pristine) {
-    Pristine;
-  } else if (isSaving) {
-    Saving;
-  } else if (dirty) {
-    Unsaved;
-  } else {
-    Saved;
-  };
 
 let component = ReasonReact.reducerComponent("Editor_Page");
 
 let make =
     (
       ~blocks,
-      ~noteOwnerId=?,
+      ~noteOwnerId as _=?,
       ~title="",
       ~noteSaveStatus: NoteSave_Types.noteSaveStatus,
       ~isEditable,
@@ -47,44 +36,40 @@ let make =
   ...component,
   initialState: () => {
     title,
-    pristine: true,
-    dirty: false,
+    editorContentStatus: Ec_Pristine,
+    noteSaveStatus: ref(noteSaveStatus),
     blocks: ref(blocks),
-    isSaving: ref(false),
     executeCallback: None,
   },
-  /* willReceiveProps: ({state}) =>
-     if (state.isSaving^ != isSaving) {
-       state.isSaving := isSaving;
-       {...state, dirty: false, pristine: false};
-     } else {
-       state;
-     }, */
+  willReceiveProps: ({state}) =>
+    if (state.noteSaveStatus^ != noteSaveStatus) {
+      state.noteSaveStatus := noteSaveStatus;
+      switch (noteSaveStatus) {
+      | NoteSave_Loading => {...state, editorContentStatus: Ec_Saving}
+      | NoteSave_Done => {...state, editorContentStatus: Ec_Saved}
+      | NoteSave_Error =>
+        /*
+         * TODO: Show global error message
+         */
+        {...state, editorContentStatus: Ec_Dirty}
+      };
+    } else {
+      state;
+    },
   reducer: (action, state) =>
     switch (action) {
     | TitleUpdate(title) =>
-      ReasonReact.Update({...state, pristine: false, dirty: true, title})
+      ReasonReact.Update({...state, title, editorContentStatus: Ec_Dirty})
     | RegisterExecuteCallback(callback) =>
       ReasonReact.Update({...state, executeCallback: Some(callback)})
     | BlockUpdate(blocks) =>
       state.blocks := blocks;
-      ReasonReact.Update({...state, pristine: false, dirty: true});
+      ReasonReact.Update({...state, editorContentStatus: Ec_Dirty});
     },
   render: ({state, send}) => {
-    Js.log(
-      switch (noteSaveStatus) {
-      | NoteSave_Done => "note save done"
-      | NoteSave_Loading => "note save loading"
-      | NoteSave_Error => "note save error"
-      },
-    );
+    let readOnly = !isEditable;
+    let {editorContentStatus} = state;
     <>
-      /* let saveStatus =
-         deriveSaveStatus(
-           ~pristine=state.pristine,
-           ~isSaving,
-           ~dirty=state.dirty,
-         ); */
       <UI_Topbar.WithToolbar>
         ...(
              (~buttonClassName) =>
@@ -113,68 +98,73 @@ let make =
                       </button>
                  </UI_Balloon>
                  (
-                   !isEditable ?
-                     /* aka readOnly */
+                   readOnly ?
                      ReasonReact.null :
-                     <UI_Balloon position=Down length=Fit message="Save">
-                       /* switch (saveStatus) {
-                          | Pristine => "Nothing to save (Ctrl+S)"
-                          | Saved => "Saved (Ctrl+S)"
-                          | Saving
-                          | Unsaved => "Save modified changes (Ctrl+S)"
-                          } */
-                       /* switch (saveStatus) {
-                          | Pristine
-                          | Saved
-                          | Saving => true
-                          | Unsaved => false
-                          } */
-
-                         ...<button
-                              disabled=false
-                              className=buttonClassName
-                              onClick=(
-                                _ => {
-                                  onSave(
-                                    ~title=state.title,
-                                    ~data=state.blocks^,
-                                  );
-                                  switch (state.executeCallback) {
-                                  | None => ()
-                                  | Some(callback) => callback()
-                                  };
-                                }
-                              )>
-                              <> <Fi.Save /> "Save"->str </>
-                            </button>
-                       </UI_Balloon>
+                     <UI_Balloon
+                       position=Down
+                       length=Fit
+                       message=(
+                         switch (editorContentStatus) {
+                         | Ec_Saving => "Saving...(Ctrl+S)"
+                         | Ec_Saved => "Saved (Ctrl+S)"
+                         | Ec_Pristine => "Nothing to save (Ctrl+S)"
+                         | Ec_Dirty => "Save modified changes (Ctrl+S)"
+                         }
+                       )>
+                       ...<button
+                            disabled=(
+                              switch (editorContentStatus) {
+                              | Ec_Saving
+                              | Ec_Saved
+                              | Ec_Pristine => true
+                              | Ec_Dirty => false
+                              }
+                            )
+                            className=buttonClassName
+                            onClick=(
+                              _ => {
+                                onSave(
+                                  ~title=state.title,
+                                  ~data=state.blocks^,
+                                );
+                                switch (state.executeCallback) {
+                                | None => ()
+                                | Some(callback) => callback()
+                                };
+                              }
+                            )>
+                            (
+                              switch (editorContentStatus) {
+                              | Ec_Saving =>
+                                <>
+                                  <Fi.Loader
+                                    className="EditorNav__button--spin"
+                                  />
+                                  "Saving"->str
+                                </>
+                              | Ec_Saved
+                              | Ec_Dirty
+                              | Ec_Pristine => <> <Fi.Save /> "Save"->str </>
+                              }
+                            )
+                          </button>
+                     </UI_Balloon>
                  )
-                 /* (
-                      isSaving ?
-                        <>
-                          <Fi.Loader
-                            className="EditorNav__button--spin"
-                          />
-                          "Saving"->str
-                        </> :
-                        <> <Fi.Save /> "Save"->str </>
-                    ) */
                </>
            )
       </UI_Topbar.WithToolbar>
-      <div
-        className="EditorNote__saveStatus"
-        /* {
-             let status =
-               switch (saveStatus) {
-               | Pristine => ""
-               | Saved => "Saved"
-               | Saving => "Saving"
-               | Unsaved => "Unsaved"
-               };
-             status->str;
-           } */
-      />
+      <div className="EditorNote__saveStatus">
+        {
+          let status =
+            switch (editorContentStatus) {
+            | Ec_Pristine => ""
+            | Ec_Saved => "Saved"
+            | Ec_Saving => "Saving"
+            | Ec_Dirty => "Unsaved"
+            };
+          status->str;
+        }
+      </div>
       <main className="EditorNote">
         <Helmet>
           <title>
@@ -190,7 +180,7 @@ let make =
             placeholder="untitled note"
             value=state.title
             onChange=(event => valueFromEvent(event)->TitleUpdate->send)
-            readOnly=(!isEditable)
+            readOnly
           />
         </div>
         <Editor_Blocks
@@ -199,7 +189,7 @@ let make =
             callback => send(RegisterExecuteCallback(callback))
           )
           onUpdate=(blocks => send(BlockUpdate(blocks)))
-          readOnly=(!isEditable)
+          readOnly
         />
       </main>
     </>;
