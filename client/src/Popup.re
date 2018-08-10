@@ -16,6 +16,6 @@ let openPopup = (~width=1024, ~height=640, url) => {
   let params = {j|width=$(width), height=$(height), top=$(top), left=$(left)|j};
   let window = Webapi.Dom.window;
   window
-  ->(Webapi.Dom.Window.open_(~url, ~name="authWindow", ~features=params));
-  ();
+  ->(Webapi.Dom.Window.open_(~url, ~name="authWindow", ~features=params))
+  ->ignore;
 };
