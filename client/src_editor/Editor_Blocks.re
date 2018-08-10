@@ -24,14 +24,23 @@ type state = {
 
 let blockControlsButtons = (b_id, send) =>
   <div className="block__controls--buttons">
-    <button onClick=(_ => send(Block_Add(b_id, BTyp_Code)))>
-      "Add code block"->str
+    <button
+      className="block__controls--button"
+      onClick=(_ => send(Block_Add(b_id, BTyp_Code)))>
+      <Fi.Code />
+      "add code block"->str
     </button>
-    <button onClick=(_ => send(Block_Add(b_id, BTyp_Text)))>
-      "Add text block"->str
+    <button
+      className="block__controls--button"
+      onClick=(_ => send(Block_Add(b_id, BTyp_Text)))>
+      <Fi.Edit2 />
+      "add text block"->str
     </button>
-    <button onClick=(_ => send(Block_Delete(b_id)))>
-      "Delete block"->str
+    <button
+      className="block__controls--button block__controls--danger"
+      onClick=(_ => send(Block_Delete(b_id)))>
+      <Fi.Trash2 />
+      "delete block"->str
     </button>
   </div>;
 

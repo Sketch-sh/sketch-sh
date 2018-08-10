@@ -126,3 +126,39 @@ module Plus = {
       children,
     );
 };
+
+module Code = {
+  [@bs.module "react-icons/fi"]
+  external reactClass: ReasonReact.reactClass = "FiCode";
+
+  let make = (~className="", children) =>
+    ReasonReact.wrapJsForReason(
+      ~reactClass,
+      ~props={"className": className},
+      children,
+    );
+};
+
+module Edit2 = {
+  [@bs.module "react-icons/fi"]
+  external reactClass: ReasonReact.reactClass = "FiEdit2";
+
+  let make = (~className="", children) =>
+    ReasonReact.wrapJsForReason(
+      ~reactClass,
+      ~props={"className": className},
+      children,
+    );
+};
+
+module Trash2 = {
+  [@bs.module "react-icons/fi"]
+  external reactClass: ReasonReact.reactClass = "FiTrash2";
+
+  let make = (~className="", children) =>
+    ReasonReact.wrapJsForReason(
+      ~reactClass,
+      ~props={"className": className},
+      children,
+    );
+};

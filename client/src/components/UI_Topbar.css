@@ -1,5 +1,5 @@
 :root {
-  --topbar-c-primary: #1874d5;
+  --topbar-c-primary: var(--c-primary);
 }
 
 .Topbar {
@@ -15,6 +15,7 @@
   justify-content: space-between;
   z-index: 10;
   color: var(--c-text-sub);
+  border-top: var(--topbar-hero-border) solid var(--c-primary);
 }
 
 .Topbar a {
@@ -41,6 +42,11 @@
 .Topbar__left .Topbar__home {
   padding: var(--space3);
   font-weight: 500;
+  color: var(--c-text);
+
+  &:visited {
+    color: var(--c-text);
+  }
 }
 
 .Topbar__action {

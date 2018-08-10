@@ -2,7 +2,7 @@
   min-width: 768px;
   max-width: 1100px;
   padding: calc(var(--topbar-height) + var(--space4)) var(--space4)
-    var(--space3) var(--space4);
+    var(--space5) var(--space4);
   margin: auto;
 }
 
@@ -22,6 +22,11 @@
   margin: 0 0 0 8px;
   padding: 0;
   background-color: transparent;
+  /* background-image: linear-gradient(
+    180deg,
+    transparent 70%,
+    rgba(101, 125, 225, 0.4) 0
+  ); */
 }
 
 @keyframes spin {

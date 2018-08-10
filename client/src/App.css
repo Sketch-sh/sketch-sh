@@ -29,6 +29,9 @@
   --c-moon-gray: #ccc;
   --c-light-gray: #eee; */
 
+  --c-primary: #1874d5;
+  --c-danger: #eb5656;
+
   --c-text: #000;
   --c-text-sub: #444;
   --c-text-sub2: rgb(143, 166, 178);
@@ -36,7 +39,8 @@
   --bg-base: #fff;
 
   /* Components */
-  --topbar-height: 3rem;
+  --topbar-hero-border: 4px;
+  --topbar-height: calc(3rem + var(--topbar-hero-border));
 }
 
 * {

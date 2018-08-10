@@ -4,7 +4,7 @@
   top: -100px;
   left: 0;
   right: 0;
-  background: #eb5656;
+  background: var(--c-danger);
   color: #fff;
   text-align: center;
   line-height: 2.5;
