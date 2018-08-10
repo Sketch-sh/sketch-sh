@@ -80,7 +80,7 @@ let make =
                                 ~element=createErrorWidget(content),
                                 ~options=
                                   CodeMirror.LineWidget.options(
-                                    ~coverGutter=true,
+                                    ~coverGutter=false,
                                     ~noHScroll=false,
                                     ~above=false,
                                     ~showIfHidden=false,
@@ -96,7 +96,7 @@ let make =
                                 ~element=createWarningWidget(content),
                                 ~options=
                                   CodeMirror.LineWidget.options(
-                                    ~coverGutter=true,
+                                    ~coverGutter=false,
                                     ~noHScroll=false,
                                     ~above=false,
                                     ~showIfHidden=false,
