@@ -7,9 +7,15 @@ let make = _children => {
   render: _self =>
     <div className="Layout__withHeader">
       <UI_Topbar.NoToolbar />
-      <p>
-        <Link route=Route.EditorDevelopment> "Editor development"->str </Link>
-      </p>
+      (
+        Utils.env == "production" ?
+          React.null :
+          <p>
+            <Link route=Route.EditorDevelopment>
+              "Editor development"->str
+            </Link>
+          </p>
+      )
       <hr />
       <AuthStatus.IsAuthenticated>
         ...(
