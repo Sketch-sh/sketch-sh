@@ -4,7 +4,6 @@ const path = require("path");
 const UglifyJsPlugin = require("uglifyjs-webpack-plugin");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const OptimizeCSSAssetsPlugin = require("optimize-css-assets-webpack-plugin");
-const BundleBuddyWebpackPlugin = require("bundle-buddy-webpack-plugin");
 
 const postcssPresetEnv = require("postcss-preset-env");
 
@@ -108,9 +107,7 @@ if (!isProd) {
 }
 
 if (process.env.ANALYZE) {
-  console.log("analyze");
-  // base.plugins = [...base.plugins, new BundleBuddyWebpackPlugin()]
-  base.devtool = "source-map"
+  base.devtool = "source-map";
 }
 
 module.exports = base;
