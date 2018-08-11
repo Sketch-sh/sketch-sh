@@ -16,32 +16,35 @@ module Unload = {
     unregister;
   };
 
-  [@bs.send]
-  external onbeforeunload:
-    (Webapi.Dom.Window.t, Js.t('a) => Js.Nullable.t(string)) => unit =
-    "onbeforeunload";
+  [@bs.deriving abstract]
+  type window = {
+    mutable onbeforeunload:
+      (. {. [@bs.set] "returnValue": string}) => Js.Nullable.t(string),
+  };
+
+  [@bs.val] external window: window = "";
 
   module Provider = {
     let component = ReasonReact.reducerComponent("Router_UnloadProvider");
 
     let make = (_children: React.childless): React.component(unit, 'a, unit) => {
       ...component,
-      didMount: _self => {
-        let window = Webapi.Dom.window;
+      didMount: _self =>
         window
-        ->onbeforeunload(
-            _event =>
+        ->onbeforeunloadSet(
+            (. event) =>
               /* TODO: IE compat: e.returnValue = message; */
               switch (cb^) {
               | None => Js.Nullable.null
               | Some(cb) =>
                 switch (cb()) {
                 | None => Js.Nullable.null
-                | Some(message) => Js.Nullable.return(message)
+                | Some(message) =>
+                  event##returnValue #= message;
+                  Js.Nullable.return(message);
                 }
               },
-          );
-      },
+          ),
       render: _self => React.null,
     };
   };
