@@ -25,20 +25,17 @@ let make = (~userId, _children) => {
                          user##name
                          =>> (
                            name =>
-                             <Fragment>
-                               <dt> "Name"->str </dt>
-                               <dd> name->str </dd>
-                             </Fragment>
+                             <> <dt> "Name"->str </dt> <dd> name->str </dd> </>
                          )
                        )
                        (
                          user##username
                          =>> (
                            username =>
-                             <Fragment>
+                             <>
                                <dt> "Username"->str </dt>
                                <dd> username->str </dd>
-                             </Fragment>
+                             </>
                          )
                        )
                        (

@@ -11,7 +11,8 @@
     "deploy": "now build && now alias",
     "staging": "npm run build && now build && now alias staging.rtop.khoanguyen.me",
     "start": "webpack-dev-server",
-    "ci:build": "bsb -clean-world && npm run build"
+    "ci:build": "bsb -clean-world && npm run build",
+    "webpack-defaults": "webpack-defaults"
   },
   "author": "",
   "license": "MIT",
@@ -54,6 +55,7 @@
     "babel-jest": "^23.4.0",
     "babel-preset-env": "^1.7.0",
     "bs-platform": "^4.0.3",
+    "bundle-buddy-webpack-plugin": "^0.3.0",
     "css-loader": "^1.0.0",
     "graphql_ppx": "^0.2.6",
     "html-webpack-plugin": "^3.0.6",

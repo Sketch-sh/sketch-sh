@@ -343,7 +343,7 @@ let make =
       };
     },
   render: ({send, state}) =>
-    <Fragment>
+    <>
       state.blocks
       ->(
           Belt.Array.mapU((. {b_id, b_data}) =>
@@ -410,5 +410,5 @@ let make =
           )
         )
       ->ReasonReact.array
-    </Fragment>,
+    </>,
 };
