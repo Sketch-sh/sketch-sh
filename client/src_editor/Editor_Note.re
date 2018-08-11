@@ -1,3 +1,4 @@
+[%%debugger.chrome];
 Modules.require("./Editor_Note.css");
 open Utils;
 open Editor_Types.Block;
@@ -58,6 +59,16 @@ let make =
     } else {
       state;
     },
+  didMount: self => {
+    let unregister =
+      Router.Unload.register(() =>
+        switch (self.state.editorContentStatus) {
+        | Ec_Dirty => Some("Changes you made may not be saved")
+        | _ => None
+        }
+      );
+    self.onUnmount(unregister);
+  },
   reducer: (action, state) =>
     switch (action) {
     | TitleUpdate(title) =>

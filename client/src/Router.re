@@ -32,8 +32,8 @@ module Unload = {
       didMount: _self =>
         window
         ->onbeforeunloadSet(
-            (. event) =>
-              /* TODO: IE compat: e.returnValue = message; */
+            (. event) => {
+              Js.log(cb^);
               switch (cb^) {
               | None => Js.Nullable.null
               | Some(cb) =>
@@ -43,7 +43,8 @@ module Unload = {
                   event##returnValue #= message;
                   Js.Nullable.return(message);
                 }
-              },
+              };
+            },
           ),
       render: _self => React.null,
     };
@@ -63,11 +64,15 @@ let pushUnsafe = url => {
     switch (Unload.cb^) {
     | None => true
     | Some(cb) =>
+      Js.log(cb);
       switch (cb()) {
       | None => true
-      | Some(message) => Webapi.Dom.(Window.confirm(message, window))
-      }
+      | Some(message) =>
+        Js.log("I got a message");
+        Webapi.Dom.(Window.confirm(message, window));
+      };
     };
+  Js.log(result);
   if (result) {
     ReasonReact.Router.push(url);
   };
