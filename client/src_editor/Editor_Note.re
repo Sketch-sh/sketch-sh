@@ -9,6 +9,13 @@ type editorContentStatus =
   | Ec_Saving
   | Ec_Saved;
 
+let editorContentStatusToString =
+  fun
+  | Ec_Pristine => "pristine"
+  | Ec_Dirty => "dirty"
+  | Ec_Saving => "saving"
+  | Ec_Saved => "saved";
+
 type state = {
   title: string,
   editorContentStatus,
@@ -59,15 +66,16 @@ let make =
     } else {
       state;
     },
-  didMount: self => {
+  didMount: ({state, onUnmount}) => {
     let unregister =
-      Router.Unload.register(() =>
-        switch (self.state.editorContentStatus) {
+      Router.Unload.register(() => {
+        state.editorContentStatus->editorContentStatusToString->Js.log;
+        switch (state.editorContentStatus) {
         | Ec_Dirty => Some("Changes you made may not be saved")
         | _ => None
-        }
-      );
-    self.onUnmount(unregister);
+        };
+      });
+    onUnmount(unregister);
   },
   reducer: (action, state) =>
     switch (action) {
