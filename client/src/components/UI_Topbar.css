@@ -1,5 +1,6 @@
 :root {
-  --topbar-c-primary: var(--c-primary);
+  /* --topbar-c-primary: var(--c-primary); */
+  --topbar-c-primary: #1874d5; /* Still --c-primary */
 }
 
 .Topbar {

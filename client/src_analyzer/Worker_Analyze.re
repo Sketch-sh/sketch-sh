@@ -230,11 +230,6 @@ module Make = (ESig: Worker_Evaluator.EvaluatorSig) => {
       /* Reset before evaluating several blocks */
       Evaluator.reset();
       codeBlocks
-      ->(
-          Belt.List.mapU((. (id, code)) => {
-            Js.log(code);
-            (id, execute(. false, code));
-          })
-        );
+      ->(Belt.List.mapU((. (id, code)) => (id, execute(. false, code))));
     };
 };

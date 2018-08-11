@@ -19,6 +19,8 @@
 }
 
 .block__controls--button {
+  --transparent-height: 60%;
+
   display: flex;
   align-items: center;
 
@@ -32,7 +34,7 @@
   cursor: pointer;
   background-image: linear-gradient(
     180deg,
-    transparent 70%,
+    transparent var(--transparent-height),
     rgba(101, 125, 225, 0.4) 0
   );
   font-size: var(--f5);
@@ -44,7 +46,7 @@
   &:hover {
     background-image: linear-gradient(
       180deg,
-      transparent 70%,
+      transparent calc(var(--transparent-height) + 10%),
       /* --c-primary */ rgba(24, 116, 213, 0.4) 0
     );
   }
@@ -52,7 +54,7 @@
   &.block__controls--danger:hover {
     background-image: linear-gradient(
       180deg,
-      transparent 70%,
+      transparent calc(var(--transparent-height) + 10%),
       /* --c-danger */ rgba(235, 86, 86, 0.4) 0
     );
   }

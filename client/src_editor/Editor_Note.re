@@ -68,7 +68,7 @@ let make =
     let readOnly = !isEditable;
     let {editorContentStatus} = state;
     <>
-      <UI_Topbar.WithToolbar>
+      <UI_Topbar.Actions>
         ...(
              (~buttonClassName) =>
                <>
@@ -150,7 +150,7 @@ let make =
                  )
                </>
            )
-      </UI_Topbar.WithToolbar>
+      </UI_Topbar.Actions>
       <div className="EditorNote__saveStatus">
         {
           let status =

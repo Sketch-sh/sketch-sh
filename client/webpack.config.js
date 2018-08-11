@@ -1,10 +1,11 @@
 const webpack = require("webpack");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const path = require("path");
-const postcssPresetEnv = require("postcss-preset-env");
 const UglifyJsPlugin = require("uglifyjs-webpack-plugin");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const OptimizeCSSAssetsPlugin = require("optimize-css-assets-webpack-plugin");
+
+const postcssPresetEnv = require("postcss-preset-env");
 
 const outputDir = path.join(__dirname, "build/");
 
@@ -78,6 +79,9 @@ const base = {
                 postcssPresetEnv({
                   stage: 3,
                   features: {
+                    autoprefixer: isProd,
+                    "custom-properties": false,
+                    "color-mod-function": true,
                     "nesting-rules": true,
                     "custom-media-queries": {
                       extensions: {

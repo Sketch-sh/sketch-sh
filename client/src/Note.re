@@ -71,7 +71,7 @@ let make = (~noteInfo: Route.noteRouteConfig, _children) => {
       ...(
            ({result}) =>
              switch (result) {
-             | Loading => <div> (ReasonReact.string("Loading")) </div>
+             | Loading => <UI_FullpageLoading />
              | Error(error) =>
                <div> (ReasonReact.string(error##message)) </div>
              | Data(response) =>
