@@ -44,10 +44,14 @@ let make =
   willReceiveProps: ({state}) =>
     if (state.noteSaveStatus^ != noteSaveStatus) {
       state.noteSaveStatus := noteSaveStatus;
-      switch (noteSaveStatus) {
-      | NoteSave_Loading => {...state, editorContentStatus: Ec_Saving}
-      | NoteSave_Done => {...state, editorContentStatus: Ec_Saved}
-      | NoteSave_Error =>
+      switch (state.editorContentStatus, noteSaveStatus) {
+      | (_, NoteSave_Loading) => {...state, editorContentStatus: Ec_Saving}
+      | (Ec_Dirty, NoteSave_Done) => {
+          ...state,
+          editorContentStatus: Ec_Dirty,
+        }
+      | (_, NoteSave_Done) => {...state, editorContentStatus: Ec_Saved}
+      | (_, NoteSave_Error) =>
         UI_Notification.notify("Save error");
         {...state, editorContentStatus: Ec_Dirty};
       };
