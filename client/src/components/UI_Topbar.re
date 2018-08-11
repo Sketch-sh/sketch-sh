@@ -1,67 +1,84 @@
 Modules.require("./UI_Topbar.css");
 open Utils;
 
-module WithToolbar = {
-  let component = ReasonReact.statelessComponent("UI_Topbar");
+let component = ReasonReact.statelessComponent("UI_Topbar");
 
-  let loginButton = {
-    let href = Route.routeToUrl(Route.AuthGithub);
-    <a
-      href
-      className="Topbar__login"
-      onClick=(
-        event => {
-          event->ReactEvent.Mouse.preventDefault;
-          Popup.openPopup(href);
-        }
-      )>
-      <Fi.Github />
-      "Login with Github"->str
-    </a>;
-  };
-
-  let make = children => {
-    ...component,
-    render: _self =>
-      <header className="Topbar">
-        <div className="Topbar__left">
-          <Router.Link route=Route.Home className="Topbar__home">
-            "ReasonML playground"->str
-          </Router.Link>
-          <div id="Topbar__actions" className="Topbar__actions">
-            (children(~buttonClassName="Topbar__action"))
-          </div>
-        </div>
-        <div className="Topbar__right">
-          <UI_Balloon position=Down message="New note">
-            ...<button
-                 className="Topbar__action Topbar__action--highlight"
-                 onClick=(_ => Router.push(Route.NoteNew))>
-                 <Fi.Plus />
-               </button>
-          </UI_Balloon>
-          <AuthStatus.UserInfo>
-            ...(
-                 user =>
-                   switch (user) {
-                   | None => loginButton
-                   | Some((user, _userId)) => <UI_TopbarUserInfo user />
-                   }
-               )
-          </AuthStatus.UserInfo>
-        </div>
-      </header>,
-  };
+let loginButton = {
+  let href = Route.routeToUrl(Route.AuthGithub);
+  <a
+    href
+    className="Topbar__login"
+    onClick=(
+      event => {
+        event->ReactEvent.Mouse.preventDefault;
+        Popup.openPopup(href);
+      }
+    )>
+    <Fi.Github />
+    "Login with Github"->str
+  </a>;
 };
 
-module NoToolbar = {
-  let component = ReasonReact.statelessComponent("UI_TopbarNoToolbar");
+let id = "Topbar__actions";
 
-  let make = _children => {
+let make = _children => {
+  ...component,
+  render: _self =>
+    <header className="Topbar">
+      <div className="Topbar__left">
+        <Router.Link route=Route.Home className="Topbar__home">
+          "ReasonML playground"->str
+        </Router.Link>
+        <div
+          id
+          className="Topbar__actions"
+          /* (children(~buttonClassName="Topbar__action")) */
+        />
+      </div>
+      <div className="Topbar__right">
+        <UI_Balloon position=Down message="New note">
+          ...<button
+               className="Topbar__action Topbar__action--highlight"
+               onClick=(_ => Router.push(Route.NoteNew))>
+               <Fi.Plus />
+             </button>
+        </UI_Balloon>
+        <AuthStatus.UserInfo>
+          ...(
+               user =>
+                 switch (user) {
+                 | None => loginButton
+                 | Some((user, _userId)) => <UI_TopbarUserInfo user />
+                 }
+             )
+        </AuthStatus.UserInfo>
+      </div>
+    </header>,
+};
+
+module Actions = {
+  type state = bool;
+  type action =
+    | Mounted;
+  let component = ReasonReact.reducerComponent("Title");
+  let make = children => {
     ...component,
-    render: _self =>
-      <WithToolbar>
-        ...((~buttonClassName as _) => ReasonReact.null)
-      </WithToolbar>,
+    initialState: () => false,
+    reducer: (action, _state) =>
+      switch (action) {
+      | Mounted => ReasonReact.Update(true)
+      },
+    didMount: self => self.send(Mounted),
+    render: ({state}) =>
+      state ?
+        switch (Webapi.Dom.(document |> Document.getElementById(id))) {
+        | None => ReasonReact.null
+        | Some(element) =>
+          ReactDOMRe.createPortal(
+            children(~buttonClassName="Topbar__action"),
+            element,
+          )
+        } :
+        ReasonReact.null,
   };
 };

@@ -6,7 +6,6 @@ let make = _children => {
   ...component,
   render: _self =>
     <div className="Layout__withHeader">
-      <UI_Topbar.NoToolbar />
       (
         Utils.env == "production" ?
           React.null :

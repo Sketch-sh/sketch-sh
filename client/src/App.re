@@ -30,15 +30,51 @@ let make = _children => {
       <AuthStatus.Provider />
       (
         switch (state) {
-        | Home => <Home />
-        | Note(noteInfo) => <Note noteInfo />
-        | NoteNew => <Note_New />
+        | Home =>
+          <Layout_WithTopbar>
+            ...<HomeLazy
+                 fetch=(() => DynamicImport.import("./Home.bs.js"))
+                 onLoading=(() => <UI_FullpageLoading />)
+                 render=(((module Home)) => <Home />)
+               />
+          </Layout_WithTopbar>
+        | Note(noteInfo) =>
+          <Layout_WithTopbar>
+            ...<NoteLazy
+                 fetch=(() => DynamicImport.import("./Note.bs.js"))
+                 onLoading=(() => <UI_FullpageLoading />)
+                 render=(((module Note)) => <Note noteInfo />)
+               />
+          </Layout_WithTopbar>
+        | NoteNew =>
+          <Layout_WithTopbar>
+            ...<NoteNewLazy
+                 fetch=(() => DynamicImport.import("./NoteNew.bs.js"))
+                 onLoading=(() => <UI_FullpageLoading />)
+                 render=(((module NoteNew)) => <NoteNew />)
+               />
+          </Layout_WithTopbar>
         | AuthCallback(token) => <Auth.AuthCallback token />
         | AuthLogout => <Auth.AuthLogout />
         | AuthGithub => <Auth.AuthGithub />
         | AuthFailure => "auth failure"->str
         | EditorDevelopment =>
-          Utils.env == "production" ? <NotFound /> : <Editor_Note_Loader />
+          Utils.env == "production" ?
+            <NotFound /> :
+            <Layout_WithTopbar>
+              ...<Editor_Note_LoaderLazy
+                   fetch=(
+                     () =>
+                       DynamicImport.import(
+                         "../src_editor/Editor_Note_Loader.bs.js",
+                       )
+                   )
+                   onLoading=(() => <UI_FullpageLoading />)
+                   render=(
+                     ((module Editor_Note_Loader)) => <Editor_Note_Loader />
+                   )
+                 />
+            </Layout_WithTopbar>
         | NotFound => <NotFound />
         }
       )

@@ -30,7 +30,9 @@
     "bs-css",
     "@glennsl/bs-json",
     "bs-webapi",
-    "reason-apollo"
+    "reason-apollo",
+    "bs-dynamic-import",
+    "reason-loadable"
   ],
   "bs-dev-dependencies": ["@glennsl/bs-jest"],
   "refmt": 3,
