@@ -33,7 +33,11 @@ let make = _children => {
         | Home =>
           <Layout_WithTopbar>
             ...<HomeLazy
-                 fetch=(() => DynamicImport.import("./Home.bs.js"))
+                 fetch=(
+                   () => [%bs.raw
+                     {| import(/* webpackChunkName: "Home" */ "./Home.bs.js") |}
+                   ]
+                 )
                  onLoading=(() => <UI_FullpageLoading />)
                  render=(((module Home)) => <Home />)
                />
@@ -41,7 +45,11 @@ let make = _children => {
         | Note(noteInfo) =>
           <Layout_WithTopbar>
             ...<NoteLazy
-                 fetch=(() => DynamicImport.import("./Note.bs.js"))
+                 fetch=(
+                   () => [%bs.raw
+                     {| import(/* webpackChunkName: "Note" */ "./Note.bs.js") |}
+                   ]
+                 )
                  onLoading=(() => <UI_FullpageLoading />)
                  render=(((module Note)) => <Note noteInfo />)
                />
@@ -49,7 +57,11 @@ let make = _children => {
         | NoteNew =>
           <Layout_WithTopbar>
             ...<NoteNewLazy
-                 fetch=(() => DynamicImport.import("./NoteNew.bs.js"))
+                 fetch=(
+                   () => [%bs.raw
+                     {| import(/* webpackChunkName: "NoteNew" */ "./NoteNew.bs.js") |}
+                   ]
+                 )
                  onLoading=(() => <UI_FullpageLoading />)
                  render=(((module NoteNew)) => <NoteNew />)
                />
@@ -64,10 +76,9 @@ let make = _children => {
             <Layout_WithTopbar>
               ...<Editor_Note_LoaderLazy
                    fetch=(
-                     () =>
-                       DynamicImport.import(
-                         "../src_editor/Editor_Note_Loader.bs.js",
-                       )
+                     () => [%bs.raw
+                       {| import(/* webpackChunkName: "Editor_Note_Loader" */ "../src_editor/Editor_Note_Loader.bs.js") |}
+                     ]
                    )
                    onLoading=(() => <UI_FullpageLoading />)
                    render=(
