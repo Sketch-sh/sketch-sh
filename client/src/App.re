@@ -26,6 +26,7 @@ let make = _children => {
   },
   render: ({state}) =>
     <ReasonApollo.Provider client=GqlClient.instance>
+      <Router.Unload.Provider />
       <UI_Notification.Provider />
       <AuthStatus.Provider />
       (
