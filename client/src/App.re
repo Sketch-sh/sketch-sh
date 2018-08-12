@@ -94,10 +94,7 @@ let make = _children => {
         | NotFound => <NotFound />
         }
       )
-      <div className="warning-staging-server">
-        "WARNING: This is a staging server of ReasonML playground. All data will be reset every day"
-        ->Utils.str
-      </div>
+      <UI_WarningStagingServer />
     </ReasonApollo.Provider>,
 };
 

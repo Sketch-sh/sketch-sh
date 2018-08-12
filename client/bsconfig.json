@@ -27,7 +27,6 @@
   "namespace": true,
   "bs-dependencies": [
     "reason-react",
-    "bs-css",
     "@glennsl/bs-json",
     "bs-webapi",
     "reason-apollo",

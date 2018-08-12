@@ -10,3 +10,5 @@ let graphqlEndpoint =
 let anonymousUserId = "anonymous";
 
 let cmTheme = "rtop";
+
+let stagingHost = "rtop.khoa.xyz";
