@@ -120,8 +120,8 @@ jobs:
       - run: npm install now
       - run: |
           cd build
-          ./node_modules/.bin/now --token $NOW_TOKEN
-          ./node_modules/.bin/now alias --token $NOW_TOKEN rtop.khoa.xyz
+          ../node_modules/.bin/now --token $NOW_TOKEN
+          ../node_modules/.bin/now alias --token $NOW_TOKEN rtop.khoa.xyz
 
 workflows:
   version: 2
