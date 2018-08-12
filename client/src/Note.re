@@ -51,6 +51,7 @@ module EnsureUrlEncodedData = {
                 ~noteId,
                 ~json,
                 ~title=note##title->optionToEmptyString,
+                ~kind=Replace,
               )
               ->ignore
           ),

@@ -1,4 +1,13 @@
-let replaceNoteRoute = (~noteId, ~json, ~title) =>
+/*
+ * See https://github.com/thangngoc89/rtop-ui/issues/76
+ * Use pushState when saving newNote
+ *     replaceState when adjusting oldNote URL
+ */
+type pushOrReplace =
+  | Push
+  | Replace;
+
+let replaceNoteRoute = (~noteId, ~json, ~title, ~kind) =>
   Js.Promise.(
     LzString.async()
     |> then_(lzstring =>
@@ -9,10 +18,15 @@ let replaceNoteRoute = (~noteId, ~json, ~title) =>
          )
          ->resolve
        )
-    |> then_(compressed =>
-         Router.pushSilent(Route.Note({noteId, data: Some(compressed)}))
-         ->resolve
-       )
+    |> then_(compressed => {
+         let routerAction =
+           switch (kind) {
+           | Push => Router.pushSilent
+           | Replace => Router.replaceSilent
+           };
+         routerAction(Route.Note({noteId, data: Some(compressed)}))
+         ->resolve;
+       })
     |> Utils.handleError
   );
 
@@ -44,11 +58,16 @@ let make =
     | SavedNewNote(noteId, title, json) =>
       ReasonReact.UpdateWithSideEffects(
         {kind: Old(noteId)},
-        (_self => replaceNoteRoute(~noteId, ~json, ~title)->ignore),
+        (
+          _self => replaceNoteRoute(~noteId, ~json, ~title, ~kind=Push)->ignore
+        ),
       )
     | SavedOldNote(noteId, title, json) =>
       ReasonReact.SideEffects(
-        (_self => replaceNoteRoute(~noteId, ~json, ~title)->ignore),
+        (
+          _self =>
+            replaceNoteRoute(~noteId, ~json, ~title, ~kind=Replace)->ignore
+        ),
       )
     },
   render: ({state, send}) =>

@@ -81,6 +81,22 @@ let pushSilentUnsafe = path =>
 
 let pushSilent = route => pushSilentUnsafe(Route.routeToUrl(route));
 
+[@bs.send]
+external replaceState:
+  (Dom.history, [@bs.as {json|null|json}] _, [@bs.as ""] _, ~href: string) =>
+  unit =
+  "";
+
+let replaceSilentUnsafe = path =>
+  switch ([%external history], [%external window]) {
+  | (None, _)
+  | (_, None) => ()
+  | (Some((history: Dom.history)), Some(_)) =>
+    replaceState(history, ~href=path)
+  };
+
+let replaceSilent = route => replaceSilentUnsafe(Route.routeToUrl(route));
+
 module LinkUnsafe = {
   let component = ReasonReact.statelessComponent("LinkUnsafe");
 
