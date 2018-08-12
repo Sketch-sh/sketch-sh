@@ -9,10 +9,21 @@ services:
     restart: always
     volumes:
     - db_data:/var/lib/postgresql/data
+  migration:
+    depends_on:
+      - postgres
+      - graphql-engine
+    build:
+      context: .
+      dockerfile: Dockerfile-migration
+    environment:
+      - HASURA_ENDPOINT=http://graphql-engine:8080
+      - DATABASE_URL=postgres://postgres:mysecretpassword@postgres:5432/postgres
+    command: ["sh", "./wait-for-pg.sh", "postgres", "npm run migrate"]
   graphql-engine:
-    image: hasura/graphql-engine:v1.0.0-alpha12
+    image: hasura/graphql-engine:v1.0.0-alpha13
     ports:
-    - "8081:8080"
+    - "8080:8080"
     depends_on:
     - postgres
     restart: always

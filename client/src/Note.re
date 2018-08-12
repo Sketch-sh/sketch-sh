@@ -85,13 +85,9 @@ let make = (~noteInfo: Route.noteRouteConfig, _children) => {
                             ...(
                                  (~noteSaveStatus, ~user, ~onSave) => {
                                    let noteOwnerId =
-                                     switch (note##owner) {
+                                     switch (note##owner##id) {
                                      | None => None
-                                     | Some(owner) =>
-                                       switch (owner##id) {
-                                       | None => None
-                                       | Some(id) => Some(id)
-                                       }
+                                     | Some(id) => Some(id)
                                      };
 
                                    let isEditable =

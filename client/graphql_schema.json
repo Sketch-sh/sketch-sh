@@ -1953,9 +1953,13 @@
               "deprecationReason": null,
               "name": "created_at",
               "type": {
-                "kind": "SCALAR",
-                "name": "timestamptz",
-                "ofType": null
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "timestamptz",
+                  "ofType": null
+                }
               },
               "description": null
             },
@@ -2050,9 +2054,13 @@
               "deprecationReason": null,
               "name": "id",
               "type": {
-                "kind": "SCALAR",
-                "name": "String",
-                "ofType": null
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
               },
               "description": null
             },
@@ -2062,9 +2070,13 @@
               "deprecationReason": null,
               "name": "owner",
               "type": {
-                "kind": "OBJECT",
-                "name": "user_public",
-                "ofType": null
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "OBJECT",
+                  "name": "user_public",
+                  "ofType": null
+                }
               },
               "description": "An object relationship"
             },
@@ -2159,9 +2171,13 @@
               "deprecationReason": null,
               "name": "updated_at",
               "type": {
-                "kind": "SCALAR",
-                "name": "timestamptz",
-                "ofType": null
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "timestamptz",
+                  "ofType": null
+                }
               },
               "description": null
             },
@@ -2171,9 +2187,13 @@
               "deprecationReason": null,
               "name": "user",
               "type": {
-                "kind": "OBJECT",
-                "name": "user",
-                "ofType": null
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "OBJECT",
+                  "name": "user",
+                  "ofType": null
+                }
               },
               "description": "An object relationship"
             },
@@ -2183,9 +2203,13 @@
               "deprecationReason": null,
               "name": "user_id",
               "type": {
-                "kind": "SCALAR",
-                "name": "String",
-                "ofType": null
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
               },
               "description": null
             }
@@ -2458,11 +2482,31 @@
               "args": [],
               "isDeprecated": false,
               "deprecationReason": null,
+              "name": "note",
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "OBJECT",
+                  "name": "note",
+                  "ofType": null
+                }
+              },
+              "description": "An object relationship"
+            },
+            {
+              "args": [],
+              "isDeprecated": false,
+              "deprecationReason": null,
               "name": "note_id",
               "type": {
-                "kind": "SCALAR",
-                "name": "String",
-                "ofType": null
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
               },
               "description": null
             },
@@ -2472,9 +2516,13 @@
               "deprecationReason": null,
               "name": "token",
               "type": {
-                "kind": "SCALAR",
-                "name": "String",
-                "ofType": null
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
               },
               "description": null
             }
@@ -2517,6 +2565,16 @@
                   "name": "note_edit_token_bool_exp",
                   "ofType": null
                 }
+              },
+              "description": null
+            },
+            {
+              "name": "note",
+              "defaultValue": null,
+              "type": {
+                "kind": "INPUT_OBJECT",
+                "name": "note_bool_exp",
+                "ofType": null
               },
               "description": null
             },
@@ -2663,9 +2721,13 @@
               "deprecationReason": null,
               "name": "note_id",
               "type": {
-                "kind": "SCALAR",
-                "name": "String",
-                "ofType": null
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
               },
               "description": null
             },
@@ -2675,9 +2737,13 @@
               "deprecationReason": null,
               "name": "token",
               "type": {
-                "kind": "SCALAR",
-                "name": "String",
-                "ofType": null
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
               },
               "description": null
             }
@@ -2945,9 +3011,13 @@
               "deprecationReason": null,
               "name": "created_at",
               "type": {
-                "kind": "SCALAR",
-                "name": "timestamptz",
-                "ofType": null
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "timestamptz",
+                  "ofType": null
+                }
               },
               "description": null
             },
@@ -2969,9 +3039,13 @@
               "deprecationReason": null,
               "name": "id",
               "type": {
-                "kind": "SCALAR",
-                "name": "String",
-                "ofType": null
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
               },
               "description": null
             },
@@ -2993,9 +3067,13 @@
               "deprecationReason": null,
               "name": "updated_at",
               "type": {
-                "kind": "SCALAR",
-                "name": "timestamptz",
-                "ofType": null
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "timestamptz",
+                  "ofType": null
+                }
               },
               "description": null
             },
@@ -3005,9 +3083,13 @@
               "deprecationReason": null,
               "name": "user_id",
               "type": {
-                "kind": "SCALAR",
-                "name": "String",
-                "ofType": null
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
               },
               "description": null
             }
@@ -3239,9 +3321,13 @@
               "deprecationReason": null,
               "name": "created_at",
               "type": {
-                "kind": "SCALAR",
-                "name": "timestamptz",
-                "ofType": null
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "timestamptz",
+                  "ofType": null
+                }
               },
               "description": null
             },
@@ -3263,9 +3349,13 @@
               "deprecationReason": null,
               "name": "note",
               "type": {
-                "kind": "OBJECT",
-                "name": "note",
-                "ofType": null
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "OBJECT",
+                  "name": "note",
+                  "ofType": null
+                }
               },
               "description": "An object relationship"
             },
@@ -3275,9 +3365,13 @@
               "deprecationReason": null,
               "name": "note_id",
               "type": {
-                "kind": "SCALAR",
-                "name": "String",
-                "ofType": null
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
               },
               "description": null
             },
@@ -3616,9 +3710,13 @@
               "deprecationReason": null,
               "name": "created_at",
               "type": {
-                "kind": "SCALAR",
-                "name": "timestamptz",
-                "ofType": null
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "timestamptz",
+                  "ofType": null
+                }
               },
               "description": null
             },
@@ -3640,9 +3738,13 @@
               "deprecationReason": null,
               "name": "note_id",
               "type": {
-                "kind": "SCALAR",
-                "name": "String",
-                "ofType": null
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
               },
               "description": null
             },
@@ -5304,9 +5406,13 @@
               "deprecationReason": null,
               "name": "created_at",
               "type": {
-                "kind": "SCALAR",
-                "name": "timestamptz",
-                "ofType": null
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "timestamptz",
+                  "ofType": null
+                }
               },
               "description": null
             },
@@ -5328,9 +5434,13 @@
               "deprecationReason": null,
               "name": "id",
               "type": {
-                "kind": "SCALAR",
-                "name": "String",
-                "ofType": null
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
               },
               "description": null
             },
@@ -5498,9 +5608,13 @@
               "deprecationReason": null,
               "name": "updated_at",
               "type": {
-                "kind": "SCALAR",
-                "name": "timestamptz",
-                "ofType": null
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "timestamptz",
+                  "ofType": null
+                }
               },
               "description": null
             },
@@ -5510,9 +5624,13 @@
               "deprecationReason": null,
               "name": "username",
               "type": {
-                "kind": "SCALAR",
-                "name": "String",
-                "ofType": null
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
               },
               "description": null
             }
@@ -5689,9 +5807,13 @@
               "deprecationReason": null,
               "name": "data",
               "type": {
-                "kind": "SCALAR",
-                "name": "jsonb",
-                "ofType": null
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "jsonb",
+                  "ofType": null
+                }
               },
               "description": null
             },
@@ -5701,9 +5823,13 @@
               "deprecationReason": null,
               "name": "identity_id",
               "type": {
-                "kind": "SCALAR",
-                "name": "String",
-                "ofType": null
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
               },
               "description": null
             },
@@ -5713,9 +5839,13 @@
               "deprecationReason": null,
               "name": "identity_type",
               "type": {
-                "kind": "SCALAR",
-                "name": "String",
-                "ofType": null
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
               },
               "description": null
             },
@@ -5725,9 +5855,13 @@
               "deprecationReason": null,
               "name": "user",
               "type": {
-                "kind": "OBJECT",
-                "name": "user",
-                "ofType": null
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "OBJECT",
+                  "name": "user",
+                  "ofType": null
+                }
               },
               "description": "An object relationship"
             },
@@ -5737,9 +5871,13 @@
               "deprecationReason": null,
               "name": "user_id",
               "type": {
-                "kind": "SCALAR",
-                "name": "String",
-                "ofType": null
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
               },
               "description": null
             }
@@ -6066,9 +6204,13 @@
               "deprecationReason": null,
               "name": "data",
               "type": {
-                "kind": "SCALAR",
-                "name": "jsonb",
-                "ofType": null
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "jsonb",
+                  "ofType": null
+                }
               },
               "description": null
             },
@@ -6078,9 +6220,13 @@
               "deprecationReason": null,
               "name": "identity_id",
               "type": {
-                "kind": "SCALAR",
-                "name": "String",
-                "ofType": null
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
               },
               "description": null
             },
@@ -6090,9 +6236,13 @@
               "deprecationReason": null,
               "name": "identity_type",
               "type": {
-                "kind": "SCALAR",
-                "name": "String",
-                "ofType": null
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
               },
               "description": null
             },
@@ -6102,9 +6252,13 @@
               "deprecationReason": null,
               "name": "user_id",
               "type": {
-                "kind": "SCALAR",
-                "name": "String",
-                "ofType": null
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
               },
               "description": null
             }
@@ -6339,9 +6493,13 @@
               "deprecationReason": null,
               "name": "user_identity_type",
               "type": {
-                "kind": "SCALAR",
-                "name": "String",
-                "ofType": null
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
               },
               "description": null
             }
@@ -6510,9 +6668,13 @@
               "deprecationReason": null,
               "name": "user_identity_type",
               "type": {
-                "kind": "SCALAR",
-                "name": "String",
-                "ofType": null
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
               },
               "description": null
             }
@@ -6768,9 +6930,13 @@
               "deprecationReason": null,
               "name": "created_at",
               "type": {
-                "kind": "SCALAR",
-                "name": "timestamptz",
-                "ofType": null
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "timestamptz",
+                  "ofType": null
+                }
               },
               "description": null
             },
@@ -6792,9 +6958,13 @@
               "deprecationReason": null,
               "name": "id",
               "type": {
-                "kind": "SCALAR",
-                "name": "String",
-                "ofType": null
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
               },
               "description": null
             },
@@ -6816,9 +6986,13 @@
               "deprecationReason": null,
               "name": "updated_at",
               "type": {
-                "kind": "SCALAR",
-                "name": "timestamptz",
-                "ofType": null
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "timestamptz",
+                  "ofType": null
+                }
               },
               "description": null
             },
@@ -6828,9 +7002,13 @@
               "deprecationReason": null,
               "name": "username",
               "type": {
-                "kind": "SCALAR",
-                "name": "String",
-                "ofType": null
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
               },
               "description": null
             }
