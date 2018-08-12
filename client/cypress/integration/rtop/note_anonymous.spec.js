@@ -1,11 +1,8 @@
 const faker = require("faker");
 
-let baseUrl = "http://localhost:3000/";
-let url = path => baseUrl + path;
-
 context("note - anonymous user", () => {
   beforeEach(() => {
-    cy.visit(url("new"));
+    cy.visit("new");
   });
 
   it("create new note and edit it anonymously", () => {
@@ -31,7 +28,11 @@ context("note - anonymous user", () => {
 
     cy.get("@save").click();
 
-    cy.url().should("match", /s\/.+\/.+---.+/, "should not be new route");
+    cy.url({ timeout: 10000 }).should(
+      "match",
+      /s\/.+\/.+---.+/,
+      "should go to new url"
+    );
 
     cy.reload(true);
 

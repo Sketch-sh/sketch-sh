@@ -1,0 +1,9 @@
+{
+  "data": {
+    "mutate": { "affected_rows": 1, "__typename": "note_mutation_response" },
+    "insert_note_edit_token": {
+      "affected_rows": 1,
+      "__typename": "note_edit_token_mutation_response"
+    }
+  }
+}
