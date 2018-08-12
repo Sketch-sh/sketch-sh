@@ -29,7 +29,7 @@ jobs:
         environment:
           POSTGRES_USER: gql_test
           POSTGRES_DB: gql_test
-      - image: hasura/graphql-engine:v1.0.0-alpha12
+      - image: hasura/graphql-engine:v1.0.0-alpha13
         environment:
           HASURA_GRAPHQL_DATABASE_URL: postgres://gql_test:@localhost:5432/gql_test
           HASURA_GRAPHQL_ACCESS_KEY: verysecretaccesskey
