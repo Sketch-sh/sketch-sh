@@ -1,3 +1,4 @@
+[%%debugger.chrome];
 Modules.require("./Editor_Note.css");
 open Utils;
 open Editor_Types.Block;
@@ -7,6 +8,13 @@ type editorContentStatus =
   | Ec_Dirty
   | Ec_Saving
   | Ec_Saved;
+
+let editorContentStatusToString =
+  fun
+  | Ec_Pristine => "pristine"
+  | Ec_Dirty => "dirty"
+  | Ec_Saving => "saving"
+  | Ec_Saved => "saved";
 
 type state = {
   title: string,
@@ -58,6 +66,16 @@ let make =
     } else {
       state;
     },
+  didUpdate: ({oldSelf, newSelf}) =>
+    if (newSelf.state.editorContentStatus != oldSelf.state.editorContentStatus) {
+      let unloadMessage =
+        switch (newSelf.state.editorContentStatus) {
+        | Ec_Dirty => Some("Changes you made may not be saved")
+        | _ => None
+        };
+      Router.Unload.register(unloadMessage);
+    },
+  didMount: ({onUnmount}) => onUnmount(Router.Unload.unregister),
   reducer: (action, state) =>
     switch (action) {
     | TitleUpdate(title) =>

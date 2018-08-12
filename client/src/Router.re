@@ -3,6 +3,48 @@
    This module contains utilities on top of ReasonReact's Router
  */
 
+module Unload = {
+  let cb: ref(option(string)) = ref(None);
+
+  let unregister = () => {
+    cb := None;
+    ();
+  };
+
+  let register = message => {
+    cb := message;
+    ();
+  };
+
+  [@bs.deriving abstract]
+  type window = {
+    mutable onbeforeunload:
+      (. {. [@bs.set] "returnValue": string}) => Js.Nullable.t(string),
+  };
+
+  [@bs.val] external window: window = "";
+
+  module Provider = {
+    let component = ReasonReact.reducerComponent("Router_UnloadProvider");
+
+    let make = (_children: React.childless): React.component(unit, 'a, unit) => {
+      ...component,
+      didMount: _self =>
+        window
+        ->onbeforeunloadSet(
+            (. event) =>
+              switch (cb^) {
+              | None => Js.Nullable.null
+              | Some(message) =>
+                event##returnValue #= message;
+                Js.Nullable.return(message);
+              },
+          ),
+      render: _self => React.null,
+    };
+  };
+};
+
 let redirect: string => unit = [%bs.raw
   {|
   function (url) {
@@ -11,7 +53,16 @@ let redirect: string => unit = [%bs.raw
 |}
 ];
 
-let pushUnsafe = url => ReasonReact.Router.push(url);
+let pushUnsafe = url => {
+  let result =
+    switch (Unload.cb^) {
+    | None => true
+    | Some(message) => Webapi.Dom.(Window.confirm(message, window))
+    };
+  if (result) {
+    ReasonReact.Router.push(url);
+  };
+};
 let push = route => pushUnsafe(Route.routeToUrl(route));
 
 [@bs.send]
@@ -43,7 +94,7 @@ module LinkUnsafe = {
         onClick=(
           self.handle((event, _self) => {
             event->ReactEvent.Mouse.preventDefault;
-            ReasonReact.Router.push(href);
+            pushUnsafe(href);
           })
         )>
         ...children
