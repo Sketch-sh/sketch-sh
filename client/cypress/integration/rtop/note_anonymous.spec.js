@@ -63,4 +63,43 @@ context("note - anonymous user", () => {
       cy.url().should("contains", noteId, "same note id");
     });
   });
+
+  it.only("prompt before leaving with dirty state", () => {
+    let title = faker.lorem.words();
+
+    cy.get(".Topbar__action")
+      .contains("Save")
+      .as("save");
+
+    cy.get(".metadata")
+      .find("input")
+      .first()
+      .as("title")
+      .type(title);
+
+    cy.get("@save").should("be.enabled");
+
+    const stub = cy.stub();
+    stub.onFirstCall().returns(false);
+
+    cy.on("window:confirm", stub);
+
+    cy.get(`a[href="/"]`)
+      .click()
+      .then(() => {
+        expect(stub.getCall(0)).to.be.calledWith(
+          "Changes you made may not be saved"
+        );
+      });
+
+    cy.location("pathname").should("equal", "/new");
+
+    cy.get("@save").click();  
+    cy.get("@save").should("be.disabled");
+
+    cy.url().should("contains", "new");
+    cy.get(`a[href="/"]`).click();
+    cy.url().should("not.contains", "new");
+    cy.location("pathname").should("equal", "/");
+  });
 });
