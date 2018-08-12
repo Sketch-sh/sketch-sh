@@ -26,6 +26,10 @@ let make = _children => {
   },
   render: ({state}) =>
     <ReasonApollo.Provider client=GqlClient.instance>
+      <Helmet
+        defaultTitle="ReasonML Playground"
+        titleTemplate="%s - ReasonML Playground"
+      />
       <Router.Unload.Provider />
       <UI_Notification.Provider />
       <AuthStatus.Provider />
