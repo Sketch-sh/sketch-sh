@@ -22,7 +22,7 @@ const base = {
     historyApiFallback: true,
     disableHostCheck: true,
     proxy: {
-      "/graphql": "http://localhost:8081/v1alpha1",
+      "/graphql": "http://localhost:8080/v1alpha1",
     },
   },
   output: {

@@ -29,9 +29,7 @@ context("note - anonymous user", () => {
       .first()
       .type("let a: string = 1;", { force: true });
 
-    cy.get("@save")
-      .click()
-      .contains("Saving");
+    cy.get("@save").click();
 
     cy.url().should("match", /s\/.+\/.+---.+/, "should not be new route");
 
@@ -60,7 +58,7 @@ context("note - anonymous user", () => {
       });
 
       let noteId = firstUrl.split("/")[4];
-      
+
       cy.url().should("contains", noteId, "same note id");
     });
   });

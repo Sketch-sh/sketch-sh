@@ -2,6 +2,8 @@
 
 A note writing application for teaching and sharing ReasonML code with inline evaluation.
 
+[![CircleCI](https://circleci.com/gh/thangngoc89/rtop-ui/tree/master.svg?style=svg)](https://circleci.com/gh/thangngoc89/rtop-ui/tree/master)
+
 ![](github/screenshot.png)
 
 ## How does it work?
