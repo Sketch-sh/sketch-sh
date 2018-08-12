@@ -4,16 +4,16 @@
  */
 
 module Unload = {
-  let cb = ref(None);
+  let cb: ref(option(string)) = ref(None);
 
   let unregister = () => {
     cb := None;
     ();
   };
 
-  let register = newCallback => {
-    cb := Some(newCallback);
-    unregister;
+  let register = message => {
+    cb := message;
+    ();
   };
 
   [@bs.deriving abstract]
@@ -32,19 +32,13 @@ module Unload = {
       didMount: _self =>
         window
         ->onbeforeunloadSet(
-            (. event) => {
-              Js.log(cb^);
+            (. event) =>
               switch (cb^) {
               | None => Js.Nullable.null
-              | Some(cb) =>
-                switch (cb()) {
-                | None => Js.Nullable.null
-                | Some(message) =>
-                  event##returnValue #= message;
-                  Js.Nullable.return(message);
-                }
-              };
-            },
+              | Some(message) =>
+                event##returnValue #= message;
+                Js.Nullable.return(message);
+              },
           ),
       render: _self => React.null,
     };
@@ -63,16 +57,8 @@ let pushUnsafe = url => {
   let result =
     switch (Unload.cb^) {
     | None => true
-    | Some(cb) =>
-      Js.log(cb);
-      switch (cb()) {
-      | None => true
-      | Some(message) =>
-        Js.log("I got a message");
-        Webapi.Dom.(Window.confirm(message, window));
-      };
+    | Some(message) => Webapi.Dom.(Window.confirm(message, window))
     };
-  Js.log(result);
   if (result) {
     ReasonReact.Router.push(url);
   };

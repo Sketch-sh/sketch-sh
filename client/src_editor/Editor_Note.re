@@ -66,17 +66,16 @@ let make =
     } else {
       state;
     },
-  didMount: ({state, onUnmount}) => {
-    let unregister =
-      Router.Unload.register(() => {
-        state.editorContentStatus->editorContentStatusToString->Js.log;
-        switch (state.editorContentStatus) {
+  didUpdate: ({oldSelf, newSelf}) =>
+    if (newSelf.state.editorContentStatus != oldSelf.state.editorContentStatus) {
+      let unloadMessage =
+        switch (newSelf.state.editorContentStatus) {
         | Ec_Dirty => Some("Changes you made may not be saved")
         | _ => None
         };
-      });
-    onUnmount(unregister);
-  },
+      Router.Unload.register(unloadMessage);
+    },
+  didMount: ({onUnmount}) => onUnmount(Router.Unload.unregister),
   reducer: (action, state) =>
     switch (action) {
     | TitleUpdate(title) =>
