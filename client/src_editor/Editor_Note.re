@@ -9,13 +9,6 @@ type editorContentStatus =
   | Ec_Saving
   | Ec_Saved;
 
-let editorContentStatusToString =
-  fun
-  | Ec_Pristine => "pristine"
-  | Ec_Dirty => "dirty"
-  | Ec_Saving => "saving"
-  | Ec_Saved => "saved";
-
 type state = {
   title: string,
   editorContentStatus,
