@@ -8,7 +8,7 @@ save:
 	hasura metadata export --access-key hasura
 update-schema: save
 	cd ../client && \
-	./node_modules/.bin/send-introspection-query http://localhost:8081/v1alpha1/graphql -H "X-Hasura-Access-Key: hasura"
+	./node_modules/.bin/send-introspection-query http://localhost:8080/v1alpha1/graphql -H "X-Hasura-Access-Key: hasura"
 
 clear:
 	docker-compose down -v && \
