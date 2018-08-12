@@ -11,7 +11,7 @@
     "deploy": "now build && now alias",
     "staging": "npm run build && now build && now alias staging.rtop.khoanguyen.me",
     "start": "webpack-dev-server",
-    "ci:build": "rm -rf build && bsb -clean-world && npm run build",
+    "ci:build": "rm -rf build && node ./set-bs-config-production.js && bsb -clean-world && npm run build",
     "ci:cypress": "start-server-and-test start http-get://localhost:3000 cy:run:record",
     "cy:open": "cypress open",
     "cy:run": "cypress run",
