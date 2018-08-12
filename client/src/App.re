@@ -33,6 +33,7 @@ let make = _children => {
       <Router.Unload.Provider />
       <UI_Notification.Provider />
       <AuthStatus.Provider />
+      <FontFaceObserver.Provider />
       (
         switch (state) {
         | Home =>
