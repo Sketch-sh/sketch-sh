@@ -28,6 +28,7 @@
     "apollo-link-error": "^1.1.0",
     "apollo-link-http": "^1.5.4",
     "apollo-link-ws": "^1.0.8",
+    "bs-date-fns": "^0.1.6",
     "bs-dynamic-import": "^0.3.0",
     "bs-webapi": "^0.10.0",
     "codemirror": "^5.39.2",

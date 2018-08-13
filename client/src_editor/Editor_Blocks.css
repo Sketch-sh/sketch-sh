@@ -4,7 +4,7 @@
   position: relative;
 }
 
-.metadata + .block__container {
+.EditorNote__metadata + .block__container {
   margin-top: var(--space4);
 }
 

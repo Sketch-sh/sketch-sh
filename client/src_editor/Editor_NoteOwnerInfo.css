@@ -1,0 +1,37 @@
+.EditorNoteOwnerInfo {
+  margin: var(--space1) 0 0 8px;
+  display: flex;
+  align-items: center;
+
+  & > a {
+    display: flex;
+    align-items: center;
+    text-decoration-color: var(--c-text-sub2);
+  }
+}
+
+.EditorNoteOwnerInfo__avatar {
+  border: 2px solid var(--c-text-sub2);
+  border-radius: 50%;
+  margin-right: var(--space2);
+}
+
+.EditorNoteOwnerInfo__username {
+  color: var(--c-text-sub2);
+  font-weight: 700;
+}
+
+.EditorNoteOwnerInfo__lastEdited {
+  padding-right: var(--space2);
+  font-weight: 400;
+  color: var(--c-text-sub2);
+}
+
+.EditorNoteOwnerInfo__lastEdited::before {
+  content: "-";
+  margin: 0 var(--space2);
+}
+
+.EditorNoteOwnerInfo__time {
+  margin-left: var(--space1);
+}

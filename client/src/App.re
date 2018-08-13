@@ -69,6 +69,10 @@ let make = _children => {
                  render=(((module NoteNew)) => <NoteNew />)
                />
           </Layout_WithTopbar>
+        | User(username) =>
+          <Layout_WithTopbar>
+            ...<div className="Layout__withHeader"> username->str </div>
+          </Layout_WithTopbar>
         | AuthCallback(token) => <Auth.AuthCallback token />
         | AuthLogout => <Auth.AuthLogout />
         | AuthGithub => <Auth.AuthGithub />

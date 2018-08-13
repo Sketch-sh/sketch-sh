@@ -27,7 +27,8 @@ let component = ReasonReact.reducerComponent("Editor_Page");
 let make =
     (
       ~blocks,
-      ~noteOwnerId as _=?,
+      ~noteOwner=?,
+      ~noteLastEdited=?,
       ~title="",
       ~noteSaveStatus: NoteSave_Types.noteSaveStatus,
       ~isEditable,
@@ -187,14 +188,20 @@ let make =
             }
           </title>
         </Helmet>
-        <div className="metadata">
+        <div className="EditorNote__metadata">
           <input
-            className="metadata__title-input"
+            className="EditorNote__metadata--title"
             placeholder="untitled sketch"
             value=state.title
             onChange=(event => valueFromEvent(event)->TitleUpdate->send)
             readOnly
           />
+          (
+            noteOwner
+            =>> (
+              noteOwner => <Editor_NoteOwnerInfo noteOwner ?noteLastEdited />
+            )
+          )
         </div>
         <Editor_Blocks
           blocks

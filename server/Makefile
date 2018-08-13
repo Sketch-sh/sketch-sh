@@ -31,4 +31,8 @@ prod-migrate:
 	cd ../hasura && \
 	hasura metadata apply --endpoint https://sketch-graphql.herokuapp.com --access-key $$SKETCH_ACCESS_KEY
 
+psql:
+	# Access psql of a running container
+	docker exec -it server_postgres_1 psql -U postgres
+
 .PHONY: migrate save update-schema clear reset prod-migrate staging-migrate

@@ -105,7 +105,8 @@ let make = (~noteInfo: Route.noteRouteConfig, _children) => {
                                    <Editor_Note
                                      title=note##title->optionToEmptyString
                                      isEditable
-                                     ?noteOwnerId
+                                     noteLastEdited=note##updated_at
+                                     noteOwner=note##owner
                                      blocks=(
                                        switch (note##data) {
                                        | None => [||]

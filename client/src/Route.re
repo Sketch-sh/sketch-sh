@@ -11,6 +11,7 @@ type t =
   | Home
   | Note(noteRouteConfig)
   | NoteNew
+  | User(string)
   | EditorDevelopment
   | AuthGithub
   | AuthFailure
@@ -32,6 +33,7 @@ let routeToUrl: t => string =
       }
     )
   | NoteNew => "/new"
+  | User(username) => "/u/" ++ username
   | EditorDevelopment => "/____EDITOR-DEVELOPMENT____"
   | AuthGithub => "/auth/github"
   | AuthFailure => "/auth/failure"
@@ -49,6 +51,7 @@ let urlToRoute: ReasonReact.Router.url => t =
     | []
     | ["/"] => Home
     | ["new"] => NoteNew
+    | ["u", username] => User(username)
     | ["____EDITOR-DEVELOPMENT____"] => EditorDevelopment
     | ["auth", "github"] => AuthGithub
     | ["auth", "failure"] => AuthFailure

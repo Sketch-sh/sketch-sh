@@ -31,7 +31,8 @@
     "bs-webapi",
     "reason-apollo",
     "bs-dynamic-import",
-    "reason-loadable"
+    "reason-loadable",
+    "bs-date-fns"
   ],
   "bs-dev-dependencies": ["@glennsl/bs-jest"],
   "refmt": 3,
