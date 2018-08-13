@@ -38,7 +38,24 @@ let (=>>) = (value, render) =>
   | Some(value) => render(value)
   };
 
-let handleError = Js.Promise.(catch(error => Js.log(error)->resolve));
+external promiseToObject: Js.Promise.error => Js.t({..}) = "%identity";
+
+let handleError =
+  Js.Promise.(
+    catch(error => {
+      let content = error->promiseToObject;
+      switch (content##isCanceled->Js.undefinedToOption) {
+      | None => Js.log(error)
+      | Some(bool) =>
+        if (bool) {
+          Js.log("Promise cancelled");
+        } else {
+          Js.log(error);
+        }
+      };
+      resolve();
+    })
+  );
 
 let splitOnChar = (sep, s) => {
   let j = ref(String.length(s));

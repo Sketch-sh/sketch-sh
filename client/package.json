@@ -39,6 +39,7 @@
     "jwt-decode": "^2.2.0",
     "lz-string": "^1.4.4",
     "make-cancelable": "^1.0.0",
+    "makecancelable": "^1.0.0",
     "nanoid": "^1.1.0",
     "react": "^16.4.1",
     "react-apollo": "^2.1.9",
