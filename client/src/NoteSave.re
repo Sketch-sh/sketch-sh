@@ -65,7 +65,7 @@ let make =
       ReasonReact.UpdateWithSideEffects(
         {...state, kind: Old(noteId)},
         (
-          _self =>
+          ({state}) =>
             state.replaceNote :=
               replaceNoteRoute(~noteId, ~json, ~title, ~kind=Push)
               ->PromiseCancelable.make
@@ -75,7 +75,7 @@ let make =
     | SavedOldNote(noteId, title, json) =>
       ReasonReact.SideEffects(
         (
-          _self =>
+          ({state}) =>
             state.replaceNote :=
               replaceNoteRoute(~noteId, ~json, ~title, ~kind=Replace)
               ->PromiseCancelable.make
@@ -83,16 +83,11 @@ let make =
         ),
       )
     },
-  didMount: ({handle, onUnmount}) =>
-    onUnmount(
-      handle((_, self) => {
-        let state = self.ReasonReact.state;
-        switch (state.replaceNote^) {
-        | None => ()
-        | Some(p) => PromiseCancelable.cancel(p)
-        };
-      }),
-    ),
+  willUnmount: ({state}) =>
+    switch (state.replaceNote^) {
+    | None => Js.log("no promises")
+    | Some(p) => PromiseCancelable.cancel(p)
+    },
   render: ({state, send}) =>
     <AuthStatus.IsAuthenticated>
       ...(
