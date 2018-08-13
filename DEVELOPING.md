@@ -90,7 +90,7 @@ Server implementations contains 2 microserives: auth, hasura's graphql engine
 
   - Go to https://github.com/settings/developers
   - Create a new app
-  - Set `Authorization callback URL` to `http://localhost:3001/auth/github/callback`
+  - Set `Authorization callback URL` to `http://localhost:3000/api/auth/github/callback`
   - Save `Client ID` and `Client Secret`
 
 ## Starting development server
