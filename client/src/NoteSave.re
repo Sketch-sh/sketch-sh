@@ -85,7 +85,7 @@ let make =
     },
   willUnmount: ({state}) =>
     switch (state.replaceNote^) {
-    | None => Js.log("no promises")
+    | None => ()
     | Some(p) => PromiseCancelable.cancel(p)
     },
   render: ({state, send}) =>
