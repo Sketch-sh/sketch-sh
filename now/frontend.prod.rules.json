@@ -1,0 +1,11 @@
+{
+  "rules": [
+    {
+      "pathname": "/api/auth/**",
+      "dest": "auth.sketch.sh"
+    },
+    {
+      "dest": "sketch.now.sh"
+    }
+  ]
+}

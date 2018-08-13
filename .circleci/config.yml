@@ -33,7 +33,7 @@ jobs:
         environment:
           HASURA_GRAPHQL_DATABASE_URL: postgres://gql_test:@localhost:5432/gql_test
           HASURA_GRAPHQL_ACCESS_KEY: verysecretaccesskey
-          HASURA_GRAPHQL_AUTH_HOOK: http://localhost:3001/auth/webhook
+          HASURA_GRAPHQL_AUTH_HOOK: http://localhost:3001/api/auth/webhook
         command:
           - sh
           - -c
@@ -111,7 +111,7 @@ jobs:
           paths:
             - build
       
-  deploy:
+  deploy-staging:
     <<: *defaults
     steps:
       - attach_workspace:
@@ -121,16 +121,33 @@ jobs:
       - run: |
           cd build
           ../node_modules/.bin/now --token $NOW_TOKEN
-          ../node_modules/.bin/now alias --token $NOW_TOKEN rtop.khoa.xyz
+          ../node_modules/.bin/now alias --token $NOW_TOKEN sketch-staging.now.sh
+  deploy-prodution:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          # Must be absolute path or relative path from working_directory
+          at: .
+      - run: npm install now
+      - run: |
+          cd build
+          ../node_modules/.bin/now --token $NOW_TOKEN
+          ../node_modules/.bin/now alias --token $NOW_TOKEN sketch.now.sh
 
 workflows:
   version: 2
   build-test-deploy:
     jobs:
       - build
-      - deploy:
+      - deploy-staging:
           requires:
             - build
           filters:
             branches:
               only: master
+      - deploy-production:
+          requires:
+            - build
+          filters:
+            branches:
+              only: deploy

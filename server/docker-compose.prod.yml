@@ -1,0 +1,46 @@
+version: '3.6'
+services:
+  postgres:
+    networks:
+      - rtop
+    volumes:
+      - ~/rtop/pgdata:/var/lib/postgresql/data
+  migration:
+    networks:
+      - rtop
+  graphql-engine:
+    expose:
+      - "8080"
+    networks:
+      - rtop
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=rtop_graphql"
+      - "traefik.frontend.rule=Host:api.sketch.sh;Path:/graphql;AddPrefix:/v1alpha1/graphql;"
+  auth:
+    build:
+      context: auth
+      args:
+        - NODE_ENV=production
+    expose:
+      - "3001"
+    environment:
+      - NODE_ENV=production
+      - JWT_TOKEN=${JWT_TOKEN}
+      - HASURA_ENDPOINT=http://graphql-engine:8080/v1alpha1/graphql
+      - GITHUB_CLIENT_ID=${GITHUB_CLIENT_ID}
+      - GITHUB_CLIENT_SECRET=${GITHUB_CLIENT_SECRET}
+      - AUTH_URL=${AUTH_URL}
+      - FRONTEND_URL=${FRONTEND_URL}
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=rtop_auth"
+      - "traefik.frontend.rule=Host:api.sketch.sh;Path:/auth"
+
+    depends_on:
+      - graphql-engine
+
+networks:
+  rtop:
+    external:
+      name: traefik_webgateway

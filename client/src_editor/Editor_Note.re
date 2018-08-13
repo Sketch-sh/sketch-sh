@@ -190,7 +190,7 @@ let make =
         <div className="metadata">
           <input
             className="metadata__title-input"
-            placeholder="untitled note"
+            placeholder="untitled sketch"
             value=state.title
             onChange=(event => valueFromEvent(event)->TitleUpdate->send)
             readOnly

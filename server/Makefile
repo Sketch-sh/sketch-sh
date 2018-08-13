@@ -16,12 +16,19 @@ clear:
 
 reset: update-schema clear migrate
 
-DATABASE_URL := $(shell heroku config:get DATABASE_URL -a rtop-server)?ssl=true
+STAGING_DATABASE_URL := $(shell heroku config:get DATABASE_URL -a rtop-server)?ssl=true
+PROD_DATABASE_URL := $(shell heroku config:get DATABASE_URL -a sketch-graphql)?ssl=true
 
-prod-migrate: 
+staging-migrate: 
 	cd schema && \
 	DATABASE_URL=$(DATABASE_URL) ./node_modules/.bin/knex migrate:latest --env production && \
 	cd ../hasura && \
 	hasura metadata apply --endpoint https://rtop-server.herokuapp.com --access-key $$RTOP_ACCESS_KEY
 
-.PHONY: migrate save update-schema clear reset prod-migrate
+prod-migrate: 
+	cd schema && \
+	DATABASE_URL=$(PROD_DATABASE_URL) ./node_modules/.bin/knex migrate:latest --env production && \
+	cd ../hasura && \
+	hasura metadata apply --endpoint https://sketch-graphql.herokuapp.com --access-key $$SKETCH_ACCESS_KEY
+
+.PHONY: migrate save update-schema clear reset prod-migrate staging-migrate
