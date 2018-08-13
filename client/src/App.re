@@ -35,15 +35,26 @@ let make = _children => {
         switch (state) {
         | Home =>
           <Layout_WithTopbar>
-            ...<HomeLazy
-                 fetch=(
-                   () => [%bs.raw
-                     {| import(/* webpackChunkName: "Home" */ "./Home.bs.js") |}
-                   ]
-                 )
-                 onLoading=(() => <UI_FullpageLoading />)
-                 render=(((module Home)) => <Home />)
-               />
+            ...<AuthStatus.IsAuthenticated>
+                 ...(
+                      fun
+                      | Anonymous =>
+                        <NoteNewLazy
+                          title="Sketch.sh - Interactive ReasonML sketchbook"
+                          blocks=Editor_Introduction.blocks
+                        />
+                      | Login(_) =>
+                        <HomeLazy
+                          fetch=(
+                            () => [%bs.raw
+                              {| import(/* webpackChunkName: "Home" */ "./Home.bs.js") |}
+                            ]
+                          )
+                          onLoading=(() => <UI_FullpageLoading />)
+                          render=(((module Home)) => <Home />)
+                        />
+                    )
+               </AuthStatus.IsAuthenticated>
           </Layout_WithTopbar>
         | Note(noteInfo) =>
           <Layout_WithTopbar>
@@ -58,17 +69,7 @@ let make = _children => {
                />
           </Layout_WithTopbar>
         | NoteNew =>
-          <Layout_WithTopbar>
-            ...<NoteNewLazy
-                 fetch=(
-                   () => [%bs.raw
-                     {| import(/* webpackChunkName: "NoteNew" */ "./NoteNew.bs.js") |}
-                   ]
-                 )
-                 onLoading=(() => <UI_FullpageLoading />)
-                 render=(((module NoteNew)) => <NoteNew />)
-               />
-          </Layout_WithTopbar>
+          <Layout_WithTopbar> ...<NoteNewLazy /> </Layout_WithTopbar>
         | User(username) =>
           <Layout_WithTopbar>
             ...<div className="Layout__withHeader"> username->str </div>

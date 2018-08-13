@@ -1,4 +1,4 @@
-let blocks = [|
+let defaultBlocks = [|
   {
     Editor_Types.Block.b_id: Utils.generateId(),
     b_data: Editor_Blocks_Utils.emptyCodeBlock(),
@@ -7,13 +7,19 @@ let blocks = [|
 
 let component = ReasonReact.statelessComponent("Note_New");
 
-let make = _children => {
+let make = (~blocks=defaultBlocks, ~title=?, _children) => {
   ...component,
   render: _self =>
     <NoteSave noteKind=New>
       ...(
            (~noteSaveStatus, ~user as _, ~onSave) =>
-             <Editor_Note blocks noteSaveStatus onSave isEditable=true />
+             <Editor_Note
+               blocks
+               ?title
+               noteSaveStatus
+               onSave
+               isEditable=true
+             />
          )
     </NoteSave>,
 };
