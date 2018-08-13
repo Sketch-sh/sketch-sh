@@ -85,13 +85,7 @@ let make =
         ),
       )
     | SetPromiseCancelHandler(handler) =>
-      state.promiseCancelHandler :=
-        Some(
-          handler
-          ->PromiseCancelable.catch(
-              (reject_reason => Js.log(reject_reason)),
-            ),
-        );
+      state.promiseCancelHandler := Some(handler);
       ReasonReact.NoUpdate;
     },
   willUnmount: ({state}) => {
