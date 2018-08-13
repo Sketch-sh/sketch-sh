@@ -31,6 +31,12 @@ let replaceNoteRoute = (~noteId, ~json, ~title, ~kind) =>
   );
 
 open NoteSave_Types;
+
+type state = {
+  kind: noteKind,
+  replaceNote: ref(option(PromiseCancelable.t(unit))),
+};
+
 type action =
   | SavedNewNote(id, string, Js.Json.t)
   | SavedOldNote(id, string, Js.Json.t);
@@ -52,24 +58,41 @@ let make =
         ReasonReact.reactElement,
     ) => {
   ...component,
-  initialState: () => {kind: noteKind},
-  reducer: (action, _state) =>
+  initialState: () => {kind: noteKind, replaceNote: ref(None)},
+  reducer: (action, state) =>
     switch (action) {
     | SavedNewNote(noteId, title, json) =>
       ReasonReact.UpdateWithSideEffects(
-        {kind: Old(noteId)},
+        {...state, kind: Old(noteId)},
         (
-          _self => replaceNoteRoute(~noteId, ~json, ~title, ~kind=Push)->ignore
+          _self =>
+            state.replaceNote :=
+              replaceNoteRoute(~noteId, ~json, ~title, ~kind=Push)
+              ->PromiseCancelable.make
+              ->Some
         ),
       )
     | SavedOldNote(noteId, title, json) =>
       ReasonReact.SideEffects(
         (
           _self =>
-            replaceNoteRoute(~noteId, ~json, ~title, ~kind=Replace)->ignore
+            state.replaceNote :=
+              replaceNoteRoute(~noteId, ~json, ~title, ~kind=Replace)
+              ->PromiseCancelable.make
+              ->Some
         ),
       )
     },
+  didMount: ({handle, onUnmount}) =>
+    onUnmount(
+      handle((_, self) => {
+        let state = self.ReasonReact.state;
+        switch (state.replaceNote^) {
+        | None => ()
+        | Some(p) => PromiseCancelable.cancel(p)
+        };
+      }),
+    ),
   render: ({state, send}) =>
     <AuthStatus.IsAuthenticated>
       ...(
