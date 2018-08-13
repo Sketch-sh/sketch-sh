@@ -6,6 +6,9 @@ let make = _children => {
   ...component,
   render: _self =>
     <div className="Layout__withHeader">
+      <Helmet>
+        <title> "Sketch.sh - Interactive ReasonML sketchbook"->str </title>
+      </Helmet>
       (
         Utils.env == "production" ?
           React.null :
