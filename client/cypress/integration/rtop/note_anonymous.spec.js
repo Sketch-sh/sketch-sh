@@ -17,7 +17,7 @@ context("note - anonymous user", () => {
 
     cy.get("@save").should("be.disabled");
 
-    cy.get(".metadata")
+    cy.get(".EditorNote__metadata")
       .find("input")
       .first()
       .as("title")
