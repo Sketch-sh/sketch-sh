@@ -6,6 +6,6 @@
     "pg": "^7.4.3"
   },
   "scripts": {
-    "migrate": "knex migrate:latest && cd ../hasura && hasura metadata apply --access-key hasura --endpoint $HASURA_ENDPOINT"
+    "migrate": "knex migrate:latest && cd ../hasura && hasura metadata apply --access-key $HASURA_ACCESS_KEY --endpoint $HASURA_ENDPOINT"
   }
 }

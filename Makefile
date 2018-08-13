@@ -1,15 +1,13 @@
-client-bswatch: 
-	$(MAKE) -C client bswatch
-client-start:
-	$(MAKE) -C client start
-client-build:
-	$(MAKE) -C client build
+ROOT_PATH := $(shell pwd)
 
-server-start: 
-	$(MAKE) -C server start
-server-watch:
-	$(MAKE) -C server watch
-server-bswatch:
-	$(MAKE) -C server bswatch
+prod-auth:
+	cd server/auth && \
+	now -A ${ROOT_PATH}/now/auth.prod.now.json && \
+	now -A ${ROOT_PATH}/now/auth.prod.now.json alias 
 
-.PHONY: client-bswatch client-start client-webpack server-start server-watch server-bswatch
+prod-client:
+	# Deploying frontend - production
+	now && now alias sketch.now.sh && \
+	now alias sketch.sh --rules ${ROOT_PATH}/now/frontend.prod.rules.json
+
+.PHONY: prod-auth prod-client

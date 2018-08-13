@@ -16,12 +16,17 @@ let generateId = () =>
     22
   );
 
+const GITHUB_CALLBACK_URL =
+  process.env.FRONTEND_URL + "/api/auth/github/callback";
+const FRONTEND_AUTH_FAILURE = process.env.FRONTEND_URL + "/auth/failure";
+const FRONTEND_AUTH_CALLBACK = process.env.FRONTEND_URL + "/auth/callback";
+
 passport.use(
   new GitHubStrategy(
     {
       clientID: process.env.GITHUB_CLIENT_ID,
       clientSecret: process.env.GITHUB_CLIENT_SECRET,
-      callbackURL: process.env.GITHUB_CALLBACK_URL,
+      callbackURL: GITHUB_CALLBACK_URL,
       scope: ["user:email"],
     },
     function(accessToken, refreshToken, profile, done) {
@@ -64,16 +69,19 @@ const app = express();
 app.use(morgan(process.env.NODE_ENV === "production" ? "combined" : "dev"));
 app.use(passport.initialize());
 
-app.get("/auth/github", passport.authenticate("github"), function(req, res) {
+app.get("/api/auth/github", passport.authenticate("github"), function(
+  req,
+  res
+) {
   // The request will be redirected to GitHub for authentication, so this
   // function will not be called.
 });
 
 app.get(
-  "/auth/github/callback",
+  "/api/auth/github/callback",
   passport.authenticate("github", {
     session: false,
-    failureRedirect: process.env.FRONTEND_AUTH_FAILURE,
+    failureRedirect: FRONTEND_AUTH_FAILURE,
   }),
   function(req, res) {
     const userId = req.user;
@@ -87,9 +95,7 @@ app.get(
     );
 
     const redirectUrl =
-      process.env.FRONTEND_AUTH_CALLBACK +
-      "?" +
-      qs.stringify({ token: jwtToken });
+      FRONTEND_AUTH_CALLBACK + "?" + qs.stringify({ token: jwtToken });
 
     res.redirect(redirectUrl);
   }
@@ -105,7 +111,7 @@ const jwtTokenFromHeader = req => {
   return null;
 };
 
-app.get("/auth/webhook", (req, res) => {
+app.get("/api/auth/webhook", (req, res) => {
   // Extract token from request
   const token = jwtTokenFromHeader(req);
 
