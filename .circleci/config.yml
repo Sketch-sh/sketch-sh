@@ -33,7 +33,7 @@ jobs:
         environment:
           HASURA_GRAPHQL_DATABASE_URL: postgres://gql_test:@localhost:5432/gql_test
           HASURA_GRAPHQL_ACCESS_KEY: verysecretaccesskey
-          HASURA_GRAPHQL_AUTH_HOOK: http://localhost:3001/auth/webhook
+          HASURA_GRAPHQL_AUTH_HOOK: http://localhost:3001/api/auth/webhook
         command:
           - sh
           - -c

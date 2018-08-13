@@ -1,6 +1,6 @@
 open Utils;
 
-let authDomain = env == "production" ? "/api" : "http://localhost:3001";
+let authDomain = "/api";
 
 let stagingHost = "rtop.khoa.xyz";
 

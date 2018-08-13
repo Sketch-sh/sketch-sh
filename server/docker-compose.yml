@@ -33,7 +33,7 @@ services:
     environment:
       - HASURA_GRAPHQL_DATABASE_URL=postgres://postgres:${POSTGRES_PASSWORD}@postgres:5432/postgres
       - HASURA_GRAPHQL_ACCESS_KEY=${HASURA_ACCESS_KEY}
-      - HASURA_GRAPHQL_AUTH_HOOK=http://auth/auth/webhook
+      - HASURA_GRAPHQL_AUTH_HOOK=http://auth/api/auth/webhook
     command: >
       /bin/sh -c "graphql-engine serve --enable-console;"
 
