@@ -3,7 +3,6 @@ Modules.require("./reason-mode.js");
 Modules.require("codemirror/addon/edit/matchbrackets");
 Modules.require("codemirror/addon/comment/comment");
 Modules.require("codemirror/addon/display/placeholder");
-Modules.require("codemirror/addon/selection/active-line");
 Modules.require("codemirror/mode/gfm/gfm");
 Modules.require("codemirror/lib/codemirror.css");
 Modules.require("./cm-theme.css");

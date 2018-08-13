@@ -24,24 +24,30 @@ type state = {
 
 let blockControlsButtons = (b_id, send) =>
   <div className="block__controls--buttons">
-    <button
-      className="block__controls--button"
-      onClick=(_ => send(Block_Add(b_id, BTyp_Code)))>
-      <Fi.Code />
-      "add code block"->str
-    </button>
-    <button
-      className="block__controls--button"
-      onClick=(_ => send(Block_Add(b_id, BTyp_Text)))>
-      <Fi.Edit2 />
-      "add text block"->str
-    </button>
-    <button
-      className="block__controls--button block__controls--danger"
-      onClick=(_ => send(Block_Delete(b_id)))>
-      <Fi.Trash2 />
-      "delete block"->str
-    </button>
+    <UI_Balloon message="Add code block" position=Down>
+      ...<button
+           className="block__controls--button"
+           onClick=(_ => send(Block_Add(b_id, BTyp_Code)))>
+           <Fi.Code />
+           <sup> "+"->str </sup>
+         </button>
+    </UI_Balloon>
+    <UI_Balloon message="Add text block" position=Down>
+      ...<button
+           className="block__controls--button"
+           onClick=(_ => send(Block_Add(b_id, BTyp_Text)))>
+           <Fi.Edit2 />
+           <sup> "+"->str </sup>
+         </button>
+    </UI_Balloon>
+    <UI_Balloon message="Delete block" position=Down>
+      ...<button
+           className="block__controls--button block__controls--danger"
+           onClick=(_ => send(Block_Delete(b_id)))>
+           <Fi.Trash2 />
+           <sup> "-"->str </sup>
+         </button>
+    </UI_Balloon>
   </div>;
 
 let component = ReasonReact.reducerComponent("Editor_Page");

@@ -1,11 +1,7 @@
 .block__container {
-  margin-top: var(--space5);
+  margin-top: var(--space4);
   padding: 0px;
   position: relative;
-}
-
-.EditorNote__metadata + .block__container {
-  margin-top: var(--space4);
 }
 
 .block__controls {
@@ -19,24 +15,15 @@
 }
 
 .block__controls--button {
-  --transparent-height: 60%;
-
-  display: flex;
-  align-items: center;
-
   background: none;
   border: 0;
   outline: none;
   font-weight: 700;
   padding: 0;
-  color: var(--c-text-sub);
+  color: #aaa;
+  transition: color 250ms ease;
   margin-right: var(--space3);
   cursor: pointer;
-  background-image: linear-gradient(
-    180deg,
-    transparent var(--transparent-height),
-    rgba(101, 125, 225, 0.4) 0
-  );
   font-size: var(--f5);
 
   & svg {
@@ -44,20 +31,16 @@
   }
 
   &:hover {
-    background-image: linear-gradient(
-      180deg,
-      transparent calc(var(--transparent-height) + 10%),
-      /* --c-primary */ rgba(24, 116, 213, 0.4) 0
-    );
+    color: var(--c-primary) !important;
   }
 
   &.block__controls--danger:hover {
-    background-image: linear-gradient(
-      180deg,
-      transparent calc(var(--transparent-height) + 10%),
-      /* --c-danger */ rgba(235, 86, 86, 0.4) 0
-    );
+    color: var(--c-danger) !important;
   }
+}
+
+.block__container:hover .block__controls--button {
+  color: #888;
 }
 
 .block__controls--button:last-of-type {
