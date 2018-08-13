@@ -71,7 +71,7 @@ context("note - anonymous user", () => {
       .contains("Save")
       .as("save");
 
-    cy.get(".metadata")
+    cy.get(".EditorNote__metadata")
       .find("input")
       .first()
       .as("title")
@@ -87,14 +87,12 @@ context("note - anonymous user", () => {
     cy.get(`a[href="/"]`)
       .click()
       .then(() => {
-        expect(stub.getCall(0)).to.be.calledWith(
-          "Changes you made may not be saved"
-        );
+        expect(stub).to.be.calledOnce;
       });
 
     cy.location("pathname").should("equal", "/new");
 
-    cy.get("@save").click();  
+    cy.get("@save").click();
     cy.get("@save").should("be.disabled");
 
     cy.url().should("contains", "new");
