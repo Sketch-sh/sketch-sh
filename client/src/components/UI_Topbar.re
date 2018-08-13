@@ -27,16 +27,12 @@ let make = _children => {
     <header className="Topbar">
       <div className="Topbar__left">
         <Router.Link route=Route.Home className="Topbar__home">
-          "ReasonML playground"->str
+          "Sketch.sh"->str
         </Router.Link>
-        <div
-          id
-          className="Topbar__actions"
-          /* (children(~buttonClassName="Topbar__action")) */
-        />
+        <div id className="Topbar__actions" />
       </div>
       <div className="Topbar__right">
-        <UI_Balloon position=Down message="New note">
+        <UI_Balloon position=Down message="New sketch">
           ...<button
                className="Topbar__action Topbar__action--highlight"
                onClick=(_ => Router.push(Route.NoteNew))>
