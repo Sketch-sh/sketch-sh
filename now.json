@@ -3,6 +3,35 @@
   "type": "static",
   "public": true,
   "static": {
-    "rewrites": [{ "source": "**", "destination": "/index.html" }]
+    "rewrites": [{ "source": "**", "destination": "/index.html" }],
+    "headers": [
+      {
+        "source": "index.html",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "no-cache"
+          }
+        ]
+      },
+      {
+        "source": "**/*.@(jpg|jpeg|gif|png|js|css)",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "max-age=311536000,public"
+          }
+        ]
+      },
+      {
+        "source": "**.@(js|css)",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "max-age=311536000,public"
+          }
+        ]
+      }
+    ]
   }
 }
