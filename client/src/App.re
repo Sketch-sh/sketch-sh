@@ -7,7 +7,7 @@ type state = route;
 type action =
   | ChangeView(route);
 
-let component = ReasonReact.reducerComponent("Rtop");
+let component = ReasonReact.reducerComponent("Sketch.sh");
 
 let make = _children => {
   ...component,
@@ -70,9 +70,17 @@ let make = _children => {
           </Layout_WithTopbar>
         | NoteNew =>
           <Layout_WithTopbar> ...<NoteNewLazy /> </Layout_WithTopbar>
-        | User(username) =>
+        | User(userName) =>
           <Layout_WithTopbar>
-            ...<div className="Layout__withHeader"> username->str </div>
+            ...<UserLazy
+                 fetch=(
+                   () => [%bs.raw
+                     {| import(/* webpackChunkName: "User" */ "./User.bs.js") |}
+                   ]
+                 )
+                 onLoading=(() => <UI_FullpageLoading />)
+                 render=(((module User)) => <User userName />)
+               />
           </Layout_WithTopbar>
         | AuthCallback(token) => <Auth.AuthCallback token />
         | AuthLogout => <Auth.AuthLogout />

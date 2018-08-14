@@ -5,7 +5,9 @@ let component = ReasonReact.statelessComponent("UI_TopbarUserInfo");
 let make = (~user, _children) => {
   ...component,
   render: _self =>
-    <div className="Topbar__userInfo">
+    <Router.Link
+      className="Topbar__userInfo"
+      route=(Route.User(optionToEmptyString(user##username)))>
       <div className="Topbar__userInfo--content">
         (
           user##name
@@ -36,5 +38,5 @@ let make = (~user, _children) => {
             />
         )
       )
-    </div>,
+    </Router.Link>,
 };
