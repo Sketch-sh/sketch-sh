@@ -1,0 +1,31 @@
+.User__notes {
+  list-style-type: none;
+}
+
+.User__notes__note {
+  margin: var(--space3) 0;
+}
+
+.User__notes__title {
+  font-size: var(--f2);
+  font-weight: 700;
+  color: var(--cm-text);
+  font-family: var(--font-monospace);
+  margin-top: var(--space3);
+  padding: var(--space3);
+
+  &:visited {
+    color: inherit;
+  }
+}
+
+.User__notes__lastEdited {
+  padding-right: var(--space2);
+  font-weight: 400;
+  font-size: var(--f6);
+  color: var(--c-text-sub2);
+}
+
+.User__notes__time {
+  margin-left: var(--space1);
+}

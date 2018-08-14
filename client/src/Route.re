@@ -33,7 +33,7 @@ let routeToUrl: t => string =
       }
     )
   | NoteNew => "/new"
-  | User(username) => "/u/" ++ username
+  | User(userName) => "/u/" ++ userName
   | EditorDevelopment => "/____EDITOR-DEVELOPMENT____"
   | AuthGithub => "/auth/github"
   | AuthFailure => "/auth/failure"
