@@ -18,7 +18,7 @@ export const createErrorWidget = html => createLintWidget("error", html);
 export const createWarningWidget = html => createLintWidget("warning", html);
 
 export const createValueWidget = text => {
-  const wrapper = document.createElement("div");
+  const wrapper = document.createElement("pre");
   wrapper.className = "widget__value";
   wrapper.appendChild(document.createTextNode(text));
 

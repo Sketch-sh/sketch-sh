@@ -19,9 +19,15 @@ let parse = output =>
               let content = matches[4]->Js.String.trim;
               let errContent = {
                 o_content: content,
-                o_pos: (
-                  {o_line: line, o_col: matches[2]->int_of_string},
-                  {o_line: line, o_col: matches[3]->int_of_string},
+                o_loc: (
+                  Worker_Types.CompilerErrorMessage.mkPos(
+                    ~line,
+                    ~col=matches[2]->int_of_string,
+                  ),
+                  Worker_Types.CompilerErrorMessage.mkPos(
+                    ~line,
+                    ~col=matches[3]->int_of_string,
+                  ),
                 ),
               };
               /* Error and Warning at the beginning */

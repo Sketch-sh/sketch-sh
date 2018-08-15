@@ -20,8 +20,8 @@ let executeResultToWidget = (result: list(Worker_Types.blockData)) => {
         Belt.List.reduceU(
           [||],
           (. acc, exeResult) => {
-            let {block_content: _, block_result: result, block_pos} = exeResult;
-            let (_, {line}) = block_pos;
+            let {block_result: result, block_loc} = exeResult;
+            let (_, {line}) = block_loc;
 
             let evaluate =
               result.blockResult_evaluate
@@ -48,7 +48,7 @@ let executeResultToWidget = (result: list(Worker_Types.blockData)) => {
                     Belt.Array.mapU((. error) => {
                       let toWidgetContent = (content: ErrorMessage.content) => {
                         let ({line, col: colStart}, {col: colEnd}) =
-                          content.errMsg_pos;
+                          content.errMsg_loc;
 
                         (
                           line,
