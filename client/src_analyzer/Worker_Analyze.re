@@ -102,7 +102,7 @@ module Make = (ESig: Worker_Evaluator.EvaluatorSig) => {
                 | "" => None
                 | str => Some(str);
 
-              let stderr = phraseContent->Evaluator.PhraseContent.stderrGet;
+              let _stderr = phraseContent->Evaluator.PhraseContent.stderrGet;
 
               {
                 block_result: {
