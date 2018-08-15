@@ -1,6 +1,6 @@
 open Worker_Binding;
 
-Worker.importScripts("/reason.js");
+Worker.importScripts("/reason_v2.js");
 
 module Analyze = Worker_Analyze.Make(Worker_BrowserEvaluator);
 
