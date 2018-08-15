@@ -16,6 +16,7 @@
 .Topbar__userInfo--name,
 .Topbar__userInfo--username {
   font-weight: 500;
+  color: var(--c-text);
 }
 
 .Topbar__userInfo--name + .Topbar__userInfo--username {
