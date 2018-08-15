@@ -1,9 +1,5 @@
 .EditorNote {
   min-width: 768px;
-  max-width: 1100px;
-  padding: calc(var(--topbar-height) + var(--space4)) var(--space4)
-    var(--space5) var(--space4);
-  margin: auto;
 }
 
 .EditorNote__metadata {

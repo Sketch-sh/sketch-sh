@@ -5,7 +5,7 @@ let component = ReasonReact.statelessComponent("Home");
 let make = _children => {
   ...component,
   render: _self =>
-    <div className="Layout__withHeader">
+    <div className="Layout__center">
       <Helmet>
         <title> "Sketch.sh - Interactive ReasonML sketchbook"->str </title>
       </Helmet>

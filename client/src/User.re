@@ -34,7 +34,7 @@ let make = (~userName, _children) => {
                <div> (ReasonReact.string(error##message)) </div>
              | Data(response) =>
                let notes = response##note;
-               <div className="Layout__withHeader User">
+               <div className="Layout__center User">
                  <h1> {j|$(userName)'s sketchbooks|j}->str </h1>
                  <ul className="User__notes">
                    ...notes

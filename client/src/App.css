@@ -69,6 +69,13 @@ body {
   margin-top: calc(var(--topbar-height) + var(--space4));
 }
 
+.Layout__center {
+  max-width: 1100px;
+  padding: calc(var(--topbar-height) + var(--space4)) var(--space4)
+    var(--space5) var(--space4);
+  margin: auto;
+}
+
 .warning-staging-server {
   position: fixed;
   bottom: 0;

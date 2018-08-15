@@ -179,7 +179,7 @@ let make =
           status->str;
         }
       </div>
-      <main className="EditorNote">
+      <main className="EditorNote Layout__center">
         <Helmet>
           <title>
             {
