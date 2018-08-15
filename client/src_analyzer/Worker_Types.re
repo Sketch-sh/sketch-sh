@@ -10,11 +10,6 @@ module CompilerErrorMessage = {
     o_content: string,
     o_loc: (pos, pos),
   };
-
-  type t =
-    | Err_Warning(content)
-    | Err_Error(content)
-    | Err_Unknown(string);
 };
 
 type pos = {

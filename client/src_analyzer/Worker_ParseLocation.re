@@ -1,4 +1,4 @@
-open Worker_Types.CompilerErrorMessage;
+open Worker_Types.ErrorMessage;
 
 let parse = output =>
   (output |> Js.String.split({|File "", |}))
@@ -18,16 +18,16 @@ let parse = output =>
               let line = matches[1]->int_of_string;
               let content = matches[4]->Js.String.trim;
               let errContent = {
-                o_content: content,
-                o_loc: (
-                  Worker_Types.CompilerErrorMessage.mkPos(
-                    ~line,
-                    ~col=matches[2]->int_of_string,
-                  ),
-                  Worker_Types.CompilerErrorMessage.mkPos(
-                    ~line,
-                    ~col=matches[3]->int_of_string,
-                  ),
+                errMsg_content: content,
+                errMsg_loc: (
+                  {
+                    Worker_Types.line: line - 1,
+                    col: matches[2]->int_of_string,
+                  },
+                  {
+                    Worker_Types.line: line - 1,
+                    col: matches[3]->int_of_string,
+                  },
                 ),
               };
               /* Error and Warning at the beginning */

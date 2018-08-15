@@ -30,10 +30,14 @@ module Types = {
 module type EvaluatorSig = {
   let js_execute: string => Types.execResult;
   let js_reset: unit => unit;
+  let mlSyntax: unit => unit;
+  let reSyntax: unit => unit;
 };
 
 module Make = (B: EvaluatorSig) => {
   include Types;
   let reset = B.js_reset;
   let execute = code => B.js_execute(code);
+  let mlSyntax = B.mlSyntax;
+  let reSyntax = B.reSyntax;
 };

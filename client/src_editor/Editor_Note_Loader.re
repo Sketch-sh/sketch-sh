@@ -1,13 +1,8 @@
 let blocks = [|
   {"kind": "code", "value": Editor_Loremipsum.code1},
   {"kind": "code", "value": Editor_Loremipsum.code2},
+  {"kind": "code", "value": Editor_Loremipsum.code3},
 |];
-
-let blocks =
-  Belt.Array.concat(
-    [|{"kind": "text", "value": Editor_Loremipsum.text1}|],
-    blocks,
-  );
 
 external toJson: 'a => Js.Json.t = "%identity";
 

@@ -8,7 +8,7 @@ fun
 | Bye => ()
 | _ => ();
 
-/* A syntax error */
+/* A error */
 a|};
 
 let code3 = {|type say = | Hello | Bye;
@@ -34,27 +34,3 @@ let myTree =
   );
 
 Printf.sprintf("%i", sum(myTree));|};
-
-let text1 = {|You're viewing an early demo of ReasonML playground.
-
-A note writing application for teaching and sharing ReasonML code with inline evaluation.
-
-This is **OCaml 4.06.0 toplevel** compiled with [js_of_ocaml](http://ocsigen.org/js_of_ocaml/).
-
-Please note that this is **not** Bucklescript so you can't use these modules:
-  - Js
-  - Dom
-  - Node
-  - Belt (Belt could be compiled with js_of_ocaml so this could be done with some works)
-
-## Usage:
-
-- Write your code
-- Press **Shift-enter** to evaluate each codeblock
-- Share your work
-
-## Contribute
-
-This is an open source project, if you see a missing feature, you can help me build it
-
-Repository: https://github.com/thangngoc89/rtop-ui|};

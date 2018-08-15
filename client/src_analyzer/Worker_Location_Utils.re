@@ -13,9 +13,3 @@ let compilerLocToLoc:
     let (from, to_) = compilerPos;
     (compilerPosToCodeEditorPos(from), compilerPosToCodeEditorPos(to_));
   };
-
-let compilerErrorMessageToErrorMessage =
-    (content: CompilerErrorMessage.content): ErrorMessage.content => {
-  errMsg_content: content.o_content,
-  errMsg_loc: content.o_loc |> compilerLocToLoc,
-};
