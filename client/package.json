@@ -78,6 +78,7 @@
     "workerize-loader": "^1.0.3"
   },
   "jest": {
+    "testMatch": ["**/*_test.bs.js"],
     "transformIgnorePatterns": [
       "/node_modules/(?!@glennsl|@thangngoc89|bs-platform)",
       "/public/"

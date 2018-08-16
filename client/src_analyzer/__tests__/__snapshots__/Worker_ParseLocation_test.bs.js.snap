@@ -7,11 +7,11 @@ Array [
       "Warning 11: this match case is unused.",
       Array [
         Array [
-          5,
+          4,
           2,
         ],
         Array [
-          5,
+          4,
           5,
         ],
       ],
@@ -22,11 +22,11 @@ Array [
       "Error: Syntax error",
       Array [
         Array [
-          3,
+          2,
           0,
         ],
         Array [
-          3,
+          2,
           3,
         ],
       ],
@@ -37,11 +37,11 @@ Array [
       "Error: Unbound value pi",
       Array [
         Array [
-          3,
+          2,
           15,
         ],
         Array [
-          3,
+          2,
           17,
         ],
       ],
@@ -52,11 +52,11 @@ Array [
       "Error: Unbound value random_gaussian",
       Array [
         Array [
-          3,
+          2,
           2,
         ],
         Array [
-          3,
+          2,
           17,
         ],
       ],
@@ -72,11 +72,11 @@ Array [
       "Warning 11: this match case is unused.",
       Array [
         Array [
-          5,
+          4,
           2,
         ],
         Array [
-          5,
+          4,
           5,
         ],
       ],
