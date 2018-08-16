@@ -25,12 +25,6 @@
 }
 
 .widget__value {
-  color: var(--cm-text);
-  padding: var(--cm-padding-v) var(--cm-padding-h);
-  height: 2em;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
   opacity: 0.5;
   user-select: none;
 }

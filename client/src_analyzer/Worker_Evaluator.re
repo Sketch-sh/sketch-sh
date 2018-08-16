@@ -1,31 +1,43 @@
-[@bs.deriving abstract]
-type js_executeResult = {
-  evaluate: string,
-  stderr: string,
-  stdout: string,
+module Types = {
+  [@bs.deriving abstract]
+  type pos = {
+    line: int,
+    col: int,
+  };
+  type loc = (pos, pos);
+
+  module PhraseContent = {
+    [@bs.deriving abstract]
+    type t = {
+      loc: Js.Nullable.t(loc),
+      value: string,
+      stderr: string,
+      stdout: string,
+    };
+  };
+
+  type phraseResult = Belt.Result.t(PhraseContent.t, PhraseContent.t);
+
+  [@bs.deriving abstract]
+  type js_phraseResult = {
+    kind: string,
+    value: PhraseContent.t,
+  };
+
+  type execResult = array(js_phraseResult);
 };
 
 module type EvaluatorSig = {
-  let js_execute: string => js_executeResult;
+  let js_execute: string => Types.execResult;
   let js_reset: unit => unit;
+  let mlSyntax: unit => unit;
+  let reSyntax: unit => unit;
 };
 
 module Make = (B: EvaluatorSig) => {
-  open Worker_Types;
-
-  let emptyStringToOption =
-    fun
-    | "" => None
-    | str => Some(str);
-
+  include Types;
   let reset = B.js_reset;
-
-  let execute = code => {
-    let result = B.js_execute(code);
-    {
-      evaluate: result->evaluateGet->Js.String.trim->emptyStringToOption,
-      stderr: result->stderrGet->Js.String.trim->emptyStringToOption,
-      stdout: result->stdoutGet->Js.String.trim->emptyStringToOption,
-    };
-  };
+  let execute = code => B.js_execute(code);
+  let mlSyntax = B.mlSyntax;
+  let reSyntax = B.reSyntax;
 };
