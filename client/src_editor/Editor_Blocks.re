@@ -243,18 +243,18 @@ let make =
         stateUpdateReason: Some(action),
         focusedBlock: Some((blockId, blockTyp, FcTyp_EditorFocus)),
       })
-    | Block_Blur(blockId) =>
-      switch (state.focusedBlock) {
-      | None => ReasonReact.NoUpdate
-      | Some((focusedBlockId, _, _)) =>
-        focusedBlockId == blockId ?
-          ReasonReact.Update({
-            ...state,
-            stateUpdateReason: Some(action),
-            focusedBlock: None,
-          }) :
-          ReasonReact.NoUpdate
-      }
+    | Block_Blur(_blockId) => ReasonReact.NoUpdate
+    /* switch (state.focusedBlock) {
+       | None => ReasonReact.NoUpdate
+       | Some((focusedBlockId, _, _)) =>
+         focusedBlockId == blockId ?
+           ReasonReact.Update({
+             ...state,
+             stateUpdateReason: Some(action),
+             focusedBlock: None,
+           }) :
+           ReasonReact.NoUpdate
+       } */
     | Block_Add(afterBlockId, blockTyp) =>
       let newBlockId = Utils.generateId();
       ReasonReact.Update({
@@ -371,7 +371,6 @@ let make =
                         (newValue, diff) =>
                           send(Block_UpdateValue(b_id, newValue, diff))
                       )
-                      onExecute=(() => send(Block_Execute))
                       onFocus=(() => send(Block_Focus(b_id, BTyp_Code)))
                       onBlur=(() => send(Block_Blur(b_id)))
                       onBlockUp=(() => send(Block_FocusUp(b_id)))
