@@ -1,11 +1,8 @@
 const faker = require("faker");
 
-let baseUrl = "http://localhost:3000/";
-let url = path => baseUrl + path;
-
 context("note - anonymous user", () => {
   beforeEach(() => {
-    cy.visit(url("new"));
+    cy.visit("new");
   });
 
   it("create new note and edit it anonymously", () => {
@@ -31,7 +28,11 @@ context("note - anonymous user", () => {
 
     cy.get("@save").click();
 
-    cy.url().should("match", /s\/.+\/.+---.+/, "should not be new route");
+    cy.url({ timeout: 10000 }).should(
+      "match",
+      /s\/.+\/.+---.+/,
+      "should go to new url"
+    );
 
     cy.reload(true);
 
@@ -61,5 +62,42 @@ context("note - anonymous user", () => {
 
       cy.url().should("contains", noteId, "same note id");
     });
+  });
+
+  it.only("prompt before leaving with dirty state", () => {
+    let title = faker.lorem.words();
+
+    cy.get(".Topbar__action")
+      .contains("Save")
+      .as("save");
+
+    cy.get(".EditorNote__metadata")
+      .find("input")
+      .first()
+      .as("title")
+      .type(title);
+
+    cy.get("@save").should("be.enabled");
+
+    const stub = cy.stub();
+    stub.onFirstCall().returns(false);
+
+    cy.on("window:confirm", stub);
+
+    cy.get(`a[href="/"]`)
+      .click()
+      .then(() => {
+        expect(stub).to.be.calledOnce;
+      });
+
+    cy.location("pathname").should("equal", "/new");
+
+    cy.get("@save").click();
+    cy.get("@save").should("be.disabled");
+
+    cy.url().should("contains", "new");
+    cy.get(`a[href="/"]`).click();
+    cy.url().should("not.contains", "new");
+    cy.location("pathname").should("equal", "/");
   });
 });

@@ -24,6 +24,7 @@ let replaceNoteRoute = (~noteId, ~json, ~title, ~kind) =>
            | Push => Router.pushSilent
            | Replace => Router.replaceSilent
            };
+         Js.log("replace route");
          routerAction(Route.Note({noteId, data: Some(compressed)}))
          ->resolve;
        })
@@ -31,9 +32,16 @@ let replaceNoteRoute = (~noteId, ~json, ~title, ~kind) =>
   );
 
 open NoteSave_Types;
+
+type state = {
+  kind: noteKind,
+  promiseCancelHandler: ref(option(PromiseCancelable.t(unit))),
+};
+
 type action =
   | SavedNewNote(id, string, Js.Json.t)
-  | SavedOldNote(id, string, Js.Json.t);
+  | SavedOldNote(id, string, Js.Json.t)
+  | SetPromiseCancelHandler(PromiseCancelable.t(unit));
 
 /* TODO:
    When receive the mutation result,
@@ -52,24 +60,45 @@ let make =
         ReasonReact.reactElement,
     ) => {
   ...component,
-  initialState: () => {kind: noteKind},
-  reducer: (action, _state) =>
+  initialState: () => {kind: noteKind, promiseCancelHandler: ref(None)},
+  reducer: (action, state) =>
     switch (action) {
     | SavedNewNote(noteId, title, json) =>
       ReasonReact.UpdateWithSideEffects(
-        {kind: Old(noteId)},
+        {...state, kind: Old(noteId)},
         (
-          _self => replaceNoteRoute(~noteId, ~json, ~title, ~kind=Push)->ignore
+          ({send}) =>
+            replaceNoteRoute(~noteId, ~json, ~title, ~kind=Push)
+            ->PromiseCancelable.make
+            ->SetPromiseCancelHandler
+            ->send
         ),
       )
     | SavedOldNote(noteId, title, json) =>
       ReasonReact.SideEffects(
         (
-          _self =>
-            replaceNoteRoute(~noteId, ~json, ~title, ~kind=Replace)->ignore
+          ({send}) =>
+            replaceNoteRoute(~noteId, ~json, ~title, ~kind=Replace)
+            ->PromiseCancelable.make
+            ->SetPromiseCancelHandler
+            ->send
         ),
       )
+    | SetPromiseCancelHandler(handler) =>
+      state.promiseCancelHandler := Some(handler);
+      ReasonReact.NoUpdate;
     },
+  willUnmount: ({state}) => {
+    Js.log("unmount");
+    switch (state.promiseCancelHandler^) {
+    | None =>
+      Js.log("no promise");
+      ();
+    | Some(p) =>
+      Js.log("cancel promise");
+      PromiseCancelable.cancel(p);
+    };
+  },
   render: ({state, send}) =>
     <AuthStatus.IsAuthenticated>
       ...(
