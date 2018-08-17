@@ -55,20 +55,20 @@ let make =
   initialState: () => {kind: noteKind},
   reducer: (action, _state) =>
     switch (action) {
-    | SavedNewNote(noteId, title, json) =>
-      ReasonReact.UpdateWithSideEffects(
-        {kind: Old(noteId)},
-        (
-          _self => replaceNoteRoute(~noteId, ~json, ~title, ~kind=Push)->ignore
-        ),
-      )
-    | SavedOldNote(noteId, title, json) =>
-      ReasonReact.SideEffects(
-        (
-          _self =>
-            replaceNoteRoute(~noteId, ~json, ~title, ~kind=Replace)->ignore
-        ),
-      )
+    | SavedNewNote(noteId, title, json) => ReasonReact.NoUpdate
+    /* ReasonReact.UpdateWithSideEffects(
+         {kind: Old(noteId)},
+         (
+           _self => replaceNoteRoute(~noteId, ~json, ~title, ~kind=Push)->ignore
+         ),
+       ) */
+    | SavedOldNote(noteId, title, json) => ReasonReact.NoUpdate
+    /* ReasonReact.SideEffects(
+         (
+           _self =>
+             replaceNoteRoute(~noteId, ~json, ~title, ~kind=Replace)->ignore
+         ),
+       ) */
     },
   render: ({state, send}) =>
     <AuthStatus.IsAuthenticated>
