@@ -9,6 +9,8 @@ const GitHubStrategy = require("passport-github2").Strategy;
 const checkUserInfo = require("./checkUserInfo");
 const nanoidGenerate = require("nanoid/generate");
 const morgan = require("morgan");
+const proxy = require("express-http-proxy");
+const { graphqlEndpoint } = require("./config");
 
 let generateId = () =>
   nanoidGenerate(
@@ -137,5 +139,18 @@ app.get("/api/auth/webhook", (req, res) => {
     }
   });
 });
+
+app.post(
+  "/api/graphql",
+  proxy(graphqlEndpoint, {
+    proxyReqPathResolver: function(req) {
+      return "/v1alpha1/graphql";
+    },
+    proxyReqOptDecorator: function(proxyReqOpts, srcReq) {
+      proxyReqOpts.headers["Referer"] = "";
+      return proxyReqOpts;
+    },
+  })
+);
 
 module.exports = app;

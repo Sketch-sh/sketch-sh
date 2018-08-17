@@ -7,13 +7,13 @@ const { setContext } = require("apollo-link-context");
 const { makeRemoteExecutableSchema } = require("graphql-tools");
 const jwt = require("jsonwebtoken");
 
-const graphqlEndpoint = process.env.HASURA_ENDPOINT;
+const { graphqlEndpoint, jwtToken } = require("./config");
 
 const selfSignedToken = jwt.sign(
   {
     role: "auth_service",
   },
-  process.env.JWT_TOKEN
+  jwtToken
 );
 
 const httpLink = createHttpLink({
@@ -26,8 +26,8 @@ const authLink = setContext((_, { headers }) => {
     headers: {
       ...headers,
       authorization: `Bearer ${selfSignedToken}`,
-    }
-  }
+    },
+  };
 });
 
 const errorLink = onError(({ graphQLErrors, networkError }) => {
