@@ -11,7 +11,6 @@ type action =
   | Block_FocusNextBlockOrCreate
   | Block_Delete(id)
   | Block_Focus(id, blockTyp)
-  | Block_Blur(id)
   | Block_UpdateValue(id, string, CodeMirror.EditorChange.t)
   | Block_AddWidgets(id, array(Widget.t))
   | Block_FocusUp(id)
@@ -59,7 +58,7 @@ let make =
       ~readOnly=false,
       ~onUpdate,
       ~registerExecuteCallback=?,
-      ~registerShortcut=?,
+      ~registerShortcut: option(Shortcut.subscribeFun)=?,
       _children,
     ) => {
   ...component,
@@ -112,7 +111,6 @@ let make =
       | Some(action) =>
         switch (action) {
         | Block_Focus(_, _)
-        | Block_Blur(_)
         | Block_AddWidgets(_, _)
         | Block_FocusUp(_)
         | Block_FocusDown(_)
@@ -151,8 +149,42 @@ let make =
             ),
       })
     | Block_FocusNextBlockOrCreate =>
+      let blockLength = state.blocks->Belt.Array.length;
+
+      let nextBlockIndex =
+        switch (state.focusedBlock) {
+        | None => blockLength - 1
+        | Some((id, blockTyp, _)) =>
+          switch (state.blocks->arrayFindIndex((({b_id}) => b_id == id))) {
+          | None => blockLength - 1
+          | Some(index) => index
+          }
+        };
       Js.log("Should focus next block");
-      ReasonReact.NoUpdate;
+      let findBlockId = index => {
+        let {b_id, b_data} = state.blocks[index];
+        (b_id, blockDataToBlockTyp(b_data));
+      };
+      if (nextBlockIndex == blockLength - 1) {
+        ReasonReact.SideEffects(
+          (
+            ({send}) =>
+              send(Block_Add(findBlockId(nextBlockIndex)->fst, BTyp_Code))
+          ),
+        );
+      } else {
+        ReasonReact.SideEffects(
+          (
+            ({send}) =>
+              send(
+                {
+                  let (id, blockTyp) = findBlockId(nextBlockIndex);
+                  Block_Focus(id, blockTyp);
+                },
+              )
+          ),
+        );
+      };
     | Block_Execute(focusNextBlock) =>
       let allCodeBlocks =
         state.blocks
@@ -286,18 +318,6 @@ let make =
         stateUpdateReason: Some(action),
         focusedBlock: Some((blockId, blockTyp, FcTyp_EditorFocus)),
       })
-    | Block_Blur(_blockId) => ReasonReact.NoUpdate
-    /* switch (state.focusedBlock) {
-       | None => ReasonReact.NoUpdate
-       | Some((focusedBlockId, _, _)) =>
-         focusedBlockId == blockId ?
-           ReasonReact.Update({
-             ...state,
-             stateUpdateReason: Some(action),
-             focusedBlock: None,
-           }) :
-           ReasonReact.NoUpdate
-       } */
     | Block_Add(afterBlockId, blockTyp) =>
       let newBlockId = Utils.generateId();
       ReasonReact.Update({
@@ -415,7 +435,6 @@ let make =
                           send(Block_UpdateValue(b_id, newValue, diff))
                       )
                       onFocus=(() => send(Block_Focus(b_id, BTyp_Code)))
-                      onBlur=(() => send(Block_Blur(b_id)))
                       onBlockUp=(() => send(Block_FocusUp(b_id)))
                       onBlockDown=(() => send(Block_FocusDown(b_id)))
                       widgets=bc_widgets
@@ -435,7 +454,6 @@ let make =
                         }
                       )
                       onFocus=(() => send(Block_Focus(b_id, BTyp_Text)))
-                      onBlur=(() => send(Block_Blur(b_id)))
                       onBlockUp=(() => send(Block_FocusUp(b_id)))
                       onBlockDown=(() => send(Block_FocusDown(b_id)))
                       onChange=(
