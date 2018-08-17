@@ -18,6 +18,7 @@
     "apollo-link-http": "^1.5.4",
     "dotenv": "^6.0.0",
     "express": "^4.16.3",
+    "express-http-proxy": "^1.2.0",
     "graphql": "^0.13.2",
     "graphql-binding": "^2.1.1",
     "graphql-tag": "^2.9.2",
