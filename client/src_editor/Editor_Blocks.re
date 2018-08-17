@@ -150,17 +150,15 @@ let make =
       })
     | Block_FocusNextBlockOrCreate =>
       let blockLength = state.blocks->Belt.Array.length;
-
       let nextBlockIndex =
         switch (state.focusedBlock) {
         | None => blockLength - 1
-        | Some((id, blockTyp, _)) =>
+        | Some((id, _blockTyp, _)) =>
           switch (state.blocks->arrayFindIndex((({b_id}) => b_id == id))) {
           | None => blockLength - 1
           | Some(index) => index
           }
         };
-      Js.log("Should focus next block");
       let findBlockId = index => {
         let {b_id, b_data} = state.blocks[index];
         (b_id, blockDataToBlockTyp(b_data));
@@ -172,18 +170,16 @@ let make =
               send(Block_Add(findBlockId(nextBlockIndex)->fst, BTyp_Code))
           ),
         );
+      } else if (nextBlockIndex < blockLength - 1) {
+        let (blockId, blockTyp) = findBlockId(nextBlockIndex + 1);
+        ReasonReact.Update({
+          ...state,
+          stateUpdateReason: Some(action),
+          focusedBlock:
+            Some((blockId, blockTyp, FcTyp_BlockExecuteAndFocusNextBlock)),
+        });
       } else {
-        ReasonReact.SideEffects(
-          (
-            ({send}) =>
-              send(
-                {
-                  let (id, blockTyp) = findBlockId(nextBlockIndex);
-                  Block_Focus(id, blockTyp);
-                },
-              )
-          ),
-        );
+        ReasonReact.NoUpdate;
       };
     | Block_Execute(focusNextBlock) =>
       let allCodeBlocks =

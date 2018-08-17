@@ -29,7 +29,9 @@ module Block = {
     | FcTyp_EditorFocus
     | FcTyp_BlockNew
     | FcTyp_BlockFocusUp
-    | FcTyp_BlockFocusDown;
+    | FcTyp_BlockFocusDown
+    /* Shift+Enter shortcut */
+    | FcTyp_BlockExecuteAndFocusNextBlock;
 };
 
 module JsonDecode = {
