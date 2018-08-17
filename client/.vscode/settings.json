@@ -1,6 +1,6 @@
 {
   "files.exclude": {
-    "src/*.js": true,
+    "src/*.bs.js": true,
     "shared/*.js": true,
     "src_editor/*.bs.js": true,
     "src_analyzer/*.js": true,

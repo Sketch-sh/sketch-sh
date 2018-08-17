@@ -38,6 +38,7 @@
     "graphql-tag": "^2.9.2",
     "jwt-decode": "^2.2.0",
     "lz-string": "^1.4.4",
+    "mousetrap": "^1.6.2",
     "nanoid": "^1.1.0",
     "react": "^16.4.1",
     "react-apollo": "^2.1.9",
@@ -78,7 +79,9 @@
     "workerize-loader": "^1.0.3"
   },
   "jest": {
-    "testMatch": ["**/*_test.bs.js"],
+    "testMatch": [
+      "**/*_test.bs.js"
+    ],
     "transformIgnorePatterns": [
       "/node_modules/(?!@glennsl|@thangngoc89|bs-platform)",
       "/public/"
