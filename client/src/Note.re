@@ -36,11 +36,11 @@ module EnsureUrlEncodedData = {
 
   let make = (~note, ~noteId, children): React.component(unit, 'a, action) => {
     ...component,
-    didMount: ({send}) =>
-      switch (note##data) {
-      | None => ()
-      | Some(json) => send(NoteLoaded(json))
-      },
+    /* didMount: ({send}) =>
+       switch (note##data) {
+       | None => ()
+       | Some(json) => send(NoteLoaded(json))
+       }, */
     reducer: (action, _) =>
       switch (action) {
       | NoteLoaded(json) =>
