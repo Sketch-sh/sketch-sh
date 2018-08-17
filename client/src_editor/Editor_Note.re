@@ -239,6 +239,7 @@ module Editor_Note = {
             registerExecuteCallback=(
               callback => send(RegisterExecuteCallback(callback))
             )
+            registerShortcut
             onUpdate=(blocks => send(BlockUpdate(blocks)))
             readOnly
           />

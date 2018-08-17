@@ -7,7 +7,8 @@ open Editor_Types.Block;
 
 type action =
   | Block_Add(id, blockTyp)
-  | Block_Execute
+  | Block_Execute(bool)
+  | Block_FocusNextBlockOrCreate
   | Block_Delete(id)
   | Block_Focus(id, blockTyp)
   | Block_Blur(id)
@@ -58,6 +59,7 @@ let make =
       ~readOnly=false,
       ~onUpdate,
       ~registerExecuteCallback=?,
+      ~registerShortcut=?,
       _children,
     ) => {
   ...component,
@@ -67,10 +69,40 @@ let make =
     focusedBlock: None,
   },
   didMount: self => {
-    self.send(Block_Execute);
+    self.send(Block_Execute(false));
     switch (registerExecuteCallback) {
     | None => ()
-    | Some(register) => register(() => self.send(Block_Execute))
+    | Some(register) => register(() => self.send(Block_Execute(false)))
+    };
+    switch (registerShortcut) {
+    | None => ()
+    | Some(registerShortcut) =>
+      let unReg =
+        registerShortcut(
+          ~global=true,
+          "mod+enter",
+          event => {
+            open Webapi.Dom;
+
+            event->KeyboardEvent.preventDefault;
+            self.send(Block_Execute(false));
+          },
+        );
+      let unReg2 =
+        registerShortcut(
+          ~global=true,
+          "shift+enter",
+          event => {
+            open Webapi.Dom;
+
+            event->KeyboardEvent.preventDefault;
+            self.send(Block_Execute(true));
+          },
+        );
+      self.onUnmount(() => {
+        unReg();
+        unReg2();
+      });
     };
   },
   didUpdate: ({oldSelf, newSelf}) =>
@@ -84,7 +116,9 @@ let make =
         | Block_AddWidgets(_, _)
         | Block_FocusUp(_)
         | Block_FocusDown(_)
-        | Block_Execute => ()
+        | Block_FocusNextBlockOrCreate
+        | Block_Execute(_) => ()
+
         | Block_Add(_, _)
         | Block_Delete(_)
         | Block_UpdateValue(_, _, _) => onUpdate(newSelf.state.blocks)
@@ -116,7 +150,10 @@ let make =
               })
             ),
       })
-    | Block_Execute =>
+    | Block_FocusNextBlockOrCreate =>
+      Js.log("Should focus next block");
+      ReasonReact.NoUpdate;
+    | Block_Execute(focusNextBlock) =>
       let allCodeBlocks =
         state.blocks
         ->(
@@ -145,6 +182,12 @@ let make =
                        })
                      );
 
+                   resolve();
+                 })
+              |> then_(() => {
+                   if (focusNextBlock) {
+                     self.send(Block_FocusNextBlockOrCreate);
+                   };
                    resolve();
                  })
               |> catch(error => resolve(Js.log(error)))
