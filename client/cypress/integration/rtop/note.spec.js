@@ -19,7 +19,6 @@ const shortcut = shortcut =>
 
 context("keyboard shortcuts", () => {
   beforeEach(() => {
-    cy.on("window:confirm", () => true);
     cy.visit("new");
   });
 
@@ -54,34 +53,6 @@ context("keyboard shortcuts", () => {
     shortcut("{ctrl}s");
 
     cy.get("@save").should("be.disabled");
-  });
-
-  it("ctrl+enter should execute without creating new block", () => {
-    assertBlocks(1);
-
-    cy.get(".block__container")
-      .first()
-      .find("textarea")
-      .as("block1")
-      .type("let a: string = 1;", { force: true });
-    assertErrorsOrWarnings(0);
-
-    cy.get("body")
-      .focus()
-      .type("{ctrl}{enter}");
-    assertErrorsOrWarnings(1);
-
-    cy.get("@block1")
-      .clear({ force: true })
-      .type("let a = 1;", { force: true });
-    assertErrorsOrWarnings(0);
-
-    shortcut("{ctrl}{enter}");
-
-    assertErrorsOrWarnings(0);
-    cy.get("@block1")
-      .get(".widget__value")
-      .should("contain", "let a: int = 1;");
   });
 
   it("shift+enter execute and focus next block/or create new block", () => {
@@ -133,5 +104,33 @@ context("keyboard shortcuts", () => {
       .find("textarea")
       .focused();
     assertBlocks(5);
+  });
+
+  it("ctrl+enter should execute without creating new block", () => {
+    assertBlocks(1);
+
+    cy.get(".block__container")
+      .first()
+      .find("textarea")
+      .as("block1")
+      .type("let a: string = 1;", { force: true });
+    assertErrorsOrWarnings(0);
+
+    cy.get("body")
+      .focus()
+      .type("{ctrl}{enter}");
+    assertErrorsOrWarnings(1);
+
+    cy.get("@block1")
+      .clear({ force: true })
+      .type("let a = 1;", { force: true });
+    assertErrorsOrWarnings(0);
+
+    shortcut("{ctrl}{enter}");
+
+    assertErrorsOrWarnings(0);
+    cy.get("@block1")
+      .get(".widget__value")
+      .should("contain", "let a: int = 1;");
   });
 });
