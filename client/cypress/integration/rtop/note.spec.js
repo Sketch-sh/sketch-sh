@@ -22,6 +22,7 @@ context("keyboard shortcuts", () => {
     cy.on("window:confirm", () => true);
     cy.visit("new");
   });
+
   it("ctrl+s for save", () => {
     let title = faker.lorem.words();
 
