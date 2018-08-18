@@ -33,7 +33,7 @@ module EditorConfiguration = {
         Extra keymaps are found in the keymap directory. See the section on keymaps for more information. */
     keyMap: string,
     [@bs.optional] /** Can be used to specify extra keybindings for the editor, alongside the ones defined by keyMap. Should be either null, or a valid keymap value. */
-    extraKeys: Js.Dict.t(editor => unit),
+    extraKeys: Js.Dict.t(string),
     [@bs.optional] /** Whether CodeMirror should scroll or wrap for long lines. Defaults to false (scroll). */
     lineWrapping: bool,
     [@bs.optional] /** Whether to show line numbers to the left of the editor. */
@@ -77,8 +77,7 @@ module EditorConfiguration = {
     dragDrop: bool,
     [@bs.optional] /** When given , this will be called when the editor is handling a dragenter , dragover , or drop event.
         It will be passed the editor instance and the event object as arguments.
-        The callback can choose to handle the event itself , in which case it should return true to indicate that CodeMirror should not do anything further. */ /* TODO */ /* onDragEvent?: (instance: CodeMirror.Editor, event: Event) => boolean; */
-                                                                    /** This provides a rather low - level hook into CodeMirror's key handling.
+        The callback can choose to handle the event itself , in which case it should return true to indicate that CodeMirror should not do anything further. */ /* TODO */ /* onDragEvent?: (instance: CodeMirror.Editor, event: Event) => boolean; */ /** This provides a rather low - level hook into CodeMirror's key handling.
         If provided, this function will be called on every keydown, keyup, and keypress event that CodeMirror captures.
         It will be passed two arguments, the editor instance and the key event.
         This key event is pretty much the raw key event, except that a stop() method is always added to it.

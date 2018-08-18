@@ -15,6 +15,11 @@ module Block = {
     | BTyp_Code
     | BTyp_Text;
 
+  let blockDataToBlockTyp =
+    fun
+    | B_Code(_) => BTyp_Code
+    | B_Text(_) => BTyp_Text;
+
   type block = {
     b_id: id,
     b_data: blockData,
@@ -24,7 +29,9 @@ module Block = {
     | FcTyp_EditorFocus
     | FcTyp_BlockNew
     | FcTyp_BlockFocusUp
-    | FcTyp_BlockFocusDown;
+    | FcTyp_BlockFocusDown
+    /* Shift+Enter shortcut */
+    | FcTyp_BlockExecuteAndFocusNextBlock;
 };
 
 module JsonDecode = {

@@ -24,7 +24,6 @@ let make =
       ~onBlur=?,
       ~onBlockUp=?,
       ~onBlockDown=?,
-      ~onExecute,
       ~readOnly=?,
       _children,
     )
@@ -171,21 +170,13 @@ let make =
           ~matchBrackets=true,
           ~lineWrapping=true,
           ~firstLineNumber,
+          ~tabSize=2,
           ~readOnly?,
           ~extraKeys={
             let key = Js.Dict.empty();
-            key
-            ->(
-                Js.Dict.set("Tab", cm => {
-                  let spaces =
-                    String.make(
-                      cm->CodeMirror.Editor.GetOption.indentUnit,
-                      ' ',
-                    );
-                  cm->(CodeMirror.Editor.replaceSelection(spaces));
-                })
-              );
-            key->(Js.Dict.set("Shift-Enter", _cm => onExecute()));
+
+            Js.Dict.set(key, "Tab", "indentMore");
+            Js.Dict.set(key, "Shift-Tab", "indentLess");
             key;
           },
           (),

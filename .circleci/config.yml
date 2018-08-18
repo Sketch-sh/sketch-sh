@@ -23,7 +23,7 @@ jobs:
   build:
     <<: *defaults
     docker:
-      - image: circleci/node:10
+      - image: circleci/node:10-browsers
       - image: cypress/base:8
       - image: circleci/postgres:10-alpine
         environment:

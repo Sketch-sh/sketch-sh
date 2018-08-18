@@ -72,6 +72,7 @@ let make =
                 )
               );
           | FcTyp_BlockNew
+          | FcTyp_BlockExecuteAndFocusNextBlock
           | FcTyp_EditorFocus => ()
           };
         };

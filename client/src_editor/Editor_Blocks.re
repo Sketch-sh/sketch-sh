@@ -7,10 +7,10 @@ open Editor_Types.Block;
 
 type action =
   | Block_Add(id, blockTyp)
-  | Block_Execute
+  | Block_Execute(bool)
+  | Block_FocusNextBlockOrCreate
   | Block_Delete(id)
   | Block_Focus(id, blockTyp)
-  | Block_Blur(id)
   | Block_UpdateValue(id, string, CodeMirror.EditorChange.t)
   | Block_AddWidgets(id, array(Widget.t))
   | Block_FocusUp(id)
@@ -58,6 +58,7 @@ let make =
       ~readOnly=false,
       ~onUpdate,
       ~registerExecuteCallback=?,
+      ~registerShortcut: option(Shortcut.subscribeFun)=?,
       _children,
     ) => {
   ...component,
@@ -67,10 +68,40 @@ let make =
     focusedBlock: None,
   },
   didMount: self => {
-    self.send(Block_Execute);
+    self.send(Block_Execute(false));
     switch (registerExecuteCallback) {
     | None => ()
-    | Some(register) => register(() => self.send(Block_Execute))
+    | Some(register) => register(() => self.send(Block_Execute(false)))
+    };
+    switch (registerShortcut) {
+    | None => ()
+    | Some(registerShortcut) =>
+      let unReg =
+        registerShortcut(
+          ~global=true,
+          "mod+enter",
+          event => {
+            open Webapi.Dom;
+
+            event->KeyboardEvent.preventDefault;
+            self.send(Block_Execute(false));
+          },
+        );
+      let unReg2 =
+        registerShortcut(
+          ~global=true,
+          "shift+enter",
+          event => {
+            open Webapi.Dom;
+
+            event->KeyboardEvent.preventDefault;
+            self.send(Block_Execute(true));
+          },
+        );
+      self.onUnmount(() => {
+        unReg();
+        unReg2();
+      });
     };
   },
   didUpdate: ({oldSelf, newSelf}) =>
@@ -80,11 +111,12 @@ let make =
       | Some(action) =>
         switch (action) {
         | Block_Focus(_, _)
-        | Block_Blur(_)
         | Block_AddWidgets(_, _)
         | Block_FocusUp(_)
         | Block_FocusDown(_)
-        | Block_Execute => ()
+        | Block_FocusNextBlockOrCreate
+        | Block_Execute(_) => ()
+
         | Block_Add(_, _)
         | Block_Delete(_)
         | Block_UpdateValue(_, _, _) => onUpdate(newSelf.state.blocks)
@@ -116,7 +148,40 @@ let make =
               })
             ),
       })
-    | Block_Execute =>
+    | Block_FocusNextBlockOrCreate =>
+      let blockLength = state.blocks->Belt.Array.length;
+      let nextBlockIndex =
+        switch (state.focusedBlock) {
+        | None => blockLength - 1
+        | Some((id, _blockTyp, _)) =>
+          switch (state.blocks->arrayFindIndex((({b_id}) => b_id == id))) {
+          | None => blockLength - 1
+          | Some(index) => index
+          }
+        };
+      let findBlockId = index => {
+        let {b_id, b_data} = state.blocks[index];
+        (b_id, blockDataToBlockTyp(b_data));
+      };
+      if (nextBlockIndex == blockLength - 1) {
+        ReasonReact.SideEffects(
+          (
+            ({send}) =>
+              send(Block_Add(findBlockId(nextBlockIndex)->fst, BTyp_Code))
+          ),
+        );
+      } else if (nextBlockIndex < blockLength - 1) {
+        let (blockId, blockTyp) = findBlockId(nextBlockIndex + 1);
+        ReasonReact.Update({
+          ...state,
+          stateUpdateReason: Some(action),
+          focusedBlock:
+            Some((blockId, blockTyp, FcTyp_BlockExecuteAndFocusNextBlock)),
+        });
+      } else {
+        ReasonReact.NoUpdate;
+      };
+    | Block_Execute(focusNextBlock) =>
       let allCodeBlocks =
         state.blocks
         ->(
@@ -145,6 +210,12 @@ let make =
                        })
                      );
 
+                   resolve();
+                 })
+              |> then_(() => {
+                   if (focusNextBlock) {
+                     self.send(Block_FocusNextBlockOrCreate);
+                   };
                    resolve();
                  })
               |> catch(error => resolve(Js.log(error)))
@@ -243,18 +314,6 @@ let make =
         stateUpdateReason: Some(action),
         focusedBlock: Some((blockId, blockTyp, FcTyp_EditorFocus)),
       })
-    | Block_Blur(blockId) =>
-      switch (state.focusedBlock) {
-      | None => ReasonReact.NoUpdate
-      | Some((focusedBlockId, _, _)) =>
-        focusedBlockId == blockId ?
-          ReasonReact.Update({
-            ...state,
-            stateUpdateReason: Some(action),
-            focusedBlock: None,
-          }) :
-          ReasonReact.NoUpdate
-      }
     | Block_Add(afterBlockId, blockTyp) =>
       let newBlockId = Utils.generateId();
       ReasonReact.Update({
@@ -371,9 +430,7 @@ let make =
                         (newValue, diff) =>
                           send(Block_UpdateValue(b_id, newValue, diff))
                       )
-                      onExecute=(() => send(Block_Execute))
                       onFocus=(() => send(Block_Focus(b_id, BTyp_Code)))
-                      onBlur=(() => send(Block_Blur(b_id)))
                       onBlockUp=(() => send(Block_FocusUp(b_id)))
                       onBlockDown=(() => send(Block_FocusDown(b_id)))
                       widgets=bc_widgets
@@ -393,7 +450,6 @@ let make =
                         }
                       )
                       onFocus=(() => send(Block_Focus(b_id, BTyp_Text)))
-                      onBlur=(() => send(Block_Blur(b_id)))
                       onBlockUp=(() => send(Block_FocusUp(b_id)))
                       onBlockDown=(() => send(Block_FocusDown(b_id)))
                       onChange=(
