@@ -19,6 +19,7 @@ const shortcut = shortcut =>
 
 context("keyboard shortcuts", () => {
   beforeEach(() => {
+    cy.on("window:confirm", () => true);
     cy.visit("new");
   });
   it("ctrl+s for save", () => {
@@ -76,7 +77,7 @@ context("keyboard shortcuts", () => {
 
     shortcut("{ctrl}{enter}");
 
-    cy.get(".widget__lint").should("have.length", 0);
+    assertErrorsOrWarnings(0);
     cy.get("@block1")
       .get(".widget__value")
       .should("contain", "let a: int = 1;");
