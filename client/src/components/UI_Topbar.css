@@ -23,10 +23,6 @@
   text-decoration: none;
 }
 
-.Topbar a:visited {
-  color: inherit;
-}
-
 .Topbar svg {
   margin-right: var(--space1);
 }
@@ -50,7 +46,9 @@
 }
 
 .Topbar__action {
-  transition: border-color color 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  transition: border-color 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+    color 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+
   flex-direction: row;
   align-items: center;
   vertical-align: middle;
@@ -71,9 +69,6 @@
   color: var(--c-text-sub);
 }
 
-.Topbar__action--highlight {
-  color: var(--topbar-c-primary);
-}
 .Topbar__action:hover {
   border-color: var(--topbar-c-primary);
   color: var(--c-text);
@@ -85,6 +80,15 @@
 
 .Topbar__action:hover:disabled {
   border-color: var(--c-text-sub2);
+}
+
+.Topbar__action--highlight {
+  color: var(--topbar-c-primary);
+  font-weight: 500;
+}
+.Topbar__action--highlight:hover,
+.Topbar__action--highlight:visited {
+  color: var(--topbar-c-primary);
 }
 
 .Topbar__login {

@@ -42,13 +42,14 @@ context("keyboard shortcuts", () => {
     cy.get("textarea")
       .first()
       .type("let a: string = 1;", { force: true });
-
     shortcut("{ctrl}s");
+
     cy.get("@save").should("be.disabled");
 
     // Repeat
     cy.get("@title").type(faker.lorem.words());
     cy.get("@save").should("be.enabled");
+
 
     shortcut("{ctrl}s");
 

@@ -33,11 +33,12 @@ let make = _children => {
       </div>
       <div className="Topbar__right">
         <UI_Balloon position=Down message="New sketch">
-          ...<button
-               className="Topbar__action Topbar__action--highlight"
-               onClick=(_ => Router.push(Route.NoteNew))>
+          ...<Router.Link
+               route=Route.NoteNew
+               className="Topbar__action Topbar__action--highlight">
                <Fi.Plus />
-             </button>
+               "New Sketch"->str
+             </Router.Link>
         </UI_Balloon>
         <AuthStatus.UserInfo>
           ...(

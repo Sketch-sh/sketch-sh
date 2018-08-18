@@ -67,7 +67,7 @@ let make =
                     [],
                     (. acc, w) => {
                       open Editor_CodeBlockTypes.Widget;
-                      open Editor_CodeBlockLineWidget;
+                      open Editor_LineWidget;
                       let {lw_line: line, lw_data} = w;
                       let newLineWidget =
                         switch (lw_data) {
