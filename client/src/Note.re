@@ -31,30 +31,17 @@ open Utils;
  */
 module EnsureUrlEncodedData = {
   type action =
-    | NoteLoaded(Js.Json.t);
+    | NoteLoaded;
   let component = ReasonReact.reducerComponent("Note_EnsureUrlEncodedData");
 
-  let make = (~note, ~noteId, children): React.component(unit, 'a, action) => {
+  let make = (~noteId, children): React.component(unit, 'a, action) => {
     ...component,
-    didMount: ({send}) =>
-      switch (note##data) {
-      | None => ()
-      | Some(json) => send(NoteLoaded(json))
-      },
+    didMount: ({send}) => send(NoteLoaded),
     reducer: (action, _) =>
       switch (action) {
-      | NoteLoaded(json) =>
+      | NoteLoaded =>
         ReasonReact.SideEffects(
-          (
-            _ =>
-              NoteSave.replaceNoteRoute(
-                ~noteId,
-                ~json,
-                ~title=note##title->optionToEmptyString,
-                ~kind=Replace,
-              )
-              ->ignore
-          ),
+          (_ => NoteSave.replaceNoteRoute(~noteId, ~kind=Replace)->ignore),
         )
       },
     render: _send => children,
@@ -80,7 +67,7 @@ let make = (~noteInfo: Route.noteRouteConfig, _children) => {
                notes
                ->(
                    arrayFirst(~empty=<NotFound entity="note" />, ~render=note =>
-                     <EnsureUrlEncodedData noteId=noteInfo.noteId note>
+                     <EnsureUrlEncodedData noteId=noteInfo.noteId>
                        ...<NoteSave noteKind=(Old(noteInfo.noteId))>
                             ...(
                                  (~noteSaveStatus, ~user, ~onSave) => {
