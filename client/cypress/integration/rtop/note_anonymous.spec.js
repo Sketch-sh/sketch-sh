@@ -31,7 +31,7 @@ context("note - anonymous user", () => {
 
     cy.get("@save").click();
 
-    cy.url().should("match", /s\/.+\/.+---.+/, "should not be new route");
+    cy.url().should("match", /s\/.+/, "should not be new route");
 
     cy.reload(true);
 

@@ -7,33 +7,19 @@ type pushOrReplace =
   | Push
   | Replace;
 
-let replaceNoteRoute = (~noteId, ~json, ~title, ~kind) =>
-  Js.Promise.(
-    LzString.async()
-    |> then_(lzstring =>
-         (
-           lzstring->(LzString.URI.compress(title))
-           ++ "---"
-           ++ lzstring->LzString.URI.compress(Js.Json.stringify(json))
-         )
-         ->resolve
-       )
-    |> then_(compressed => {
-         let routerAction =
-           switch (kind) {
-           | Push => Router.pushSilent
-           | Replace => Router.replaceSilent
-           };
-         routerAction(Route.Note({noteId, data: Some(compressed)}))
-         ->resolve;
-       })
-    |> Utils.handleError
-  );
+let replaceNoteRoute = (~noteId, ~kind) => {
+  let routerAction =
+    switch (kind) {
+    | Push => Router.pushSilent
+    | Replace => Router.replaceSilent
+    };
+  routerAction(Route.Note({noteId, data: None}));
+};
 
 open NoteSave_Types;
 type action =
-  | SavedNewNote(id, string, Js.Json.t)
-  | SavedOldNote(id, string, Js.Json.t);
+  | SavedNewNote(id)
+  | SavedOldNote(id);
 
 /* TODO:
    When receive the mutation result,
@@ -55,20 +41,12 @@ let make =
   initialState: () => {kind: noteKind},
   reducer: (action, _state) =>
     switch (action) {
-    | SavedNewNote(noteId, title, json) =>
+    | SavedNewNote(noteId) =>
       ReasonReact.UpdateWithSideEffects(
         {kind: Old(noteId)},
-        (
-          _self => replaceNoteRoute(~noteId, ~json, ~title, ~kind=Push)->ignore
-        ),
+        (_self => replaceNoteRoute(~noteId, ~kind=Push)->ignore),
       )
-    | SavedOldNote(noteId, title, json) =>
-      ReasonReact.SideEffects(
-        (
-          _self =>
-            replaceNoteRoute(~noteId, ~json, ~title, ~kind=Replace)->ignore
-        ),
-      )
+    | SavedOldNote(_noteId) => ReasonReact.NoUpdate
     },
   render: ({state, send}) =>
     <AuthStatus.IsAuthenticated>
@@ -79,12 +57,10 @@ let make =
                <NoteSave_Anonymous
                  kind=state.kind
                  onSaveNewNote=(
-                   (noteId, title, data) =>
-                     SavedNewNote(noteId, title, data)->send
+                   (noteId, _title, _data) => SavedNewNote(noteId)->send
                  )
                  onSaveOldNote=(
-                   (noteId, title, data) =>
-                     SavedOldNote(noteId, title, data)->send
+                   (noteId, _title, _data) => SavedOldNote(noteId)->send
                  )>
                  ...children
                </NoteSave_Anonymous>
@@ -93,12 +69,10 @@ let make =
                  kind=state.kind
                  userId
                  onSaveNewNote=(
-                   (noteId, title, data) =>
-                     SavedNewNote(noteId, title, data)->send
+                   (noteId, _title, _data) => SavedNewNote(noteId)->send
                  )
                  onSaveOldNote=(
-                   (noteId, title, data) =>
-                     SavedOldNote(noteId, title, data)->send
+                   (noteId, _title, _data) => SavedOldNote(noteId)->send
                  )>
                  ...children
                </NoteSave_Login>
