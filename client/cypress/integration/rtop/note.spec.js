@@ -50,7 +50,6 @@ context("keyboard shortcuts", () => {
     cy.get("@title").type(faker.lorem.words());
     cy.get("@save").should("be.enabled");
 
-
     shortcut("{ctrl}s");
 
     cy.get("@save").should("be.disabled");
@@ -133,5 +132,34 @@ context("keyboard shortcuts", () => {
     cy.get("@block1")
       .get(".widget__value")
       .should("contain", "let a: int = 1;");
+  });
+});
+
+context("Edge cases", () => {
+  it("should not prevent editing title after focusing on a block #105", () => {
+    // https://github.com/Sketch-sh/sketch-sh/issues/105
+
+    cy.visit("new");
+
+    cy.get(".EditorNote__metadata")
+      .find("input")
+      .first()
+      .as("title")
+      .type(faker.lorem.words());
+
+    cy.get(".block__container")
+      .first()
+      .find("textarea")
+      .as("block1")
+      .type("let a = 1;", { force: true });
+
+    cy.get("@title")
+      .focus()
+      .clear()
+      .type("new title");
+
+    cy.get("@title")
+      .should("have.value", "new title")
+      .focused();
   });
 });
