@@ -2,6 +2,7 @@
   list-style-type: none;
   padding: 0;
   margin: 0;
+  line-height: 26px;
 }
 
 .UI_SketchList__sketch {
@@ -13,15 +14,14 @@
   color: var(--c-primary);
   font-size: var(--f4);
 
-  &:hover {
-    text-decoration: underline;
-    text-decoration-color: var(--c-text-sub);
+  &:hover .UI_SketchList__sketch--title {
+    color: var(--c-text);
   }
 }
 
 .UI_SketchList__sketch--title {
   font-weight: 500;
-  color: var(--c-text);
+  color: var(--c-text-sub);
 }
 
 .UI_SketchList__sketch--dash {

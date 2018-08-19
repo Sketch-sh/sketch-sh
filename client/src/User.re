@@ -30,9 +30,8 @@ let make = (~userName, _children) => {
         ...(
              ({result}) =>
                switch (result) {
-               | Loading => <UI_FullpageLoading />
-               | Error(error) =>
-                 <div> (ReasonReact.string(error##message)) </div>
+               | Loading => <UI_SketchList.Placeholder />
+               | Error(error) => error##message->str
                | Data(response) =>
                  <UI_SketchList
                    sketches=response##note

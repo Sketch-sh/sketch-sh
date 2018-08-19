@@ -43,6 +43,7 @@
     "re-classnames": "^2.1.0",
     "react": "^16.4.1",
     "react-apollo": "^2.1.9",
+    "react-content-loader": "^3.1.2",
     "react-dom": "^16.4.1",
     "react-helmet": "^5.2.0",
     "react-icons": "^3.0.4",

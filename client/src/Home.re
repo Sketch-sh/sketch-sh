@@ -65,43 +65,50 @@ let make = (~userId, _children) => {
         <GetRecentSketchesComponent variables=recentSketchesQuery##variables>
           ...(
                ({result}) =>
-                 switch (result) {
-                 | Loading => <UI_FullpageLoading />
-                 | Error(error) =>
-                   <section> (ReasonReact.string(error##message)) </section>
-                 | Data(response) =>
-                   <section>
-                     <h2 className="Home__section--title">
-                       "Your recent sketches"->str
-                     </h2>
-                     <UI_SketchList
-                       sketches=response##sketches
-                       className="Home__section--list"
-                       noSketches={<UI_NoSketches />}
-                     />
-                   </section>
-                 }
+                 <section>
+                   <h2 className="Home__section--title">
+                     "Your recent sketches"->str
+                   </h2>
+                   (
+                     switch (result) {
+                     | Loading =>
+                       <UI_SketchList.Placeholder
+                         className="Home__section--list"
+                       />
+                     | Error(error) => error##message->str
+                     | Data(response) =>
+                       <UI_SketchList
+                         sketches=response##sketches
+                         className="Home__section--list"
+                       />
+                     }
+                   )
+                 </section>
              )
         </GetRecentSketchesComponent>
         <GetCommunitySketchesComponent
           variables=recentSketchesQuery##variables>
           ...(
                ({result}) =>
-                 switch (result) {
-                 | Loading => <UI_FullpageLoading />
-                 | Error(error) =>
-                   <section> (ReasonReact.string(error##message)) </section>
-                 | Data(response) =>
-                   <section>
-                     <h2 className="Home__section--title">
-                       "New community sketches"->str
-                     </h2>
-                     <UI_SketchList.WithUserInfo
-                       sketches=response##sketches
-                       className="Home__section--list"
-                     />
-                   </section>
-                 }
+                 <section>
+                   <h2 className="Home__section--title">
+                     "New community sketches"->str
+                   </h2>
+                   (
+                     switch (result) {
+                     | Loading =>
+                       <UI_SketchList.Placeholder
+                         className="Home__section--list"
+                       />
+                     | Error(error) => error##message->str
+                     | Data(response) =>
+                       <UI_SketchList.WithUserInfo
+                         sketches=response##sketches
+                         className="Home__section--list"
+                       />
+                     }
+                   )
+                 </section>
              )
         </GetCommunitySketchesComponent>
       </main>

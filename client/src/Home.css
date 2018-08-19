@@ -15,7 +15,7 @@
   .Home__main {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    grid-column-gap: var(--space2);
+    grid-column-gap: var(--space5);
   }
   .Home__section--title {
     text-align: center;

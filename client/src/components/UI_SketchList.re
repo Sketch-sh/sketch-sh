@@ -90,3 +90,29 @@ module WithUserInfo = {
       },
   };
 };
+
+module Placeholder = {
+  let component = ReasonReact.statelessComponent("UI_SketchList.Placeholder");
+
+  let make = (~className=?, _children) => {
+    ...component,
+    render: _self =>
+      <ReactContentLoader ?className height=250 width=450>
+        <rect x="0" y="0" rx="0" ry="0" width="93" height="20" />
+        <rect x="110" y="0" rx="0" ry="0" width="195" height="20" />
+        <rect x="30" y="30" rx="0" ry="0" width="130" height="14" />
+        <rect x="180" y="30" rx="0" ry="0" width="170" height="14" />
+        <circle cx="12" cy="37" r="12" />
+        <rect x="0" y="70" rx="0" ry="0" width="30" height="20" />
+        <rect x="47" y="70" rx="0" ry="0" width="377" height="20" />
+        <rect x="30" y="100" rx="0" ry="0" width="183" height="14" />
+        <rect x="224" y="100" rx="0" ry="0" width="191" height="14" />
+        <circle cx="12" cy="107" r="12" />
+        <rect x="0" y="140" rx="0" ry="0" width="139" height="20" />
+        <rect x="170" y="140" rx="0" ry="0" width="196" height="20" />
+        <rect x="30" y="170" rx="0" ry="0" width="129" height="14" />
+        <rect x="178" y="170" rx="0" ry="0" width="203" height="14" />
+        <circle cx="12" cy="177" r="12" />
+      </ReactContentLoader>,
+  };
+};
