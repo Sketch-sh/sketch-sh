@@ -74,11 +74,7 @@ let make = (~userId, _children) => {
                      <h2 className="Home__section--title">
                        "Your recent sketches"->str
                      </h2>
-                     <UI_SketchList
-                       sketches=response##sketches
-                       className="Home__section--list"
-                       noSketches={<UI_NoSketches />}
-                     />
+                     <UI_LoadingPlaceholder />
                    </section>
                  }
              )
