@@ -58,17 +58,16 @@ let make = _children => {
           </Layout_WithTopbar>
         | Note(noteInfo) =>
           <Layout_WithTopbar>
-            ...<Editor_NotePlaceholder />
+            ...<NoteLazy
+                 fetch=(
+                   () => [%bs.raw
+                     {| import(/* webpackChunkName: "Note" */ "./Note.bs.js") |}
+                   ]
+                 )
+                 onLoading=(() => <Editor_NotePlaceholder />)
+                 render=(((module Note)) => <Note noteInfo />)
+               />
           </Layout_WithTopbar>
-        /* ...<NoteLazy
-             fetch=(
-               () => [%bs.raw
-                 {| import(/* webpackChunkName: "Note" */ "./Note.bs.js") |}
-               ]
-             )
-             onLoading=(() => <UI_FullpageLoading />)
-             render=(((module Note)) => <Note noteInfo />)
-           /> */
         | NoteNew =>
           <Layout_WithTopbar> ...<NoteNewLazy /> </Layout_WithTopbar>
         | User(userName) =>
