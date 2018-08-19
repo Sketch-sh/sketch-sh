@@ -108,12 +108,6 @@ Server implementation contains 2 microserives: auth, hasura's graphql engine
 ~/sketch-sh/server: > make dev
 ```
 
-- Migrate to latest database schema
-
-```sh
-~/sketch-sh/server: > make migrate
-```
-
 ### View server logs
 
 ```sh
