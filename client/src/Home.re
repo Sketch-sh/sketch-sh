@@ -80,6 +80,7 @@ let make = (~userId, _children) => {
                        <UI_SketchList
                          sketches=response##sketches
                          className="Home__section--list"
+                         noSketches={<UI_NoSketches />}
                        />
                      }
                    )
