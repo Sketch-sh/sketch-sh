@@ -93,19 +93,4 @@
 
 .Topbar__login {
   height: 100%;
-  border: 0;
-  text-decoration: none;
-  margin: 0;
-  padding: var(--space2);
-  color: #fff;
-  background: var(--topbar-c-primary);
-  transition: background 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-
-  display: flex;
-  align-items: center;
-  color: #fff !important;
-}
-
-.Topbar__login:hover {
-  background: color-mod(var(--topbar-c-primary) lightness(-6%));
 }

@@ -32,7 +32,8 @@
     "reason-apollo",
     "bs-dynamic-import",
     "reason-loadable",
-    "bs-date-fns"
+    "bs-date-fns",
+    "re-classnames"
   ],
   "bs-dev-dependencies": ["@glennsl/bs-jest"],
   "refmt": 3,

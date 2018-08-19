@@ -43,7 +43,7 @@ let make = _children => {
                           title="Sketch.sh - Interactive ReasonML sketchbook"
                           blocks=Editor_Introduction.blocks
                         />
-                      | Login(_) =>
+                      | Login(userId) =>
                         <HomeLazy
                           fetch=(
                             () => [%bs.raw
@@ -51,7 +51,7 @@ let make = _children => {
                             ]
                           )
                           onLoading=(() => <UI_FullpageLoading />)
-                          render=(((module Home)) => <Home />)
+                          render=(((module Home)) => <Home userId />)
                         />
                     )
                </AuthStatus.IsAuthenticated>

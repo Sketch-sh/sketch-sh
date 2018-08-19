@@ -230,7 +230,12 @@ module Editor_Note = {
             (
               noteOwner
               =>> (
-                noteOwner => <Editor_NoteOwnerInfo noteOwner ?noteLastEdited />
+                noteOwner =>
+                  <UI_SketchOwnerInfo
+                    owner=noteOwner
+                    ?noteLastEdited
+                    className="EditorNote__owner"
+                  />
               )
             )
           </div>

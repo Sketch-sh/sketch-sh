@@ -1,0 +1,40 @@
+.UI_SketchList {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+.UI_SketchList__sketch {
+  margin: var(--space3) 0;
+}
+
+.UI_SketchList__sketch--link {
+  text-decoration: none;
+  color: var(--c-primary);
+  font-size: var(--f4);
+
+  &:hover {
+    text-decoration: underline;
+    text-decoration-color: var(--c-text-sub);
+  }
+}
+
+.UI_SketchList__sketch--title {
+  font-weight: 500;
+  color: var(--c-text);
+}
+
+.UI_SketchList__sketch--dash {
+  color: var(--c-text);
+}
+
+.UI_SketchList__sketch--lastEdited {
+  padding-right: var(--space2);
+  font-weight: 400;
+  font-size: var(--f6);
+  color: var(--c-text-sub2);
+}
+
+.UI_SketchList__sketch--time {
+  margin-left: var(--space1);
+}

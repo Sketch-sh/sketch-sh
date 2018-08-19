@@ -4,7 +4,10 @@ open Utils;
 let component = ReasonReact.statelessComponent("UI_Topbar");
 
 let loginButton =
-  <Router.Link className="Topbar__login" popup=true route=Route.AuthGithub>
+  <Router.Link
+    className="btn btn-primary Topbar__login"
+    popup=true
+    route=Route.AuthGithub>
     <Fi.Github />
     "Login with Github"->str
   </Router.Link>;

@@ -87,3 +87,40 @@ body {
   border-top: 2px solid #9f6000;
   padding: var(--space2) var(--space3);
 }
+
+a {
+  color: var(--c-primary);
+}
+
+a:hover {
+  color: color-mod(var(--c-primary) lightness(-6%));
+}
+
+.btn {
+  transition: background 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  border: 0;
+  text-decoration: none;
+  margin: 0;
+  padding: var(--space2);
+
+  display: flex;
+  align-items: center;
+
+  & svg {
+    margin-right: var(--space1);
+  }
+}
+
+.btn--large {
+  padding: var(--space3);
+}
+
+.btn-primary {
+  background: var(--c-primary);
+  color: var(--c-text-inverse);
+}
+
+.btn-primary:hover {
+  background: color-mod(var(--c-primary) lightness(-6%));
+  color: var(--c-text-inverse);
+}

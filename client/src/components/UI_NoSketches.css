@@ -1,0 +1,19 @@
+.UI_NoSketches {
+  text-align: center;
+  color: var(--c-text-sub2);
+  font-weight: 300;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  font-size: var(--f3);
+}
+.UI_NoSketches--icon {
+  height: var(--space5);
+  width: var(--space5);
+  stroke-width: 0.5;
+  margin-bottom: var(--space3);
+}
+.UI_NoSketches--button {
+  margin-top: var(--space3);
+}
