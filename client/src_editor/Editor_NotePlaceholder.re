@@ -4,9 +4,12 @@ let make = _children => {
   ...component,
   render: _self =>
     <div className="Layout__center">
-      <div style=(ReactDOMRe.Style.make(~marginLeft="30px", ()))>
-        <div style=(ReactDOMRe.Style.make(~marginBottom="32px", ()))>
-          <ReactContentLoader width=800 height=100>
+      <div
+        style=(
+          ReactDOMRe.Style.make(~marginLeft="30px", ~maxWidth="800px", ())
+        )>
+        <div>
+          <ReactContentLoader width=600 height=100>
             <rect rx="4" ry="4" width="600" height="30" />
             <circle cx="16" cy="50" r="16" />
             <rect x="38" y="42" rx="4" ry="4" width="300" height="16" />
@@ -14,7 +17,7 @@ let make = _children => {
           </ReactContentLoader>
         </div>
         <div>
-          <ReactContentLoader width=500 height=130>
+          <ReactContentLoader width=400 height=100>
             <rect x="0" y="0" rx="3" ry="3" width="70" height="10" />
             <rect x="80" y="0" rx="3" ry="3" width="100" height="10" />
             <rect x="190" y="0" rx="3" ry="3" width="20" height="10" />
@@ -34,7 +37,7 @@ let make = _children => {
             <rect x="0" y="80" rx="3" ry="3" width="30" height="10" />
           </ReactContentLoader>
         </div>
-        <div> <ReactContentLoader width=500 height=90 typ=Code /> </div>
+        <div> <ReactContentLoader width=400 height=90 typ=Code /> </div>
       </div>
     </div>,
 };
