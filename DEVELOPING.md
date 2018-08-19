@@ -1,13 +1,13 @@
-This is a mono repository that hold all of ReasonML playground code.
+This is a mono repository that holds all of Sketch.sh code.
 
 # General coding style
 
-I use refmt with default width (80 chars). By running `npm install` inside client directory, a git hook will be setuped for you to auto format on staged files.
+I use refmt with default width (80 chars). By running `npm install` inside client directory, a git hook will be setup for you to auto format on staged files.
 
 You can clone this project by running this command:
 
 ```sh
-https://github.com/thangngoc89/rtop-ui
+git clone https://github.com/sketch-sh/sketch-sh
 ```
 
 # Frontend
@@ -31,40 +31,40 @@ https://github.com/thangngoc89/rtop-ui
 - cd into client and install dependencies
 
 ```sh
-~/rtop-ui: > cd client && npm install
+~/sketch-sh: > cd client && npm install
 ```
 
 - Run an initial bsb build
 
 ```sh
-~/rtop-ui/client: > npm run bs:build
+~/sketch-sh/client: > npm run bs:build
 ```
 
 - Start webpack development server
 
 ```sh
-~/rtop-ui/client: > npm start
+~/sketch-sh/client: > npm start
 ```
 
 - Run Bucklescript in watch mode (another tab)
 
 ```sh
-~/rtop-ui/client: > npm run bs:start
+~/sketch-sh/client: > npm run bs:start
 ```
 
 > Tips: You don't need to do this if you're using VSCode with VSCode ReasonML plugin
 > just hit save and bsb will compile everything for you
 > More information here: https://github.com/reasonml-editor/vscode-reasonml/#bsb
 
-- To make an production bundle:
+- To make a production bundle:
 
 ```sh
-~/rtop-ui/client: > npm run build
+~/sketch-sh/client: > npm run build
 ```
 
 # Server
 
-Server implementations contains 2 microserives: auth, hasura's graphql engine
+Server implementation contains 2 microserives: auth, hasura's graphql engine
 
 ## Folder structures
 
@@ -82,8 +82,7 @@ Server implementations contains 2 microserives: auth, hasura's graphql engine
 // TODO: deploy a staging server for local development
 
 - You need to have these installed
-
-  - `docker`: // TODO: find a link for installing docker
+  - `docker`: Find installation instructions for your platform from [docker's docs](https://docs.docker.com/install/#supported-platforms).
   - `docker-compose`: Head over to [docker-compose's release page](https://github.com/docker/compose/releases). Choose the latest release and follow the instruction.
 
 - Github OAuth apps
@@ -95,28 +94,28 @@ Server implementations contains 2 microserives: auth, hasura's graphql engine
 
 ## Starting development server
 
-- Copying `.env.example` to `.env`
+- Copy `.env.example` to `.env`
 
 ```sh
-~/rtop-ui/server: > cp .env.example .env
+~/sketch-sh/server: > cp .env.example .env
 ```
 
-- Open it `.env` and add `GITHUB_CLIENT_ID` and `GITHUB_CLIENT_SECRET`
+- Open `.env` and add `GITHUB_CLIENT_ID` and `GITHUB_CLIENT_SECRET`
 
 - Start docker-compose in detach mode
 
 ```sh
-~/rtop-ui/server: > && docker-compose up -d
+~/sketch-sh/server: > make dev
 ```
 
 - Migrate to latest database schema
 
 ```sh
-~/rtop-ui/server: > make migrate
+~/sketch-sh/server: > make migrate
 ```
 
 ### View server logs
 
 ```sh
-~/rtop-ui/server: > docker-compose logs -f
+~/sketch-sh/server: > docker-compose logs -f
 ```
