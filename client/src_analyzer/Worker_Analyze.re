@@ -64,7 +64,7 @@ module Make = (ESig: Worker_Evaluator.EvaluatorSig) => {
           | kind => raise(Invalid_argument("Unknown phrase result " ++ kind))
           };
         } else {
-          (acc, false);
+          (acc->Belt.List.reverse, false);
         };
       loop(0, []);
     };
