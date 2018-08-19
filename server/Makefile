@@ -34,5 +34,9 @@ prod-migrate:
 psql:
 	# Access psql of a running container
 	docker exec -it server_postgres_1 psql -U postgres
+dev:
+	docker-compose -f docker-compose.yml -f docker-compose.dev.yml up -d
+dev-build:
+	docker-compose -f docker-compose.yml -f docker-compose.dev.yml build
 
-.PHONY: migrate save update-schema clear reset prod-migrate staging-migrate
+.PHONY: migrate save update-schema clear reset prod-migrate staging-migrate dev
