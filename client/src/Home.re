@@ -74,7 +74,44 @@ let make = (~userId, _children) => {
                      <h2 className="Home__section--title">
                        "Your recent sketches"->str
                      </h2>
-                     <UI_LoadingPlaceholder />
+                     <UI_LoadingPlaceholder className="Home__section--list">
+                       <UI_LoadingPlaceholder.Rect
+                         top="0"
+                         right="0"
+                         width="40%"
+                         height="20px"
+                       />
+                       <UI_LoadingPlaceholder.Rect
+                         top="20px"
+                         left="0"
+                         right="0"
+                         height="5px"
+                       />
+                       <UI_LoadingPlaceholder.Rect
+                         top="25px"
+                         left="30px"
+                         width="10px"
+                         height="10px"
+                       />
+                       <UI_LoadingPlaceholder.Rect
+                         top="25px"
+                         left="200px"
+                         width="15px"
+                         height="10px"
+                       />
+                       <UI_LoadingPlaceholder.Rect
+                         top="25px"
+                         left="450px"
+                         right="0"
+                         height="10px"
+                       />
+                       <UI_LoadingPlaceholder.Rect
+                         top="35px"
+                         left="0"
+                         right="0"
+                         height="5px"
+                       />
+                     </UI_LoadingPlaceholder>
                    </section>
                  }
              )
