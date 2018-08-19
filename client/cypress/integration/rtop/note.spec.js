@@ -162,4 +162,26 @@ context("Edge cases", () => {
       .should("have.value", "new title")
       .focused();
   });
+
+  it("should display value in correct order when there are multiple expressions on the same line", () => {
+    cy.visit("new");
+    cy.get(".block__container")
+      .first()
+      .find("textarea")
+      .as("block1")
+      .type("let x = 1; let y = 2; let z = 3;", { force: true });
+    shortcut("{ctrl}{enter}");
+    assertValue(3);
+
+    cy.get(".widget__value").as("value");
+    cy.get("@value")
+      .eq(0)
+      .should("have.text", "let x: int = 1;\n");
+    cy.get("@value")
+      .eq(1)
+      .should("have.text", "let y: int = 2;\n");
+    cy.get("@value")
+      .eq(2)
+      .should("have.text", "let z: int = 3;\n");
+  });
 });
