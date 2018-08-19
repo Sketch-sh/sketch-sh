@@ -12,7 +12,7 @@ let renderErrorIndicator = (colStart, colEnd, content) =>
 
 let executeResultToWidget = (result: list(Worker_Types.blockData)) => {
   open Worker_Types;
-  open Editor_CodeBlockTypes;
+  open Editor_Types;
 
   let widgets =
     result
@@ -127,8 +127,13 @@ let syncLineNumber: array(block) => array(block) =
       )
     ->Utils.pluckAcc;
 
-let emptyCodeBlock = () =>
-  B_Code({bc_value: "", bc_firstLineNumber: 1, bc_widgets: [||]});
+let emptyCodeBlock = lang =>
+  B_Code({
+    bc_lang: lang,
+    bc_value: "",
+    bc_firstLineNumber: 1,
+    bc_widgets: [||],
+  });
 
 let emptyTextBlock = () => B_Text("");
 

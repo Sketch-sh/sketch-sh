@@ -66,7 +66,7 @@ let make = (~kind, ~onSaveNewNote, ~onSaveOldNote, children) => {
                    },
                  ~user=AuthStatus.Anonymous,
                  ~onSave=(~title, ~data) => {
-                   let data = data->Editor_Types.JsonEncode.encode;
+                   let data = data->Editor_Json.V1.JsonEncode.encode;
                    let noteId = Utils.generateId();
                    let newNote =
                      AddNoteAnonymousGql.make(
@@ -114,7 +114,7 @@ let make = (~kind, ~onSaveNewNote, ~onSaveOldNote, children) => {
                    },
                  ~user=AuthStatus.Anonymous,
                  ~onSave=(~title, ~data) => {
-                   let data = data->Editor_Types.JsonEncode.encode;
+                   let data = data->Editor_Json.V1.JsonEncode.encode;
                    let updatedNote =
                      UpdateNoteGql.make(~title, ~data, ~noteId, ());
                    Js.Promise.(

@@ -86,22 +86,6 @@ let make = _children => {
         | AuthLogout => <Auth.AuthLogout />
         | AuthGithub => <Auth.AuthGithub />
         | AuthFailure => "auth failure"->str
-        | EditorDevelopment =>
-          Utils.env == "production" ?
-            <NotFound /> :
-            <Layout_WithTopbar>
-              ...<Editor_Note_LoaderLazy
-                   fetch=(
-                     () => [%bs.raw
-                       {| import(/* webpackChunkName: "Editor_Note_Loader" */ "../src_editor/Editor_Note_Loader.bs.js") |}
-                     ]
-                   )
-                   onLoading=(() => <UI_FullpageLoading />)
-                   render=(
-                     ((module Editor_Note_Loader)) => <Editor_Note_Loader />
-                   )
-                 />
-            </Layout_WithTopbar>
         | NotFound => <NotFound />
         }
       )

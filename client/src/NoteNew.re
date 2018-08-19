@@ -1,7 +1,7 @@
 let defaultBlocks = [|
   {
     Editor_Types.Block.b_id: Utils.generateId(),
-    b_data: Editor_Blocks_Utils.emptyCodeBlock(),
+    b_data: Editor_Blocks_Utils.emptyCodeBlock(RE),
   },
 |];
 

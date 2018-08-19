@@ -16,7 +16,7 @@ type js_executeResult = {
 type rtop = {
   execute: (. bool, string) => Js.Promise.t(list(Worker_Types.blockData)),
   executeMany:
-    (. list((string, string))) =>
+    (. list((string, Editor_Types.Block.lang, string))) =>
     Js.Promise.t(list((string, list(Worker_Types.blockData)))),
 };
 let worker = RtopWorker.make();

@@ -70,7 +70,8 @@ module Make = (ESig: Worker_Evaluator.EvaluatorSig) => {
     };
 
   let executeMany:
-    (. list((string, string))) => list((string, list(blockData))) =
+    (. list((string, Editor_Types.Block.lang, string))) =>
+    list((string, list(blockData))) =
     (. codeBlocks) => {
       /* Reset before evaluating several blocks */
       Evaluator.reset();
@@ -82,7 +83,11 @@ module Make = (ESig: Worker_Evaluator.EvaluatorSig) => {
       let rec loop = (blocks, acc) =>
         switch (blocks) {
         | [] => acc
-        | [(id, code), ...rest] =>
+        | [(id, lang, code), ...rest] =>
+          switch (lang) {
+          | Editor_Types.Block.ML => Evaluator.mlSyntax()
+          | Editor_Types.Block.RE => Evaluator.reSyntax()
+          };
           let (result, hasError) = execute(. false, code);
 
           hasError ?

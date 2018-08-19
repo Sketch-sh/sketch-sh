@@ -1,8 +1,10 @@
+open Editor_Types;
 type state = {
   editor: ref(option(CodeMirror.editor)),
   lineWidgets: ref(list(CodeMirror.LineWidget.t)),
-  codeBlockWidgets: array(Editor_CodeBlockTypes.Widget.t),
+  codeBlockWidgets: array(Widget.t),
   firstLineNumber: int,
+  lang: Block.lang,
 };
 
 let component = ReasonReact.reducerComponent("Editor_CodeBlock");
@@ -12,6 +14,11 @@ let getEditor = (state, ~default, ~f) =>
   | None => default
   | Some(editor) => f(editor)
   };
+
+let langToMode =
+  fun
+  | Block.RE => "reason"
+  | Block.ML => "mllike";
 
 let make =
     (
@@ -25,6 +32,7 @@ let make =
       ~onBlockUp=?,
       ~onBlockDown=?,
       ~readOnly=?,
+      ~lang=Block.RE,
       _children,
     )
     : ReasonReact.component(state, _, unit) => {
@@ -34,6 +42,7 @@ let make =
     lineWidgets: ref([]),
     codeBlockWidgets: widgets,
     firstLineNumber,
+    lang,
   },
   willReceiveProps: ({state}) =>
     getEditor(state, ~default=state, ~f=editor =>
@@ -47,6 +56,12 @@ let make =
               );
           };
           firstLineNumber;
+        },
+        lang: {
+          if (state.lang != lang) {
+            editor->(CodeMirror.Editor.setOption("mode", lang->langToMode));
+          };
+          lang;
         },
         codeBlockWidgets: {
           if (widgets != state.codeBlockWidgets) {
@@ -66,7 +81,7 @@ let make =
                   Belt.Array.reduceU(
                     [],
                     (. acc, w) => {
-                      open Editor_CodeBlockTypes.Widget;
+                      open Editor_Types.Widget;
                       open Editor_LineWidget;
                       let {lw_line: line, lw_data} = w;
                       let newLineWidget =
@@ -162,7 +177,7 @@ let make =
       )
       options=(
         CodeMirror.EditorConfiguration.make(
-          ~mode="reason",
+          ~mode=lang->langToMode,
           ~theme=Config.cmTheme,
           ~lineNumbers=true,
           ~styleActiveLine=true,

@@ -97,7 +97,8 @@ let make = (~noteInfo: Route.noteRouteConfig, _children) => {
                                        switch (note##data) {
                                        | None => [||]
                                        | Some(blocks) =>
-                                         blocks->Editor_Types.JsonDecode.decode
+                                         blocks
+                                         ->Editor_Json.V1.JsonDecode.decode
                                        }
                                      )
                                      noteSaveStatus
