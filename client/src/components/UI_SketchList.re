@@ -94,10 +94,10 @@ module WithUserInfo = {
 module Placeholder = {
   let component = ReasonReact.statelessComponent("UI_SketchList.Placeholder");
 
-  let make = (~className=?, _children) => {
+  let make = (~className=?, ~width=450, _children) => {
     ...component,
     render: _self =>
-      <ReactContentLoader ?className height=250 width=450>
+      <ReactContentLoader ?className height=250 width>
         <rect x="0" y="0" rx="0" ry="0" width="93" height="20" />
         <rect x="110" y="0" rx="0" ry="0" width="195" height="20" />
         <rect x="30" y="30" rx="0" ry="0" width="130" height="14" />

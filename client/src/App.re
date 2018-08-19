@@ -64,7 +64,7 @@ let make = _children => {
                      {| import(/* webpackChunkName: "Note" */ "./Note.bs.js") |}
                    ]
                  )
-                 onLoading=(() => <Editor_NotePlaceholder />)
+                 onLoading=(() => <UI_FullpageLoading />)
                  render=(((module Note)) => <Note noteInfo />)
                />
           </Layout_WithTopbar>

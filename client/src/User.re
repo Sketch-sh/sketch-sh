@@ -30,7 +30,10 @@ let make = (~userName, _children) => {
         ...(
              ({result}) =>
                switch (result) {
-               | Loading => <UI_SketchList.Placeholder />
+               | Loading =>
+                 <div style=(ReactDOMRe.Style.make(~width="500px", ()))>
+                   <UI_SketchList.Placeholder />
+                 </div>
                | Error(error) => error##message->str
                | Data(response) =>
                  <UI_SketchList

@@ -59,9 +59,8 @@ let make = (~noteInfo: Route.noteRouteConfig, _children) => {
       ...(
            ({result}) =>
              switch (result) {
-             | Loading => <UI_FullpageLoading />
-             | Error(error) =>
-               <div> (ReasonReact.string(error##message)) </div>
+             | Loading => <Editor_NotePlaceholder />
+             | Error(error) => error##message->str
              | Data(response) =>
                let notes = response##note;
                notes

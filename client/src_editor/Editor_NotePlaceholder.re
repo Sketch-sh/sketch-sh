@@ -3,11 +3,11 @@ let component = ReasonReact.statelessComponent("Editor_NotePlaceholder");
 let make = _children => {
   ...component,
   render: _self =>
-    <div className="EditorNote Layout__center">
+    <div className="Layout__center">
       <div style=(ReactDOMRe.Style.make(~marginLeft="30px", ()))>
         <div style=(ReactDOMRe.Style.make(~marginBottom="32px", ()))>
           <ReactContentLoader width=800 height=100>
-            <rect rx="4" ry="4" width="800" height="30" />
+            <rect rx="4" ry="4" width="600" height="30" />
             <circle cx="16" cy="50" r="16" />
             <rect x="38" y="42" rx="4" ry="4" width="300" height="16" />
             <rect x="350" y="42" rx="4" ry="4" width="200" height="16" />
