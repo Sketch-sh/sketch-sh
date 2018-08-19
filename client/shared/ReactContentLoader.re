@@ -1,5 +1,8 @@
 [@bs.module "react-content-loader"]
-external reactClass: ReasonReact.reactClass = "default";
+external rawClass: ReasonReact.reactClass = "default";
+
+[@bs.module "react-content-loader"]
+external codeClass: ReasonReact.reactClass = "Code";
 
 [@bs.deriving abstract]
 type jsProps = {
@@ -29,8 +32,18 @@ type jsProps = {
   uniquekey: string,
 };
 
+type contentType =
+  | Raw
+  | Code;
+
+let contentTypeToClass =
+  fun
+  | Raw => rawClass
+  | Code => codeClass;
+
 let make =
     (
+      ~typ=Raw,
       ~animate=?,
       ~speed=?,
       ~className=?,
@@ -46,7 +59,7 @@ let make =
       children,
     ) =>
   ReasonReact.wrapJsForReason(
-    ~reactClass,
+    ~reactClass=typ->contentTypeToClass,
     ~props=
       jsProps(
         ~animate?,
