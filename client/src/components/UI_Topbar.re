@@ -9,10 +9,11 @@ let loginButton = {
     href
     className="Topbar__login"
     onClick=(
-      event => {
-        event->ReactEvent.Mouse.preventDefault;
-        Popup.openPopup(href);
-      }
+      event =>
+        if (!event->ReactEvent.Mouse.ctrlKey) {
+          event->ReactEvent.Mouse.preventDefault;
+          Popup.openPopup(href);
+        }
     )>
     <Fi.Github />
     "Login with Github"->str

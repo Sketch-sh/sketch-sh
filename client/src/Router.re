@@ -108,10 +108,12 @@ module LinkUnsafe = {
         ?title
         href
         onClick=(
-          self.handle((event, _self) => {
-            event->ReactEvent.Mouse.preventDefault;
-            pushUnsafe(href);
-          })
+          self.handle((event, _self) =>
+            if (!event->ReactEvent.Mouse.ctrlKey) {
+              event->ReactEvent.Mouse.preventDefault;
+              pushUnsafe(href);
+            }
+          )
         )>
         ...children
       </a>,
