@@ -184,6 +184,7 @@ let make =
           ~viewportMargin=infinity,
           ~matchBrackets=true,
           ~lineWrapping=true,
+          ~smartIndent=false,
           ~firstLineNumber,
           ~tabSize=2,
           ~readOnly?,
