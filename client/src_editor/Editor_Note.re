@@ -23,7 +23,8 @@ module Editor_Note = {
     | TitleUpdate(string)
     | BlockUpdate(array(Block.block))
     | RegisterExecuteCallback(unit => unit)
-    | Save;
+    | Save
+    | ChangeLang(lang);
 
   let component = ReasonReact.reducerComponent("Editor_Page");
 
@@ -121,6 +122,8 @@ module Editor_Note = {
               }
           ),
         );
+      | ChangeLang(lang) =>
+        ReasonReact.Update({...state, lang, editorContentStatus: Ec_Dirty})
       },
     render: ({state, send}) => {
       let readOnly = !isEditable;
@@ -199,27 +202,25 @@ module Editor_Note = {
                  </>
              )
         </UI_Topbar.Actions>
+        <Helmet>
+          <title>
+            {
+              let title = state.title == "" ? "untitled" : state.title;
+              title->str;
+            }
+          </title>
+        </Helmet>
         <div className="EditorNote__saveStatus">
-          {
-            let status =
-              switch (editorContentStatus) {
-              | Ec_Pristine => ""
-              | Ec_Saved => "Saved"
-              | Ec_Saving => "Saving"
-              | Ec_Dirty => "Unsaved"
-              };
-            status->str;
-          }
+          (
+            switch (editorContentStatus) {
+            | Ec_Pristine => React.null
+            | Ec_Saved => "Saved"->str
+            | Ec_Saving => "Saving"->str
+            | Ec_Dirty => "Unsaved"->str
+            }
+          )
         </div>
         <main className="EditorNote Layout__center">
-          <Helmet>
-            <title>
-              {
-                let title = state.title == "" ? "untitled" : state.title;
-                title->str;
-              }
-            </title>
-          </Helmet>
           <div className="EditorNote__metadata">
             <input
               className="EditorNote__metadata--title"
@@ -239,6 +240,28 @@ module Editor_Note = {
                   />
               )
             )
+            <div className="EditorNote__lang">
+              <button
+                className=(
+                  Cn.make([
+                    "EditorNote__lang--button EditorNote__lang--RE",
+                    Cn.ifTrue(lang == RE, "EditorNote__lang--active"),
+                  ])
+                )
+                onClick=(_ => send(ChangeLang(RE)))>
+                "RE"->str
+              </button>
+              <button
+                className=(
+                  Cn.make([
+                    "EditorNote__lang--button EditorNote__lang--ML",
+                    Cn.ifTrue(lang == ML, "EditorNote__lang--active"),
+                  ])
+                )
+                onClick=(_ => send(ChangeLang(ML)))>
+                "ML"->str
+              </button>
+            </div>
           </div>
           <Editor_Blocks
             lang

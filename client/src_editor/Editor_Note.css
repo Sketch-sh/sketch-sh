@@ -24,6 +24,30 @@
   margin: 0 0 0 8px;
 }
 
+.EditorNote__lang {
+  
+}
+.EditorNote__lang--button {
+  cursor: pointer;
+  padding: var(--space1);
+  border: 0;
+  outline: 0;
+  color: var(--c-text-inverse);
+  opacity: 0.2;
+}
+.EditorNote__lang--button:hover {
+  opacity: 0.5;
+}
+.EditorNote__lang--RE {
+  background: #da4139;
+}
+.EditorNote__lang--ML {
+  background: #ed6f0c;
+}
+.EditorNote__lang--active {
+  opacity: 1 !important;
+}
+
 @keyframes spin {
   0% {
     transform: rotate(0deg);

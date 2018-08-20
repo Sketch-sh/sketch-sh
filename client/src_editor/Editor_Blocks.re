@@ -1,28 +1,6 @@
 [%%debugger.chrome];
 Modules.require("./Editor_Blocks.css");
 
-/* <div className="block__controls--lang">
-     <button
-       className=(
-         Cn.make([
-           "block__controls--langButton block__controls--langButton-RE",
-           Cn.ifTrue(bc_lang == RE, "block__controls--langButton-active"),
-         ])
-       )
-       onClick=(_ => send(Block_ToggleLang(b_id, RE)))>
-       "RE"->str
-     </button>
-     <button
-       className=(
-         Cn.make([
-           "block__controls--langButton block__controls--langButton-ML",
-           Cn.ifTrue(bc_lang == ML, "block__controls--langButton-active"),
-         ])
-       )
-       onClick=(_ => send(Block_ToggleLang(b_id, ML)))>
-       "ML"->str
-     </button>
-   </div>; */
 open Utils;
 open Editor_Types;
 open Editor_Types.Block;
@@ -470,6 +448,7 @@ let make =
                     widgets=bc_widgets
                     readOnly
                     firstLineNumber=bc_firstLineNumber
+                    lang
                   />
                 </div>
                 <div className="block__controls">

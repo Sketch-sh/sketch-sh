@@ -11,32 +11,6 @@
   flex-direction: row-reverse;
 }
 
-.block__controls--lang {
-  flex: 1;
-}
-
-.block__controls--langButton {
-  cursor: pointer;
-  padding: var(--space1);
-  border: 0;
-  outline: 0;
-  color: var(--c-text-inverse);
-  opacity: 0.2;
-}
-.block__controls--langButton:hover {
-  opacity: 0.5;
-}
-
-.block__controls--langButton-RE {
-  background: #da4139;
-}
-.block__controls--langButton-ML {
-  background: #ed6f0c;
-}
-.block__controls--langButton-active {
-  opacity: 1 !important;
-}
-
 .block__controls--buttons {
   display: flex;
 }
