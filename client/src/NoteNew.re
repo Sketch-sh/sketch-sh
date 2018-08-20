@@ -7,7 +7,7 @@ let defaultBlocks = [|
 
 let component = ReasonReact.statelessComponent("Note_New");
 
-let make = (~blocks=defaultBlocks, ~title=?, _children) => {
+let make = (~blocks=defaultBlocks, ~title=?, ~lang, _children) => {
   ...component,
   render: _self =>
     <NoteSave noteKind=New>
@@ -15,6 +15,7 @@ let make = (~blocks=defaultBlocks, ~title=?, _children) => {
            (~noteSaveStatus, ~user as _, ~onSave) =>
              <Editor_Note
                blocks
+               lang
                ?title
                noteSaveStatus
                onSave

@@ -2,6 +2,17 @@ type lang =
   | ML
   | RE;
 
+let stringToLang =
+  fun
+  | "ML" => ML
+  | "RE" => RE
+  | _ => failwith("Unknown language");
+
+let langToString =
+  fun
+  | ML => "ML"
+  | RE => "RE";
+
 module Widget = {
   type lineWidgetData =
     | Lw_Error(string)

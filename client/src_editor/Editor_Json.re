@@ -1,3 +1,4 @@
+open Editor_Types;
 module Block = Editor_Types.Block;
 
 module V1 = {
@@ -20,8 +21,19 @@ module V1 = {
         b_id: json |> field("id", string),
         b_data: json |> field("data", blockDataDecoder),
       };
-    let decode: Js.Json.t => array(Block.block) =
-      json => json |> field("blocks", array(blockDecoder));
+    let langDecoder: Js.Json.t => lang =
+      json => json |> string |> stringToLang;
+    let decode: Js.Json.t => (lang, array(Block.block)) =
+      json => (
+        json
+        |> optional(field("lang", langDecoder))
+        |> (
+          fun
+          | None => RE
+          | Some(lang) => lang
+        ),
+        json |> field("blocks", array(blockDecoder)),
+      );
   };
 
   module JsonEncode = {
@@ -41,9 +53,10 @@ module V1 = {
           ("data", blockDataEncoder(b_data)),
         ]);
 
-    let encode: array(Block.block) => Js.Json.t =
-      blocks =>
+    let encode: (lang, array(Block.block)) => Js.Json.t =
+      (lang, blocks) =>
         object_([
+          ("lang", lang |> langToString |> string),
           (
             "blocks",
             blocks
@@ -52,4 +65,6 @@ module V1 = {
           ),
         ]);
   };
+  let decode = JsonDecode.decode;
+  let encode = JsonEncode.encode;
 };

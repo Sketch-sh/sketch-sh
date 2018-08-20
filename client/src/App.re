@@ -37,22 +37,26 @@ let make = _children => {
           <Layout_WithTopbar>
             ...<AuthStatus.IsAuthenticated>
                  ...(
-                      fun
-                      | Anonymous =>
-                        <NoteNewLazy
-                          title="Sketch.sh - Interactive ReasonML sketchbook"
-                          blocks=Editor_Introduction.blocks
-                        />
-                      | Login(userId) =>
-                        <HomeLazy
-                          fetch=(
-                            () => [%bs.raw
-                              {| import(/* webpackChunkName: "Home" */ "./Home.bs.js") |}
-                            ]
-                          )
-                          onLoading=(() => <UI_FullpageLoading />)
-                          render=(((module Home)) => <Home userId />)
-                        />
+                      user =>
+                        switch (user) {
+                        | Anonymous =>
+                          let (lang, blocks) = Editor_Introduction.blocks;
+                          <NoteNewLazy
+                            title="Sketch.sh - Interactive ReasonML sketchbook"
+                            blocks
+                            lang
+                          />;
+                        | Login(userId) =>
+                          <HomeLazy
+                            fetch=(
+                              () => [%bs.raw
+                                {| import(/* webpackChunkName: "Home" */ "./Home.bs.js") |}
+                              ]
+                            )
+                            onLoading=(() => <UI_FullpageLoading />)
+                            render=(((module Home)) => <Home userId />)
+                          />
+                        }
                     )
                </AuthStatus.IsAuthenticated>
           </Layout_WithTopbar>
@@ -69,7 +73,7 @@ let make = _children => {
                />
           </Layout_WithTopbar>
         | NoteNew =>
-          <Layout_WithTopbar> ...<NoteNewLazy /> </Layout_WithTopbar>
+          <Layout_WithTopbar> ...<NoteNewLazy lang=RE /> </Layout_WithTopbar>
         | User(userName) =>
           <Layout_WithTopbar>
             ...<UserLazy

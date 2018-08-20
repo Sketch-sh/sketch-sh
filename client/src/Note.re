@@ -88,19 +88,19 @@ let make = (~noteInfo: Route.noteRouteConfig, _children) => {
                                        response##note_edit_token->Array.length
                                        > 0
                                      };
+                                   let (lang, blocks) =
+                                     switch (note##data) {
+                                     | None => (Editor_Types.RE, [||])
+                                     | Some(blocks) =>
+                                       blocks->Editor_Json.V1.decode
+                                     };
                                    <Editor_Note
                                      title=note##title->optionToEmptyString
                                      isEditable
                                      noteLastEdited=note##updated_at
                                      noteOwner=note##owner
-                                     blocks=(
-                                       switch (note##data) {
-                                       | None => [||]
-                                       | Some(blocks) =>
-                                         blocks
-                                         ->Editor_Json.V1.JsonDecode.decode
-                                       }
-                                     )
+                                     blocks
+                                     lang
                                      noteSaveStatus
                                      onSave
                                    />;

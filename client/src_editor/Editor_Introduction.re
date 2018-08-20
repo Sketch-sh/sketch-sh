@@ -61,4 +61,4 @@ let blocks =
   ->(Belt.Array.mapU((. data) => {"id": Utils.generateId(), "data": data}))
   ->wrapInBlocks
   ->toJson
-  ->Editor_Json.V1.JsonDecode.decode;
+  ->Editor_Json.V1.decode;

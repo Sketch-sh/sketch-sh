@@ -1,7 +1,7 @@
 [%%debugger.chrome];
 Modules.require("./Editor_Note.css");
 open Utils;
-open Editor_Types.Block;
+open Editor_Types;
 
 module Editor_Note = {
   type editorContentStatus =
@@ -11,16 +11,17 @@ module Editor_Note = {
     | Ec_Saved;
 
   type state = {
+    lang,
     title: string,
     editorContentStatus,
     noteSaveStatus: ref(NoteSave_Types.noteSaveStatus),
-    blocks: ref(array(block)),
+    blocks: ref(array(Block.block)),
     executeCallback: option(unit => unit),
   };
 
   type action =
     | TitleUpdate(string)
-    | BlockUpdate(array(block))
+    | BlockUpdate(array(Block.block))
     | RegisterExecuteCallback(unit => unit)
     | Save;
 
@@ -32,6 +33,7 @@ module Editor_Note = {
         ~noteOwner=?,
         ~noteLastEdited=?,
         ~title="",
+        ~lang=RE,
         ~noteSaveStatus: NoteSave_Types.noteSaveStatus,
         ~isEditable,
         ~onSave,
@@ -40,6 +42,7 @@ module Editor_Note = {
       ) => {
     ...component,
     initialState: () => {
+      lang,
       title,
       editorContentStatus: Ec_Pristine,
       noteSaveStatus: ref(noteSaveStatus),
@@ -106,13 +109,14 @@ module Editor_Note = {
         | Ec_Saving
         | Ec_Saved
         | Ec_Pristine => ()
-        | Ec_Dirty => onSave(~title=state.title, ~data=state.blocks^)
+        | Ec_Dirty =>
+          onSave(~title=state.title, ~data=state.blocks^, ~lang=state.lang)
         };
         ReasonReact.NoUpdate;
       },
     render: ({state, send}) => {
       let readOnly = !isEditable;
-      let {editorContentStatus} = state;
+      let {editorContentStatus, lang} = state;
 
       <>
         <UI_Topbar.Actions>
@@ -171,6 +175,7 @@ module Editor_Note = {
                                   onSave(
                                     ~title=state.title,
                                     ~data=state.blocks^,
+                                    ~lang=state.lang,
                                   );
                                   switch (state.executeCallback) {
                                   | None => ()
@@ -240,6 +245,7 @@ module Editor_Note = {
             )
           </div>
           <Editor_Blocks
+            lang
             blocks
             registerExecuteCallback=(
               callback => send(RegisterExecuteCallback(callback))
@@ -259,6 +265,7 @@ module WithShortcut = {
 
   let make =
       (
+        ~lang=?,
         ~blocks,
         ~noteOwner=?,
         ~noteLastEdited=?,
@@ -274,6 +281,7 @@ module WithShortcut = {
         ...(
              registerShortcut =>
                <Editor_Note
+                 ?lang
                  blocks
                  ?noteOwner
                  ?noteLastEdited

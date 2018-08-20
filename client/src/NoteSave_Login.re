@@ -55,8 +55,12 @@ let make = (~kind, ~userId, ~onSaveNewNote, ~onSaveOldNote, children) => {
                    | NotCalled => NoteSave_Done
                    },
                  ~user=AuthStatus.Login(userId),
-                 ~onSave=(~title, ~data) => {
-                   let data = data->Editor_Json.V1.JsonEncode.encode;
+                 ~onSave=(
+                           ~title,
+                           ~data: array(Editor_Types.Block.block),
+                           ~lang: Editor_Types.lang,
+                         ) => {
+                   let data: Js.Json.t = Editor_Json.V1.encode(lang, data);
                    let noteId = Utils.generateId();
                    let newNote =
                      AddNoteLoginGql.make(
@@ -102,8 +106,8 @@ let make = (~kind, ~userId, ~onSaveNewNote, ~onSaveOldNote, children) => {
                    | NotCalled => NoteSave_Done
                    },
                  ~user=AuthStatus.Login(userId),
-                 ~onSave=(~title, ~data) => {
-                   let data = data->Editor_Json.V1.JsonEncode.encode;
+                 ~onSave=(~title, ~data, ~lang) => {
+                   let data: Js.Json.t = Editor_Json.V1.encode(lang, data);
                    let updatedNote =
                      UpdateNoteGql.make(~title, ~data, ~noteId, ());
                    Js.Promise.(
