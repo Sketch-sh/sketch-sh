@@ -9,12 +9,7 @@ module V1 = {
         let value = json |> field("value", string);
         switch (kind) {
         | "code" =>
-          B_Code({
-            bc_lang: RE,
-            bc_value: value,
-            bc_firstLineNumber: 1,
-            bc_widgets: [||],
-          })
+          B_Code({bc_value: value, bc_firstLineNumber: 1, bc_widgets: [||]})
         | "text" => B_Text(value)
         | _ => raise(Invalid_argument("Unexpected block type: " ++ kind))
         };

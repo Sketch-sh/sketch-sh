@@ -1,3 +1,7 @@
+type lang =
+  | ML
+  | RE;
+
 module Widget = {
   type lineWidgetData =
     | Lw_Error(string)
@@ -11,12 +15,7 @@ module Widget = {
 };
 
 module Block = {
-  type lang =
-    | ML
-    | RE;
-
   type bcode = {
-    bc_lang: lang,
     bc_value: string,
     bc_firstLineNumber: int,
     bc_widgets: array(Widget.t),

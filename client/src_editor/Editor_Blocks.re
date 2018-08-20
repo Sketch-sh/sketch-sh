@@ -1,6 +1,28 @@
 [%%debugger.chrome];
 Modules.require("./Editor_Blocks.css");
 
+/* <div className="block__controls--lang">
+     <button
+       className=(
+         Cn.make([
+           "block__controls--langButton block__controls--langButton-RE",
+           Cn.ifTrue(bc_lang == RE, "block__controls--langButton-active"),
+         ])
+       )
+       onClick=(_ => send(Block_ToggleLang(b_id, RE)))>
+       "RE"->str
+     </button>
+     <button
+       className=(
+         Cn.make([
+           "block__controls--langButton block__controls--langButton-ML",
+           Cn.ifTrue(bc_lang == ML, "block__controls--langButton-active"),
+         ])
+       )
+       onClick=(_ => send(Block_ToggleLang(b_id, ML)))>
+       "ML"->str
+     </button>
+   </div>; */
 open Utils;
 open Editor_Types;
 open Editor_Types.Block;
@@ -15,14 +37,12 @@ type action =
   | Block_UpdateValue(id, string, CodeMirror.EditorChange.t)
   | Block_AddWidgets(id, array(Widget.t))
   | Block_FocusUp(id)
-  | Block_FocusDown(id)
-  | Block_ToggleLang(id, Block.lang);
+  | Block_FocusDown(id);
 
 type state = {
   blocks: array(block),
   stateUpdateReason: option(action),
   focusedBlock: option((id, blockTyp, focusChangeType)),
-  preferLang: Block.lang,
 };
 
 let blockControlsButtons = (b_id, send) =>
@@ -57,6 +77,7 @@ let component = ReasonReact.reducerComponent("Editor_Page");
 
 let make =
     (
+      ~lang=RE,
       ~blocks: array(block),
       ~readOnly=false,
       ~onUpdate,
@@ -69,7 +90,6 @@ let make =
     blocks: blocks->Editor_Blocks_Utils.syncLineNumber,
     stateUpdateReason: None,
     focusedBlock: None,
-    preferLang: RE,
   },
   didMount: self => {
     self.send(Block_Execute(false));
@@ -124,8 +144,7 @@ let make =
 
         | Block_Add(_, _)
         | Block_Delete(_)
-        | Block_UpdateValue(_, _, _)
-        | Block_ToggleLang(_, _) => onUpdate(newSelf.state.blocks)
+        | Block_UpdateValue(_, _, _) => onUpdate(newSelf.state.blocks)
         }
       };
     },
@@ -194,10 +213,7 @@ let make =
             Belt.Array.reduceU([], (. acc, {b_id, b_data}) =>
               switch (b_data) {
               | B_Text(_) => acc
-              | B_Code({bc_value, bc_lang}) => [
-                  (b_id, bc_lang, bc_value),
-                  ...acc,
-                ]
+              | B_Code({bc_value}) => [(b_id, bc_value), ...acc]
               }
             )
           )
@@ -208,7 +224,7 @@ let make =
         (
           self =>
             Js.Promise.(
-              Editor_Worker.executeMany(. allCodeBlocks)
+              Editor_Worker.executeMany(. lang, allCodeBlocks)
               |> then_(results => {
                    results
                    ->(
@@ -292,17 +308,15 @@ let make =
       if (last_block) {
         let new_block = {
           b_id: Utils.generateId(),
-          b_data: Editor_Blocks_Utils.emptyCodeBlock(state.preferLang),
+          b_data: Editor_Blocks_Utils.emptyCodeBlock(),
         };
         ReasonReact.Update({
-          ...state,
           blocks: [|new_block|],
           stateUpdateReason: Some(action),
           focusedBlock: None,
         });
       } else {
         ReasonReact.Update({
-          ...state,
           blocks:
             state.blocks
             ->(Belt.Array.keepU((. {b_id}) => b_id != blockId))
@@ -337,7 +351,6 @@ let make =
     | Block_Add(afterBlockId, blockTyp) =>
       let newBlockId = Utils.generateId();
       ReasonReact.Update({
-        ...state,
         stateUpdateReason: Some(action),
         focusedBlock: Some((newBlockId, blockTyp, FcTyp_BlockNew)),
         blocks:
@@ -359,10 +372,7 @@ let make =
                           b_data:
                             switch (blockTyp) {
                             | BTyp_Text => Editor_Blocks_Utils.emptyTextBlock()
-                            | BTyp_Code =>
-                              Editor_Blocks_Utils.emptyCodeBlock(
-                                state.preferLang,
-                              )
+                            | BTyp_Code => Editor_Blocks_Utils.emptyCodeBlock()
                             },
                         },
                       |],
@@ -430,30 +440,6 @@ let make =
           focusedBlock: Some((lowerBlockId, blockTyp, FcTyp_BlockFocusDown)),
         })
       };
-    | Block_ToggleLang(blockId, lang) =>
-      ReasonReact.Update({
-        ...state,
-        preferLang: lang,
-        blocks:
-          state.blocks
-          ->Belt.Array.mapU(
-              (
-                (. blockContent) => {
-                  let {b_id, b_data} = blockContent;
-                  if (b_id != blockId) {
-                    blockContent;
-                  } else {
-                    let b_data =
-                      switch (b_data) {
-                      | B_Text(_) => b_data
-                      | B_Code(bcode) => B_Code({...bcode, bc_lang: lang})
-                      };
-                    {b_id, b_data};
-                  };
-                }
-              ),
-            ),
-      })
     },
   render: ({send, state}) =>
     <>
@@ -461,7 +447,7 @@ let make =
       ->(
           Belt.Array.mapU((. {b_id, b_data}) =>
             switch (b_data) {
-            | B_Code({bc_lang, bc_value, bc_widgets, bc_firstLineNumber}) =>
+            | B_Code({bc_value, bc_widgets, bc_firstLineNumber}) =>
               <div key=b_id id=b_id className="block__container">
                 <div className="source-editor">
                   <Editor_CodeBlock
@@ -488,34 +474,6 @@ let make =
                 </div>
                 <div className="block__controls">
                   (readOnly ? React.null : blockControlsButtons(b_id, send))
-                  <div className="block__controls--lang">
-                    <button
-                      className=(
-                        Cn.make([
-                          "block__controls--langButton block__controls--langButton-RE",
-                          Cn.ifTrue(
-                            bc_lang == RE,
-                            "block__controls--langButton-active",
-                          ),
-                        ])
-                      )
-                      onClick=(_ => send(Block_ToggleLang(b_id, RE)))>
-                      "RE"->str
-                    </button>
-                    <button
-                      className=(
-                        Cn.make([
-                          "block__controls--langButton block__controls--langButton-ML",
-                          Cn.ifTrue(
-                            bc_lang == ML,
-                            "block__controls--langButton-active",
-                          ),
-                        ])
-                      )
-                      onClick=(_ => send(Block_ToggleLang(b_id, ML)))>
-                      "ML"->str
-                    </button>
-                  </div>
                 </div>
               </div>
             | B_Text(text) =>

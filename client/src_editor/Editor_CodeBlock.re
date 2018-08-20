@@ -4,7 +4,7 @@ type state = {
   lineWidgets: ref(list(CodeMirror.LineWidget.t)),
   codeBlockWidgets: array(Widget.t),
   firstLineNumber: int,
-  lang: Block.lang,
+  lang,
 };
 
 let component = ReasonReact.reducerComponent("Editor_CodeBlock");
@@ -17,8 +17,8 @@ let getEditor = (state, ~default, ~f) =>
 
 let langToMode =
   fun
-  | Block.RE => "reason"
-  | Block.ML => "mllike";
+  | RE => "reason"
+  | ML => "mllike";
 
 let make =
     (
@@ -32,7 +32,7 @@ let make =
       ~onBlockUp=?,
       ~onBlockDown=?,
       ~readOnly=?,
-      ~lang=Block.RE,
+      ~lang=RE,
       _children,
     )
     : ReasonReact.component(state, _, unit) => {
