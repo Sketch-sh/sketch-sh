@@ -72,8 +72,10 @@ let make = _children => {
                  render=(((module Note)) => <Note noteInfo />)
                />
           </Layout_WithTopbar>
-        | NoteNew =>
-          <Layout_WithTopbar> ...<NoteNewLazy lang=RE /> </Layout_WithTopbar>
+        | NoteTemplateChoose =>
+          <Layout_WithTopbar> ...<NoteTemplateChoose /> </Layout_WithTopbar>
+        | NoteNew(lang) =>
+          <Layout_WithTopbar> ...<NoteNewLazy lang /> </Layout_WithTopbar>
         | User(userName) =>
           <Layout_WithTopbar>
             ...<UserLazy

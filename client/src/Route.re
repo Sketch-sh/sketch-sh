@@ -10,7 +10,8 @@ type noteRouteConfig = {
 type t =
   | Home
   | Note(noteRouteConfig)
-  | NoteNew
+  | NoteNew(Editor_Types.lang)
+  | NoteTemplateChoose
   | User(string)
   | AuthGithub
   | AuthFailure
@@ -24,7 +25,9 @@ let routeToUrl: t => string =
   fun
   | Home => "/"
   | Note({noteId, data: _}) => {j|/s/$(noteId)/|j}
-  | NoteNew => "/new"
+  | NoteNew(ML) => "/s/ml"
+  | NoteNew(RE) => "/s/re"
+  | NoteTemplateChoose => "/s"
   | User(userName) => "/u/" ++ userName
   | AuthGithub => "/auth/github"
   | AuthFailure => "/auth/failure"
@@ -41,7 +44,11 @@ let urlToRoute: ReasonReact.Router.url => t =
     | [""]
     | []
     | ["/"] => Home
-    | ["new"] => NoteNew
+    | ["new"]
+    | ["s", "re"] => NoteNew(RE)
+    | ["ml"]
+    | ["s", "ml"] => NoteNew(ML)
+    | ["s"] => NoteTemplateChoose
     | ["u", username] => User(username)
     | ["auth", "github"] => AuthGithub
     | ["auth", "failure"] => AuthFailure
