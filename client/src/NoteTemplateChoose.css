@@ -19,8 +19,9 @@
 }
 
 .NoteTC__select--link {
-  display: inline-block;
-  padding: var(--space3);
+  display: block;
+  padding: var(--space5) var(--space3);
+  border-radius: 4px;
 }
 
 .NoteTC__select--link:hover {

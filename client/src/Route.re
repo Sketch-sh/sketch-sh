@@ -25,9 +25,9 @@ let routeToUrl: t => string =
   fun
   | Home => "/"
   | Note({noteId, data: _}) => {j|/s/$(noteId)/|j}
-  | NoteNew(ML) => "/s/ml"
-  | NoteNew(RE) => "/s/re"
-  | NoteTemplateChoose => "/s"
+  | NoteNew(ML) => "/new/ocaml"
+  | NoteNew(RE) => "/new/reason"
+  | NoteTemplateChoose => "/new"
   | User(userName) => "/u/" ++ userName
   | AuthGithub => "/auth/github"
   | AuthFailure => "/auth/failure"
@@ -44,11 +44,12 @@ let urlToRoute: ReasonReact.Router.url => t =
     | [""]
     | []
     | ["/"] => Home
-    | ["new"]
-    | ["s", "re"] => NoteNew(RE)
+    | ["re"]
+    | ["new", "reason"] => NoteNew(RE)
     | ["ml"]
-    | ["s", "ml"] => NoteNew(ML)
-    | ["s"] => NoteTemplateChoose
+    | ["new", "ocaml"]
+    | ["new", "ml"] => NoteNew(ML)
+    | ["new"] => NoteTemplateChoose
     | ["u", username] => User(username)
     | ["auth", "github"] => AuthGithub
     | ["auth", "failure"] => AuthFailure
