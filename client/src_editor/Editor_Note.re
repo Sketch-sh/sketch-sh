@@ -112,7 +112,15 @@ module Editor_Note = {
         | Ec_Dirty =>
           onSave(~title=state.title, ~data=state.blocks^, ~lang=state.lang)
         };
-        ReasonReact.NoUpdate;
+        ReasonReact.SideEffects(
+          (
+            ({state}) =>
+              switch (state.executeCallback) {
+              | None => ()
+              | Some(callback) => callback()
+              }
+          ),
+        );
       },
     render: ({state, send}) => {
       let readOnly = !isEditable;
@@ -132,7 +140,7 @@ module Editor_Note = {
                    <UI_Balloon
                      position=Down
                      length=Fit
-                     message="Execute code (Shift+Enter)">
+                     message="Execute code (Ctrl+Enter)">
                      ...<button
                           className=buttonClassName
                           onClick=(
@@ -170,19 +178,7 @@ module Editor_Note = {
                                 }
                               )
                               className=buttonClassName
-                              onClick=(
-                                _ => {
-                                  onSave(
-                                    ~title=state.title,
-                                    ~data=state.blocks^,
-                                    ~lang=state.lang,
-                                  );
-                                  switch (state.executeCallback) {
-                                  | None => ()
-                                  | Some(callback) => callback()
-                                  };
-                                }
-                              )>
+                              onClick=(_ => send(Save))>
                               (
                                 switch (editorContentStatus) {
                                 | Ec_Saving =>
