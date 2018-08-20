@@ -22,4 +22,17 @@ context("Note template choose", () => {
       .get("input[id=ML]")
       .should("be.checked");
   });
+
+  it("/ml as an alias for ocaml", () => {
+    cy.visit("ml");
+    cy.get(`fieldset[aria-label="Language toggle"]`)
+      .get("input[id=ML]")
+      .should("be.checked");
+  })
+  it("/re as an alias for reason", () => {
+    cy.visit("re");
+    cy.get(`fieldset[aria-label="Language toggle"]`)
+      .get("input[id=RE]")
+      .should("be.checked");
+  })
 });
