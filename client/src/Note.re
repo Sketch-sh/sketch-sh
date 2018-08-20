@@ -29,10 +29,10 @@ open Utils;
  * This module will ensure url encoded data always in the URL
  * on initial note load
  */
-module EnsureUrlEncodedData = {
+module RedirectSketchURL = {
   type action =
     | NoteLoaded;
-  let component = ReasonReact.reducerComponent("Note_EnsureUrlEncodedData");
+  let component = ReasonReact.reducerComponent("Note_RedirectSketchURL");
 
   let make = (~noteId, children): React.component(unit, 'a, action) => {
     ...component,
@@ -66,7 +66,7 @@ let make = (~noteInfo: Route.noteRouteConfig, _children) => {
                notes
                ->(
                    arrayFirst(~empty=<NotFound entity="note" />, ~render=note =>
-                     <EnsureUrlEncodedData noteId=noteInfo.noteId>
+                     <RedirectSketchURL noteId=noteInfo.noteId>
                        ...<NoteSave noteKind=(Old(noteInfo.noteId))>
                             ...(
                                  (~noteSaveStatus, ~user, ~onSave) => {
@@ -107,7 +107,7 @@ let make = (~noteInfo: Route.noteRouteConfig, _children) => {
                                  }
                                )
                           </NoteSave>
-                     </EnsureUrlEncodedData>
+                     </RedirectSketchURL>
                    )
                  );
              }
