@@ -53,7 +53,7 @@
     "subscriptions-transport-ws": "^0.9.14"
   },
   "devDependencies": {
-    "@glennsl/bs-jest": "^0.4.2",
+    "@glennsl/bs-jest": "^0.4.3",
     "babel-jest": "^23.4.0",
     "babel-preset-env": "^1.7.0",
     "bs-platform": "^4.0.3",

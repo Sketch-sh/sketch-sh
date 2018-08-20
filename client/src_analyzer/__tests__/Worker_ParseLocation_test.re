@@ -18,8 +18,6 @@ Error: Unbound value random_gaussian
 
 let parse = Worker_ParseLocation.parse;
 
-/* open Worker_Types.CompilerErrorMessage; */
-
 describe("parsing error messages from ocaml compiler", () => {
   open Expect;
   open! Expect.Operators;

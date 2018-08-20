@@ -12,7 +12,7 @@ let renderErrorIndicator = (colStart, colEnd, content) =>
 
 let executeResultToWidget = (result: list(Worker_Types.blockData)) => {
   open Worker_Types;
-  open Editor_CodeBlockTypes;
+  open Editor_Types;
 
   let widgets =
     result

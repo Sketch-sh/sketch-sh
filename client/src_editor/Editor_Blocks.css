@@ -6,6 +6,7 @@
 
 .block__controls {
   margin-top: var(--space1);
+  margin-left: calc(var(--cm-gutter-width));
   display: flex;
   flex-direction: row-reverse;
 }

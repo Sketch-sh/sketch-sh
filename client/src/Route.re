@@ -12,7 +12,6 @@ type t =
   | Note(noteRouteConfig)
   | NoteNew
   | User(string)
-  | EditorDevelopment
   | AuthGithub
   | AuthFailure
   | AuthCallback(string)
@@ -34,7 +33,6 @@ let routeToUrl: t => string =
     )
   | NoteNew => "/new"
   | User(userName) => "/u/" ++ userName
-  | EditorDevelopment => "/____EDITOR-DEVELOPMENT____"
   | AuthGithub => "/auth/github"
   | AuthFailure => "/auth/failure"
   | AuthCallback(token) => "/auth/callback?token=" ++ token
@@ -52,7 +50,6 @@ let urlToRoute: ReasonReact.Router.url => t =
     | ["/"] => Home
     | ["new"] => NoteNew
     | ["u", username] => User(username)
-    | ["____EDITOR-DEVELOPMENT____"] => EditorDevelopment
     | ["auth", "github"] => AuthGithub
     | ["auth", "failure"] => AuthFailure
     | ["auth", "callback"] =>

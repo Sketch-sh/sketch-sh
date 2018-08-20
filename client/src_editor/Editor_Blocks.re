@@ -2,7 +2,7 @@
 Modules.require("./Editor_Blocks.css");
 
 open Utils;
-open Editor_CodeBlockTypes;
+open Editor_Types;
 open Editor_Types.Block;
 
 type action =
@@ -55,6 +55,7 @@ let component = ReasonReact.reducerComponent("Editor_Page");
 
 let make =
     (
+      ~lang=RE,
       ~blocks: array(block),
       ~readOnly=false,
       ~onUpdate,
@@ -201,7 +202,7 @@ let make =
         (
           self =>
             Js.Promise.(
-              Editor_Worker.executeMany(. allCodeBlocks)
+              Editor_Worker.executeMany(. lang, allCodeBlocks)
               |> then_(results => {
                    results
                    ->(
@@ -258,10 +259,7 @@ let make =
                             let currentWidgets = bcode.bc_widgets;
                             currentWidgets
                             ->(
-                                Belt.Array.keepU(
-                                  (.
-                                    {Editor_CodeBlockTypes.Widget.lw_line, _},
-                                  ) =>
+                                Belt.Array.keepU((. {Widget.lw_line, _}) =>
                                   lw_line < removeWidgetBelowMe
                                 )
                               );
@@ -426,65 +424,69 @@ let make =
       state.blocks
       ->(
           Belt.Array.mapU((. {b_id, b_data}) =>
-            <div key=b_id id=b_id className="block__container">
-              (
-                switch (b_data) {
-                | B_Code({bc_value, bc_widgets, bc_firstLineNumber}) =>
-                  <div className="source-editor">
-                    <Editor_CodeBlock
-                      value=bc_value
-                      focused=(
-                        switch (state.focusedBlock) {
-                        | None => None
-                        | Some((id, _blockTyp, changeTyp)) =>
-                          id == b_id ? Some(changeTyp) : None
-                        }
-                      )
-                      onChange=(
-                        (newValue, diff) =>
-                          send(Block_UpdateValue(b_id, newValue, diff))
-                      )
-                      onBlur=(() => send(Block_Blur(b_id)))
-                      onFocus=(() => send(Block_Focus(b_id, BTyp_Code)))
-                      onBlockUp=(() => send(Block_FocusUp(b_id)))
-                      onBlockDown=(() => send(Block_FocusDown(b_id)))
-                      widgets=bc_widgets
-                      readOnly
-                      firstLineNumber=bc_firstLineNumber
-                    />
-                  </div>
-                | B_Text(text) =>
-                  <div className="text-editor">
-                    <Editor_TextBlock
-                      value=text
-                      focused=(
-                        switch (state.focusedBlock) {
-                        | None => None
-                        | Some((id, _blockTyp, changeTyp)) =>
-                          id == b_id ? Some(changeTyp) : None
-                        }
-                      )
-                      onBlur=(() => send(Block_Blur(b_id)))
-                      onFocus=(() => send(Block_Focus(b_id, BTyp_Text)))
-                      onBlockUp=(() => send(Block_FocusUp(b_id)))
-                      onBlockDown=(() => send(Block_FocusDown(b_id)))
-                      onChange=(
-                        (newValue, diff) =>
-                          send(Block_UpdateValue(b_id, newValue, diff))
-                      )
-                      readOnly
-                    />
-                  </div>
-                }
-              )
-              (
-                readOnly ?
-                  React.null :
-                  <div className="block__controls">
-                    (blockControlsButtons(b_id, send))
-                  </div>
-              )
-            </div>
+            switch (b_data) {
+            | B_Code({bc_value, bc_widgets, bc_firstLineNumber}) =>
+              <div key=b_id id=b_id className="block__container">
+                <div className="source-editor">
+                  <Editor_CodeBlock
+                    value=bc_value
+                    focused=(
+                      switch (state.focusedBlock) {
+                      | None => None
+                      | Some((id, _blockTyp, changeTyp)) =>
+                        id == b_id ? Some(changeTyp) : None
+                      }
+                    )
+                    onChange=(
+                      (newValue, diff) =>
+                        send(Block_UpdateValue(b_id, newValue, diff))
+                    )
+                    onBlur=(() => send(Block_Blur(b_id)))
+                    onFocus=(() => send(Block_Focus(b_id, BTyp_Code)))
+                    onBlockUp=(() => send(Block_FocusUp(b_id)))
+                    onBlockDown=(() => send(Block_FocusDown(b_id)))
+                    widgets=bc_widgets
+                    readOnly
+                    firstLineNumber=bc_firstLineNumber
+                    lang
+                  />
+                </div>
+                <div className="block__controls">
+                  (readOnly ? React.null : blockControlsButtons(b_id, send))
+                </div>
+              </div>
+            | B_Text(text) =>
+              <div key=b_id id=b_id className="block__container">
+                <div className="text-editor">
+                  <Editor_TextBlock
+                    value=text
+                    focused=(
+                      switch (state.focusedBlock) {
+                      | None => None
+                      | Some((id, _blockTyp, changeTyp)) =>
+                        id == b_id ? Some(changeTyp) : None
+                      }
+                    )
+                    onBlur=(() => send(Block_Blur(b_id)))
+                    onFocus=(() => send(Block_Focus(b_id, BTyp_Text)))
+                    onBlockUp=(() => send(Block_FocusUp(b_id)))
+                    onBlockDown=(() => send(Block_FocusDown(b_id)))
+                    onChange=(
+                      (newValue, diff) =>
+                        send(Block_UpdateValue(b_id, newValue, diff))
+                    )
+                    readOnly
+                  />
+                </div>
+                (
+                  readOnly ?
+                    React.null :
+                    <div className="block__controls">
+                      (blockControlsButtons(b_id, send))
+                    </div>
+                )
+              </div>
+            }
           )
         )
       ->ReasonReact.array

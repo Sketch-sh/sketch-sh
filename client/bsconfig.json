@@ -13,6 +13,10 @@
     {
       "dir": "src_analyzer/__tests__",
       "type": "dev"
+    },
+    {
+      "dir": "src_editor/__tests__",
+      "type": "dev"
     }
   ],
   "package-specs": [

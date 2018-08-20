@@ -70,11 +70,16 @@ module Make = (ESig: Worker_Evaluator.EvaluatorSig) => {
     };
 
   let executeMany:
-    (. list((string, string))) => list((string, list(blockData))) =
-    (. codeBlocks) => {
+    (. Editor_Types.lang, list((string, string))) =>
+    list((string, list(blockData))) =
+    (. lang, codeBlocks) => {
       /* Reset before evaluating several blocks */
       Evaluator.reset();
 
+      switch (lang) {
+      | Editor_Types.ML => Evaluator.mlSyntax()
+      | Editor_Types.RE => Evaluator.reSyntax()
+      };
       /*
        * Execute blocks in order
        * Stop when encountering error in a block

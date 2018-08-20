@@ -116,9 +116,7 @@ context("keyboard shortcuts", () => {
       .type("let a: string = 1;", { force: true });
     assertErrorsOrWarnings(0);
 
-    cy.get("body")
-      .focus()
-      .type("{ctrl}{enter}");
+    shortcut("{ctrl}{enter}");
     assertErrorsOrWarnings(1);
 
     cy.get("@block1")
@@ -132,6 +130,119 @@ context("keyboard shortcuts", () => {
     cy.get("@block1")
       .get(".widget__value")
       .should("contain", "let a: int = 1;");
+  });
+});
+
+context("language toggle", () => {
+  it("should have language switcher", () => {
+    cy.visit("new");
+
+    cy.get(`fieldset[aria-label="Language toggle"]`).should("be.visible");
+  });
+
+  it("should be default to ReasonML", () => {
+    cy.visit("new");
+    cy.get(`fieldset[aria-label="Language toggle"]`)
+      .get("input[id=RE]")
+      .should("be.checked");
+  });
+
+  it("should persist language to database - ReasonML", () => {
+    cy.visit("new");
+
+    cy.get(`fieldset[aria-label="Language toggle"]`)
+      .get("input[id=RE]")
+      .should("be.checked");
+
+    cy.get(".block__container")
+      .first()
+      .as("block1")
+      .find("textarea")
+      .as("code1")
+      .type(
+        `let value = "awesome";
+      switch (value) {
+      | "awesome" => true
+      | _ => false
+      };`,
+        { force: true }
+      );
+    shortcut("{ctrl}{enter}");
+    assertErrorsOrWarnings(0);
+    cy.get("@block1")
+      .find(".widget__value")
+      .eq(1)
+      .should("have.text", "- : bool = true\n");
+
+    shortcut("{ctrl}s");
+    cy.url().should("match", /s\/.+/, "should not be new route");
+    cy.reload();
+    cy.get("@block1")
+      .find(".widget__value")
+      .eq(1)
+      .should("have.text", "- : bool = true\n");
+  });
+
+  it("should persist language to database - OCaml", () => {
+    cy.visit("new");
+
+    cy.get("input[id=ML]").check({ force: true });
+
+    cy.get(".block__container")
+      .first()
+      .as("block1")
+      .find("textarea")
+      .as("code1")
+      .type(
+        `let value = "awesome" in
+      match value with
+      | "awesome" -> true
+      | _ -> false`,
+        { force: true }
+      );
+    shortcut("{ctrl}{enter}");
+    assertErrorsOrWarnings(0);
+    cy.get("@block1")
+      .find(".widget__value")
+      .eq(0)
+      .should("have.text", "- : bool = true\n");
+
+    shortcut("{ctrl}s");
+    cy.url().should("match", /s\/.+/, "should not be new route");
+    cy.reload();
+    cy.get(`fieldset[aria-label="Language toggle"]`)
+      .get("input[id=ML]")
+      .should("be.checked");
+    cy.get("@block1")
+      .find(".widget__value")
+      .eq(0)
+      .should("have.text", "- : bool = true\n");
+  });
+
+  it("should execute the code when language changed", () => {
+    cy.visit("new");
+
+    cy.get(`fieldset[aria-label="Language toggle"]`)
+      .get("input[id=RE]")
+      .should("be.checked");
+
+    cy.get(".block__container")
+      .first()
+      .as("block1")
+      .find("textarea")
+      .as("code1")
+      .type(
+        `let value = "awesome";
+      switch (value) {
+      | "awesome" => true
+      | _ => false
+      };`,
+        { force: true }
+      );
+    shortcut("{ctrl}{enter}");
+    assertErrorsOrWarnings(0);
+    cy.get("input[id=ML]").check({ force: true });
+    assertErrorsOrWarnings(1);
   });
 });
 

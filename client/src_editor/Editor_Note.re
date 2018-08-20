@@ -1,7 +1,7 @@
 [%%debugger.chrome];
 Modules.require("./Editor_Note.css");
 open Utils;
-open Editor_Types.Block;
+open Editor_Types;
 
 module Editor_Note = {
   type editorContentStatus =
@@ -11,18 +11,20 @@ module Editor_Note = {
     | Ec_Saved;
 
   type state = {
+    lang,
     title: string,
     editorContentStatus,
     noteSaveStatus: ref(NoteSave_Types.noteSaveStatus),
-    blocks: ref(array(block)),
+    blocks: ref(array(Block.block)),
     executeCallback: option(unit => unit),
   };
 
   type action =
     | TitleUpdate(string)
-    | BlockUpdate(array(block))
+    | BlockUpdate(array(Block.block))
     | RegisterExecuteCallback(unit => unit)
-    | Save;
+    | Save
+    | ChangeLang(lang);
 
   let component = ReasonReact.reducerComponent("Editor_Page");
 
@@ -32,6 +34,7 @@ module Editor_Note = {
         ~noteOwner=?,
         ~noteLastEdited=?,
         ~title="",
+        ~lang=RE,
         ~noteSaveStatus: NoteSave_Types.noteSaveStatus,
         ~isEditable,
         ~onSave,
@@ -40,6 +43,7 @@ module Editor_Note = {
       ) => {
     ...component,
     initialState: () => {
+      lang,
       title,
       editorContentStatus: Ec_Pristine,
       noteSaveStatus: ref(noteSaveStatus),
@@ -106,13 +110,33 @@ module Editor_Note = {
         | Ec_Saving
         | Ec_Saved
         | Ec_Pristine => ()
-        | Ec_Dirty => onSave(~title=state.title, ~data=state.blocks^)
+        | Ec_Dirty =>
+          onSave(~title=state.title, ~data=state.blocks^, ~lang=state.lang)
         };
-        ReasonReact.NoUpdate;
+        ReasonReact.SideEffects(
+          (
+            ({state}) =>
+              switch (state.executeCallback) {
+              | None => ()
+              | Some(callback) => callback()
+              }
+          ),
+        );
+      | ChangeLang(lang) =>
+        ReasonReact.UpdateWithSideEffects(
+          {...state, lang, editorContentStatus: Ec_Dirty},
+          (
+            ({state}) =>
+              switch (state.executeCallback) {
+              | None => ()
+              | Some(callback) => callback()
+              }
+          ),
+        )
       },
     render: ({state, send}) => {
       let readOnly = !isEditable;
-      let {editorContentStatus} = state;
+      let {editorContentStatus, lang} = state;
 
       <>
         <UI_Topbar.Actions>
@@ -128,7 +152,7 @@ module Editor_Note = {
                    <UI_Balloon
                      position=Down
                      length=Fit
-                     message="Execute code (Shift+Enter)">
+                     message="Execute code (Ctrl+Enter)">
                      ...<button
                           className=buttonClassName
                           onClick=(
@@ -166,18 +190,7 @@ module Editor_Note = {
                                 }
                               )
                               className=buttonClassName
-                              onClick=(
-                                _ => {
-                                  onSave(
-                                    ~title=state.title,
-                                    ~data=state.blocks^,
-                                  );
-                                  switch (state.executeCallback) {
-                                  | None => ()
-                                  | Some(callback) => callback()
-                                  };
-                                }
-                              )>
+                              onClick=(_ => send(Save))>
                               (
                                 switch (editorContentStatus) {
                                 | Ec_Saving =>
@@ -198,27 +211,25 @@ module Editor_Note = {
                  </>
              )
         </UI_Topbar.Actions>
+        <Helmet>
+          <title>
+            {
+              let title = state.title == "" ? "untitled" : state.title;
+              title->str;
+            }
+          </title>
+        </Helmet>
         <div className="EditorNote__saveStatus">
-          {
-            let status =
-              switch (editorContentStatus) {
-              | Ec_Pristine => ""
-              | Ec_Saved => "Saved"
-              | Ec_Saving => "Saving"
-              | Ec_Dirty => "Unsaved"
-              };
-            status->str;
-          }
+          (
+            switch (editorContentStatus) {
+            | Ec_Pristine => React.null
+            | Ec_Saved => "Saved"->str
+            | Ec_Saving => "Saving"->str
+            | Ec_Dirty => "Unsaved"->str
+            }
+          )
         </div>
         <main className="EditorNote Layout__center">
-          <Helmet>
-            <title>
-              {
-                let title = state.title == "" ? "untitled" : state.title;
-                title->str;
-              }
-            </title>
-          </Helmet>
           <div className="EditorNote__metadata">
             <input
               className="EditorNote__metadata--title"
@@ -227,19 +238,51 @@ module Editor_Note = {
               onChange=(event => valueFromEvent(event)->TitleUpdate->send)
               readOnly
             />
-            (
-              noteOwner
-              =>> (
-                noteOwner =>
-                  <UI_SketchOwnerInfo
-                    owner=noteOwner
-                    ?noteLastEdited
-                    className="EditorNote__owner"
-                  />
+            <div className="EditorNote__metadata--info">
+              <UI_Balloon message="Sketch language" position=Down>
+                ...<fieldset
+                     className="EditorNote__lang" ariaLabel="Language toggle">
+                     <span>
+                       <input
+                         type_="radio"
+                         id="RE"
+                         name="language"
+                         checked=(lang == RE)
+                         onChange=(_ => send(ChangeLang(RE)))
+                       />
+                       <label htmlFor="RE" className="EditorNote__lang--RE">
+                         "RE"->str
+                       </label>
+                     </span>
+                     <span>
+                       <input
+                         type_="radio"
+                         id="ML"
+                         name="language"
+                         checked=(lang == ML)
+                         onChange=(_ => send(ChangeLang(ML)))
+                       />
+                       <label htmlFor="ML" className="EditorNote__lang--ML">
+                         "ML"->str
+                       </label>
+                     </span>
+                   </fieldset>
+              </UI_Balloon>
+              (
+                noteOwner
+                =>> (
+                  noteOwner =>
+                    <UI_SketchOwnerInfo
+                      owner=noteOwner
+                      ?noteLastEdited
+                      className="EditorNote__owner"
+                    />
+                )
               )
-            )
+            </div>
           </div>
           <Editor_Blocks
+            lang
             blocks
             registerExecuteCallback=(
               callback => send(RegisterExecuteCallback(callback))
@@ -259,6 +302,7 @@ module WithShortcut = {
 
   let make =
       (
+        ~lang=?,
         ~blocks,
         ~noteOwner=?,
         ~noteLastEdited=?,
@@ -274,6 +318,7 @@ module WithShortcut = {
         ...(
              registerShortcut =>
                <Editor_Note
+                 ?lang
                  blocks
                  ?noteOwner
                  ?noteLastEdited
