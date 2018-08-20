@@ -23,6 +23,7 @@
   margin: 0 0 0 8px;
   display: flex;
   flex-direction: row-reverse;
+  align-items: center;
 }
 
 .EditorNote__owner {
@@ -30,29 +31,46 @@
 }
 
 .EditorNote__lang {
-  font-size: var(--f4);
-}
-
-.EditorNote__lang--button {
-  cursor: pointer;
-  padding: var(--space1);
+  font-size: var(--f5);
+  display: block;
   border: 0;
-  outline: 0;
-  color: var(--c-text-inverse);
-  opacity: 0.2;
+  padding: 0;
+  margin: 0;
 }
 
-.EditorNote__lang--button:hover {
-  opacity: 0.5;
+.EditorNote__lang--ML {
+  background: #ed6f0c;
 }
 .EditorNote__lang--RE {
   background: #da4139;
 }
-.EditorNote__lang--ML {
-  background: #ed6f0c;
-}
-.EditorNote__lang--active {
-  opacity: 1 !important;
+
+.EditorNote__lang input[type="radio"] {
+  border: 0;
+  clip: rect(0px, 0px, 0px, 0px);
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  padding: 0;
+  position: absolute;
+  width: 1px;
+
+  & + label {
+    cursor: pointer;
+    padding: var(--space1);
+    border: 0;
+    outline: 0;
+    color: var(--c-text-inverse);
+    opacity: 0.2;
+  }
+
+  &:checked + label {
+    opacity: 1;
+  }
+
+  &:focus + label {
+    outline: auto 5px -webkit-focus-ring-color;
+  }
 }
 
 @keyframes spin {

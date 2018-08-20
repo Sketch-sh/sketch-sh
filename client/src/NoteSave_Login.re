@@ -102,7 +102,6 @@ let make = (~kind, ~userId, ~onSaveNewNote, ~onSaveOldNote, children) => {
                          NoteSave_Error;
                        }
                      }
-
                    | NotCalled => NoteSave_Done
                    },
                  ~user=AuthStatus.Login(userId),

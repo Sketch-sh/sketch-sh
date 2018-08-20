@@ -230,28 +230,34 @@ module Editor_Note = {
               readOnly
             />
             <div className="EditorNote__metadata--info">
-              <div className="EditorNote__lang">
-                <button
-                  className=(
-                    Cn.make([
-                      "EditorNote__lang--button EditorNote__lang--RE",
-                      Cn.ifTrue(lang == RE, "EditorNote__lang--active"),
-                    ])
-                  )
-                  onClick=(_ => send(ChangeLang(RE)))>
-                  "RE"->str
-                </button>
-                <button
-                  className=(
-                    Cn.make([
-                      "EditorNote__lang--button EditorNote__lang--ML",
-                      Cn.ifTrue(lang == ML, "EditorNote__lang--active"),
-                    ])
-                  )
-                  onClick=(_ => send(ChangeLang(ML)))>
-                  "ML"->str
-                </button>
-              </div>
+              <UI_Balloon message="Sketch language" position=Down>
+                ...<fieldset className="EditorNote__lang">
+                     <span>
+                       <input
+                         type_="radio"
+                         id="RE"
+                         name="language"
+                         checked=(lang == RE)
+                         onChange=(_ => send(ChangeLang(RE)))
+                       />
+                       <label htmlFor="RE" className="EditorNote__lang--RE">
+                         "RE"->str
+                       </label>
+                     </span>
+                     <span>
+                       <input
+                         type_="radio"
+                         id="ML"
+                         name="language"
+                         checked=(lang == ML)
+                         onChange=(_ => send(ChangeLang(ML)))
+                       />
+                       <label htmlFor="ML" className="EditorNote__lang--ML">
+                         "ML"->str
+                       </label>
+                     </span>
+                   </fieldset>
+              </UI_Balloon>
               (
                 noteOwner
                 =>> (
