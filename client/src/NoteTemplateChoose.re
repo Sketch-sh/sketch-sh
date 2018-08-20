@@ -109,6 +109,7 @@ let make = _children => {
       <section className="NoteTC__select">
         <div className="NoteTC__select--element">
           <Router.Link
+            id="re"
             route=(Route.NoteNew(RE))
             className="NoteTC__select--link"
             title="Create ReasonML Sketch">
@@ -117,6 +118,7 @@ let make = _children => {
         </div>
         <div className="NoteTC__select--element">
           <Router.Link
+            id="ml"
             route=(Route.NoteNew(ML))
             className="NoteTC__select--link"
             title="Create ReasonML Sketch">
