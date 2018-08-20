@@ -38,11 +38,13 @@
   margin: 0;
 }
 
+.EditorNote__lang--RE {
+  border-radius: 2px 0 0 2px;
+  background: #da4139;
+}
 .EditorNote__lang--ML {
   background: #ed6f0c;
-}
-.EditorNote__lang--RE {
-  background: #da4139;
+  border-radius: 0 2px 2px 0;
 }
 
 .EditorNote__lang input[type="radio"] {
