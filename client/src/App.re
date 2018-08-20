@@ -77,7 +77,7 @@ let make = _children => {
             ...<NoteTemplateChooseLazy
                  fetch=(
                    () => [%bs.raw
-                     {| import(/* webpackChunkName: "Note" */ "./Note.bs.js") |}
+                     {| import(/* webpackChunkName: "NoteTemplateChoose" */ "./NoteTemplateChoose.bs.js") |}
                    ]
                  )
                  onLoading=(() => <UI_FullpageLoading />)
