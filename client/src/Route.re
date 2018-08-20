@@ -23,14 +23,7 @@ type route = t;
 let routeToUrl: t => string =
   fun
   | Home => "/"
-  | Note({noteId, data}) =>
-    {j|/s/$(noteId)/|j}
-    ++ (
-      switch (data) {
-      | None => ""
-      | Some(data) => data
-      }
-    )
+  | Note({noteId, data: _}) => {j|/s/$(noteId)/|j}
   | NoteNew => "/new"
   | User(userName) => "/u/" ++ userName
   | AuthGithub => "/auth/github"
