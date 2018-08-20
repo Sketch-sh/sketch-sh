@@ -73,7 +73,19 @@ let make = _children => {
                />
           </Layout_WithTopbar>
         | NoteTemplateChoose =>
-          <Layout_WithTopbar> ...<NoteTemplateChoose /> </Layout_WithTopbar>
+          <Layout_WithTopbar>
+            ...<NoteTemplateChooseLazy
+                 fetch=(
+                   () => [%bs.raw
+                     {| import(/* webpackChunkName: "Note" */ "./Note.bs.js") |}
+                   ]
+                 )
+                 onLoading=(() => <UI_FullpageLoading />)
+                 render=(
+                   ((module NoteTemplateChoose)) => <NoteTemplateChoose />
+                 )
+               />
+          </Layout_WithTopbar>
         | NoteNew(lang) =>
           <Layout_WithTopbar> ...<NoteNewLazy lang /> </Layout_WithTopbar>
         | User(userName) =>
