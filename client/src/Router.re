@@ -100,10 +100,11 @@ let replaceSilent = route => replaceSilentUnsafe(Route.routeToUrl(route));
 module LinkUnsafe = {
   let component = ReasonReact.statelessComponent("LinkUnsafe");
 
-  let make = (~href, ~className=?, ~title=?, ~popup, ~role=?, children) => {
+  let make = (~href, ~id=?, ~className=?, ~title=?, ~popup, ~role=?, children) => {
     ...component,
     render: self =>
       <a
+        ?id
         ?className
         ?title
         ?role
@@ -132,8 +133,9 @@ module Link = {
   let make =
       (
         ~route: Route.t,
-        ~className=?,
+        ~id=?,
         ~title=?,
+        ~className=?,
         ~popup=false,
         ~role=?,
         children,
@@ -141,7 +143,7 @@ module Link = {
     ...component,
     render: _self => {
       let href = Route.routeToUrl(route);
-      <LinkUnsafe href ?className ?title popup ?role>
+      <LinkUnsafe href ?id ?className ?title popup ?role>
         ...children
       </LinkUnsafe>;
     },

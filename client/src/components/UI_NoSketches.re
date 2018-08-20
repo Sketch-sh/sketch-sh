@@ -10,7 +10,7 @@ let make = (~className=?, _children) => {
       <Fi.Package className="UI_NoSketches--icon" />
       "Your sketches will show up here"->str
       <Router.Link
-        route=Route.NoteNew
+        route=Route.NoteTemplateChoose
         className="btn btn-primary btn--large UI_NoSketches--button"
         role="button">
         <Fi.Plus />

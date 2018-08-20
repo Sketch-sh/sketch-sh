@@ -19,7 +19,7 @@ const shortcut = shortcut =>
 
 context("keyboard shortcuts", () => {
   beforeEach(() => {
-    cy.visit("new");
+    cy.visit("new/reason");
   });
 
   it("ctrl+s for save", () => {
@@ -135,20 +135,20 @@ context("keyboard shortcuts", () => {
 
 context("language toggle", () => {
   it("should have language switcher", () => {
-    cy.visit("new");
+    cy.visit("new/reason");
 
     cy.get(`fieldset[aria-label="Language toggle"]`).should("be.visible");
   });
 
   it("should be default to ReasonML", () => {
-    cy.visit("new");
+    cy.visit("new/reason");
     cy.get(`fieldset[aria-label="Language toggle"]`)
       .get("input[id=RE]")
       .should("be.checked");
   });
 
   it("should persist language to database - ReasonML", () => {
-    cy.visit("new");
+    cy.visit("new/reason");
 
     cy.get(`fieldset[aria-label="Language toggle"]`)
       .get("input[id=RE]")
@@ -184,7 +184,7 @@ context("language toggle", () => {
   });
 
   it("should persist language to database - OCaml", () => {
-    cy.visit("new");
+    cy.visit("new/reason");
 
     cy.get("input[id=ML]").check({ force: true });
 
@@ -220,7 +220,7 @@ context("language toggle", () => {
   });
 
   it("should execute the code when language changed", () => {
-    cy.visit("new");
+    cy.visit("new/reason");
 
     cy.get(`fieldset[aria-label="Language toggle"]`)
       .get("input[id=RE]")
@@ -250,7 +250,7 @@ context("Edge cases", () => {
   it("should not prevent editing title after focusing on a block #105", () => {
     // https://github.com/Sketch-sh/sketch-sh/issues/105
 
-    cy.visit("new");
+    cy.visit("new/reason");
 
     cy.get(".EditorNote__metadata")
       .find("input")
@@ -275,7 +275,7 @@ context("Edge cases", () => {
   });
 
   it("should display value in correct order when there are multiple expressions on the same line", () => {
-    cy.visit("new");
+    cy.visit("new/reason");
     cy.get(".block__container")
       .first()
       .find("textarea")

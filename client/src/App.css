@@ -37,6 +37,7 @@
   --c-text-sub2: rgb(143, 166, 178);
   --c-text-inverse: #fff;
   --bg-base: #fff;
+  --bg-inverse: #eee;
 
   /* Components */
   --topbar-hero-border: 4px;
