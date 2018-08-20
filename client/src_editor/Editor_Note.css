@@ -14,19 +14,25 @@
   color: var(--cm-text);
   font-family: var(--font-monospace);
   border: none;
-  outline: none;
   margin: 0 0 0 8px;
   padding: 0;
   background-color: transparent;
 }
 
-.EditorNote__owner {
+.EditorNote__metadata--info {
   margin: 0 0 0 8px;
+  display: flex;
+  flex-direction: row-reverse;
+}
+
+.EditorNote__owner {
+  flex: 1;
 }
 
 .EditorNote__lang {
-  
+  font-size: var(--f4);
 }
+
 .EditorNote__lang--button {
   cursor: pointer;
   padding: var(--space1);
@@ -35,6 +41,7 @@
   color: var(--c-text-inverse);
   opacity: 0.2;
 }
+
 .EditorNote__lang--button:hover {
   opacity: 0.5;
 }

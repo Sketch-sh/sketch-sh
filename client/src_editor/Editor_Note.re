@@ -229,38 +229,40 @@ module Editor_Note = {
               onChange=(event => valueFromEvent(event)->TitleUpdate->send)
               readOnly
             />
-            (
-              noteOwner
-              =>> (
-                noteOwner =>
-                  <UI_SketchOwnerInfo
-                    owner=noteOwner
-                    ?noteLastEdited
-                    className="EditorNote__owner"
-                  />
+            <div className="EditorNote__metadata--info">
+              <div className="EditorNote__lang">
+                <button
+                  className=(
+                    Cn.make([
+                      "EditorNote__lang--button EditorNote__lang--RE",
+                      Cn.ifTrue(lang == RE, "EditorNote__lang--active"),
+                    ])
+                  )
+                  onClick=(_ => send(ChangeLang(RE)))>
+                  "RE"->str
+                </button>
+                <button
+                  className=(
+                    Cn.make([
+                      "EditorNote__lang--button EditorNote__lang--ML",
+                      Cn.ifTrue(lang == ML, "EditorNote__lang--active"),
+                    ])
+                  )
+                  onClick=(_ => send(ChangeLang(ML)))>
+                  "ML"->str
+                </button>
+              </div>
+              (
+                noteOwner
+                =>> (
+                  noteOwner =>
+                    <UI_SketchOwnerInfo
+                      owner=noteOwner
+                      ?noteLastEdited
+                      className="EditorNote__owner"
+                    />
+                )
               )
-            )
-            <div className="EditorNote__lang">
-              <button
-                className=(
-                  Cn.make([
-                    "EditorNote__lang--button EditorNote__lang--RE",
-                    Cn.ifTrue(lang == RE, "EditorNote__lang--active"),
-                  ])
-                )
-                onClick=(_ => send(ChangeLang(RE)))>
-                "RE"->str
-              </button>
-              <button
-                className=(
-                  Cn.make([
-                    "EditorNote__lang--button EditorNote__lang--ML",
-                    Cn.ifTrue(lang == ML, "EditorNote__lang--active"),
-                  ])
-                )
-                onClick=(_ => send(ChangeLang(ML)))>
-                "ML"->str
-              </button>
             </div>
           </div>
           <Editor_Blocks
