@@ -147,7 +147,7 @@ context("language toggle", () => {
       .should("be.checked");
   });
 
-  it("persist language to database - ReasonML", () => {
+  it("should persist language to database - ReasonML", () => {
     cy.visit("new");
 
     cy.get(`fieldset[aria-label="Language toggle"]`)
@@ -183,7 +183,7 @@ context("language toggle", () => {
       .should("have.text", "- : bool = true\n");
   });
 
-  it("persist language to database - OCaml", () => {
+  it("should persist language to database - OCaml", () => {
     cy.visit("new");
 
     cy.get("input[id=ML]").check({ force: true });
@@ -219,7 +219,7 @@ context("language toggle", () => {
       .should("have.text", "- : bool = true\n");
   });
 
-  it.only("allow change language on the fly", () => {
+  it("should execute the code when language changed", () => {
     cy.visit("new");
 
     cy.get(`fieldset[aria-label="Language toggle"]`)

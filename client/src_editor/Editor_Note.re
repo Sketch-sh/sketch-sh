@@ -123,7 +123,16 @@ module Editor_Note = {
           ),
         );
       | ChangeLang(lang) =>
-        ReasonReact.Update({...state, lang, editorContentStatus: Ec_Dirty})
+        ReasonReact.UpdateWithSideEffects(
+          {...state, lang, editorContentStatus: Ec_Dirty},
+          (
+            ({state}) =>
+              switch (state.executeCallback) {
+              | None => ()
+              | Some(callback) => callback()
+              }
+          ),
+        )
       },
     render: ({state, send}) => {
       let readOnly = !isEditable;
