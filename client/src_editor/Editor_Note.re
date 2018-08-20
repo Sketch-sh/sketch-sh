@@ -231,7 +231,8 @@ module Editor_Note = {
             />
             <div className="EditorNote__metadata--info">
               <UI_Balloon message="Sketch language" position=Down>
-                ...<fieldset className="EditorNote__lang">
+                ...<fieldset
+                     className="EditorNote__lang" ariaLabel="Language toggle">
                      <span>
                        <input
                          type_="radio"
