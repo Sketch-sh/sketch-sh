@@ -56,10 +56,11 @@
         state.tokenize = tokenString;
         return state.tokenize(stream, state);
       },
+
       "'": function(stream, state) {
         var ch = stream.next();
         if (/\w/.test(ch)) {
-          stream.eatWhile(/(\w|\')/);
+          stream.eatWhile(/(\w)/);
 
           if (stream.next() === "'") {
             return "string";
