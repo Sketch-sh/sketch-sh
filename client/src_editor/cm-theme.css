@@ -13,6 +13,7 @@
   --hue-6: #986801;
   --hue-6-2: #c18401;
 
+  --cm-atom: var(--hue-2);
   --cm-text: var(--mono-1);
   --cm-quote: var(--mono-3);
   --cm-comment: var(--mono-3);
@@ -23,7 +24,7 @@
   --cm-operator: var(--mono-1);
   --cm-string: var(--hue-4);
   --cm-keyword: var(--hue-5);
-  --cm-number: var(--hue-6);
+  --cm-number: var(--hue-5);
   --cm-header: var(--cm-mono-1);
 
   /* Spacing and decorations */
@@ -59,10 +60,10 @@
   color: var(--cm-keyword);
 }
 .cm-s-rtop .cm-atom {
-  color: #219;
+  color: var(--cm-atom);
 }
 .cm-s-rtop .cm-number {
-  color: var(--cm-hue-6);
+  color: var(--cm-number);
 }
 .cm-s-rtop .cm-def {
   color: #00f;
