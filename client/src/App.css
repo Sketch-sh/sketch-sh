@@ -71,7 +71,7 @@ body {
 }
 
 .Layout__center {
-  /* max-width: 1100px; */
+  max-width: 1100px;
   padding: calc(var(--topbar-height) + var(--space4)) var(--space3)
     var(--space5) var(--space3);
   margin: auto;
