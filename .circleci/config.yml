@@ -124,9 +124,6 @@ jobs:
           # Must be absolute path or relative path from working_directory
           at: .
       - run: |
-          echo $PWD
-          ls client
-      - run: |
           cd client 
           npm install --no-save now
           cd build
@@ -141,11 +138,11 @@ jobs:
             cd client
             npm run ci:cypress:staging
       - persist_to_workspace:
-          root: .
+          root: client
           paths:
-            - client
+            - build
 
-  deploy-prodution:
+  deploy-production:
     <<: *defaults
     working_directory: ~/rtop
     steps:
@@ -154,9 +151,8 @@ jobs:
           at: .
       - run: |
           echo $PWD
-          ls client
+          ls .
       - run: |
-          cd client 
           npm install --no-save now
           cd build
           ../node_modules/.bin/now --token $NOW_TOKEN
