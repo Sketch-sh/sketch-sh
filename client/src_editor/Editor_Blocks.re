@@ -28,6 +28,7 @@ let blockControlsButtons = (b_id, send) =>
     <UI_Balloon message="Add code block" position=Down>
       ...<button
            className="block__controls--button"
+           ariaLabel="Add code block"
            onClick=(_ => send(Block_Add(b_id, BTyp_Code)))>
            <Fi.Code />
            <sup> "+"->str </sup>
@@ -36,6 +37,7 @@ let blockControlsButtons = (b_id, send) =>
     <UI_Balloon message="Add text block" position=Down>
       ...<button
            className="block__controls--button"
+           ariaLabel="Add text block"
            onClick=(_ => send(Block_Add(b_id, BTyp_Text)))>
            <Fi.Edit2 />
            <sup> "+"->str </sup>
@@ -44,6 +46,7 @@ let blockControlsButtons = (b_id, send) =>
     <UI_Balloon message="Delete block" position=Down>
       ...<button
            className="block__controls--button block__controls--danger"
+           ariaLabel="Delete block"
            onClick=(_ => send(Block_Delete(b_id)))>
            <Fi.Trash2 />
            <sup> "-"->str </sup>

@@ -7,6 +7,15 @@ const faker = require("faker");
  */
 const assertBlocks = howManyBlocks =>
   cy.get(".block__container").should("have.length", howManyBlocks);
+const assertCodeBlocks = howManyBlocks =>
+  cy
+    .get(".block__container > .source-editor")
+    .should("have.length", howManyBlocks);
+const assertTextBlocks = howManyBlocks =>
+  cy
+    .get(".block__container > .text-editor")
+    .should("have.length", howManyBlocks);
+
 const assertErrorsOrWarnings = howMany =>
   cy.get(".widget__lint").should("have.length", howMany);
 const assertValue = howMany =>
@@ -45,6 +54,8 @@ context("keyboard shortcuts", () => {
     shortcut("{ctrl}s");
 
     cy.get("@save").should("be.disabled");
+    cy.get("@save").should("have.text", "Saving");
+    cy.get("@save").should("have.text", "Save");
 
     // Repeat
     cy.get("@title").type(faker.lorem.words());
@@ -243,6 +254,82 @@ context("language toggle", () => {
     assertErrorsOrWarnings(0);
     cy.get("input[id=ML]").check({ force: true });
     assertErrorsOrWarnings(1);
+  });
+});
+
+context("Block controls", () => {
+  it("should be able to add new code block", () => {
+    cy.visit("new/reason");
+    assertBlocks(1);
+    assertCodeBlocks(1);
+    assertTextBlocks(0);
+
+    cy.get(".block__container")
+      .first()
+      .find(`button[aria-label="Add code block"]`)
+      .click();
+
+    assertCodeBlocks(2);
+    assertTextBlocks(0);
+
+    cy.get(".block__container")
+      .eq(1)
+      .find(`button[aria-label="Add code block"]`)
+      .click();
+
+    assertCodeBlocks(3);
+    assertTextBlocks(0);
+  });
+  it("should be able to add new text block", () => {
+    cy.visit("new/reason");
+    assertBlocks(1);
+    assertCodeBlocks(1);
+
+    cy.get(".block__container")
+      .first()
+      .find(`button[aria-label="Add text block"]`)
+      .click();
+
+    assertCodeBlocks(1);
+    assertTextBlocks(1);
+
+    cy.get(".block__container")
+      .eq(1)
+      .find(`button[aria-label="Add code block"]`)
+      .click();
+
+    assertCodeBlocks(2);
+    assertTextBlocks(1);
+  });
+  it("should be able to delete block", () => {
+    cy.visit("new/reason");
+    assertBlocks(1);
+    cy.get(".block__container")
+      .first()
+      .find(`button[aria-label="Add text block"]`)
+      .click();
+    cy.get(".block__container")
+      .first()
+      .find(`button[aria-label="Add text block"]`)
+      .click();
+    cy.get(".block__container")
+      .first()
+      .find(`button[aria-label="Add text block"]`)
+      .click();
+    cy.get(".block__container")
+      .eq(1)
+      .find(`button[aria-label="Add code block"]`)
+      .click();
+
+    assertCodeBlocks(2);
+    assertTextBlocks(3);
+
+    cy.get(".block__container")
+      .eq(1)
+      .find(`button[aria-label="Delete block"]`)
+      .click();
+    assertCodeBlocks(2);
+    assertTextBlocks(2);
   });
 });
 

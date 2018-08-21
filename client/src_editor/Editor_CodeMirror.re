@@ -161,7 +161,8 @@ let make =
       };
 
       state.editor := Some(editor);
-      if (Utils.env != "production") {
+      if (Webapi.Dom.location->Webapi.Dom.Location.host
+          != Config.productionHost) {
         %bs.raw
         {|window.editor = editor|};
       };

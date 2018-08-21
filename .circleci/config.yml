@@ -14,14 +14,14 @@ refs:
       command: *wait_for_postgres
 
 defaults: &defaults
-  working_directory: ~/rtop/client
   docker:
-    - image: circleci/node:10
+    - image: circleci/node:10-browsers
 
 version: 2
 jobs:
   build:
     <<: *defaults
+    working_directory: ~/rtop/client
     docker:
       - image: circleci/node:10-browsers
       - image: cypress/base:8
@@ -55,9 +55,9 @@ jobs:
       - checkout:
           path: ~/rtop
       - restore_cache:
-          key: v3-deps-{{ .Branch }}-{{ checksum "package.json" }}-{{ checksum "package-lock.json" }}
-          key: v3-deps-{{ .Branch }}
-          key: v3-deps
+          key: v4-deps-{{ .Branch }}-{{ checksum "package.json" }}-{{ checksum "package-lock.json" }}
+          key: v4-deps-{{ .Branch }}
+          key: v4-deps
       - run:
           name: Install Dependencies
           command: npm ci   
@@ -100,7 +100,7 @@ jobs:
           command: npm run ci:build
 
       - save_cache:
-          key: v3-deps-{{ .Branch }}-{{ checksum "package.json" }}-{{ checksum "package-lock.json" }}
+          key: v4-deps-{{ .Branch }}-{{ checksum "package.json" }}-{{ checksum "package-lock.json" }}
           paths:
             - ~/.npm
             - ~/.cache
@@ -112,29 +112,45 @@ jobs:
           command: cp ../now.json build/now.json
 
       - persist_to_workspace:
-          root: .
+          root: ..
           paths:
-            - build
+            - client
       
   deploy-staging:
     <<: *defaults
+    working_directory: ~/rtop
     steps:
       - attach_workspace:
           # Must be absolute path or relative path from working_directory
           at: .
-      - run: npm install now
       - run: |
+          cd client 
+          npm install --no-save now
           cd build
           ../node_modules/.bin/now --token $NOW_TOKEN
           ../node_modules/.bin/now alias --token $NOW_TOKEN sketch-staging.now.sh
-  deploy-prodution:
+      - run:
+          name: Install required Cypress dependencies
+          command: sudo apt-get install xvfb libgtk2.0-0 libnotify-dev libgconf-2-4 libnss3 libxss1 libasound2
+      - run: 
+          name: E2E test on staging
+          command: |
+            cd client
+            npm run ci:cypress:staging
+      - persist_to_workspace:
+          root: client
+          paths:
+            - build
+
+  deploy-production:
     <<: *defaults
+    working_directory: ~/rtop
     steps:
       - attach_workspace:
           # Must be absolute path or relative path from working_directory
           at: .
-      - run: npm install now
       - run: |
+          npm install --no-save now
           cd build
           ../node_modules/.bin/now --token $NOW_TOKEN
           ../node_modules/.bin/now alias --token $NOW_TOKEN sketch.now.sh
@@ -152,7 +168,7 @@ workflows:
               only: master
       - deploy-production:
           requires:
-            - build
+            - deploy-staging
           filters:
             branches:
-              only: deploy
+              only: master
