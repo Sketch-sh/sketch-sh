@@ -1,0 +1,27 @@
+/* Use this file to adjust reason-mode */
+let a = {|fdfdasdasd"das'dasd'as'das'd|};
+
+let a = (~foo: option(string)=?, ~bar=?, ()) => {
+  print_endline("asdasdasdasdasd");
+};
+
+type foo = [
+  | `Str(string)
+  | `Int(int)
+];
+type t('a) = array('a);
+
+let char = 'a';
+
+let string = "abc";
+
+let a = [| 1 |];
+
+let list = [1, 2, 3, 4, 5, 6];
+
+type say = Goodbye | Hello;
+
+fun 
+| Hello => ()
+| Goodbye => ()
+| _ => ();
