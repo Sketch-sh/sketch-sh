@@ -60,13 +60,20 @@
       "'": function(stream, state) {
         var ch = stream.next();
         if (/\w/.test(ch)) {
-          stream.eatWhile(/(\w)/);
-
-          if (stream.next() === "'") {
-            return "string";
-          } else {
-            console.log(stream.current());
-            return "variable-2";
+          console.log({ ch });
+          console.log({
+            eatWhile: stream.eatWhile(char => {
+              console.log(char);
+              return /\w/.test(char);
+            }),
+          });
+          if (stream.eatWhile(/(\w)/)) {
+            console.log({ streamCurrent: stream.current() });
+            if (stream.next() === "'") {
+              return "string";
+            } else {
+              return "variable-2";
+            }
           }
         }
         return null;
@@ -80,6 +87,17 @@
     },
   });
 
+  function tokenPolymorphicVar(stream, state) {
+    var next,
+      end = false;
+    while ((next = stream.next()) != null) {
+      if (/[\x00-\xFF]/.test(next) && stream.eat("'")) {
+        end = true;
+        return "string";
+        break;
+      }
+    }
+  }
   function tokenString(stream, state) {
     var next,
       end = false,
