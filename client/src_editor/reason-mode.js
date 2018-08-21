@@ -38,20 +38,6 @@
     return obj;
   }
 
-  function pushInterpolationStack(state) {
-    (state.interpolationStack || (state.interpolationStack = [])).push(
-      state.tokenize
-    );
-  }
-
-  function popInterpolationStack(state) {
-    return (state.interpolationStack || (state.interpolationStack = [])).pop();
-  }
-
-  function sizeInterpolationStack(state) {
-    return state.interpolationStack ? state.interpolationStack.length : 0;
-  }
-
   CodeMirror.defineMIME("application/reason", {
     name: "clike",
     keywords: set(keywords),
@@ -59,33 +45,31 @@
     builtin: set(builtins),
     atoms: set(atoms),
     hooks: {
-      "@": function(stream) {
-        stream.eatWhile(/[\w\$_\.]/);
-        return "meta";
+      "{": function(stream, state) {
+        if (stream.eat("|")) {
+          state.longString = true;
+          state.tokenize = tokenLongString;
+          return state.tokenize(stream, state);
+        }
       },
 
-      // custom string handling to deal with triple-quoted strings and string interpolation
-      "'": function(stream, state) {
-        return tokenString("'", stream, state, false);
-      },
       '"': function(stream, state) {
-        return tokenString('"', stream, state, false);
+        state.tokenize = tokenString;
+        return state.tokenize(stream, state);
       },
-      r: function(stream, state) {
-        var peek = stream.peek();
-        if (peek == "'" || peek == '"') {
-          return tokenString(stream.next(), stream, state, true);
-        }
-        return false;
-      },
+      "'": function(stream, state) {
+        var ch = stream.next();
+        if (/\w/.test(ch)) {
+          stream.eatWhile(/(\w|\')/);
 
-      "}": function(_stream, state) {
-        // "}" is end of interpolation, if interpolation stack is non-empty
-        if (sizeInterpolationStack(state) > 0) {
-          state.tokenize = popInterpolationStack(state);
-          return null;
+          if (stream.next() === "'") {
+            return "string";
+          } else {
+            console.log(stream.current());
+            return "variable-2";
+          }
         }
-        return false;
+        return null;
       },
 
       "/": function(stream, state) {
@@ -96,53 +80,21 @@
     },
   });
 
-  function tokenString(quote, stream, state, raw) {
-    var tripleQuoted = false;
-    if (stream.eat(quote)) {
-      if (stream.eat(quote)) tripleQuoted = true;
-      else return "string"; //empty string
-    }
-    function tokenStringHelper(stream, state) {
-      var escaped = false;
-      while (!stream.eol()) {
-        if (!raw && !escaped && stream.peek() == "$") {
-          pushInterpolationStack(state);
-          state.tokenize = tokenInterpolation;
-          return "string";
-        }
-        var next = stream.next();
-        if (
-          next == quote &&
-          !escaped &&
-          (!tripleQuoted || stream.match(quote + quote))
-        ) {
-          state.tokenize = null;
-          break;
-        }
-        escaped = !raw && !escaped && next == "\\";
+  function tokenString(stream, state) {
+    var next,
+      end = false,
+      escaped = false;
+    while ((next = stream.next()) != null) {
+      if (next === '"' && !escaped) {
+        end = true;
+        break;
       }
-      return "string";
+      escaped = !escaped && next === "\\";
     }
-    state.tokenize = tokenStringHelper;
-    return tokenStringHelper(stream, state);
-  }
-
-  function tokenInterpolation(stream, state) {
-    stream.eat("$");
-    if (stream.eat("{")) {
-      // let clike handle the content of ${...},
-      // we take over again when "}" appears (see hooks).
-      state.tokenize = null;
-    } else {
-      state.tokenize = tokenInterpolationIdentifier;
+    if (end && !escaped) {
+      state.tokenize = false;
     }
-    return null;
-  }
-
-  function tokenInterpolationIdentifier(stream, state) {
-    stream.eatWhile(/[\w_]/);
-    state.tokenize = popInterpolationStack(state);
-    return "variable";
+    return "string";
   }
 
   function tokenNestedComment(depth) {
@@ -164,6 +116,18 @@
       }
       return "comment";
     };
+  }
+
+  function tokenLongString(stream, state) {
+    var prev, next;
+    while (state.longString && (next = stream.next()) != null) {
+      if (prev === "|" && next === "}") state.longString = false;
+      prev = next;
+    }
+    if (!state.longString) {
+      state.tokenize = false;
+    }
+    return "string";
   }
 
   CodeMirror.registerHelper(
