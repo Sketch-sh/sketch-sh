@@ -161,12 +161,12 @@ workflows:
       - deploy-staging:
           requires:
             - build
-          # filters:
-          #   branches:
-          #     only: master
-      - deploy-production:
-          requires:
-            - build
           filters:
             branches:
-              only: deploy
+              only: continous-deployment
+      - deploy-production:
+          requires:
+            - deploy-staging
+          filters:
+            branches:
+              only: continous-deployment
