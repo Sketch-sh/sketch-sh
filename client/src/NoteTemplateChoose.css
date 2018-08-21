@@ -8,20 +8,28 @@
 }
 
 .NoteTC__select {
-  padding: var(--space5);
+  padding: var(--space3) 0 0 0;
   display: flex;
+  flex-wrap: wrap;
+
+  @media (--md) {
+    padding: var(--space5);
+  }
 }
 
 .NoteTC__select--element {
   flex: 1;
   text-align: center;
-  margin: var(--space4);
+
+  @media (--md) {
+    margin: var(--space4);
+  }
 }
 
 .NoteTC__select--link {
   display: block;
-  padding: var(--space5) var(--space3);
   border-radius: 4px;
+  padding: var(--space5) 0;
 }
 
 .NoteTC__select--link:hover {
