@@ -174,10 +174,10 @@ workflows:
             - build
           filters:
             branches:
-              only: continous-deployment
+              only: continous-deployement
       - deploy-production:
           requires:
             - deploy-staging
           filters:
             branches:
-              only: continous-deployment
+              only: continous-deployement
