@@ -54,6 +54,8 @@ context("keyboard shortcuts", () => {
     shortcut("{ctrl}s");
 
     cy.get("@save").should("be.disabled");
+    cy.get("@save").should("have.text", "Saving");
+    cy.get("@save").should("have.text", "Save");
 
     // Repeat
     cy.get("@title").type(faker.lorem.words());
