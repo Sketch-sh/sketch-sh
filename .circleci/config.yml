@@ -162,7 +162,7 @@ jobs:
           npm install --no-save now
           cd build
           ../node_modules/.bin/now --token $NOW_TOKEN
-          ../node_modules/.bin/now alias --token $NOW_TOKEN sketch-staging.now.sh
+          ../node_modules/.bin/now alias --token $NOW_TOKEN sketch.now.sh
 
 workflows:
   version: 2
