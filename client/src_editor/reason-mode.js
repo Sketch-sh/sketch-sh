@@ -27,10 +27,10 @@
   var blockKeywords = "try catch match with else for if switch while do begin end in module sig struct".split(
     " "
   );
-  var atoms = "unit int int32 int64 float bool option mod land lor lxor lsl lsr asr string".split(
-    " "
-  );
-  var builtins = "true false Error Ok None Some".split(" ");
+
+  var builtins =
+    "true false Error Ok None Some unit int int32 int64 float bool" +
+    "option mod land lor lxor lsl lsr asr string".split(" ");
 
   function set(words) {
     var obj = {};
@@ -43,7 +43,6 @@
     keywords: set(keywords),
     blockKeywords: set(blockKeywords),
     builtin: set(builtins),
-    atoms: set(atoms),
     hooks: {
       "{": function(stream, state) {
         if (stream.eat("|")) {
@@ -133,7 +132,7 @@
   CodeMirror.registerHelper(
     "hintWords",
     "application/reason",
-    keywords.concat(atoms).concat(builtins)
+    keywords.concat(builtins)
   );
 
   // This is needed to make loading through meta.js work.
