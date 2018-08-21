@@ -23,6 +23,8 @@ jobs:
     <<: *defaults
     working_directory: ~/rtop/client
     docker:
+      - image: circleci/node:10-browsers
+      - image: cypress/base:8
       - image: circleci/postgres:10-alpine
         environment:
           POSTGRES_USER: gql_test
@@ -98,7 +100,7 @@ jobs:
           command: npm run ci:build
 
       - save_cache:
-          key: v4-deps-{{ .Branch }}-{{ checksum "package.json" }}-{{ checksum "package-lock.json" }}
+          key: -deps-{{ .Branch }}-{{ checksum "package.json" }}-{{ checksum "package-lock.json" }}
           paths:
             - ~/.npm
             - ~/.cache
