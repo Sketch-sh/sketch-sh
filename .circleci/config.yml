@@ -15,7 +15,7 @@ refs:
 
 defaults: &defaults
   docker:
-    - image: circleci/node:10
+    - image: circleci/node:10-browsers
 
 version: 2
 jobs:
@@ -23,8 +23,6 @@ jobs:
     <<: *defaults
     working_directory: ~/rtop/client
     docker:
-      - image: circleci/node:10-browsers
-      - image: cypress/base:8
       - image: circleci/postgres:10-alpine
         environment:
           POSTGRES_USER: gql_test
