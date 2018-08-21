@@ -150,9 +150,6 @@ jobs:
           # Must be absolute path or relative path from working_directory
           at: .
       - run: |
-          echo $PWD
-          ls .
-      - run: |
           npm install --no-save now
           cd build
           ../node_modules/.bin/now --token $NOW_TOKEN
@@ -168,10 +165,10 @@ workflows:
             - build
           filters:
             branches:
-              only: continous-deployement
+              only: master
       - deploy-production:
           requires:
             - deploy-staging
           filters:
             branches:
-              only: continous-deployement
+              only: master
