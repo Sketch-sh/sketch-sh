@@ -53,9 +53,9 @@ jobs:
       - checkout:
           path: ~/rtop
       - restore_cache:
-          key: v3-deps-{{ .Branch }}-{{ checksum "package.json" }}-{{ checksum "package-lock.json" }}
-          key: v3-deps-{{ .Branch }}
-          key: v3-deps
+          key: v4-deps-{{ .Branch }}-{{ checksum "package.json" }}-{{ checksum "package-lock.json" }}
+          key: v4-deps-{{ .Branch }}
+          key: v4-deps
       - run:
           name: Install Dependencies
           command: npm ci   
@@ -98,7 +98,7 @@ jobs:
           command: npm run ci:build
 
       - save_cache:
-          key: v3-deps-{{ .Branch }}-{{ checksum "package.json" }}-{{ checksum "package-lock.json" }}
+          key: v4-deps-{{ .Branch }}-{{ checksum "package.json" }}-{{ checksum "package-lock.json" }}
           paths:
             - ~/.npm
             - ~/.cache
