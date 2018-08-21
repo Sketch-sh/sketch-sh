@@ -141,7 +141,7 @@ jobs:
             cd client
             npm run ci:cypress:staging
       - persist_to_workspace:
-          root: ..
+          root: .
           paths:
             - client
 
