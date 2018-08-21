@@ -100,7 +100,7 @@ jobs:
           command: npm run ci:build
 
       - save_cache:
-          key: -deps-{{ .Branch }}-{{ checksum "package.json" }}-{{ checksum "package-lock.json" }}
+          key: v4-deps-{{ .Branch }}-{{ checksum "package.json" }}-{{ checksum "package-lock.json" }}
           paths:
             - ~/.npm
             - ~/.cache
