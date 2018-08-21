@@ -1,6 +1,6 @@
-FROM node:10.8.0
-RUN npm -g config set user root
-RUN npm install -g bs-platform@4.0.3
+# This docker file must be in repository root folder 
+# For now.sh Github integration to work
+FROM thangngoc89/sketch-sh:now
 WORKDIR /usr/src
 COPY client/package-lock.json client/package.json ./
 RUN npm link bs-platform

@@ -15,7 +15,7 @@ refs:
 
 defaults: &defaults
   docker:
-    - image: circleci/node:10-browsers
+    - image: thangngoc89/sketch-sh
 
 version: 2
 jobs:
@@ -23,8 +23,7 @@ jobs:
     <<: *defaults
     working_directory: ~/rtop/client
     docker:
-      - image: circleci/node:10-browsers
-      - image: cypress/base:8
+      - image: thangngoc89/sketch-sh
       - image: circleci/postgres:10-alpine
         environment:
           POSTGRES_USER: gql_test
@@ -55,9 +54,9 @@ jobs:
       - checkout:
           path: ~/rtop
       - restore_cache:
-          key: v4-deps-{{ .Branch }}-{{ checksum "package.json" }}-{{ checksum "package-lock.json" }}
-          key: v4-deps-{{ .Branch }}
-          key: v4-deps
+          key: v5-deps-{{ .Branch }}-{{ checksum "package.json" }}-{{ checksum "package-lock.json" }}
+          key: v5-deps-{{ .Branch }}
+          key: v5-deps
       - run:
           name: Install Dependencies
           command: npm ci   
@@ -90,9 +89,6 @@ jobs:
           command: | 
             npm test
       - run:
-          name: Install required Cypress dependencies
-          command: sudo apt-get install xvfb libgtk2.0-0 libnotify-dev libgconf-2-4 libnss3 libxss1 libasound2
-      - run:
           name: E2E tests with Cypress
           command: npm run ci:cypress
       - run:
@@ -100,7 +96,7 @@ jobs:
           command: npm run ci:build
 
       - save_cache:
-          key: v4-deps-{{ .Branch }}-{{ checksum "package.json" }}-{{ checksum "package-lock.json" }}
+          key: v5-deps-{{ .Branch }}-{{ checksum "package.json" }}-{{ checksum "package-lock.json" }}
           paths:
             - ~/.npm
             - ~/.cache
@@ -129,9 +125,6 @@ jobs:
           cd build
           ../node_modules/.bin/now --token $NOW_TOKEN
           ../node_modules/.bin/now alias --token $NOW_TOKEN sketch-staging.now.sh
-      - run:
-          name: Install required Cypress dependencies
-          command: sudo apt-get install xvfb libgtk2.0-0 libnotify-dev libgconf-2-4 libnss3 libxss1 libasound2
       - run: 
           name: E2E test on staging
           command: |
