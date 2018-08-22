@@ -52,6 +52,11 @@ module Block = {
     b_data: blockData,
   };
 
+  type blockTimeoutMeta = {
+    id,
+    t_id: Js.Global.timeoutId,
+  };
+
   type focusChangeType =
     | FcTyp_EditorFocus
     | FcTyp_BlockNew
