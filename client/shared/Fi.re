@@ -163,6 +163,18 @@ module Trash2 = {
     );
 };
 
+module RefreshCw = {
+  [@bs.module "react-icons/fi"]
+  external reactClass: ReasonReact.reactClass = "FiRefreshCw";
+
+  let make = (~className="", children) =>
+    ReasonReact.wrapJsForReason(
+      ~reactClass,
+      ~props={"className": className},
+      children,
+    );
+};
+
 module Package = {
   [@bs.module "react-icons/fi"]
   external reactClass: ReasonReact.reactClass = "FiPackage";
