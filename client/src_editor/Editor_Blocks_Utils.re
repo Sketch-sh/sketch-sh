@@ -132,12 +132,16 @@ let emptyCodeBlock = () =>
 
 let emptyTextBlock = () => B_Text("");
 
-let wasDeletedBlock = () =>
+let wasDeletedBlock = lang => {
+  let open_ = lang == Editor_Types.RE ? "/* " : "(* ";
+  let close = lang == Editor_Types.RE ? " */" : " *)";
+  let message = "This block has been removed. It will be permanently deleted after 10 seconds. Click undo to restore.";
   B_Code({
-    bc_value: "/* This block has been removed. It will be permanently deleted after 10 seconds have passed. Click undo to restore. */",
+    bc_value: open_ ++ message ++ close,
     bc_firstLineNumber: 1,
     bc_widgets: [||],
   });
+};
 
 let findLastCodeBlock = blocks => {
   let length = Array.length(blocks);
