@@ -27,8 +27,8 @@ let make = _children => {
   render: ({state}) =>
     <ReasonApollo.Provider client=GqlClient.instance>
       <Helmet defaultTitle="Sketch.sh" titleTemplate="%s - Sketch.sh" />
+      <ButterToast.Tray />
       <Router.Unload.Provider />
-      <UI_Notification.Provider />
       <AuthStatus.Provider />
       <FontFaceObserver.Provider />
       (

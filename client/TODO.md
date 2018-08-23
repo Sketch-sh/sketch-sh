@@ -1,0 +1,5 @@
+- Fork route transition is being prevented 
+- Update sketch's owner information
+- Pass forkFrom query
+- Execute code after saving
+- Display forkFrom to EditorNote page

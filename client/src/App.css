@@ -18,20 +18,10 @@
   --f6: 0.875rem;
   --f7: 0.75rem;
 
-  /* Color */
-  /* --c-black: #000;
-  --c-near-black: #111;
-  --c-dark-gray: #333;
-  --c-mid-gray: #555;
-  --c-gray: #777;
-  --c-silver: #999;
-  --c-light-silver: #aaa;
-  --c-moon-gray: #ccc;
-  --c-light-gray: #eee; */
-
   --c-primary: #1874d5;
-  --c-danger: #eb5656;
-
+  --c-danger: #ff3860;
+  --c-success: #23d160;
+  
   --c-text: #000;
   --c-text-sub: #444;
   --c-text-sub2: rgb(143, 166, 178);

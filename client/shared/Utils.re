@@ -1,5 +1,7 @@
 [@bs.val] external warn: 'a => unit = "console.warn";
 [@bs.val] external warn2: ('a, 'b) => unit = "console.warn";
+[@bs.val] external logError: 'a => unit = "console.error";
+[@bs.val] external logError2: ('a, 'b) => unit = "console.error";
 
 let str = ReasonReact.string;
 let optionStr =
