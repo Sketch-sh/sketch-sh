@@ -77,7 +77,9 @@ jobs:
             npm install 
             ./node_modules/.bin/knex migrate:latest --env production
             cd ../hasura
-            curl -L https://cli.hasura.io/install.sh | bash
+            curl -L https://hasura.io/install/linux-amd64 -o hasura
+            chmod +x hasura
+            sudo mv hasura /usr/bin/hasura
             hasura metadata apply --access-key verysecretaccesskey
       - run:
           name: Bsb build
