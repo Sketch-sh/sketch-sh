@@ -1,9 +1,11 @@
 FROM node:10-alpine
 
 # Install curl 
-RUN apk add --no-cache curl sudo postgresql
+RUN apk add --no-cache curl postgresql
 # Install hasura cli
-RUN curl -L https://cli.hasura.io/install.sh | sh
+RUN curl -L https://hasura.io/install/linux-amd64 -o hasura && \
+  chmod +x hasura && \
+  mv hasura /usr/bin/hasura
 
 # Working on node
 RUN mkdir -p /opt/schema
