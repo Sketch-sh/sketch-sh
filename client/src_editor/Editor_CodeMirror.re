@@ -99,6 +99,8 @@ let make =
       | Some(setEditor) => setEditor(editor)
       };
       editor->(CodeMirror.Editor.setValue(value));
+      /* This is to prevent Ctrl+Z from clearing the content after mounting */
+      editor->CodeMirror.Editor.getDoc->CodeMirror.Doc.clearHistory;
 
       switch (onChange) {
       | None => ()

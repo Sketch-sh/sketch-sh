@@ -334,7 +334,7 @@ context("Block controls", () => {
 });
 
 context("Edge cases", () => {
-  it("should not prevent editing title after focusing on a block #105", () => {
+  it("#105: should not prevent editing title after focusing on a block", () => {
     // https://github.com/Sketch-sh/sketch-sh/issues/105
 
     cy.visit("new/reason");
@@ -361,7 +361,7 @@ context("Edge cases", () => {
       .focused();
   });
 
-  it("should display value in correct order when there are multiple expressions on the same line", () => {
+  it("should display value in correct order", () => {
     cy.visit("new/reason");
     cy.get(".block__container")
       .first()
@@ -381,5 +381,30 @@ context("Edge cases", () => {
     cy.get("@value")
       .eq(2)
       .should("have.text", "let z: int = 3;\n");
+  });
+
+  it("#112: ctrl+z should not clear content after mount", () => {
+    let content = "let a = 1;";
+    cy.visit("new/reason");
+    cy.get(".block__container")
+      .first()
+      .find("textarea")
+      .as("block1")
+      .type(content, { force: true });
+    shortcut("{ctrl}s");
+
+    cy.url().should("match", /s\/.+/, "should be new route");
+    cy.reload(true);
+
+    /* Wait for editor to mount */
+    assertValue(1);
+
+    cy.window().then(win => {
+      expect(win.editor.getValue()).to.equal(content);
+    });
+    cy.get("@block1").type("{ctrl}z", { force: true });
+    cy.window().then(win => {
+      expect(win.editor.getValue()).to.equal(content);
+    });
   });
 });
