@@ -79,7 +79,7 @@ jobs:
             cd ../hasura
             curl -L https://hasura.io/install/linux-amd64 -o hasura
             chmod +x hasura
-            mv hasura /usr/bin/hasura
+            sudo mv hasura /usr/bin/hasura
             hasura metadata apply --access-key verysecretaccesskey
       - run:
           name: Bsb build
