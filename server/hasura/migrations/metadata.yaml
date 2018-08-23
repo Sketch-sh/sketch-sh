@@ -232,24 +232,28 @@ tables:
   - comment: null
     permission:
       columns:
-      - id
-      - user_id
-      - title
-      - data
       - created_at
+      - data
+      - fork_from
+      - id
+      - title
       - updated_at
+      - user_id
       filter: {}
+      limit: 30
     role: public
   - comment: null
     permission:
       columns:
-      - updated_at
-      - user_id
+      - created_at
+      - data
+      - fork_from
       - id
       - title
-      - data
-      - created_at
+      - updated_at
+      - user_id
       filter: {}
+      limit: 30
     role: user
   table: note
   update_permissions:

@@ -883,6 +883,115 @@
           "fields": null
         },
         {
+          "inputFields": [
+            {
+              "name": "_eq",
+              "defaultValue": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "Boolean",
+                "ofType": null
+              },
+              "description": null
+            },
+            {
+              "name": "_gt",
+              "defaultValue": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "Boolean",
+                "ofType": null
+              },
+              "description": null
+            },
+            {
+              "name": "_gte",
+              "defaultValue": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "Boolean",
+                "ofType": null
+              },
+              "description": null
+            },
+            {
+              "name": "_in",
+              "defaultValue": null,
+              "type": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "Boolean",
+                  "ofType": null
+                }
+              },
+              "description": null
+            },
+            {
+              "name": "_is_null",
+              "defaultValue": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "Boolean",
+                "ofType": null
+              },
+              "description": null
+            },
+            {
+              "name": "_lt",
+              "defaultValue": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "Boolean",
+                "ofType": null
+              },
+              "description": null
+            },
+            {
+              "name": "_lte",
+              "defaultValue": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "Boolean",
+                "ofType": null
+              },
+              "description": null
+            },
+            {
+              "name": "_neq",
+              "defaultValue": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "Boolean",
+                "ofType": null
+              },
+              "description": null
+            },
+            {
+              "name": "_nin",
+              "defaultValue": null,
+              "type": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "Boolean",
+                  "ofType": null
+                }
+              },
+              "description": null
+            }
+          ],
+          "kind": "INPUT_OBJECT",
+          "possibleTypes": null,
+          "interfaces": null,
+          "name": "boolean_comparison_exp",
+          "enumValues": null,
+          "description": "expression to compare columns of type boolean. All fields are combined with logical 'AND'.",
+          "fields": null
+        },
+        {
           "inputFields": null,
           "kind": "ENUM",
           "possibleTypes": null,
@@ -2052,6 +2161,18 @@
               "args": [],
               "isDeprecated": false,
               "deprecationReason": null,
+              "name": "fork_from",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "description": null
+            },
+            {
+              "args": [],
+              "isDeprecated": false,
+              "deprecationReason": null,
               "name": "id",
               "type": {
                 "kind": "NON_NULL",
@@ -2059,6 +2180,22 @@
                 "ofType": {
                   "kind": "SCALAR",
                   "name": "String",
+                  "ofType": null
+                }
+              },
+              "description": null
+            },
+            {
+              "args": [],
+              "isDeprecated": false,
+              "deprecationReason": null,
+              "name": "is_published",
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "Boolean",
                   "ofType": null
                 }
               },
@@ -2152,6 +2289,18 @@
                 }
               },
               "description": "An array relationship"
+            },
+            {
+              "args": [],
+              "isDeprecated": false,
+              "deprecationReason": null,
+              "name": "slug",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "description": null
             },
             {
               "args": [],
@@ -2307,11 +2456,31 @@
               "description": null
             },
             {
+              "name": "fork_from",
+              "defaultValue": null,
+              "type": {
+                "kind": "INPUT_OBJECT",
+                "name": "varchar_comparison_exp",
+                "ofType": null
+              },
+              "description": null
+            },
+            {
               "name": "id",
               "defaultValue": null,
               "type": {
                 "kind": "INPUT_OBJECT",
                 "name": "varchar_comparison_exp",
+                "ofType": null
+              },
+              "description": null
+            },
+            {
+              "name": "is_published",
+              "defaultValue": null,
+              "type": {
+                "kind": "INPUT_OBJECT",
+                "name": "boolean_comparison_exp",
                 "ofType": null
               },
               "description": null
@@ -2332,6 +2501,16 @@
               "type": {
                 "kind": "INPUT_OBJECT",
                 "name": "note_revision_bool_exp",
+                "ofType": null
+              },
+              "description": null
+            },
+            {
+              "name": "slug",
+              "defaultValue": null,
+              "type": {
+                "kind": "INPUT_OBJECT",
+                "name": "varchar_comparison_exp",
                 "ofType": null
               },
               "description": null
@@ -2897,7 +3076,37 @@
               "description": null
             },
             {
+              "name": "fork_from",
+              "defaultValue": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "description": null
+            },
+            {
               "name": "id",
+              "defaultValue": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "description": null
+            },
+            {
+              "name": "is_published",
+              "defaultValue": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "Boolean",
+                "ofType": null
+              },
+              "description": null
+            },
+            {
+              "name": "slug",
               "defaultValue": null,
               "type": {
                 "kind": "SCALAR",
@@ -3037,6 +3246,18 @@
               "args": [],
               "isDeprecated": false,
               "deprecationReason": null,
+              "name": "fork_from",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "description": null
+            },
+            {
+              "args": [],
+              "isDeprecated": false,
+              "deprecationReason": null,
               "name": "id",
               "type": {
                 "kind": "NON_NULL",
@@ -3046,6 +3267,34 @@
                   "name": "String",
                   "ofType": null
                 }
+              },
+              "description": null
+            },
+            {
+              "args": [],
+              "isDeprecated": false,
+              "deprecationReason": null,
+              "name": "is_published",
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "Boolean",
+                  "ofType": null
+                }
+              },
+              "description": null
+            },
+            {
+              "args": [],
+              "isDeprecated": false,
+              "deprecationReason": null,
+              "name": "slug",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
               },
               "description": null
             },
@@ -3188,6 +3437,30 @@
             {
               "isDeprecated": false,
               "deprecationReason": null,
+              "name": "fork_from_asc",
+              "description": "in the ascending order of \"fork_from\", nulls last"
+            },
+            {
+              "isDeprecated": false,
+              "deprecationReason": null,
+              "name": "fork_from_asc_nulls_first",
+              "description": "in the ascending order of \"fork_from\", nulls first"
+            },
+            {
+              "isDeprecated": false,
+              "deprecationReason": null,
+              "name": "fork_from_desc",
+              "description": "in the descending order of \"fork_from\", nulls last"
+            },
+            {
+              "isDeprecated": false,
+              "deprecationReason": null,
+              "name": "fork_from_desc_nulls_first",
+              "description": "in the descending order of \"fork_from\", nulls first"
+            },
+            {
+              "isDeprecated": false,
+              "deprecationReason": null,
               "name": "id_asc",
               "description": "in the ascending order of \"id\", nulls last"
             },
@@ -3208,6 +3481,54 @@
               "deprecationReason": null,
               "name": "id_desc_nulls_first",
               "description": "in the descending order of \"id\", nulls first"
+            },
+            {
+              "isDeprecated": false,
+              "deprecationReason": null,
+              "name": "is_published_asc",
+              "description": "in the ascending order of \"is_published\", nulls last"
+            },
+            {
+              "isDeprecated": false,
+              "deprecationReason": null,
+              "name": "is_published_asc_nulls_first",
+              "description": "in the ascending order of \"is_published\", nulls first"
+            },
+            {
+              "isDeprecated": false,
+              "deprecationReason": null,
+              "name": "is_published_desc",
+              "description": "in the descending order of \"is_published\", nulls last"
+            },
+            {
+              "isDeprecated": false,
+              "deprecationReason": null,
+              "name": "is_published_desc_nulls_first",
+              "description": "in the descending order of \"is_published\", nulls first"
+            },
+            {
+              "isDeprecated": false,
+              "deprecationReason": null,
+              "name": "slug_asc",
+              "description": "in the ascending order of \"slug\", nulls last"
+            },
+            {
+              "isDeprecated": false,
+              "deprecationReason": null,
+              "name": "slug_asc_nulls_first",
+              "description": "in the ascending order of \"slug\", nulls first"
+            },
+            {
+              "isDeprecated": false,
+              "deprecationReason": null,
+              "name": "slug_desc",
+              "description": "in the descending order of \"slug\", nulls last"
+            },
+            {
+              "isDeprecated": false,
+              "deprecationReason": null,
+              "name": "slug_desc_nulls_first",
+              "description": "in the descending order of \"slug\", nulls first"
             },
             {
               "isDeprecated": false,
@@ -3999,7 +4320,37 @@
               "description": null
             },
             {
+              "name": "fork_from",
+              "defaultValue": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "description": null
+            },
+            {
               "name": "id",
+              "defaultValue": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "description": null
+            },
+            {
+              "name": "is_published",
+              "defaultValue": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "Boolean",
+                "ofType": null
+              },
+              "description": null
+            },
+            {
+              "name": "slug",
               "defaultValue": null,
               "type": {
                 "kind": "SCALAR",
