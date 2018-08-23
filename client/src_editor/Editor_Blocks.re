@@ -1,11 +1,3 @@
-/*
-   FEAT TODO:
-     - disallow deletion of empty block
-     - make wasDeletedBocks readonly (but still show controls)
-     - execute code blocks on delete?
-     - handling of last non-temp block case? (multiple blocks left, but only one not queued for deletion)
- */
-
 [%%debugger.chrome];
 Modules.require("./Editor_Blocks.css");
 
@@ -18,10 +10,10 @@ type action =
   | Block_Add(id, blockTyp)
   | Block_Execute(bool)
   | Block_FocusNextBlockOrCreate
-  | Block_Queue_Delete(id, lang)
-  | Block_Delete_Queued(id)
+  | Block_QueueDelete(id)
+  | Block_DeleteQueued(id)
   | Block_Restore(id)
-  | Block_Capture_Timeout_Id(id, Js.Global.timeoutId)
+  | Block_CaptureQueuedMeta(id, Js.Global.timeoutId, blockData)
   | Block_Focus(id, blockTyp)
   | Block_Blur(id)
   | Block_UpdateValue(id, string, CodeMirror.EditorChange.t)
@@ -31,16 +23,12 @@ type action =
 
 type state = {
   blocks: array(block),
-  deletedBlocks: array(block),
-  deletedBlockMeta: array(blockTimeoutMeta),
+  deletedBlockMeta: array(deletedBlockMeta),
   stateUpdateReason: option(action),
   focusedBlock: option((id, blockTyp, focusChangeType)),
 };
 
-let blockControlsButtons = (blockId, deletedBlocks, lang, send) => {
-  let isDeletedBlock =
-    arrayFindIndex(deletedBlocks, ({b_id}) => b_id == blockId)->getBlockIndex
-    > (-1);
+let blockControlsButtons = (blockId, isDeleted, send) =>
   <div className="block__controls--buttons">
     <UI_Balloon message="Add code block" position=Down>
       ...<button
@@ -61,12 +49,12 @@ let blockControlsButtons = (blockId, deletedBlocks, lang, send) => {
          </button>
     </UI_Balloon>
     (
-      !isDeletedBlock ?
+      !isDeleted ?
         <UI_Balloon message="Delete block" position=Down>
           ...<button
                className="block__controls--button block__controls--danger"
                ariaLabel="Delete block"
-               onClick=(_ => send(Block_Queue_Delete(blockId, lang)))>
+               onClick=(_ => send(Block_QueueDelete(blockId)))>
                <Fi.Trash2 />
                <sup> "-"->str </sup>
              </button>
@@ -77,12 +65,11 @@ let blockControlsButtons = (blockId, deletedBlocks, lang, send) => {
                ariaLabel="Restore block"
                onClick=(_ => send(Block_Restore(blockId)))>
                <Fi.RefreshCw />
-               <sup> "-"->str </sup>
+               <sup> "+"->str </sup>
              </button>
         </UI_Balloon>
     )
   </div>;
-};
 
 let component = ReasonReact.reducerComponent("Editor_Page");
 
@@ -99,7 +86,6 @@ let make =
   ...component,
   initialState: () => {
     blocks: blocks->syncLineNumber,
-    deletedBlocks: [||],
     deletedBlockMeta: [||],
     stateUpdateReason: None,
     focusedBlock: None,
@@ -155,10 +141,10 @@ let make =
         | Block_FocusNextBlockOrCreate
         | Block_Execute(_) => ()
         | Block_Add(_, _)
-        | Block_Queue_Delete(_, _)
-        | Block_Delete_Queued(_)
+        | Block_QueueDelete(_)
+        | Block_DeleteQueued(_)
         | Block_Restore(_)
-        | Block_Capture_Timeout_Id(_, _)
+        | Block_CaptureQueuedMeta(_, _, _)
         | Block_UpdateValue(_, _, _) => onUpdate(newSelf.state.blocks)
         }
       };
@@ -173,7 +159,7 @@ let make =
           state.blocks
           ->(
               Belt.Array.mapU((. block) => {
-                let {b_id, b_data} = block;
+                let {b_id, b_data, b_deleted} = block;
                 if (b_id != blockId) {
                   block;
                 } else {
@@ -182,6 +168,7 @@ let make =
                   | B_Code(bcode) => {
                       b_id,
                       b_data: B_Code({...bcode, bc_widgets: widgets}),
+                      b_deleted,
                     }
                   };
                 };
@@ -263,13 +250,9 @@ let make =
         ),
       );
     | Block_UpdateValue(blockId, newValue, diff) =>
-      let foundIndex =
-        arrayFindIndex(state.blocks, ({b_id}) => b_id == blockId);
       let blockIndex =
-        switch (foundIndex) {
-        | None => (-1)
-        | Some(i) => i
-        };
+        arrayFindIndex(state.blocks, ({b_id}) => b_id == blockId)
+        ->getBlockIndex;
 
       ReasonReact.Update({
         ...state,
@@ -278,7 +261,7 @@ let make =
           state.blocks
           ->(
               Belt.Array.mapWithIndexU((. i, block) => {
-                let {b_id, b_data} = block;
+                let {b_id, b_data, b_deleted} = block;
                 if (i < blockIndex) {
                   block;
                 } else if (i == blockIndex) {
@@ -301,8 +284,9 @@ let make =
                               );
                           },
                         }),
+                      b_deleted,
                     }
-                  | B_Text(_) => {b_id, b_data: B_Text(newValue)}
+                  | B_Text(_) => {b_id, b_data: B_Text(newValue), b_deleted}
                   };
                 } else {
                   switch (b_data) {
@@ -317,32 +301,34 @@ let make =
             )
           ->syncLineNumber,
       });
-    | Block_Queue_Delete(blockId, lang) =>
-      let queueTimeout = self => {
+    | Block_QueueDelete(blockId) =>
+      let queueTimeout = (self, b_data) => {
         let timeoutId =
           Js.Global.setTimeout(
-            () => self.ReasonReact.send(Block_Delete_Queued(blockId)),
-            10000,
+            () => self.ReasonReact.send(Block_DeleteQueued(blockId)),
+            2000,
           );
-        self.ReasonReact.send(Block_Capture_Timeout_Id(blockId, timeoutId));
+        self.ReasonReact.send(
+          Block_CaptureQueuedMeta(blockId, timeoutId, b_data),
+        );
         ();
       };
-
-      let lastBlock = Belt.Array.length(state.blocks) == 1;
-      let warningBlock = {b_id: blockId, b_data: wasDeletedBlock(lang)};
-
-      if (lastBlock) {
-        let newBlock = {b_id: generateId(), b_data: emptyCodeBlock()};
-        ReasonReact.UpdateWithSideEffects(
-          {
-            ...state,
-            deletedBlocks: [|state.blocks[0]|],
-            blocks: [|newBlock, warningBlock|]->syncLineNumber,
-            stateUpdateReason: Some(action),
-            focusedBlock: None,
-          },
-          (self => queueTimeout(self)),
-        );
+      if (isLastBlock(state.blocks)) {
+        switch (isEmpty(state.blocks[0].b_data)) {
+        | true => ReasonReact.NoUpdate
+        | _ =>
+          ReasonReact.UpdateWithSideEffects(
+            {
+              ...state,
+              blocks:
+                [|newBlock(), {...state.blocks[0], b_deleted: true}|]
+                ->syncLineNumber,
+              stateUpdateReason: Some(action),
+              focusedBlock: None,
+            },
+            (self => queueTimeout(self, state.blocks[0].b_data)),
+          )
+        };
       } else {
         let blockIndex =
           arrayFindIndex(state.blocks, ({b_id}) => b_id == blockId)
@@ -354,15 +340,11 @@ let make =
               state.blocks
               ->(
                   Belt.Array.mapWithIndexU((. i, block) =>
-                    i == blockIndex ? warningBlock : block
+                    i == blockIndex ?
+                      {...state.blocks[blockIndex], b_deleted: true} : block
                   )
                 )
               ->syncLineNumber,
-            deletedBlocks:
-              Belt.Array.concat(
-                state.deletedBlocks,
-                [|state.blocks[blockIndex]|],
-              ),
             stateUpdateReason: Some(action),
             focusedBlock:
               switch (state.focusedBlock) {
@@ -371,19 +353,16 @@ let make =
                 focusedBlock == blockId ? None : state.focusedBlock
               },
           },
-          (self => queueTimeout(self)),
+          (self => queueTimeout(self, state.blocks[blockIndex].b_data)),
         );
       };
-    | Block_Delete_Queued(blockId) =>
-      let lastBlock = Belt.Array.length(state.blocks) == 1;
-      if (lastBlock) {
-        let newBlock = {b_id: generateId(), b_data: emptyCodeBlock()};
+    | Block_DeleteQueued(blockId) =>
+      if (isLastBlock(state.blocks)) {
         ReasonReact.Update({
-          blocks: [|newBlock|],
-          deletedBlocks: [||],
+          blocks: [|newBlock()|],
           deletedBlockMeta:
             state.deletedBlockMeta
-            ->(Belt.Array.keepU((. {id}) => id != blockId)),
+            ->(Belt.Array.keepU((. {db_id}) => db_id != blockId)),
           stateUpdateReason: Some(action),
           focusedBlock: None,
         });
@@ -393,12 +372,9 @@ let make =
             state.blocks
             ->(Belt.Array.keepU((. {b_id}) => b_id != blockId))
             ->syncLineNumber,
-          deletedBlocks:
-            state.deletedBlocks
-            ->(Belt.Array.keepU((. {b_id}) => b_id != blockId)),
           deletedBlockMeta:
             state.deletedBlockMeta
-            ->(Belt.Array.keepU((. {id}) => id != blockId)),
+            ->(Belt.Array.keepU((. {db_id}) => db_id != blockId)),
           stateUpdateReason: Some(action),
           focusedBlock:
             switch (state.focusedBlock) {
@@ -407,17 +383,22 @@ let make =
               focusedBlock == blockId ? None : state.focusedBlock
             },
         });
-      };
+      }
     | Block_Restore(blockId) =>
       let blockIndex =
         arrayFindIndex(state.blocks, ({b_id}) => b_id == blockId)
         ->getBlockIndex;
-      let restored = state.deletedBlocks
-                     ->Belt.Array.keepU(((. {b_id}) => b_id == blockId))[0];
-      let timeoutId =
+
+      let restoreMeta =
         state.deletedBlockMeta
-        ->Belt.Array.keepU(((. {id}) => id == blockId))[0].
-          t_id;
+        ->Belt.Array.keepU(((. {db_id}) => db_id == blockId));
+
+      let restoredBlock = {
+        ...state.blocks[blockIndex],
+        b_deleted: false,
+        b_data: restoreMeta[0].db_data,
+      };
+
       ReasonReact.UpdateWithSideEffects(
         {
           ...state,
@@ -425,26 +406,23 @@ let make =
             state.blocks
             ->(
                 Belt.Array.mapWithIndexU((. i, block) =>
-                  i == blockIndex ? restored : block
+                  i == blockIndex ? restoredBlock : block
                 )
               )
             ->syncLineNumber,
-          deletedBlocks:
-            state.deletedBlocks
-            ->(Belt.Array.keepU((. {b_id}) => b_id != blockId)),
           deletedBlockMeta:
             state.deletedBlockMeta
-            ->(Belt.Array.keepU((. {id}) => id != blockId)),
+            ->(Belt.Array.keepU((. {db_id}) => db_id != blockId)),
           stateUpdateReason: Some(action),
         },
-        (_self => Js.Global.clearTimeout(timeoutId)),
+        (_self => Js.Global.clearTimeout(restoreMeta[0].to_id)),
       );
-    | Block_Capture_Timeout_Id(blockId, timeoutId) =>
-      let blockTimeoutMeta = {id: blockId, t_id: timeoutId};
+    | Block_CaptureQueuedMeta(blockId, timeoutId, data) =>
+      let meta = {db_id: blockId, to_id: timeoutId, db_data: data};
       ReasonReact.Update({
         ...state,
         deletedBlockMeta:
-          Belt.Array.concat(state.deletedBlockMeta, [|blockTimeoutMeta|]),
+          Belt.Array.concat(state.deletedBlockMeta, [|meta|]),
         stateUpdateReason: Some(action),
       });
     | Block_Focus(blockId, blockTyp) =>
@@ -492,6 +470,7 @@ let make =
                             | BTyp_Text => emptyTextBlock()
                             | BTyp_Code => emptyCodeBlock()
                             },
+                          b_deleted: false,
                         },
                       |],
                     );
@@ -563,13 +542,13 @@ let make =
     <>
       state.blocks
       ->(
-          Belt.Array.mapU((. {b_id, b_data}) =>
+          Belt.Array.mapU((. {b_id, b_data, b_deleted}) =>
             switch (b_data) {
             | B_Code({bc_value, bc_widgets, bc_firstLineNumber}) =>
               <div key=b_id id=b_id className="block__container">
                 <div className="source-editor">
                   <Editor_CodeBlock
-                    value=bc_value
+                    value=(b_deleted ? warning(lang, BTyp_Code) : bc_value)
                     focused=(
                       switch (state.focusedBlock) {
                       | None => None
@@ -594,13 +573,7 @@ let make =
                 <div className="block__controls">
                   (
                     readOnly ?
-                      React.null :
-                      blockControlsButtons(
-                        b_id,
-                        state.deletedBlocks,
-                        lang,
-                        send,
-                      )
+                      React.null : blockControlsButtons(b_id, b_deleted, send)
                   )
                 </div>
               </div>
@@ -608,7 +581,7 @@ let make =
               <div key=b_id id=b_id className="block__container">
                 <div className="text-editor">
                   <Editor_TextBlock
-                    value=text
+                    value=(b_deleted ? warning(lang, BTyp_Text) : text)
                     focused=(
                       switch (state.focusedBlock) {
                       | None => None
@@ -631,14 +604,7 @@ let make =
                   readOnly ?
                     React.null :
                     <div className="block__controls">
-                      (
-                        blockControlsButtons(
-                          b_id,
-                          state.deletedBlocks,
-                          lang,
-                          send,
-                        )
-                      )
+                      (blockControlsButtons(b_id, b_deleted, send))
                     </div>
                 )
               </div>
