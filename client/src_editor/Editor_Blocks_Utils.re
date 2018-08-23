@@ -135,7 +135,7 @@ let emptyCodeBlock = () =>
 
 let emptyTextBlock = () => B_Text("");
 
-let newBlock = () => {
+let newBlock = {
   b_id: Utils.generateId(),
   b_data: emptyCodeBlock(),
   b_deleted: false,
