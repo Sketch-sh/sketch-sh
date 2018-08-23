@@ -195,6 +195,8 @@ module Doc = {
     "";
 
   [@bs.send] external setCursor: (t, Position.t) => unit = "";
+
+  [@bs.send] external clearHistory: t => unit = "";
 };
 
 module Editor = {
