@@ -306,7 +306,7 @@ let make =
         let timeoutId =
           Js.Global.setTimeout(
             () => self.ReasonReact.send(Block_DeleteQueued(blockId)),
-            2000,
+            10000,
           );
         self.ReasonReact.send(
           Block_CaptureQueuedMeta(blockId, timeoutId, b_data),
@@ -321,7 +321,7 @@ let make =
             {
               ...state,
               blocks:
-                [|newBlock(), {...state.blocks[0], b_deleted: true}|]
+                [|newBlock, {...state.blocks[0], b_deleted: true}|]
                 ->syncLineNumber,
               stateUpdateReason: Some(action),
               focusedBlock: None,
@@ -357,9 +357,9 @@ let make =
         );
       };
     | Block_DeleteQueued(blockId) =>
-      if (isLastBlock(state.blocks)) {
+      if (isLastBlock(state.blocks) || Belt.Array.length(state.blocks) == 0) {
         ReasonReact.Update({
-          blocks: [|newBlock()|],
+          blocks: [|newBlock|],
           deletedBlockMeta:
             state.deletedBlockMeta
             ->(Belt.Array.keepU((. {db_id}) => db_id != blockId)),
