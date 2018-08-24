@@ -1,13 +1,22 @@
-[@bs.val]
-external js_execute: string => Worker_Evaluator.Types.execResult =
-  "evaluator.execute";
+open Worker_Evaluator.Types;
 
-let js_execute = js_execute;
-
+[@bs.val] external js_execute: string => execResult = "evaluator.execute";
 [@bs.val] external js_reset: unit => unit = "evaluator.reset";
-
-let js_reset = js_reset;
-
 [@bs.val] external mlSyntax: unit => unit = "evaluator.mlSyntax";
-
 [@bs.val] external reSyntax: unit => unit = "evaluator.reasonSyntax";
+
+/* Implementation */
+[@bs.val]
+external parseRE: string => Refmt.implementationAST = "refmt.parseRE";
+[@bs.val]
+external printRE: Refmt.implementationAST => string = "refmt.printRE";
+[@bs.val]
+external parseML: string => Refmt.implementationAST = "refmt.parseML";
+[@bs.val]
+external printML: Refmt.implementationAST => string = "refmt.printML";
+
+/* Interface */
+[@bs.val] external parseREI: string => Refmt.interfaceAST = "refmt.parseREI";
+[@bs.val] external parseMLI: string => Refmt.interfaceAST = "refmt.parseMLI";
+[@bs.val] external printREI: Refmt.interfaceAST => string = "refmt.printREI";
+[@bs.val] external printMLI: Refmt.interfaceAST => string = "refmt.printMLI";

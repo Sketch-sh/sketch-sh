@@ -60,6 +60,7 @@ const base = {
       {
         test: file =>
           file.endsWith(".worker.js") || file.endsWith("Worker_Index.bs.js"),
+        exclude: ["public"],
         use: { loader: "worker-loader" },
       },
       {
@@ -98,6 +99,10 @@ const base = {
             },
           },
         ],
+      },
+      {
+        test: /\.(png|jpg|gif)$|toplevel.js$/,
+        loader: "file-loader?name=[name].[hash].[ext]",
       },
     ],
   },
