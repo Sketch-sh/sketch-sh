@@ -209,14 +209,18 @@ let make =
         ReasonReact.NoUpdate;
       };
     | Block_Execute(focusNextBlock) =>
-      let allCodeBlocks =
+      let allCodeToExecute =
         state.blocks
         ->(
-            Belt.Array.reduceU([], (. acc, {b_id, b_data}) =>
-              switch (b_data) {
-              | B_Text(_) => acc
-              | B_Code({bc_value}) => [(b_id, bc_value), ...acc]
-              }
+            Belt.Array.reduceU([], (. acc, {b_id, b_data, b_deleted}) =>
+              b_deleted ?
+                acc :
+                (
+                  switch (b_data) {
+                  | B_Text(_) => acc
+                  | B_Code({bc_value}) => [(b_id, bc_value), ...acc]
+                  }
+                )
             )
           )
         ->Belt.List.reverse;
@@ -226,7 +230,7 @@ let make =
         (
           self =>
             Js.Promise.(
-              Editor_Worker.executeMany(. lang, allCodeBlocks)
+              Editor_Worker.executeMany(. lang, allCodeToExecute)
               |> then_(results => {
                    results
                    ->(
