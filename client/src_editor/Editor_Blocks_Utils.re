@@ -157,10 +157,13 @@ let isEmpty =
   | B_Code({bc_value}) => String.length(bc_value) == 0
   | B_Text(value) => String.length(value) == 0;
 
-let getBlockIndex =
-  fun
-  | None => (-1)
-  | Some(i) => i;
+let getBlockIndex = (blocks, blockId) =>
+  blocks->Utils.arrayFindIndex(({b_id}) => b_id == blockId)
+  |> (
+    fun
+    | None => (-1)
+    | Some(i) => i
+  );
 
 let isLastBlock = blocks => Belt.Array.length(blocks) == 1;
 

@@ -250,10 +250,7 @@ let make =
         ),
       );
     | Block_UpdateValue(blockId, newValue, diff) =>
-      let blockIndex =
-        arrayFindIndex(state.blocks, ({b_id}) => b_id == blockId)
-        ->getBlockIndex;
-
+      let blockIndex = state.blocks->getBlockIndex(blockId);
       ReasonReact.Update({
         ...state,
         stateUpdateReason: Some(action),
@@ -330,9 +327,7 @@ let make =
           )
         };
       } else {
-        let blockIndex =
-          arrayFindIndex(state.blocks, ({b_id}) => b_id == blockId)
-          ->getBlockIndex;
+        let blockIndex = state.blocks->getBlockIndex(blockId);
         ReasonReact.UpdateWithSideEffects(
           {
             ...state,
@@ -385,9 +380,7 @@ let make =
         });
       }
     | Block_Restore(blockId) =>
-      let blockIndex =
-        arrayFindIndex(state.blocks, ({b_id}) => b_id == blockId)
-        ->getBlockIndex;
+      let blockIndex = state.blocks->getBlockIndex(blockId);
 
       let restoreMeta =
         state.deletedBlockMeta
