@@ -141,17 +141,6 @@ let newBlock = {
   b_deleted: false,
 };
 
-let warning = (lang, blockTyp) => {
-  let message = "This block has been removed. It will be permanently deleted after 10 seconds. Click undo to restore.";
-  switch (blockTyp) {
-  | BTyp_Text => "### " ++ message
-  | BTyp_Code =>
-    let open_ = lang == Editor_Types.RE ? "/* " : "(* ";
-    let close = lang == Editor_Types.RE ? " */" : " *)";
-    open_ ++ message ++ close;
-  };
-};
-
 let isEmpty =
   fun
   | B_Code({bc_value}) => String.length(bc_value) == 0
