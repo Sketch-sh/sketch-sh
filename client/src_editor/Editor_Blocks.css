@@ -47,3 +47,68 @@
 .block__controls--button:last-of-type {
   margin-right: 0;
 }
+
+/* ////////// Deleted block */
+.block__deleted {
+  margin-left: var(--cm-gutter-width);
+  border-radius: 4px;
+  padding: var(--space4);
+  background: #feefb3;
+  text-align: center;
+  font-size: var(--f4);
+  position: relative;
+}
+.block__deleted h3 {
+  margin: var(--space2) 0;
+}
+.block__deleted p {
+  margin: 0;
+}
+.block__deleted--progress {
+  width: 100%;
+  position: absolute;
+  background: rgba(0, 0, 0, 0.2);
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  animation: width 10s linear forwards;
+  opacity: 1;
+  z-index: 1;
+}
+@keyframes width {
+  0% {
+    width: 100%;
+  }
+  100% {
+    width: 0;
+  }
+}
+.block__deleted--active {
+  width: 0;
+  opacity: 1;
+}
+.block__deleted--buttons {
+  display: flex;
+  justify-content: center;
+  margin-top: var(--space3);
+}
+.block__deleted--buttons button {
+  z-index: 2;
+  outline: none;
+  display: flex;
+  padding: var(--space3);
+  border: 0;
+  border-radius: 4px;
+  background-color: color-mod(#feefb3 lightness(+6%));
+  transition: background-color 100ms ease-in-out;
+  font-size: var(--f4);
+
+  & svg {
+    margin-right: var(--space2);
+  }
+}
+
+.block__deleted--buttons button:hover {
+  background-color: color-mod(#feefb3 shade(10%))
+}
