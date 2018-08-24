@@ -20,7 +20,14 @@ module V1 = {
       json => {
         b_id: json |> field("id", string),
         b_data: json |> field("data", blockDataDecoder),
-        b_deleted: json |> field("deleted", bool),
+        b_deleted:
+          json
+          |> optional(field("deleted", bool))
+          |> (
+            fun
+            | None => false
+            | Some(bool) => bool
+          ),
       };
     let langDecoder: Js.Json.t => lang =
       json => json |> string |> stringToLang;

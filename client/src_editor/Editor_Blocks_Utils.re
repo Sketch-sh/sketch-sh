@@ -152,11 +152,15 @@ let warning = (lang, blockTyp) => {
   };
 };
 
-let isEmpty = b_data =>
-  switch (b_data) {
+let isEmpty =
+  fun
   | B_Code({bc_value}) => String.length(bc_value) == 0
-  | B_Text(value) => String.length(value) == 0
-  };
+  | B_Text(value) => String.length(value) == 0;
+
+let getBlockIndex =
+  fun
+  | None => (-1)
+  | Some(i) => i;
 
 let isLastBlock = blocks => Belt.Array.length(blocks) == 1;
 
@@ -173,12 +177,6 @@ let findLastCodeBlock = blocks => {
     };
   loop(length - 1);
 };
-
-let getBlockIndex = foundIndex =>
-  switch (foundIndex) {
-  | None => (-1)
-  | Some(i) => i
-  };
 
 let getFirstLineFromDiff = (diff: CodeMirror.EditorChange.t) => {
   let fromPos = diff->CodeMirror.EditorChange.fromGet;

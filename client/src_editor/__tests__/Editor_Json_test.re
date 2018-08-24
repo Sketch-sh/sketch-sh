@@ -18,16 +18,14 @@ describe("decode", () => {
           "data" : {
             "kind": "code",
             "value": "let a: string = 1;"
-          },
-          "deleted": false
+          }
         },
         {
           "id": "2",
           "data" : {
             "kind": "text",
             "value": "awesome"
-          },
-          "deleted": false
+          }
         }
       ]
     }|}
