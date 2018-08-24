@@ -20,6 +20,14 @@ module V1 = {
       json => {
         b_id: json |> field("id", string),
         b_data: json |> field("data", blockDataDecoder),
+        b_deleted:
+          json
+          |> optional(field("deleted", bool))
+          |> (
+            fun
+            | None => false
+            | Some(bool) => bool
+          ),
       };
     let langDecoder: Js.Json.t => lang =
       json => json |> string |> stringToLang;
@@ -47,10 +55,11 @@ module V1 = {
         object_([("kind", string("text")), ("value", string(value))]);
 
     let blockEncoder: Block.block => Js.Json.t =
-      ({b_id, b_data}) =>
+      ({b_id, b_data, b_deleted}) =>
         object_([
           ("id", string(b_id)),
           ("data", blockDataEncoder(b_data)),
+          ("deleted", bool(b_deleted)),
         ]);
 
     let encode: (lang, array(Block.block)) => Js.Json.t =

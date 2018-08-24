@@ -44,8 +44,9 @@ describe("decode", () => {
                  bc_firstLineNumber: 1,
                  bc_widgets: [||],
                }),
+             b_deleted: false,
            },
-           {b_id: "2", b_data: B_Text("awesome")},
+           {b_id: "2", b_data: B_Text("awesome"), b_deleted: false},
          |],
        );
   });
@@ -60,14 +61,16 @@ describe("decode", () => {
           "data" : {
             "kind": "code",
             "value": "let a: string = 1;"
-          }
+          },
+          "deleted": false
         },
         {
           "id": "2",
           "data" : {
             "kind": "text",
             "value": "awesome"
-          }
+          },
+          "deleted": false
         }
       ]
     }|}
@@ -86,8 +89,9 @@ describe("decode", () => {
                  bc_firstLineNumber: 1,
                  bc_widgets: [||],
                }),
+             b_deleted: false,
            },
-           {b_id: "2", b_data: B_Text("awesome")},
+           {b_id: "2", b_data: B_Text("awesome"), b_deleted: false},
          |],
        );
   });
@@ -101,14 +105,16 @@ describe("decode", () => {
           "data" : {
             "kind": "code",
             "value": "let a: string = 1;"
-          }
+          },
+          "deleted": false
         },
         {
           "id": "2",
           "data" : {
             "kind": "text",
             "value": "awesome"
-          }
+          },
+          "deleted": false
         }
       ]
     }|}
@@ -127,8 +133,9 @@ describe("decode", () => {
                  bc_firstLineNumber: 1,
                  bc_widgets: [||],
                }),
+             b_deleted: false,
            },
-           {b_id: "2", b_data: B_Text("awesome")},
+           {b_id: "2", b_data: B_Text("awesome"), b_deleted: false},
          |],
        );
   });
@@ -147,14 +154,16 @@ describe("encode", () => {
           "data" : {
             "kind": "code",
             "value": "let a: string = 1;"
-          }
+          },
+          "deleted": false
         },
         {
           "id": "2",
           "data" : {
             "kind": "text",
             "value": "awesome"
-          }
+          },
+          "deleted": false
         }
       ]
     }|}
@@ -172,8 +181,9 @@ describe("encode", () => {
                 bc_firstLineNumber: 1,
                 bc_widgets: [||],
               }),
+            b_deleted: false,
           },
-          {b_id: "2", b_data: B_Text("awesome")},
+          {b_id: "2", b_data: B_Text("awesome"), b_deleted: false},
         |],
       ),
     )
@@ -189,14 +199,16 @@ describe("encode", () => {
           "data" : {
             "kind": "code",
             "value": "let a: string = 1;"
-          }
+          },
+          "deleted": false
         },
         {
           "id": "2",
           "data" : {
             "kind": "text",
             "value": "awesome"
-          }
+          },
+          "deleted": false
         }
       ]
     }|}
@@ -214,8 +226,9 @@ describe("encode", () => {
                 bc_firstLineNumber: 1,
                 bc_widgets: [||],
               }),
+            b_deleted: false,
           },
-          {b_id: "2", b_data: B_Text("awesome")},
+          {b_id: "2", b_data: B_Text("awesome"), b_deleted: false},
         |],
       ),
     )

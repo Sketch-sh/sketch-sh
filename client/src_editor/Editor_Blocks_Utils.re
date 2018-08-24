@@ -107,14 +107,17 @@ let syncLineNumber: array(block) => array(block) =
         Belt.Array.reduceU(
           ([||], 1),
           (. (acc, firstLineNumber), block) => {
-            let {b_id, b_data} = block;
+            let {b_id, b_data, b_deleted} = block;
             switch (b_data) {
             | B_Code(bcode) =>
               let {bc_value} = bcode;
               let newBCode =
                 B_Code({...bcode, bc_firstLineNumber: firstLineNumber});
               (
-                Belt.Array.concat(acc, [|{b_id, b_data: newBCode}|]),
+                Belt.Array.concat(
+                  acc,
+                  [|{b_id, b_deleted, b_data: newBCode}|],
+                ),
                 firstLineNumber + bc_value->Utils.js_countLine,
               );
             | B_Text(_) => (
@@ -131,6 +134,38 @@ let emptyCodeBlock = () =>
   B_Code({bc_value: "", bc_firstLineNumber: 1, bc_widgets: [||]});
 
 let emptyTextBlock = () => B_Text("");
+
+let newBlock = {
+  b_id: Utils.generateId(),
+  b_data: emptyCodeBlock(),
+  b_deleted: false,
+};
+
+let warning = (lang, blockTyp) => {
+  let message = "This block has been removed. It will be permanently deleted after 10 seconds. Click undo to restore.";
+  switch (blockTyp) {
+  | BTyp_Text => "### " ++ message
+  | BTyp_Code =>
+    let open_ = lang == Editor_Types.RE ? "/* " : "(* ";
+    let close = lang == Editor_Types.RE ? " */" : " *)";
+    open_ ++ message ++ close;
+  };
+};
+
+let isEmpty =
+  fun
+  | B_Code({bc_value}) => String.length(bc_value) == 0
+  | B_Text(value) => String.length(value) == 0;
+
+let getBlockIndex = (blocks, blockId) =>
+  blocks->Utils.arrayFindIndex(({b_id}) => b_id == blockId)
+  |> (
+    fun
+    | None => (-1)
+    | Some(i) => i
+  );
+
+let isLastBlock = blocks => Belt.Array.length(blocks) == 1;
 
 let findLastCodeBlock = blocks => {
   let length = Array.length(blocks);

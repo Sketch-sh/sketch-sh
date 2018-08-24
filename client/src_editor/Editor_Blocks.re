@@ -4,12 +4,16 @@ Modules.require("./Editor_Blocks.css");
 open Utils;
 open Editor_Types;
 open Editor_Types.Block;
+open Editor_Blocks_Utils;
 
 type action =
   | Block_Add(id, blockTyp)
   | Block_Execute(bool)
   | Block_FocusNextBlockOrCreate
-  | Block_Delete(id)
+  | Block_QueueDelete(id)
+  | Block_DeleteQueued(id)
+  | Block_Restore(id)
+  | Block_CaptureQueuedMeta(id, Js.Global.timeoutId, blockData)
   | Block_Focus(id, blockTyp)
   | Block_Blur(id)
   | Block_UpdateValue(id, string, CodeMirror.EditorChange.t)
@@ -19,17 +23,18 @@ type action =
 
 type state = {
   blocks: array(block),
+  deletedBlockMeta: array(deletedBlockMeta),
   stateUpdateReason: option(action),
   focusedBlock: option((id, blockTyp, focusChangeType)),
 };
 
-let blockControlsButtons = (b_id, send) =>
+let blockControlsButtons = (blockId, isDeleted, send) =>
   <div className="block__controls--buttons">
     <UI_Balloon message="Add code block" position=Down>
       ...<button
            className="block__controls--button"
            ariaLabel="Add code block"
-           onClick=(_ => send(Block_Add(b_id, BTyp_Code)))>
+           onClick=(_ => send(Block_Add(blockId, BTyp_Code)))>
            <Fi.Code />
            <sup> "+"->str </sup>
          </button>
@@ -38,20 +43,32 @@ let blockControlsButtons = (b_id, send) =>
       ...<button
            className="block__controls--button"
            ariaLabel="Add text block"
-           onClick=(_ => send(Block_Add(b_id, BTyp_Text)))>
+           onClick=(_ => send(Block_Add(blockId, BTyp_Text)))>
            <Fi.Edit2 />
            <sup> "+"->str </sup>
          </button>
     </UI_Balloon>
-    <UI_Balloon message="Delete block" position=Down>
-      ...<button
-           className="block__controls--button block__controls--danger"
-           ariaLabel="Delete block"
-           onClick=(_ => send(Block_Delete(b_id)))>
-           <Fi.Trash2 />
-           <sup> "-"->str </sup>
-         </button>
-    </UI_Balloon>
+    (
+      !isDeleted ?
+        <UI_Balloon message="Delete block" position=Down>
+          ...<button
+               className="block__controls--button block__controls--danger"
+               ariaLabel="Delete block"
+               onClick=(_ => send(Block_QueueDelete(blockId)))>
+               <Fi.Trash2 />
+               <sup> "-"->str </sup>
+             </button>
+        </UI_Balloon> :
+        <UI_Balloon message="Restore block" position=Down>
+          ...<button
+               className="block__controls--button"
+               ariaLabel="Restore block"
+               onClick=(_ => send(Block_Restore(blockId)))>
+               <Fi.RefreshCw />
+               <sup> "+"->str </sup>
+             </button>
+        </UI_Balloon>
+    )
   </div>;
 
 let component = ReasonReact.reducerComponent("Editor_Page");
@@ -68,7 +85,8 @@ let make =
     ) => {
   ...component,
   initialState: () => {
-    blocks: blocks->Editor_Blocks_Utils.syncLineNumber,
+    blocks: blocks->syncLineNumber,
+    deletedBlockMeta: [||],
     stateUpdateReason: None,
     focusedBlock: None,
   },
@@ -122,9 +140,11 @@ let make =
         | Block_FocusDown(_)
         | Block_FocusNextBlockOrCreate
         | Block_Execute(_) => ()
-
         | Block_Add(_, _)
-        | Block_Delete(_)
+        | Block_QueueDelete(_)
+        | Block_DeleteQueued(_)
+        | Block_Restore(_)
+        | Block_CaptureQueuedMeta(_, _, _)
         | Block_UpdateValue(_, _, _) => onUpdate(newSelf.state.blocks)
         }
       };
@@ -139,7 +159,7 @@ let make =
           state.blocks
           ->(
               Belt.Array.mapU((. block) => {
-                let {b_id, b_data} = block;
+                let {b_id, b_data, b_deleted} = block;
                 if (b_id != blockId) {
                   block;
                 } else {
@@ -148,6 +168,7 @@ let make =
                   | B_Code(bcode) => {
                       b_id,
                       b_data: B_Code({...bcode, bc_widgets: widgets}),
+                      b_deleted,
                     }
                   };
                 };
@@ -210,8 +231,7 @@ let make =
                    results
                    ->(
                        Belt.List.forEachU((. (blockId, result)) => {
-                         let widgets =
-                           Editor_Blocks_Utils.executeResultToWidget(result);
+                         let widgets = executeResultToWidget(result);
                          self.send(Block_AddWidgets(blockId, widgets));
                        })
                      );
@@ -230,14 +250,7 @@ let make =
         ),
       );
     | Block_UpdateValue(blockId, newValue, diff) =>
-      let foundIndex =
-        arrayFindIndex(state.blocks, ({b_id}) => b_id == blockId);
-      let blockIndex =
-        switch (foundIndex) {
-        | None => (-1)
-        | Some(i) => i
-        };
-
+      let blockIndex = state.blocks->getBlockIndex(blockId);
       ReasonReact.Update({
         ...state,
         stateUpdateReason: Some(action),
@@ -245,7 +258,7 @@ let make =
           state.blocks
           ->(
               Belt.Array.mapWithIndexU((. i, block) => {
-                let {b_id, b_data} = block;
+                let {b_id, b_data, b_deleted} = block;
                 if (i < blockIndex) {
                   block;
                 } else if (i == blockIndex) {
@@ -258,7 +271,7 @@ let make =
                           bc_value: newValue,
                           bc_widgets: {
                             let removeWidgetBelowMe =
-                              diff->Editor_Blocks_Utils.getFirstLineFromDiff;
+                              diff->getFirstLineFromDiff;
                             let currentWidgets = bcode.bc_widgets;
                             currentWidgets
                             ->(
@@ -268,8 +281,9 @@ let make =
                               );
                           },
                         }),
+                      b_deleted,
                     }
-                  | B_Text(_) => {b_id, b_data: B_Text(newValue)}
+                  | B_Text(_) => {b_id, b_data: B_Text(newValue), b_deleted}
                   };
                 } else {
                   switch (b_data) {
@@ -282,17 +296,68 @@ let make =
                 };
               })
             )
-          ->Editor_Blocks_Utils.syncLineNumber,
+          ->syncLineNumber,
       });
-    | Block_Delete(blockId) =>
-      let last_block = Belt.Array.length(state.blocks) == 1;
-      if (last_block) {
-        let new_block = {
-          b_id: Utils.generateId(),
-          b_data: Editor_Blocks_Utils.emptyCodeBlock(),
+    | Block_QueueDelete(blockId) =>
+      let queueTimeout = (self, b_data) => {
+        let timeoutId =
+          Js.Global.setTimeout(
+            () => self.ReasonReact.send(Block_DeleteQueued(blockId)),
+            10000,
+          );
+        self.ReasonReact.send(
+          Block_CaptureQueuedMeta(blockId, timeoutId, b_data),
+        );
+        ();
+      };
+      if (isLastBlock(state.blocks)) {
+        switch (isEmpty(state.blocks[0].b_data)) {
+        | true => ReasonReact.NoUpdate
+        | _ =>
+          ReasonReact.UpdateWithSideEffects(
+            {
+              ...state,
+              blocks:
+                [|newBlock, {...state.blocks[0], b_deleted: true}|]
+                ->syncLineNumber,
+              stateUpdateReason: Some(action),
+              focusedBlock: None,
+            },
+            (self => queueTimeout(self, state.blocks[0].b_data)),
+          )
         };
+      } else {
+        let blockIndex = state.blocks->getBlockIndex(blockId);
+        ReasonReact.UpdateWithSideEffects(
+          {
+            ...state,
+            blocks:
+              state.blocks
+              ->(
+                  Belt.Array.mapWithIndexU((. i, block) =>
+                    i == blockIndex ?
+                      {...state.blocks[blockIndex], b_deleted: true} : block
+                  )
+                )
+              ->syncLineNumber,
+            stateUpdateReason: Some(action),
+            focusedBlock:
+              switch (state.focusedBlock) {
+              | None => None
+              | Some((focusedBlock, _, _)) =>
+                focusedBlock == blockId ? None : state.focusedBlock
+              },
+          },
+          (self => queueTimeout(self, state.blocks[blockIndex].b_data)),
+        );
+      };
+    | Block_DeleteQueued(blockId) =>
+      if (isLastBlock(state.blocks) || Belt.Array.length(state.blocks) == 0) {
         ReasonReact.Update({
-          blocks: [|new_block|],
+          blocks: [|newBlock|],
+          deletedBlockMeta:
+            state.deletedBlockMeta
+            ->(Belt.Array.keepU((. {db_id}) => db_id != blockId)),
           stateUpdateReason: Some(action),
           focusedBlock: None,
         });
@@ -301,7 +366,10 @@ let make =
           blocks:
             state.blocks
             ->(Belt.Array.keepU((. {b_id}) => b_id != blockId))
-            ->Editor_Blocks_Utils.syncLineNumber,
+            ->syncLineNumber,
+          deletedBlockMeta:
+            state.deletedBlockMeta
+            ->(Belt.Array.keepU((. {db_id}) => db_id != blockId)),
           stateUpdateReason: Some(action),
           focusedBlock:
             switch (state.focusedBlock) {
@@ -310,7 +378,46 @@ let make =
               focusedBlock == blockId ? None : state.focusedBlock
             },
         });
+      }
+    | Block_Restore(blockId) =>
+      let blockIndex = state.blocks->getBlockIndex(blockId);
+
+      let restoreMeta =
+        state.deletedBlockMeta
+        ->Belt.Array.keepU(((. {db_id}) => db_id == blockId));
+
+      let restoredBlock = {
+        ...state.blocks[blockIndex],
+        b_deleted: false,
+        b_data: restoreMeta[0].db_data,
       };
+
+      ReasonReact.UpdateWithSideEffects(
+        {
+          ...state,
+          blocks:
+            state.blocks
+            ->(
+                Belt.Array.mapWithIndexU((. i, block) =>
+                  i == blockIndex ? restoredBlock : block
+                )
+              )
+            ->syncLineNumber,
+          deletedBlockMeta:
+            state.deletedBlockMeta
+            ->(Belt.Array.keepU((. {db_id}) => db_id != blockId)),
+          stateUpdateReason: Some(action),
+        },
+        (_self => Js.Global.clearTimeout(restoreMeta[0].to_id)),
+      );
+    | Block_CaptureQueuedMeta(blockId, timeoutId, data) =>
+      let meta = {db_id: blockId, to_id: timeoutId, db_data: data};
+      ReasonReact.Update({
+        ...state,
+        deletedBlockMeta:
+          Belt.Array.concat(state.deletedBlockMeta, [|meta|]),
+        stateUpdateReason: Some(action),
+      });
     | Block_Focus(blockId, blockTyp) =>
       ReasonReact.Update({
         ...state,
@@ -330,8 +437,9 @@ let make =
           ReasonReact.NoUpdate
       }
     | Block_Add(afterBlockId, blockTyp) =>
-      let newBlockId = Utils.generateId();
+      let newBlockId = generateId();
       ReasonReact.Update({
+        ...state,
         stateUpdateReason: Some(action),
         focusedBlock: Some((newBlockId, blockTyp, FcTyp_BlockNew)),
         blocks:
@@ -352,9 +460,10 @@ let make =
                           b_id: newBlockId,
                           b_data:
                             switch (blockTyp) {
-                            | BTyp_Text => Editor_Blocks_Utils.emptyTextBlock()
-                            | BTyp_Code => Editor_Blocks_Utils.emptyCodeBlock()
+                            | BTyp_Text => emptyTextBlock()
+                            | BTyp_Code => emptyCodeBlock()
                             },
+                          b_deleted: false,
                         },
                       |],
                     );
@@ -362,7 +471,7 @@ let make =
                 },
               )
             )
-          ->Editor_Blocks_Utils.syncLineNumber,
+          ->syncLineNumber,
       });
     | Block_FocusUp(blockId) =>
       let upperBlock = {
@@ -426,13 +535,13 @@ let make =
     <>
       state.blocks
       ->(
-          Belt.Array.mapU((. {b_id, b_data}) =>
+          Belt.Array.mapU((. {b_id, b_data, b_deleted}) =>
             switch (b_data) {
             | B_Code({bc_value, bc_widgets, bc_firstLineNumber}) =>
               <div key=b_id id=b_id className="block__container">
                 <div className="source-editor">
                   <Editor_CodeBlock
-                    value=bc_value
+                    value=(b_deleted ? warning(lang, BTyp_Code) : bc_value)
                     focused=(
                       switch (state.focusedBlock) {
                       | None => None
@@ -455,14 +564,17 @@ let make =
                   />
                 </div>
                 <div className="block__controls">
-                  (readOnly ? React.null : blockControlsButtons(b_id, send))
+                  (
+                    readOnly ?
+                      React.null : blockControlsButtons(b_id, b_deleted, send)
+                  )
                 </div>
               </div>
             | B_Text(text) =>
               <div key=b_id id=b_id className="block__container">
                 <div className="text-editor">
                   <Editor_TextBlock
-                    value=text
+                    value=(b_deleted ? warning(lang, BTyp_Text) : text)
                     focused=(
                       switch (state.focusedBlock) {
                       | None => None
@@ -485,7 +597,7 @@ let make =
                   readOnly ?
                     React.null :
                     <div className="block__controls">
-                      (blockControlsButtons(b_id, send))
+                      (blockControlsButtons(b_id, b_deleted, send))
                     </div>
                 )
               </div>

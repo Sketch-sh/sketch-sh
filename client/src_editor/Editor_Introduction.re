@@ -58,7 +58,11 @@ external toJson: 'a => Js.Json.t = "%identity";
 let wrapInBlocks = blocks => {"blocks": blocks};
 let blocks =
   blocks
-  ->(Belt.Array.mapU((. data) => {"id": Utils.generateId(), "data": data}))
+  ->(
+      Belt.Array.mapU((. data) =>
+        {"id": Utils.generateId(), "data": data, "deleted": false}
+      )
+    )
   ->wrapInBlocks
   ->toJson
   ->Editor_Json.V1.decode;

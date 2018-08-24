@@ -50,6 +50,13 @@ module Block = {
   type block = {
     b_id: id,
     b_data: blockData,
+    b_deleted: bool,
+  };
+
+  type deletedBlockMeta = {
+    db_id: id,
+    db_data: blockData,
+    to_id: Js.Global.timeoutId,
   };
 
   type focusChangeType =
