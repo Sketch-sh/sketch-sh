@@ -6,6 +6,14 @@ open Block;
 
 let parse = Js.Json.parseExn;
 
+/*
+ * NOTE: If you change JSON encode/decode
+ * - NEVER change the json value of decode
+ * - You can change the expected ReasonML code
+ * this is to ensure that all saved data will be correctly
+ * decoded in case of an API change
+ * - Encode could be change as will
+ */
 describe("decode", () => {
   open Expect;
   open! Expect.Operators;
@@ -61,16 +69,14 @@ describe("decode", () => {
           "data" : {
             "kind": "code",
             "value": "let a: string = 1;"
-          },
-          "deleted": false
+          }
         },
         {
           "id": "2",
           "data" : {
             "kind": "text",
             "value": "awesome"
-          },
-          "deleted": false
+          }
         }
       ]
     }|}
@@ -105,8 +111,50 @@ describe("decode", () => {
           "data" : {
             "kind": "code",
             "value": "let a: string = 1;"
+          }
+        },
+        {
+          "id": "2",
+          "data" : {
+            "kind": "text",
+            "value": "awesome"
+          }
+        }
+      ]
+    }|}
+      ->parse
+      ->decode;
+
+    expect((lang, blocks))
+    == (
+         RE,
+         [|
+           {
+             b_id: "1",
+             b_data:
+               B_Code({
+                 bc_value: "let a: string = 1;",
+                 bc_firstLineNumber: 1,
+                 bc_widgets: [||],
+               }),
+             b_deleted: false,
+           },
+           {b_id: "2", b_data: B_Text("awesome"), b_deleted: false},
+         |],
+       );
+  });
+  test("decode deleted blocks", () => {
+    let (lang, blocks) =
+      {|{
+      "lang": "RE",
+      "blocks": [
+        {
+          "id": "1",
+          "data" : {
+            "kind": "code",
+            "value": "let a: string = 1;"
           },
-          "deleted": false
+          "deleted": true
         },
         {
           "id": "2",
@@ -133,7 +181,7 @@ describe("decode", () => {
                  bc_firstLineNumber: 1,
                  bc_widgets: [||],
                }),
-             b_deleted: false,
+             b_deleted: true,
            },
            {b_id: "2", b_data: B_Text("awesome"), b_deleted: false},
          |],
@@ -200,7 +248,7 @@ describe("encode", () => {
             "kind": "code",
             "value": "let a: string = 1;"
           },
-          "deleted": false
+          "deleted": true
         },
         {
           "id": "2",
@@ -226,7 +274,7 @@ describe("encode", () => {
                 bc_firstLineNumber: 1,
                 bc_widgets: [||],
               }),
-            b_deleted: false,
+            b_deleted: true,
           },
           {b_id: "2", b_data: B_Text("awesome"), b_deleted: false},
         |],

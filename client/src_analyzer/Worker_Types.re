@@ -1,17 +1,3 @@
-module CompilerErrorMessage = {
-  /*
-   Ocaml's parse location is really weird:
-   - Line: 1-based
-   - Col: 0-based
-   */
-  type pos = Worker_Evaluator.Types.pos;
-  let mkPos = Worker_Evaluator.Types.pos;
-  type content = {
-    o_content: string,
-    o_loc: (pos, pos),
-  };
-};
-
 type pos = {
   line: int,
   col: int,
