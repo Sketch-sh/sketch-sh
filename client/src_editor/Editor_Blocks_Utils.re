@@ -106,24 +106,28 @@ let syncLineNumber: array(block) => array(block) =
     ->(
         Belt.Array.reduceU(
           ([||], 1),
-          (. (acc, firstLineNumber), block) => {
+          (. (acc, nextLineNumber), block) => {
             let {b_id, b_data, b_deleted} = block;
-            switch (b_data) {
-            | B_Code(bcode) =>
-              let {bc_value} = bcode;
-              let newBCode =
-                B_Code({...bcode, bc_firstLineNumber: firstLineNumber});
-              (
-                Belt.Array.concat(
-                  acc,
-                  [|{b_id, b_deleted, b_data: newBCode}|],
-                ),
-                firstLineNumber + bc_value->Utils.js_countLine,
-              );
-            | B_Text(_) => (
-                Belt.Array.concat(acc, [|block|]),
-                firstLineNumber,
-              )
+            if (b_deleted) {
+              (Belt.Array.concat(acc, [|block|]), nextLineNumber);
+            } else {
+              switch (b_data) {
+              | B_Code(bcode) =>
+                let {bc_value} = bcode;
+                let newBCode =
+                  B_Code({...bcode, bc_firstLineNumber: nextLineNumber});
+                (
+                  Belt.Array.concat(
+                    acc,
+                    [|{b_id, b_deleted, b_data: newBCode}|],
+                  ),
+                  nextLineNumber + bc_value->Utils.js_countLine,
+                );
+              | B_Text(_) => (
+                  Belt.Array.concat(acc, [|block|]),
+                  nextLineNumber,
+                )
+              };
             };
           },
         )
