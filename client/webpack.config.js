@@ -1,3 +1,5 @@
+//@ts-check
+
 const webpack = require("webpack");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const path = require("path");
@@ -11,6 +13,7 @@ const outputDir = path.join(__dirname, "build/");
 
 const isProd = process.env.NODE_ENV === "production";
 
+/** @type webpack.Configuration */
 const base = {
   entry: ["react-hot-loader/patch", "./entry.js"],
   mode: isProd ? "production" : "development",
