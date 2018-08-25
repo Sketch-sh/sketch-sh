@@ -323,7 +323,7 @@ context("Block controls", () => {
         .find(".block__deleted", { timeout: 10000 })
         .should("not.exist");
     });
-    it.only("have restore button in toolbar as well", () => {
+    it("have restore button in toolbar as well", () => {
       cy.visit("new/reason");
       shortcut("{shift}{enter}");
       shortcut("{shift}{enter}");
@@ -400,6 +400,23 @@ context("Block controls", () => {
 
       assertValue(0);
       assertErrorsOrWarnings(1);
+    });
+
+    it("sync line number when temporary block shows up", () => {
+      cy.visit("new/reason");
+      shortcut("{shift}{enter}");
+      shortcut("{shift}{enter}");
+      assertCodeBlocks(3);
+
+      cy.get(".block__container")
+        .eq(1)
+        .find(`button[aria-label="Delete block"]`)
+        .click();
+      assertCodeBlocks(2);
+
+      cy.window().then(win => {
+        expect(win.editor.getOption("firstLineNumber")).to.equal(2);
+      });
     });
   });
 });
