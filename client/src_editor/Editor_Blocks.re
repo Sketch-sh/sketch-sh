@@ -548,7 +548,9 @@ let make =
                     "It will be permanently deleted after 10 seconds"->str
                   </p>
                   <div className="block__deleted--buttons">
-                    <button onClick=(_ => send(Block_Restore(b_id)))>
+                    <button
+                      onClick=(_ => send(Block_Restore(b_id)))
+                      ariaLabel="Restore block">
                       <Fi.RefreshCw />
                       "Restore"->str
                     </button>
