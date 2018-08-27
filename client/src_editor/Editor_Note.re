@@ -283,6 +283,7 @@ module WithShortcut = {
         ~blocks,
         ~noteOwnerId,
         ~noteLastEdited,
+        ~forkFrom=?,
         _children,
       ) => {
     ...component,
@@ -298,6 +299,7 @@ module WithShortcut = {
                  initialBlocks=blocks
                  initialNoteOwnerId=noteOwnerId
                  initialNoteLastEdited=noteLastEdited
+                 initialForkFrom=?forkFrom
                  registerShortcut
                />
            )

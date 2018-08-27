@@ -7,6 +7,7 @@ module Editor = [%graphql
       data
       updated_at
       user_id
+      fork_from
     }
   |}
 ];

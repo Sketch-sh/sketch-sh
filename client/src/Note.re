@@ -67,6 +67,7 @@ let make = (~noteInfo: Route.noteRouteConfig, _children: React.childless) => {
                               title=?(note##title)
                               lang
                               blocks
+                              forkFrom=?(note##fork_from)
                             />
                        </RedirectSketchURL>;
                      },
