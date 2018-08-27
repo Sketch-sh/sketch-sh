@@ -185,6 +185,7 @@ module Editor_Note = {
                      className=buttonClassName
                    />
                    <Editor_Note_ForkButton
+                     hasSavePermission=state.hasSavePermission
                      noteId=state.noteId
                      noteState=state.noteState
                      updateForkStatus=(

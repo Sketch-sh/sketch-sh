@@ -5,7 +5,8 @@ module ForkButton = {
   let component =
     ReasonReact.statelessComponent("Editor_Note_SaveButton_Button");
 
-  let make = (~handleFork, ~forkStatus, ~className=?, _children) => {
+  let make =
+      (~hasSavePermission, ~handleFork, ~forkStatus, ~className=?, _children) => {
     ...component,
     render: _self =>
       <UI_Balloon position=Down message="Fork this Sketch">
@@ -17,7 +18,24 @@ module ForkButton = {
                }
              )
              ?className
-             onClick=(_ => handleFork())>
+             onClick=(
+               _ => {
+                 let continue =
+                   if (hasSavePermission) {
+                     Webapi.Dom.(
+                       Window.confirm(
+                         "Do you want to fork your own Sketch?",
+                         window,
+                       )
+                     );
+                   } else {
+                     true;
+                   };
+                 if (continue) {
+                   handleFork();
+                 };
+               }
+             )>
              (
                switch (forkStatus) {
                | ForkStatus_Loading =>
@@ -226,6 +244,7 @@ let component = ReasonReact.statelessComponent("Editor_Note_SaveButton");
 
 let make =
     (
+      ~hasSavePermission,
       ~forkStatus,
       ~noteId,
       ~noteState,
@@ -246,7 +265,12 @@ let make =
                <ForkLogin getCurrentData userId noteId updateForkStatus>
                  ...(
                       (~handleFork) =>
-                        <ForkButton forkStatus handleFork ?className />
+                        <ForkButton
+                          hasSavePermission
+                          forkStatus
+                          handleFork
+                          ?className
+                        />
                     )
                </ForkLogin>
              | Anonymous =>
@@ -257,7 +281,12 @@ let make =
                  updateForkStatus>
                  ...(
                       (~handleFork) =>
-                        <ForkButton forkStatus handleFork ?className />
+                        <ForkButton
+                          hasSavePermission
+                          forkStatus
+                          handleFork
+                          ?className
+                        />
                     )
                </ForkAnonymous>
            )

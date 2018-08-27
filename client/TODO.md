@@ -1,5 +1,7 @@
 - [x] Fork route transition is being prevented 
 - [x] Update sketch's owner information
-- Pass forkFrom query
-- Execute code after saving
-- Display forkFrom to EditorNote page
+- [x] Pass forkFrom query
+- [ ] Show prompt when forking your own fork
+- [ ] Execute code after saving
+- [ ] Display forkFrom to EditorNote page
+- [ ] Test logged in user
