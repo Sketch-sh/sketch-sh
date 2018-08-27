@@ -63,8 +63,9 @@ module Editor_Note = {
           != oldSelf.state.editorContentStatus) {
         let unloadMessage =
           switch (newSelf.state.editorContentStatus) {
-          | Ec_Dirty => Some("Changes you made may not be saved")
-          | _ => None
+          | Ec_Saved
+          | Ec_Pristine => None
+          | _ => Some("Changes you made may not be saved")
           };
         Router.Unload.register(unloadMessage);
       },
