@@ -52,6 +52,7 @@ module ForkLogin = {
       }) {
         returning {
           updated_at
+          user_id
         }
       }
     }
@@ -101,6 +102,7 @@ module ForkLogin = {
                                   newId: newNoteId,
                                   forkFrom: noteId,
                                   lastEdited: newNoteData##updated_at,
+                                  owner: newNoteData##user_id,
                                 });
                               } else {
                                 ForkStatus_Error;
@@ -142,6 +144,7 @@ module ForkAnonymous = {
       }) {
         returning {
           updated_at
+          user_id
         }
       }
       insert_note_edit_token(objects:{
@@ -197,6 +200,7 @@ module ForkAnonymous = {
                                   newId: newNoteId,
                                   forkFrom: noteId,
                                   lastEdited: newNoteData##updated_at,
+                                  owner: newNoteData##user_id,
                                 });
                               } else {
                                 ForkStatus_Error;

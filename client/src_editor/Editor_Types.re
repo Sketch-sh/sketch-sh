@@ -38,6 +38,7 @@ type forkData = {
   newId: id,
   forkFrom: id,
   lastEdited: Js.Json.t,
+  owner: id,
 };
 type forkStatus =
   | ForkStatus_Initial

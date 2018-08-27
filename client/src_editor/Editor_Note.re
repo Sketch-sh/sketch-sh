@@ -115,7 +115,7 @@ module Editor_Note = {
         }
       | UpdateForkStatus(forkStatus) =>
         switch (forkStatus) {
-        | ForkStatus_Done({newId, forkFrom, lastEdited}) =>
+        | ForkStatus_Done({newId, forkFrom, lastEdited, owner}) =>
           Notify.info("Forked successfully");
           ReasonReact.UpdateWithSideEffects(
             {
@@ -126,6 +126,7 @@ module Editor_Note = {
               forkFrom: Some(forkFrom),
               editorContentStatus: Ec_Saved,
               noteLastEdited: Some(lastEdited),
+              noteOwnerId: owner,
             },
             (
               _ => Router.pushSilent(Route.Note({noteId: newId, data: None}))
