@@ -5,6 +5,7 @@ open Editor_Types;
 
 module Editor_Note = {
   type state = {
+    hasSavePermission: bool,
     noteId: id,
     forkFrom: option(id),
     noteState,
@@ -30,6 +31,7 @@ module Editor_Note = {
 
   let make =
       (
+        ~initialHasSavePermission,
         ~initialNoteId,
         ~initialForkFrom=?,
         ~initialNoteState: noteState,
@@ -43,6 +45,7 @@ module Editor_Note = {
       ) => {
     ...component,
     initialState: () => {
+      hasSavePermission: initialHasSavePermission,
       noteId: initialNoteId,
       forkFrom: initialForkFrom,
       noteState: initialNoteState,
@@ -127,6 +130,7 @@ module Editor_Note = {
               editorContentStatus: Ec_Saved,
               noteLastEdited: Some(lastEdited),
               noteOwnerId: owner,
+              hasSavePermission: true,
             },
             (
               _ => Router.pushSilent(Route.Note({noteId: newId, data: None}))
@@ -163,6 +167,7 @@ module Editor_Note = {
                         </button>
                    </UI_Balloon>
                    <Editor_Note_SaveButton
+                     hasSavePermission=state.hasSavePermission
                      noteId=state.noteId
                      noteState=state.noteState
                      editorContentStatus
@@ -276,6 +281,7 @@ module WithShortcut = {
 
   let make =
       (
+        ~hasSavePermission,
         ~noteId,
         ~noteState,
         ~lang=?,
@@ -292,6 +298,7 @@ module WithShortcut = {
         ...(
              registerShortcut =>
                <Editor_Note
+                 initialHasSavePermission=hasSavePermission
                  initialNoteId=noteId
                  initialNoteState=noteState
                  initialLang=?lang

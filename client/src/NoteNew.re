@@ -22,6 +22,7 @@ let make = (~blocks=defaultBlocks, ~title=?, ~lang, _children) => {
                | Login(userId) => userId
                };
              <Editor_Note
+               hasSavePermission=true
                noteOwnerId=userId
                noteLastEdited=None
                noteId=(Utils.generateId())

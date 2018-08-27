@@ -10,6 +10,7 @@ module SaveButton = {
 
   let make =
       (
+        ~hasSavePermission,
         ~handleSave,
         ~editorContentStatus,
         ~className=?,
@@ -30,8 +31,18 @@ module SaveButton = {
       ->onUnmount,
     reducer: (action, _state) =>
       switch (action) {
-      /* TODO: Don't save when there is nothing to do */
-      | Save => ReasonReact.SideEffects((_ => handleSave()))
+      | Save =>
+        if (!hasSavePermission) {
+          Notify.error(
+            "You don't have permission to update this Sketch. You can fork it instead",
+          );
+          ReasonReact.NoUpdate;
+        } else {
+          /* TODO: Don't save when there is nothing to do */
+          ReasonReact.SideEffects(
+            (_ => handleSave()),
+          );
+        }
       },
     render: self =>
       <UI_Balloon
@@ -296,6 +307,7 @@ let component = ReasonReact.statelessComponent("Editor_Note_SaveButton");
 
 let make =
     (
+      ~hasSavePermission,
       ~noteId,
       ~getCurrentData,
       ~noteState,
@@ -316,6 +328,7 @@ let make =
                  ...(
                       (~handleSave) =>
                         <SaveButton
+                          hasSavePermission
                           editorContentStatus
                           handleSave
                           ?className
@@ -329,6 +342,7 @@ let make =
                  ...(
                       (~handleSave) =>
                         <SaveButton
+                          hasSavePermission
                           editorContentStatus
                           handleSave
                           ?className
@@ -345,6 +359,7 @@ let make =
                  ...(
                       (~handleSave) =>
                         <SaveButton
+                          hasSavePermission
                           editorContentStatus
                           handleSave
                           ?className

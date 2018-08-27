@@ -39,42 +39,55 @@ let make = (~noteInfo: Route.noteRouteConfig, _children: React.childless) => {
   render: _self => {
     let noteId = noteInfo.noteId;
     let noteQuery = GetNote.make(~noteId, ());
-
-    <GetNoteComponent variables=noteQuery##variables>
+    <AuthStatus.IsAuthenticated>
       ...(
-           ({result}) =>
-             switch (result) {
-             | Loading => <Editor_NotePlaceholder />
-             | Error(error) => error##message->str
-             | Data(response) =>
-               let notes = response##note;
-               notes
-               ->(
-                   arrayFirst(
-                     ~empty=<NotFound entity="note" />,
-                     ~render=note => {
-                       let (lang, blocks) =
-                         switch (note##data) {
-                         | None => (Editor_Types.RE, [||])
-                         | Some(blocks) => blocks->Editor_Json.V1.decode
-                         };
-                       <RedirectSketchURL noteId>
-                         ...<Editor_Note
-                              noteOwnerId=note##user_id
-                              noteLastEdited=(Some(note##updated_at))
-                              noteId
-                              noteState=NoteState_Old
-                              title=?(note##title)
-                              lang
-                              blocks
-                              forkFrom=?(note##fork_from)
-                            />
-                       </RedirectSketchURL>;
-                     },
-                   )
-                 );
-             }
+           user =>
+             <GetNoteComponent variables=noteQuery##variables>
+               ...(
+                    ({result}) =>
+                      switch (result) {
+                      | Loading => <Editor_NotePlaceholder />
+                      | Error(error) => error##message->str
+                      | Data(response) =>
+                        let notes = response##note;
+                        notes
+                        ->(
+                            arrayFirst(
+                              ~empty=<NotFound entity="note" />,
+                              ~render=note => {
+                                let (lang, blocks) =
+                                  switch (note##data) {
+                                  | None => (Editor_Types.RE, [||])
+                                  | Some(blocks) =>
+                                    blocks->Editor_Json.V1.decode
+                                  };
+                                let hasSavePermission =
+                                  switch (user) {
+                                  | Login(currentUserId) =>
+                                    note##user_id == currentUserId
+                                  | Anonymous =>
+                                    response##note_edit_token->Array.length > 0
+                                  };
+                                <RedirectSketchURL noteId>
+                                  ...<Editor_Note
+                                       noteOwnerId=note##user_id
+                                       noteLastEdited=(Some(note##updated_at))
+                                       noteId
+                                       noteState=NoteState_Old
+                                       title=?(note##title)
+                                       lang
+                                       blocks
+                                       forkFrom=?(note##fork_from)
+                                       hasSavePermission
+                                     />
+                                </RedirectSketchURL>;
+                              },
+                            )
+                          );
+                      }
+                  )
+             </GetNoteComponent>
          )
-    </GetNoteComponent>;
+    </AuthStatus.IsAuthenticated>;
   },
 };
