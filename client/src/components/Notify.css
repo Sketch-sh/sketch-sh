@@ -4,7 +4,7 @@
   position: relative;
   min-height: 50px;
   width: 300px;
-  padding: var(--space3) var(--space3);
+  padding: var(--space3) var(--space4) var(--space3) var(--space3);
   box-sizing: border-box;
   box-shadow: 0 3px 5px #e0e0e0;
   border-radius: 2px;
