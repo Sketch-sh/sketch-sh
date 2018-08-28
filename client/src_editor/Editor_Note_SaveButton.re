@@ -213,7 +213,6 @@ module CreateAnonymous = {
                      ~editToken=Auth.Auth.getOrCreateEditToken(),
                      (),
                    );
-                 mutation(~variables=newNote##variables, ()) |> ignore;
                  updateSaveStatus(SaveStatus_Loading);
 
                  mutation(~variables=newNote##variables, ())
