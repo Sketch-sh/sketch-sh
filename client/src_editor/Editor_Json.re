@@ -1,5 +1,4 @@
 open Editor_Types;
-module Block = Editor_Types.Block;
 
 module V1 = {
   module JsonDecode = {
@@ -29,16 +28,30 @@ module V1 = {
             | Some(bool) => bool
           ),
       };
-    let linkDecoder: Js.Json.t => link =
-      json => {
-        note_id: json |> field("note_id", string),
-        name: json |> field("name", string),
-        revision_at: json |> field("revision_at", string),
-        blocks: json |> field("blocks", array(blockDecoder)),
-      };
+
     let langDecoder: Js.Json.t => lang =
       json => json |> string |> stringToLang;
-    let decode: Js.Json.t => (lang, array(link), array(Block.block)) =
+
+    let internalBlockDecoder: Js.Json.t => Link.internalLink =
+      json => {
+        revision_at: json |> field("timestamp", string),
+        sketch_id: json |> field("id", string),
+        name: json |> field("name", string),
+        lang: json |> field("lang", langDecoder),
+        code: json |> field("code", string),
+      };
+
+    let linkDecoder: Js.Json.t => Link.link =
+      json => {
+        let kind = json |> field("kind", string);
+        switch (kind) {
+        | "internal" =>
+          Internal(json |> field("value", internalBlockDecoder))
+        | _ => External()
+        };
+      };
+
+    let decode: Js.Json.t => (lang, array(Link.link), array(Block.block)) =
       json => (
         json
         |> optional(field("lang", langDecoder))
@@ -81,16 +94,21 @@ module V1 = {
           ("deleted", bool(b_deleted)),
         ]);
 
-    let linkDecoder: link => Js.Json.t =
-      ({note_id, name, revision_at, blocks}) =>
-        object_([
-          ("note_id", string(note_id)),
-          ("name", string(name)),
-          ("revision_at", string(revision_at)),
-          ("blocks", blocks->mapToJsonArray(blockEncoder)),
-        ]);
+    let linkDecoder: Link.link => Js.Json.t =
+      link =>
+        switch (link) {
+        | Internal(internalLink) =>
+          object_([
+            ("sketch_id", string(internalLink.sketch_id)),
+            ("name", string(internalLink.name)),
+            ("lang", internalLink.lang |> langToString |> string),
+            ("timestamp", string(internalLink.revision_at)),
+            ("code", string(internalLink.code)),
+          ])
+        | External () => object_([])
+        };
 
-    let encode: (lang, array(link), array(Block.block)) => Js.Json.t =
+    let encode: (lang, array(Link.link), array(Block.block)) => Js.Json.t =
       (lang, links, blocks) =>
         object_([
           ("lang", lang |> langToString |> string),

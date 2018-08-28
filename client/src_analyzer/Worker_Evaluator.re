@@ -31,6 +31,7 @@ module Types = {
       message: string,
     };
   };
+
   type linkResult = Belt.Result.t(bool, exn);
 };
 

@@ -69,37 +69,39 @@ module Make = (ESig: Worker_Evaluator.EvaluatorSig) => {
       loop(0, []);
     };
 
-  let link:
-    (. Editor_Types.lang, string, array((string, string))) => linkResult =
-    (. lang, name, codeBlocks) => {
-      let filename = name ++ lang->Editor_Types.langToExtension;
+  let link: (. Editor_Types.lang, string, string) => linkResult =
+    (. lang, name, code) => {
+      let filename = name ++ Editor_Types.langToExtension(lang);
 
-      let content: string =
-        Belt.Array.reduce(codeBlocks, "", (a, (_, c)) => a ++ c);
-
-      Evaluator.insertModule(filename, content);
+      Evaluator.insertModule(filename, code);
     };
 
-  exception Link_Error;
+  exception Not_Implemented;
 
   let linkMany:
-    (. Editor_Types.lang, list(Editor_Types.link)) =>
-    list((string, linkResult)) =
+    (. Editor_Types.lang, list(Editor_Types.Link.link)) =>
+    list((Editor_Types.Link.link, linkResult)) =
     (. lang, links) => {
-      let rec loop: (list(Editor_Types.link), list) =
-        (links, acc) =>
-          switch (links) {
-          | [] => acc
-          | [singleLink, ...rest] =>
-            let {name, sowas} = singleLink;
-            let result = link(. lang, name, sowas);
+      open Editor_Types.Link;
+      let rec loop = (links, acc) =>
+        switch (links) {
+        | [] => acc
+        | [singleLink, ...rest] =>
+          let (name, result) =
+            switch (singleLink) {
+            | Internal(internalLink) =>
+              let {name, code} = internalLink;
+              let result = link(. lang, name, code);
+              (singleLink, result);
+            | External(_) => raise(Not_Implemented)
+            };
 
-            let hasError = Belt.Result.isError(result);
+          let hasError = Belt.Result.isError(result);
 
-            hasError ?
-              [(name, result), ...acc] :
-              loop(rest, [(name, result), ...acc]);
-          };
+          hasError ?
+            [(name, result), ...acc] :
+            loop(rest, [(name, result), ...acc]);
+        };
       loop(links, []);
     };
 

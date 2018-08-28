@@ -17,6 +17,11 @@ let langToString =
   | ML => "ML"
   | RE => "RE";
 
+let langToExtension =
+  fun
+  | ML => ".ml"
+  | RE => ".re";
+
 type noteState =
   | NoteState_New
   | NoteState_Old;
@@ -45,10 +50,6 @@ type forkStatus =
   | ForkStatus_Loading
   | ForkStatus_Error
   | ForkStatus_Done(forkData);
-let langToExtension =
-  fun
-  | ML => ".ml"
-  | RE => ".re";
 
 module Widget = {
   type lineWidgetData =
@@ -103,9 +104,18 @@ module Block = {
     | FcTyp_BlockExecuteAndFocusNextBlock;
 };
 
-type link = {
-  revision_at: string,
-  note_id: string,
-  name: string,
-  blocks: array(Block.block),
+module Link = {
+  type internalLink = {
+    revision_at: string,
+    sketch_id: string,
+    name: string,
+    lang,
+    code: string,
+  };
+
+  type externalLink = unit;
+
+  type link =
+    | Internal(internalLink)
+    | External(externalLink);
 };

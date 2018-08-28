@@ -11,7 +11,7 @@ module Editor_Note = {
     noteState,
     lang,
     title: string,
-    links: ref(array(link)),
+    links: ref(array(Link.link)),
     blocks: ref(array(Block.block)),
     editorContentStatus,
     executeCallback: option(unit => unit),
@@ -23,7 +23,7 @@ module Editor_Note = {
   type action =
     | TitleUpdate(string)
     | BlockUpdate(array(Block.block))
-    | LinkUpdate(array(link))
+    | LinkUpdate(array(Link.link))
     | RegisterExecuteCallback(unit => unit)
     | UpdateNoteSaveStatus(saveStatus)
     | UpdateForkStatus(forkStatus)
@@ -41,7 +41,7 @@ module Editor_Note = {
         ~initialLang: lang=RE,
         ~initialTitle: string="",
         ~initialBlocks: array(Block.block),
-        ~initialLinks: array(link),
+        ~initialLinks: array(Link.link),
         ~initialNoteOwnerId: id,
         ~initialNoteLastEdited: option(Js.Json.t),
         ~registerShortcut: Shortcut.subscribeFun,
@@ -95,6 +95,9 @@ module Editor_Note = {
               }
           ),
         )
+      | LinkUpdate(links) =>
+        state.links := links;
+        ReasonReact.Update({...state, editorContentStatus: Ec_Dirty});
       | BlockUpdate(blocks) =>
         state.blocks := blocks;
         ReasonReact.Update({...state, editorContentStatus: Ec_Dirty});
