@@ -4,6 +4,8 @@ const faker = require("faker");
 context("note - anonymous user", () => {
   it("create new note and edit it anonymously", () => {
     cy.visit("new/reason");
+    cy.get(".EditorNote__metadata--info").find(`a[href="/u/anonymous"]`);
+
     let title = faker.lorem.words();
 
     cy.get(".Topbar__action")
