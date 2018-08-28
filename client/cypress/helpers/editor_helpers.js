@@ -19,11 +19,18 @@ const shortcut = shortcut =>
     .focus()
     .type(shortcut);
 
+const assertLastBlockValue = value => {
+  cy.window().then(win => {
+    expect(win.editor.getValue()).to.equal(value);
+  });
+};
+
 export {
   assertBlocks,
   assertCodeBlocks,
   assertTextBlocks,
   assertErrorsOrWarnings,
   assertValue,
-  shortcut
-}
+  shortcut,
+  assertLastBlockValue,
+};

@@ -8,7 +8,16 @@ import {
   assertErrorsOrWarnings,
   assertValue,
   shortcut,
+  assertLastBlockValue,
 } from "../../helpers/editor_helpers";
+
+import generate from "nanoid/generate";
+
+const generateId = () =>
+  generate(
+    "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789",
+    22
+  );
 
 context("create - edit", () => {
   it("create new and edit note anonymously", () => {
@@ -122,5 +131,64 @@ context("fork", () => {
       cy.url().should("not.equal", currentUrl);
       cy.url().should("match", /s\/.+/, "should not be new route");
     });
+  });
+
+  it.only("fork another anonymous", () => {
+    let newNoteId = generateId();
+
+    cy.request("POST", Cypress.env("GRAPHQL_ENDPOINT"), {
+      operationName: "createNoteAnonymous",
+      variables: {
+        noteId: newNoteId,
+        editToken: generateId(),
+        userId: "anonymous",
+        title: "",
+        data: {
+          lang: "RE",
+          blocks: [
+            {
+              id: generateId(),
+              data: { kind: "code", value: "let a = 1;" },
+              deleted: false,
+            },
+          ],
+        },
+      },
+      query: `mutation createNoteAnonymous(
+          $noteId: String!, 
+          $editToken: String!, 
+          $userId: String!, 
+          $title: String!, 
+          $data: jsonb!
+        ) { 
+          mutate: insert_note(objects: 
+            {title: $title, id: $noteId, user_id: $userId, data: $data}
+          ) {
+            returning {
+              updated_at
+            }
+          }
+          insert_note_edit_token(objects: 
+            {note_id: $noteId, token: $editToken}
+          ) {
+            affected_rows  
+           }
+        }
+          `,
+    });
+    cy.visit(`/s/` + newNoteId);
+    cy.get(".block__container")
+      .first()
+      .find("textarea")
+      .as("block1")
+      .type("let a = 2;", { force: true });
+    shortcut("{ctrl}s");
+    cy.get(".Notify.Notify--error").contains("You don't have permission");
+    cy.get(`button[aria-label="Fork"]`).click();
+
+    cy.url().should("not.contain", newNoteId);
+    cy.reload();
+    assertBlocks(1);
+    assertLastBlockValue("let a = 2;let a = 1;")
   });
 });
