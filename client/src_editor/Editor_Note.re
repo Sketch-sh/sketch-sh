@@ -142,9 +142,7 @@ module Editor_Note = {
               noteOwnerId: owner,
               hasSavePermission: true,
             },
-            (
-              _ => Router.pushSilent(Route.Note({noteId: newId, data: None}))
-            ),
+            (_ => Router.push(Route.Note({noteId: newId, data: None}))),
           );
         | ForkStatus_Error =>
           Notify.error("Fork error");
