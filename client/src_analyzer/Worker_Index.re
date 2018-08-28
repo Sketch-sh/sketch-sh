@@ -32,6 +32,7 @@ let obj = {
       | Error(error) => Error(error)
       }
     ),
+  "link": Analyze.link,
 };
 
 Comlink.(comlink->(expose(obj, Worker.self)));

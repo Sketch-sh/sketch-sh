@@ -10,11 +10,11 @@ let defaultBlocks = [|
 
 let component = ReasonReact.statelessComponent("Note_New");
 
-let make = (~blocks=defaultBlocks, ~title=?, ~lang, _children) => {
+let make = (~blocks=defaultBlocks, ~title=?, ~lang, ~links=[||], _children) => {
   ...component,
   render: _self =>
     <AuthStatus.IsAuthenticated>
-      ...(
+      ...{
            user => {
              let userId =
                switch (user) {
@@ -25,13 +25,14 @@ let make = (~blocks=defaultBlocks, ~title=?, ~lang, _children) => {
                hasSavePermission=true
                noteOwnerId=userId
                noteLastEdited=None
-               noteId=(Utils.generateId())
+               noteId={Utils.generateId()}
                noteState=NoteState_New
                blocks
                lang
                ?title
+               links
              />;
            }
-         )
+         }
     </AuthStatus.IsAuthenticated>,
 };

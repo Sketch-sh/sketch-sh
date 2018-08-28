@@ -4,6 +4,9 @@ open Worker_Evaluator.Types;
 [@bs.val] external js_reset: unit => unit = "evaluator.reset";
 [@bs.val] external mlSyntax: unit => unit = "evaluator.mlSyntax";
 [@bs.val] external reSyntax: unit => unit = "evaluator.reasonSyntax";
+[@bs.val]
+external insertModule: (string, string) => Worker_Evaluator.Types.linkResult =
+  "evaluator.insertModule";
 
 /* Implementation */
 [@bs.val]

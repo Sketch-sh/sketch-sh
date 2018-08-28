@@ -11,6 +11,7 @@ module Editor_Note = {
     noteState,
     lang,
     title: string,
+    links: ref(array(link)),
     blocks: ref(array(Block.block)),
     editorContentStatus,
     executeCallback: option(unit => unit),
@@ -22,6 +23,7 @@ module Editor_Note = {
   type action =
     | TitleUpdate(string)
     | BlockUpdate(array(Block.block))
+    | LinkUpdate(array(link))
     | RegisterExecuteCallback(unit => unit)
     | UpdateNoteSaveStatus(saveStatus)
     | UpdateForkStatus(forkStatus)
@@ -154,7 +156,7 @@ module Editor_Note = {
       let {editorContentStatus, lang} = state;
       <>
         <UI_Topbar.Actions>
-          ...(
+          ...{
                (~buttonClassName) =>
                  <>
                    <UI_Balloon
@@ -163,52 +165,52 @@ module Editor_Note = {
                      message="Execute code (Ctrl+Enter)">
                      ...<button
                           className=buttonClassName
-                          onClick=(
+                          onClick={
                             _ =>
                               switch (state.executeCallback) {
                               | None => ()
                               | Some(callback) => callback()
                               }
-                          )>
+                          }>
                           <Fi.Terminal />
                           "Run"->str
                         </button>
                    </UI_Balloon>
                    <Editor_Note_SaveButton
-                     hasSavePermission=state.hasSavePermission
-                     noteId=state.noteId
-                     noteState=state.noteState
+                     hasSavePermission={state.hasSavePermission}
+                     noteId={state.noteId}
+                     noteState={state.noteState}
                      editorContentStatus
-                     updateSaveStatus=(
+                     updateSaveStatus={
                        saveStatus => saveStatus->UpdateNoteSaveStatus->send
-                     )
-                     getCurrentData=(
+                     }
+                     getCurrentData={
                        () => (
                          state.title,
                          Editor_Json.V1.encode(state.lang, state.blocks^),
                        )
-                     )
+                     }
                      registerShortcut
                      className=buttonClassName
                    />
                    <Editor_Note_ForkButton
-                     hasSavePermission=state.hasSavePermission
-                     noteId=state.noteId
-                     noteState=state.noteState
-                     updateForkStatus=(
+                     hasSavePermission={state.hasSavePermission}
+                     noteId={state.noteId}
+                     noteState={state.noteState}
+                     updateForkStatus={
                        forkStatus => forkStatus->UpdateForkStatus->send
-                     )
-                     getCurrentData=(
+                     }
+                     getCurrentData={
                        () => (
                          state.title,
                          Editor_Json.V1.encode(state.lang, state.blocks^),
                        )
-                     )
+                     }
                      className=buttonClassName
-                     forkStatus=state.forkStatus
+                     forkStatus={state.forkStatus}
                    />
                  </>
-             )
+             }
         </UI_Topbar.Actions>
         <Helmet>
           <title>
@@ -223,8 +225,8 @@ module Editor_Note = {
             <input
               className="EditorNote__metadata--title"
               placeholder="untitled sketch"
-              value=state.title
-              onChange=(event => valueFromEvent(event)->TitleUpdate->send)
+              value={state.title}
+              onChange={event => valueFromEvent(event)->TitleUpdate->send}
             />
             <div className="EditorNote__metadata--info">
               <UI_Balloon message="Sketch language" position=Down>
@@ -235,8 +237,8 @@ module Editor_Note = {
                          type_="radio"
                          id="RE"
                          name="language"
-                         checked=(lang == RE)
-                         onChange=(_ => send(ChangeLang(RE)))
+                         checked={lang == RE}
+                         onChange={_ => send(ChangeLang(RE))}
                        />
                        <label htmlFor="RE" className="EditorNote__lang--RE">
                          "RE"->str
@@ -247,8 +249,8 @@ module Editor_Note = {
                          type_="radio"
                          id="ML"
                          name="language"
-                         checked=(lang == ML)
-                         onChange=(_ => send(ChangeLang(ML)))
+                         checked={lang == ML}
+                         onChange={_ => send(ChangeLang(ML))}
                        />
                        <label htmlFor="ML" className="EditorNote__lang--ML">
                          "ML"->str
@@ -256,20 +258,20 @@ module Editor_Note = {
                      </span>
                    </fieldset>
               </UI_Balloon>
-              <Editor_Note_GetUserInfo userId=state.noteOwnerId>
-                ...(
+              <Editor_Note_GetUserInfo userId={state.noteOwnerId}>
+                ...{
                      fun
                      | None => React.null
                      | Some(user) =>
                        <UI_SketchOwnerInfo
                          owner=user
-                         noteLastEdited=?state.noteLastEdited
+                         noteLastEdited=?{state.noteLastEdited}
                          className="EditorNote__owner"
                        />
-                   )
+                   }
               </Editor_Note_GetUserInfo>
             </div>
-            (
+            {
               state.forkFrom
               =>> (
                 forkFrom =>
@@ -277,22 +279,23 @@ module Editor_Note = {
                     <p>
                       "Forked from"->str
                       <Router.Link
-                        route=(Route.Note({noteId: forkFrom, data: None}))>
+                        route={Route.Note({noteId: forkFrom, data: None})}>
                         {j|/s/$(forkFrom)|j}->str
                       </Router.Link>
                     </p>
                   </div>
               )
-            )
+            }
           </div>
           <Editor_Blocks
             lang
             blocks=state.blocks^
-            registerExecuteCallback=(
+            links
+            registerExecuteCallback={
               callback => send(RegisterExecuteCallback(callback))
-            )
+            }
             registerShortcut
-            onUpdate=(blocks => send(BlockUpdate(blocks)))
+            onUpdate={blocks => send(BlockUpdate(blocks))}
           />
         </main>
       </>;
@@ -309,6 +312,7 @@ module WithShortcut = {
         ~noteId,
         ~noteState,
         ~lang=?,
+        ~links,
         ~title=?,
         ~blocks,
         ~noteOwnerId,
@@ -319,7 +323,7 @@ module WithShortcut = {
     ...component,
     render: _self =>
       <Shortcut.Consumer>
-        ...(
+        ...{
              registerShortcut =>
                <Editor_Note
                  initialHasSavePermission=hasSavePermission
@@ -327,13 +331,14 @@ module WithShortcut = {
                  initialNoteState=noteState
                  initialLang=?lang
                  initialTitle=?title
+                 initialLinks=links
                  initialBlocks=blocks
                  initialNoteOwnerId=noteOwnerId
                  initialNoteLastEdited=noteLastEdited
                  initialForkFrom=?forkFrom
                  registerShortcut
                />
-           )
+           }
       </Shortcut.Consumer>,
   };
 };

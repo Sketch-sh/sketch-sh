@@ -40,10 +40,11 @@ let make = _children => {
                       user =>
                         switch (user) {
                         | Anonymous =>
-                          let (lang, blocks) = Editor_Introduction.blocks;
+                          let (lang, links, blocks) = Editor_Introduction.blocks;
                           <NoteNewLazy
                             title="Sketch.sh - Interactive ReasonML sketchbook"
                             blocks
+                            links
                             lang
                           />;
                         | Login(userId) =>

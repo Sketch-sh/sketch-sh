@@ -25,3 +25,5 @@ type blockData = {
   block_result: blockResult,
   block_loc: (pos, pos),
 };
+
+type linkResult = Belt.Result.t(bool, exn);
