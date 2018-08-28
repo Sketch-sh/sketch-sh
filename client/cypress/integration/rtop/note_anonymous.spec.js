@@ -74,11 +74,13 @@ context("create - edit", () => {
 });
 
 context("fork", () => {
-  before(() => {
+  it("should not have fork button when creating new note", () => {
     cy.visit("new/reason");
+    cy.get(`button[aria-label="Fork"]`).should("not.exist");
   });
 
   it("show confirmation when forking your own note", () => {
+    cy.visit("new/reason");
     const stub = cy.stub();
     stub.onFirstCall().returns(false);
     cy.on("window:confirm", stub);
@@ -97,15 +99,23 @@ context("fork", () => {
       cy.get(`button[aria-label="Fork"]`).click();
       cy.url().should("equal", currentUrl);
     });
-
-    after(() => {
-      expect(stub).to.be.calledOnce();
-    });
   });
+
   it("allow to fork your own note", () => {
+    cy.visit("new/reason");
     const stub = cy.stub();
     stub.onFirstCall().returns(true);
     cy.on("window:confirm", stub);
+
+    let title = faker.lorem.words();
+    cy.get(".EditorNote__metadata")
+      .find("input")
+      .first()
+      .as("title")
+      .type(title);
+
+    shortcut("{ctrl}s");
+    cy.url().should("match", /s\/.+/, "should not be new route");
 
     cy.url().then(currentUrl => {
       cy.get(`button[aria-label="Fork"]`).click();
