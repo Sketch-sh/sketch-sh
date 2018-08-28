@@ -44,7 +44,7 @@ module ForkButton = {
                    <Fi.Loader className="EditorNav__button--spin" />
                    "Forking"->str
                  </>
-               | _ => <> <Fi.Save /> "Fork"->str </>
+               | _ => <> <Fi.GitBranch /> "Fork"->str </>
                }
              )
            </button>

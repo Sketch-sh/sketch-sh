@@ -271,6 +271,21 @@ module Editor_Note = {
                    )
               </Editor_Note_GetUserInfo>
             </div>
+            (
+              state.forkFrom
+              =>> (
+                forkFrom =>
+                  <div className="EditorNote__forkFrom">
+                    <p>
+                      "Fork from"->str
+                      <Router.Link
+                        route=(Route.Note({noteId: forkFrom, data: None}))>
+                        {j|/s/$(forkFrom)|j}->str
+                      </Router.Link>
+                    </p>
+                  </div>
+              )
+            )
           </div>
           <Editor_Blocks
             lang
