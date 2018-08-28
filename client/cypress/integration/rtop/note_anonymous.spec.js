@@ -1,8 +1,17 @@
 /// <reference types="Cypress" />
 const faker = require("faker");
 
-context("note - anonymous user", () => {
-  it("create new note and edit it anonymously", () => {
+import {
+  assertBlocks,
+  assertCodeBlocks,
+  assertTextBlocks,
+  assertErrorsOrWarnings,
+  assertValue,
+  shortcut,
+} from "../../helpers/editor_helpers";
+
+context("create - edit", () => {
+  it("create new and edit note anonymously", () => {
     cy.visit("new/reason");
     cy.get(".EditorNote__metadata--info").find(`a[href="/u/anonymous"]`);
 
@@ -29,6 +38,9 @@ context("note - anonymous user", () => {
     cy.get("@save").click();
 
     cy.url().should("match", /s\/.+/, "should not be new route");
+    cy.get(".EditorNote__metadata--info")
+      .find(`span`)
+      .contains("last edited");
 
     cy.reload(true);
 
@@ -57,6 +69,48 @@ context("note - anonymous user", () => {
       let noteId = firstUrl.split("/")[4];
 
       cy.url().should("contains", noteId, "same note id");
+    });
+  });
+});
+
+context("fork", () => {
+  before(() => {
+    cy.visit("new/reason");
+  });
+
+  it("show confirmation when forking your own note", () => {
+    const stub = cy.stub();
+    stub.onFirstCall().returns(false);
+    cy.on("window:confirm", stub);
+
+    let title = faker.lorem.words();
+    cy.get(".EditorNote__metadata")
+      .find("input")
+      .first()
+      .as("title")
+      .type(title);
+
+    shortcut("{ctrl}s");
+    cy.url().should("match", /s\/.+/, "should not be new route");
+
+    cy.url().then(currentUrl => {
+      cy.get(`button[aria-label="Fork"]`).click();
+      cy.url().should("equal", currentUrl);
+    });
+
+    after(() => {
+      expect(stub).to.be.calledOnce();
+    });
+  });
+  it("allow to fork your own note", () => {
+    const stub = cy.stub();
+    stub.onFirstCall().returns(true);
+    cy.on("window:confirm", stub);
+
+    cy.url().then(currentUrl => {
+      cy.get(`button[aria-label="Fork"]`).click();
+      cy.url().should("not.equal", currentUrl);
+      cy.url().should("match", /s\/.+/, "should not be new route");
     });
   });
 });

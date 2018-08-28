@@ -11,6 +11,7 @@ module ForkButton = {
     render: _self =>
       <UI_Balloon position=Down message="Fork this Sketch">
         ...<button
+             ariaLabel="Fork"
              disabled=(
                switch (forkStatus) {
                | ForkStatus_Loading => true
