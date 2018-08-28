@@ -315,7 +315,6 @@ let make =
             ->syncLineNumber,
         });
       | Block_QueueDelete(blockId) =>
-        Js.log("queue delete");
         let queueTimeout = (self, b_data) => {
           let timeoutId =
             Js.Global.setTimeout(
