@@ -13,7 +13,7 @@
     "start": "webpack-dev-server",
     "ci:build": "rm -rf build && node ./set-bsconfig-production.js && bsb -clean-world && npm run build",
     "ci:cypress": "start-server-and-test start http-get://localhost:3000 cy:run:record",
-    "ci:cypress:staging": "cypress run --record --browser chrome -c baseUrl=\"https://staging.sketch.sh\",defaultCommandTimeout=20000",
+    "ci:cypress:staging": "CYPRESS_GRAPHQL_ENDPOINT=https://rtop-server.herokuapp.com/v1alpha1/graphql cypress run --record --browser chrome -c baseUrl=\"https://staging.sketch.sh\",defaultCommandTimeout=20000",
     "cy:open": "cypress open",
     "cy:run": "cypress run",
     "cy:run:record": "cypress run --record --browser chrome"
