@@ -1,20 +1,4 @@
-module GetNote = [%graphql
-  {|
-    query getNote (
-      $noteId: String!
-    ) {
-      note: note (where: {id : {_eq: $noteId}}) {
-        ...GqlFragment.Editor.EditorNote
-      }
-      note_edit_token(where: {note_id: {_eq: $noteId}}) {
-        note_id
-      }
-    }
-  |}
-];
-
-module GetNoteComponent = ReasonApollo.CreateQuery(GetNote);
-
+open GqlGetNoteById;
 open Utils;
 open Editor_Types;
 
@@ -38,11 +22,11 @@ let make = (~noteInfo: Route.noteRouteConfig, _children: React.childless) => {
   ...component,
   render: _self => {
     let noteId = noteInfo.noteId;
-    let noteQuery = GetNote.make(~noteId, ());
+    let noteQuery = GetNoteById.make(~noteId, ());
     <AuthStatus.IsAuthenticated>
       ...(
            user =>
-             <GetNoteComponent variables=noteQuery##variables>
+             <GetNoteByIdComponent variables=noteQuery##variables>
                ...(
                     ({result}) =>
                       switch (result) {
@@ -86,7 +70,7 @@ let make = (~noteInfo: Route.noteRouteConfig, _children: React.childless) => {
                           );
                       }
                   )
-             </GetNoteComponent>
+             </GetNoteByIdComponent>
          )
     </AuthStatus.IsAuthenticated>;
   },
