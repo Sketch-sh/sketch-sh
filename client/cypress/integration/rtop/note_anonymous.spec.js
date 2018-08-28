@@ -133,7 +133,7 @@ context("fork", () => {
     });
   });
 
-  it.only("fork another anonymous", () => {
+  it("fork another anonymous", () => {
     let newNoteId = generateId();
 
     cy.request("POST", Cypress.env("GRAPHQL_ENDPOINT"), {
