@@ -4,7 +4,13 @@ module GetNoteById = [%graphql
       $noteId: String!
     ) {
       note: note (where: {id : {_eq: $noteId}}) {
-        ...GqlFragment.Editor.EditorNote
+        __typename
+        id
+        title
+        data
+        updated_at
+        user_id
+        fork_from
       }
       note_edit_token(where: {note_id: {_eq: $noteId}}) {
         note_id

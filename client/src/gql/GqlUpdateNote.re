@@ -11,7 +11,13 @@ module UpdateNoteGql = [%graphql
       }) {
         affected_rows
         returning {
+          __typename
+          id
+          title
+          data
           updated_at
+          user_id
+          fork_from
         }
       }
     }

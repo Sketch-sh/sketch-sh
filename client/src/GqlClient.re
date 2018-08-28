@@ -4,7 +4,21 @@ external concat:
   ReasonApolloTypes.apolloLink =
   "concat";
 
-let inMemoryCache = ApolloInMemoryCache.createInMemoryCache();
+external toString: Js.Nullable.t('a) => string = "%identity";
+
+let inMemoryCache =
+  ApolloInMemoryCache.createInMemoryCache(
+    ~dataIdFromObject=
+      obj =>
+        (
+          switch (obj##id->Js.Nullable.toOption) {
+          | None => Js.Nullable.null
+          | Some(id) => Js.Nullable.return(id)
+          }
+        )
+        |> toString,
+    (),
+  );
 
 /* Create an HTTP Link */
 let httpLink = ApolloLinks.createHttpLink(~uri=Config.graphqlEndpoint, ());
