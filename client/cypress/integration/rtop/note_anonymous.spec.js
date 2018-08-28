@@ -135,7 +135,7 @@ context("fork", () => {
     });
   });
 
-  it.only("allow navigate between forks", () => {
+  it("allow navigate between forks", () => {
     cy.visit("new/reason");
     const stub = cy.stub();
     stub.withArgs("Changes you made may not be saved").returns(false);
@@ -188,6 +188,8 @@ context("fork", () => {
 
         cy.get(`a[href="/s/${getId(firstUrl)}/"]`).click();
         cy.url().should("eq", firstUrl);
+        assertBlocks(1);
+        assertLastBlockValue("1");
       });
     });
   });
