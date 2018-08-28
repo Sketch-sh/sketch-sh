@@ -25,6 +25,7 @@ module Editor_Note = {
     | RegisterExecuteCallback(unit => unit)
     | UpdateNoteSaveStatus(saveStatus)
     | UpdateForkStatus(forkStatus)
+    | Execute
     | ChangeLang(lang);
 
   let component = ReasonReact.reducerComponent("Editor_Page");
@@ -68,6 +69,10 @@ module Editor_Note = {
           | _ => Some("Changes you made may not be saved")
           };
         Router.Unload.register(unloadMessage);
+        /* This execute the code after save */
+        if (newSelf.state.editorContentStatus == Ec_Saved) {
+          newSelf.send(Execute);
+        };
       },
     didMount: ({onUnmount}) => onUnmount(Router.Unload.unregister),
     reducer: (action, state) =>
@@ -76,12 +81,8 @@ module Editor_Note = {
         ReasonReact.Update({...state, title, editorContentStatus: Ec_Dirty})
       | RegisterExecuteCallback(callback) =>
         ReasonReact.Update({...state, executeCallback: Some(callback)})
-      | BlockUpdate(blocks) =>
-        state.blocks := blocks;
-        ReasonReact.Update({...state, editorContentStatus: Ec_Dirty});
-      | ChangeLang(lang) =>
-        ReasonReact.UpdateWithSideEffects(
-          {...state, lang, editorContentStatus: Ec_Dirty},
+      | Execute =>
+        ReasonReact.SideEffects(
           (
             ({state}) =>
               switch (state.executeCallback) {
@@ -89,6 +90,14 @@ module Editor_Note = {
               | Some(callback) => callback()
               }
           ),
+        )
+      | BlockUpdate(blocks) =>
+        state.blocks := blocks;
+        ReasonReact.Update({...state, editorContentStatus: Ec_Dirty});
+      | ChangeLang(lang) =>
+        ReasonReact.UpdateWithSideEffects(
+          {...state, lang, editorContentStatus: Ec_Dirty},
+          (self => self.send(Execute)),
         )
       | UpdateNoteSaveStatus(saveStatus) =>
         switch (state.editorContentStatus, saveStatus) {
