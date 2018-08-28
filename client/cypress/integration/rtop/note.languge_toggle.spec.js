@@ -10,12 +10,6 @@ import {
 } from "../../helpers/editor_helpers";
 
 context("language toggle", () => {
-  it("visual test - languge choose page", () => {
-    cy.visit("new");
-
-    cy.get(".Layout__center").matchImageSnapshot();
-  });
-
   it("should have language switcher", () => {
     cy.visit("new/reason");
 
