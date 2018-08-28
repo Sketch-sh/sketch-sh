@@ -9,6 +9,8 @@ import {
   assertValue,
   shortcut,
   assertLastBlockValue,
+  typeTitle,
+  typeBlock,
 } from "../../helpers/editor_helpers";
 
 import generate from "nanoid/generate";
@@ -133,7 +135,66 @@ context("fork", () => {
     });
   });
 
-  it.only("fork another anonymous", () => {
+  it("allow navigate between forks", () => {
+    cy.visit("new/reason");
+    const stub = cy.stub();
+    stub.withArgs("Changes you made may not be saved").returns(false);
+    stub.withArgs("Do you want to fork your own Sketch?").returns(true);
+
+    cy.on("window:confirm", stub);
+    cy.get(".Topbar__action")
+      .contains("Save")
+      .as("save");
+
+    typeTitle("1");
+    typeBlock(0, "1");
+    cy.get("@save").click();
+
+    cy.url().should("match", /s\/.+/);
+
+    let getId = url => {
+      expect(url).to.match(/s\/.+/);
+      return url.split("/")[4];
+    };
+
+    cy.url().then(firstUrl => {
+      cy.get(`button[aria-label="Fork"]`).click();
+      cy.url().should("not.eq", firstUrl);
+
+      cy.url().then(secondUrl => {
+        // Edit 2nd fork content
+        typeTitle("{backspace}2");
+        typeBlock(0, "2");
+
+        cy.get("@save").should("be.enabled");
+        cy.get("@save").click();
+        cy.get("@save").should("be.disabled");
+
+        cy.get(`button[aria-label="Fork"]`).click();
+        cy.url().should("not.eq", secondUrl);
+
+        // Edit 3rd fork content
+        typeTitle("{backspace}3");
+        typeBlock(0, "3");
+
+        cy.get("@save").should("be.enabled");
+        cy.get("@save").click();
+        cy.get("@save").should("be.disabled");
+
+        cy.get(`a[href="/s/${getId(secondUrl)}/"]`).click();
+        cy.url().should("eq", secondUrl);
+        assertBlocks(1);
+        assertLastBlockValue("21");
+
+        cy.get(`a[href="/s/${getId(firstUrl)}/"]`).click();
+        cy.url().should("eq", firstUrl);
+        assertBlocks(1);
+        assertLastBlockValue("1");
+      });
+    });
+  });
+
+  it("fork another anonymous", () => {
     let newNoteId = generateId();
 
     cy.request("POST", Cypress.env("GRAPHQL_ENDPOINT"), {
@@ -189,6 +250,6 @@ context("fork", () => {
     cy.url().should("not.contain", newNoteId);
     cy.reload();
     assertBlocks(1);
-    assertLastBlockValue("let a = 2;let a = 1;")
+    assertLastBlockValue("let a = 2;let a = 1;");
   });
 });

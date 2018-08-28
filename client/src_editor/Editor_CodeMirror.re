@@ -1,4 +1,4 @@
-/* Modules.require("codemirror/mode/mllike/mllike"); */
+[%%debugger.chrome];
 Modules.require("./reason-mode.js");
 Modules.require("codemirror/addon/edit/matchbrackets");
 Modules.require("codemirror/addon/comment/comment");
@@ -109,7 +109,9 @@ let make =
         ->(
             CodeMirror.Editor.onChange((editor, diff) => {
               let currentEditorValue = editor->CodeMirror.Editor.getValue;
-              onChange(currentEditorValue, diff);
+              if (value != currentEditorValue) {
+                onChange(currentEditorValue, diff);
+              };
             })
           )
       };

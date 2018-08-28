@@ -25,6 +25,19 @@ const assertLastBlockValue = value => {
   });
 };
 
+const typeTitle = title => {
+  cy.get(".EditorNote__metadata")
+    .find("input")
+    .first()
+    .as("title")
+    .type(title);
+};
+const typeBlock = (eq = 0, content) => {
+  cy.get(".block__container")
+    .eq(eq)
+    .find("textarea")
+    .type(content, { force: true });
+};
 export {
   assertBlocks,
   assertCodeBlocks,
@@ -33,4 +46,6 @@ export {
   assertValue,
   shortcut,
   assertLastBlockValue,
+  typeTitle,
+  typeBlock,
 };
