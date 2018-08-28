@@ -34,7 +34,7 @@ let blockControlsButtons = (blockId, isDeleted, send) =>
       ...<button
            className="block__controls--button"
            ariaLabel="Add code block"
-           onClick={_ => send(Block_Add(blockId, BTyp_Code))}>
+           onClick=(_ => send(Block_Add(blockId, BTyp_Code)))>
            <Fi.Code />
            <sup> "+"->str </sup>
          </button>
@@ -43,18 +43,18 @@ let blockControlsButtons = (blockId, isDeleted, send) =>
       ...<button
            className="block__controls--button"
            ariaLabel="Add text block"
-           onClick={_ => send(Block_Add(blockId, BTyp_Text))}>
+           onClick=(_ => send(Block_Add(blockId, BTyp_Text)))>
            <Fi.Edit2 />
            <sup> "+"->str </sup>
          </button>
     </UI_Balloon>
-    {
+    (
       !isDeleted ?
         <UI_Balloon message="Delete block" position=Down>
           ...<button
                className="block__controls--button block__controls--danger"
                ariaLabel="Delete block"
-               onClick={_ => send(Block_QueueDelete(blockId))}>
+               onClick=(_ => send(Block_QueueDelete(blockId)))>
                <Fi.Trash2 />
                <sup> "-"->str </sup>
              </button>
@@ -63,12 +63,12 @@ let blockControlsButtons = (blockId, isDeleted, send) =>
           ...<button
                className="block__controls--button"
                ariaLabel="Restore block"
-               onClick={_ => send(Block_Restore(blockId))}>
+               onClick=(_ => send(Block_Restore(blockId)))>
                <Fi.RefreshCw />
                <sup> "+"->str </sup>
              </button>
         </UI_Balloon>
-    }
+    )
   </div>;
 
 let component = ReasonReact.reducerComponent("Editor_Page");
@@ -79,7 +79,6 @@ let make =
       ~blocks: array(block),
       ~readOnly=false,
       ~onUpdate,
-      ~links: array(link),
       ~registerExecuteCallback=?,
       ~registerShortcut: option(Shortcut.subscribeFun)=?,
       _children,
@@ -182,7 +181,7 @@ let make =
         switch (state.focusedBlock) {
         | None => blockLength - 1
         | Some((id, _blockTyp, _)) =>
-          switch (state.blocks->arrayFindIndex(({b_id}) => b_id == id)) {
+          switch (state.blocks->arrayFindIndex((({b_id}) => b_id == id))) {
           | None => blockLength - 1
           | Some(index) => index
           }
@@ -225,45 +224,33 @@ let make =
             )
           )
         ->Belt.List.reverse;
+
       /* Clear all widgets and execute all blocks */
-      open Js.Promise;
-
-      let links = Belt.Array.mapU(links, (. l) => l);
-
       ReasonReact.SideEffects(
         (
           self =>
-            Editor_Worker.link(.
-              Editor_Types.RE,
-              "awesome",
-              [|("somereandom", "let test = 3;")|],
-            )
-            |> then_(_ =>
-                 Editor_Worker.executeMany(. lang, allCodeBlocks)
-                 |> then_(results => {
-                      results
-                      ->(
-                          Belt.List.forEachU((. (blockId, result)) => {
-                            let widgets =
-                              Editor_Blocks_Utils.executeResultToWidget(
-                                result,
-                              );
-                            self.send(Block_AddWidgets(blockId, widgets));
-                          })
-                        );
+            Js.Promise.(
+              Editor_Worker.executeMany(. lang, allCodeToExecute)
+              |> then_(results => {
+                   results
+                   ->(
+                       Belt.List.forEachU((. (blockId, result)) => {
+                         let widgets = executeResultToWidget(result);
+                         self.send(Block_AddWidgets(blockId, widgets));
+                       })
+                     );
 
-                      resolve();
-                    })
-                 |> then_(() => {
-                      if (focusNextBlock) {
-                        self.send(Block_FocusNextBlockOrCreate);
-                      };
-                      resolve();
-                    })
-                 |> catch(error => resolve(Js.log(error)))
-               )
-            |> catch(error => resolve(Js.log(error)))
-            |> ignore
+                   resolve();
+                 })
+              |> then_(() => {
+                   if (focusNextBlock) {
+                     self.send(Block_FocusNextBlockOrCreate);
+                   };
+                   resolve();
+                 })
+              |> catch(error => resolve(Js.log(error)))
+              |> ignore
+            )
         ),
       );
     | Block_UpdateValue(blockId, newValue, diff) =>
@@ -402,7 +389,7 @@ let make =
 
       let restoreMeta =
         state.deletedBlockMeta
-        ->Belt.Array.keepU((. {db_id}) => db_id == blockId);
+        ->Belt.Array.keepU(((. {db_id}) => db_id == blockId));
 
       let restoredBlock = {
         ...state.blocks[blockIndex],
@@ -497,7 +484,7 @@ let make =
           if (i >= 0) {
             let {b_id} = state.blocks[i];
             if (b_id == blockId && i != 0) {
-              let {b_id, b_data} = state.blocks[i - 1];
+              let {b_id, b_data} = state.blocks[(i - 1)];
               switch (b_data) {
               | B_Code(_) => Some((b_id, BTyp_Code))
               | B_Text(_) => Some((b_id, BTyp_Text))
@@ -526,7 +513,7 @@ let make =
           if (i < length) {
             let {b_id} = state.blocks[i];
             if (b_id == blockId && i != length - 1) {
-              let {b_id, b_data} = state.blocks[i + 1];
+              let {b_id, b_data} = state.blocks[(i + 1)];
               switch (b_data) {
               | B_Code(_) => Some((b_id, BTyp_Code))
               | B_Text(_) => Some((b_id, BTyp_Text))
@@ -563,7 +550,7 @@ let make =
                   </p>
                   <div className="block__deleted--buttons">
                     <button
-                      onClick={_ => send(Block_Restore(b_id))}
+                      onClick=(_ => send(Block_Restore(b_id)))
                       ariaLabel="Restore block">
                       <Fi.RefreshCw />
                       "Restore"->str
@@ -572,7 +559,7 @@ let make =
                   <div className="block__deleted--progress" />
                 </div>
                 <div className="block__controls">
-                  {blockControlsButtons(b_id, b_deleted, send)}
+                  (blockControlsButtons(b_id, b_deleted, send))
                 </div>
               </div> :
               (
@@ -582,13 +569,13 @@ let make =
                     <div className="source-editor">
                       <Editor_CodeBlock
                         value=bc_value
-                        focused={
+                        focused=(
                           switch (state.focusedBlock) {
                           | None => None
                           | Some((id, _blockTyp, changeTyp)) =>
                             id == b_id ? Some(changeTyp) : None
                           }
-                        }
+                        )
                         onChange=(
                           (newValue, diff) =>
                             send(Block_UpdateValue(b_id, newValue, diff))
@@ -604,11 +591,11 @@ let make =
                       />
                     </div>
                     <div className="block__controls">
-                      {
+                      (
                         readOnly ?
                           React.null :
                           blockControlsButtons(b_id, b_deleted, send)
-                      }
+                      )
                     </div>
                   </div>
                 | B_Text(text) =>
@@ -616,13 +603,13 @@ let make =
                     <div className="text-editor">
                       <Editor_TextBlock
                         value=text
-                        focused={
+                        focused=(
                           switch (state.focusedBlock) {
                           | None => None
                           | Some((id, _blockTyp, changeTyp)) =>
                             id == b_id ? Some(changeTyp) : None
                           }
-                        }
+                        )
                         onBlur=(() => send(Block_Blur(b_id)))
                         onFocus=(() => send(Block_Focus(b_id, BTyp_Text)))
                         onBlockUp=(() => send(Block_FocusUp(b_id)))
@@ -634,13 +621,13 @@ let make =
                         readOnly
                       />
                     </div>
-                    {
+                    (
                       readOnly ?
                         React.null :
                         <div className="block__controls">
-                          {blockControlsButtons(b_id, b_deleted, send)}
+                          (blockControlsButtons(b_id, b_deleted, send))
                         </div>
-                    }
+                    )
                   </div>
                 }
               )

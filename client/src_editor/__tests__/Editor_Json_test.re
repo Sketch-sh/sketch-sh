@@ -150,9 +150,10 @@ describe("decode", () => {
        );
   });
   test("decode deleted blocks", () => {
-    let (lang, blocks) =
+    let (lang, links, blocks) =
       {|{
       "lang": "RE",
+      "links": [],
       "blocks": [
         {
           "id": "1",
@@ -175,9 +176,10 @@ describe("decode", () => {
       ->parse
       ->decode;
 
-    expect((lang, blocks))
+    expect((lang, links, blocks))
     == (
          RE,
+         [||],
          [|
            {
              b_id: "1",
