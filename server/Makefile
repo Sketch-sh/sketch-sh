@@ -21,7 +21,7 @@ PROD_DATABASE_URL := $(shell heroku config:get DATABASE_URL -a sketch-graphql)?s
 
 staging-migrate: 
 	cd schema && \
-	DATABASE_URL=$(DATABASE_URL) ./node_modules/.bin/knex migrate:latest --env production && \
+	DATABASE_URL=$(STAGING_DATABASE_URL) ./node_modules/.bin/knex migrate:latest --env production && \
 	cd ../hasura && \
 	hasura metadata apply --endpoint https://rtop-server.herokuapp.com --access-key $$RTOP_ACCESS_KEY
 

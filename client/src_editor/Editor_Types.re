@@ -1,3 +1,7 @@
+exception UnknownLanguage;
+
+type id = string;
+
 type lang =
   | ML
   | RE;
@@ -6,12 +10,41 @@ let stringToLang =
   fun
   | "ML" => ML
   | "RE" => RE
-  | _ => failwith("Unknown language");
+  | _ => raise(UnknownLanguage);
 
 let langToString =
   fun
   | ML => "ML"
   | RE => "RE";
+
+type noteState =
+  | NoteState_New
+  | NoteState_Old;
+
+type editorContentStatus =
+  | Ec_Pristine
+  | Ec_Dirty
+  | Ec_Saving
+  | Ec_Saved;
+
+type saveData = {lastEdited: Js.Json.t};
+type saveStatus =
+  | SaveStatus_Initial
+  | SaveStatus_Loading
+  | SaveStatus_Error
+  | SaveStatus_Done(saveData);
+
+type forkData = {
+  newId: id,
+  forkFrom: id,
+  lastEdited: Js.Json.t,
+  owner: id,
+};
+type forkStatus =
+  | ForkStatus_Initial
+  | ForkStatus_Loading
+  | ForkStatus_Error
+  | ForkStatus_Done(forkData);
 
 module Widget = {
   type lineWidgetData =
@@ -31,8 +64,6 @@ module Block = {
     bc_firstLineNumber: int,
     bc_widgets: array(Widget.t),
   };
-
-  type id = string;
 
   type blockData =
     | B_Code(bcode)

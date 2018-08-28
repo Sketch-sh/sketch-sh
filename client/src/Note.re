@@ -3,16 +3,8 @@ module GetNote = [%graphql
     query getNote (
       $noteId: String!
     ) {
-      note (where: {id : {_eq: $noteId}}) {
-        id
-        title
-        data
-        updated_at
-        owner {
-          id
-          username
-          avatar
-        }
+      note: note (where: {id : {_eq: $noteId}}) {
+        ...GqlFragment.Editor.EditorNote
       }
       note_edit_token(where: {note_id: {_eq: $noteId}}) {
         note_id
@@ -24,94 +16,78 @@ module GetNote = [%graphql
 module GetNoteComponent = ReasonApollo.CreateQuery(GetNote);
 
 open Utils;
+open Editor_Types;
 
 /*
  * This module will ensure url encoded data always in the URL
  * on initial note load
  */
 module RedirectSketchURL = {
-  type action =
-    | NoteLoaded;
   let component = ReasonReact.reducerComponent("Note_RedirectSketchURL");
 
-  let make = (~noteId, children): React.component(unit, 'a, action) => {
+  let make = (~noteId, children): React.component(unit, 'a, unit) => {
     ...component,
-    didMount: ({send}) => send(NoteLoaded),
-    reducer: (action, _) =>
-      switch (action) {
-      | NoteLoaded =>
-        ReasonReact.SideEffects(
-          (_ => NoteSave.replaceNoteRoute(~noteId, ~kind=Replace)->ignore),
-        )
-      },
+    didMount: _ => Router.replaceSilent(Route.Note({noteId, data: None})),
     render: _send => children,
   };
 };
 
 let component = ReasonReact.statelessComponent("Note");
 
-let make = (~noteInfo: Route.noteRouteConfig, _children) => {
+let make = (~noteInfo: Route.noteRouteConfig, _children: React.childless) => {
   ...component,
   render: _self => {
-    let noteQuery = GetNote.make(~noteId=noteInfo.noteId, ());
-
-    <GetNoteComponent variables=noteQuery##variables>
+    let noteId = noteInfo.noteId;
+    let noteQuery = GetNote.make(~noteId, ());
+    <AuthStatus.IsAuthenticated>
       ...(
-           ({result}) =>
-             switch (result) {
-             | Loading => <Editor_NotePlaceholder />
-             | Error(error) => error##message->str
-             | Data(response) =>
-               let notes = response##note;
-               notes
-               ->(
-                   arrayFirst(~empty=<NotFound entity="note" />, ~render=note =>
-                     <RedirectSketchURL noteId=noteInfo.noteId>
-                       ...<NoteSave noteKind=(Old(noteInfo.noteId))>
-                            ...(
-                                 (~noteSaveStatus, ~user, ~onSave) => {
-                                   let noteOwnerId =
-                                     switch (note##owner##id) {
-                                     | None => None
-                                     | Some(id) => Some(id)
-                                     };
-
-                                   let isEditable =
-                                     switch (user) {
-                                     | Login(currentUserId) =>
-                                       switch (noteOwnerId) {
-                                       | None => false
-                                       | Some(noteOwnerId) =>
-                                         noteOwnerId == currentUserId
-                                       }
-                                     | Anonymous =>
-                                       response##note_edit_token->Array.length
-                                       > 0
-                                     };
-                                   let (lang, blocks) =
-                                     switch (note##data) {
-                                     | None => (Editor_Types.RE, [||])
-                                     | Some(blocks) =>
-                                       blocks->Editor_Json.V1.decode
-                                     };
-                                   <Editor_Note
-                                     title=note##title->optionToEmptyString
-                                     isEditable
-                                     noteLastEdited=note##updated_at
-                                     noteOwner=note##owner
-                                     blocks
-                                     lang
-                                     noteSaveStatus
-                                     onSave
-                                   />;
-                                 }
-                               )
-                          </NoteSave>
-                     </RedirectSketchURL>
-                   )
-                 );
-             }
+           user =>
+             <GetNoteComponent variables=noteQuery##variables>
+               ...(
+                    ({result}) =>
+                      switch (result) {
+                      | Loading => <Editor_NotePlaceholder />
+                      | Error(error) => error##message->str
+                      | Data(response) =>
+                        let notes = response##note;
+                        notes
+                        ->(
+                            arrayFirst(
+                              ~empty=<NotFound entity="note" />,
+                              ~render=note => {
+                                let (lang, blocks) =
+                                  switch (note##data) {
+                                  | None => (Editor_Types.RE, [||])
+                                  | Some(blocks) =>
+                                    blocks->Editor_Json.V1.decode
+                                  };
+                                let hasSavePermission =
+                                  switch (user) {
+                                  | Login(currentUserId) =>
+                                    note##user_id == currentUserId
+                                  | Anonymous =>
+                                    response##note_edit_token->Array.length > 0
+                                  };
+                                <RedirectSketchURL noteId>
+                                  ...<Editor_Note
+                                       noteOwnerId=note##user_id
+                                       noteLastEdited=(Some(note##updated_at))
+                                       noteId
+                                       noteState=NoteState_Old
+                                       title=?(note##title)
+                                       lang
+                                       blocks
+                                       forkFrom=?(note##fork_from)
+                                       hasSavePermission
+                                     />
+                                </RedirectSketchURL>;
+                              },
+                            )
+                          );
+                      }
+                  )
+             </GetNoteComponent>
          )
-    </GetNoteComponent>;
+    </AuthStatus.IsAuthenticated>;
   },
 };

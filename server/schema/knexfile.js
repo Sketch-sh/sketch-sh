@@ -1,9 +1,8 @@
 // Update with your config settings.
-
 module.exports = {
   development: {
     client: "pg",
-    connection: "postgres://postgres:mysecretpassword@localhost:5432/postgres",
+    connection: "postgres://postgres:verysecret@localhost:5432/postgres",
     pool: {
       min: process.env.DATABASE_POOL_MIN || 2,
       max: process.env.DATABASE_POOL_MAX || 20,

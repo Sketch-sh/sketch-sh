@@ -1,4 +1,7 @@
 {
   "projectId": "z1mc5b",
-  "baseUrl": "http://localhost:3000"
+  "baseUrl": "http://localhost:3000",
+  "env": {
+    "GRAPHQL_ENDPOINT": "/graphql"
+  }
 }

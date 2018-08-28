@@ -4,115 +4,84 @@ open Utils;
 open Editor_Types;
 
 module Editor_Note = {
-  type editorContentStatus =
-    | Ec_Pristine
-    | Ec_Dirty
-    | Ec_Saving
-    | Ec_Saved;
-
   type state = {
+    hasSavePermission: bool,
+    noteId: id,
+    forkFrom: option(id),
+    noteState,
     lang,
     title: string,
-    editorContentStatus,
-    noteSaveStatus: ref(NoteSave_Types.noteSaveStatus),
     blocks: ref(array(Block.block)),
+    editorContentStatus,
     executeCallback: option(unit => unit),
+    noteOwnerId: id,
+    noteLastEdited: option(Js.Json.t),
+    forkStatus,
   };
 
   type action =
     | TitleUpdate(string)
     | BlockUpdate(array(Block.block))
     | RegisterExecuteCallback(unit => unit)
-    | Save
+    | UpdateNoteSaveStatus(saveStatus)
+    | UpdateForkStatus(forkStatus)
+    | Execute
     | ChangeLang(lang);
 
   let component = ReasonReact.reducerComponent("Editor_Page");
 
   let make =
       (
-        ~blocks,
-        ~noteOwner=?,
-        ~noteLastEdited=?,
-        ~title="",
-        ~lang=RE,
-        ~noteSaveStatus: NoteSave_Types.noteSaveStatus,
-        ~isEditable,
-        ~onSave,
+        ~initialHasSavePermission,
+        ~initialNoteId,
+        ~initialForkFrom=?,
+        ~initialNoteState: noteState,
+        ~initialLang: lang=RE,
+        ~initialTitle: string="",
+        ~initialBlocks: array(Block.block),
+        ~initialNoteOwnerId: id,
+        ~initialNoteLastEdited: option(Js.Json.t),
         ~registerShortcut: Shortcut.subscribeFun,
         _children,
       ) => {
     ...component,
     initialState: () => {
-      lang,
-      title,
+      hasSavePermission: initialHasSavePermission,
+      noteId: initialNoteId,
+      forkFrom: initialForkFrom,
+      noteState: initialNoteState,
+      lang: initialLang,
+      title: initialTitle,
       editorContentStatus: Ec_Pristine,
-      noteSaveStatus: ref(noteSaveStatus),
-      blocks: ref(blocks),
+      blocks: ref(initialBlocks),
       executeCallback: None,
+      noteOwnerId: initialNoteOwnerId,
+      noteLastEdited: initialNoteLastEdited,
+      forkStatus: ForkStatus_Initial,
     },
-    willReceiveProps: ({state}) =>
-      if (state.noteSaveStatus^ != noteSaveStatus) {
-        state.noteSaveStatus := noteSaveStatus;
-        switch (state.editorContentStatus, noteSaveStatus) {
-        | (_, NoteSave_Loading) => {...state, editorContentStatus: Ec_Saving}
-        | (Ec_Dirty, NoteSave_Done) => {
-            ...state,
-            editorContentStatus: Ec_Dirty,
-          }
-        | (_, NoteSave_Done) => {...state, editorContentStatus: Ec_Saved}
-        | (_, NoteSave_Error) =>
-          UI_Notification.notify("Save error");
-          {...state, editorContentStatus: Ec_Dirty};
-        };
-      } else {
-        state;
-      },
     didUpdate: ({oldSelf, newSelf}) =>
       if (newSelf.state.editorContentStatus
           != oldSelf.state.editorContentStatus) {
         let unloadMessage =
           switch (newSelf.state.editorContentStatus) {
-          | Ec_Dirty => Some("Changes you made may not be saved")
-          | _ => None
+          | Ec_Saved
+          | Ec_Pristine => None
+          | _ => Some("Changes you made may not be saved")
           };
         Router.Unload.register(unloadMessage);
+        /* This execute the code after save */
+        if (newSelf.state.editorContentStatus == Ec_Saved) {
+          newSelf.send(Execute);
+        };
       },
-    didMount: ({send, onUnmount}) => {
-      let unregisterShortcut =
-        registerShortcut(
-          ~global=true,
-          "mod+s",
-          event => {
-            open Webapi.Dom;
-
-            event->KeyboardEvent.preventDefault;
-            send(Save);
-          },
-        );
-
-      onUnmount(() => {
-        Router.Unload.unregister();
-        unregisterShortcut();
-      });
-    },
+    didMount: ({onUnmount}) => onUnmount(Router.Unload.unregister),
     reducer: (action, state) =>
       switch (action) {
       | TitleUpdate(title) =>
         ReasonReact.Update({...state, title, editorContentStatus: Ec_Dirty})
       | RegisterExecuteCallback(callback) =>
         ReasonReact.Update({...state, executeCallback: Some(callback)})
-      | BlockUpdate(blocks) =>
-        state.blocks := blocks;
-        ReasonReact.Update({...state, editorContentStatus: Ec_Dirty});
-      | Save =>
-        /* TODO: nice notification */
-        switch (state.editorContentStatus) {
-        | Ec_Saving
-        | Ec_Saved
-        | Ec_Pristine => ()
-        | Ec_Dirty =>
-          onSave(~title=state.title, ~data=state.blocks^, ~lang=state.lang)
-        };
+      | Execute =>
         ReasonReact.SideEffects(
           (
             ({state}) =>
@@ -121,34 +90,73 @@ module Editor_Note = {
               | Some(callback) => callback()
               }
           ),
-        );
+        )
+      | BlockUpdate(blocks) =>
+        state.blocks := blocks;
+        ReasonReact.Update({...state, editorContentStatus: Ec_Dirty});
       | ChangeLang(lang) =>
         ReasonReact.UpdateWithSideEffects(
           {...state, lang, editorContentStatus: Ec_Dirty},
-          (
-            ({state}) =>
-              switch (state.executeCallback) {
-              | None => ()
-              | Some(callback) => callback()
-              }
-          ),
+          (self => self.send(Execute)),
         )
+      | UpdateNoteSaveStatus(saveStatus) =>
+        switch (state.editorContentStatus, saveStatus) {
+        | (_, SaveStatus_Initial) => ReasonReact.NoUpdate
+        | (_, SaveStatus_Loading) =>
+          ReasonReact.Update({...state, editorContentStatus: Ec_Saving})
+        | (Ec_Dirty, SaveStatus_Done({lastEdited: _})) =>
+          ReasonReact.Update({...state, editorContentStatus: Ec_Dirty})
+        | (_, SaveStatus_Done({lastEdited})) =>
+          Notify.info("Saved successfully");
+          ReasonReact.UpdateWithSideEffects(
+            {
+              ...state,
+              editorContentStatus: Ec_Saved,
+              noteState: NoteState_Old,
+              noteLastEdited: Some(lastEdited),
+            },
+            (
+              _ =>
+                Router.pushSilent(
+                  Route.Note({noteId: state.noteId, data: None}),
+                )
+            ),
+          );
+        | (_, SaveStatus_Error) =>
+          Notify.error("Save error");
+          ReasonReact.Update({...state, editorContentStatus: Ec_Dirty});
+        }
+      | UpdateForkStatus(forkStatus) =>
+        switch (forkStatus) {
+        | ForkStatus_Done({newId, forkFrom, lastEdited, owner}) =>
+          Notify.info("Forked successfully");
+          ReasonReact.UpdateWithSideEffects(
+            {
+              ...state,
+              forkStatus,
+              noteState: NoteState_Old,
+              noteId: newId,
+              forkFrom: Some(forkFrom),
+              editorContentStatus: Ec_Saved,
+              noteLastEdited: Some(lastEdited),
+              noteOwnerId: owner,
+              hasSavePermission: true,
+            },
+            (_ => Router.push(Route.Note({noteId: newId, data: None}))),
+          );
+        | ForkStatus_Error =>
+          Notify.error("Fork error");
+          ReasonReact.Update({...state, forkStatus});
+        | _ => ReasonReact.Update({...state, forkStatus})
+        }
       },
     render: ({state, send}) => {
-      let readOnly = !isEditable;
       let {editorContentStatus, lang} = state;
-
       <>
         <UI_Topbar.Actions>
           ...(
                (~buttonClassName) =>
                  <>
-                   <UI_Balloon position=Down message="Not implemented">
-                     ...<button className=buttonClassName disabled=true>
-                          <Fi.GitBranch />
-                          "Fork"->str
-                        </button>
-                   </UI_Balloon>
                    <UI_Balloon
                      position=Down
                      length=Fit
@@ -166,48 +174,39 @@ module Editor_Note = {
                           "Run"->str
                         </button>
                    </UI_Balloon>
-                   (
-                     readOnly ?
-                       ReasonReact.null :
-                       <UI_Balloon
-                         position=Down
-                         length=Fit
-                         message=(
-                           switch (editorContentStatus) {
-                           | Ec_Saving => "Saving...(Ctrl+S)"
-                           | Ec_Saved => "Saved (Ctrl+S)"
-                           | Ec_Pristine => "Nothing to save (Ctrl+S)"
-                           | Ec_Dirty => "Save modified changes (Ctrl+S)"
-                           }
-                         )>
-                         ...<button
-                              disabled=(
-                                switch (editorContentStatus) {
-                                | Ec_Saving
-                                | Ec_Saved
-                                | Ec_Pristine => true
-                                | Ec_Dirty => false
-                                }
-                              )
-                              className=buttonClassName
-                              onClick=(_ => send(Save))>
-                              (
-                                switch (editorContentStatus) {
-                                | Ec_Saving =>
-                                  <>
-                                    <Fi.Loader
-                                      className="EditorNav__button--spin"
-                                    />
-                                    "Saving"->str
-                                  </>
-                                | Ec_Saved
-                                | Ec_Dirty
-                                | Ec_Pristine => <> <Fi.Save /> "Save"->str </>
-                                }
-                              )
-                            </button>
-                       </UI_Balloon>
-                   )
+                   <Editor_Note_SaveButton
+                     hasSavePermission=state.hasSavePermission
+                     noteId=state.noteId
+                     noteState=state.noteState
+                     editorContentStatus
+                     updateSaveStatus=(
+                       saveStatus => saveStatus->UpdateNoteSaveStatus->send
+                     )
+                     getCurrentData=(
+                       () => (
+                         state.title,
+                         Editor_Json.V1.encode(state.lang, state.blocks^),
+                       )
+                     )
+                     registerShortcut
+                     className=buttonClassName
+                   />
+                   <Editor_Note_ForkButton
+                     hasSavePermission=state.hasSavePermission
+                     noteId=state.noteId
+                     noteState=state.noteState
+                     updateForkStatus=(
+                       forkStatus => forkStatus->UpdateForkStatus->send
+                     )
+                     getCurrentData=(
+                       () => (
+                         state.title,
+                         Editor_Json.V1.encode(state.lang, state.blocks^),
+                       )
+                     )
+                     className=buttonClassName
+                     forkStatus=state.forkStatus
+                   />
                  </>
              )
         </UI_Topbar.Actions>
@@ -219,16 +218,6 @@ module Editor_Note = {
             }
           </title>
         </Helmet>
-        <div className="EditorNote__saveStatus">
-          (
-            switch (editorContentStatus) {
-            | Ec_Pristine => React.null
-            | Ec_Saved => "Saved"->str
-            | Ec_Saving => "Saving"->str
-            | Ec_Dirty => "Unsaved"->str
-            }
-          )
-        </div>
         <main className="EditorNote Layout__center">
           <div className="EditorNote__metadata">
             <input
@@ -236,7 +225,6 @@ module Editor_Note = {
               placeholder="untitled sketch"
               value=state.title
               onChange=(event => valueFromEvent(event)->TitleUpdate->send)
-              readOnly
             />
             <div className="EditorNote__metadata--info">
               <UI_Balloon message="Sketch language" position=Down>
@@ -268,28 +256,43 @@ module Editor_Note = {
                      </span>
                    </fieldset>
               </UI_Balloon>
-              (
-                noteOwner
-                =>> (
-                  noteOwner =>
-                    <UI_SketchOwnerInfo
-                      owner=noteOwner
-                      ?noteLastEdited
-                      className="EditorNote__owner"
-                    />
-                )
-              )
+              <Editor_Note_GetUserInfo userId=state.noteOwnerId>
+                ...(
+                     fun
+                     | None => React.null
+                     | Some(user) =>
+                       <UI_SketchOwnerInfo
+                         owner=user
+                         noteLastEdited=?state.noteLastEdited
+                         className="EditorNote__owner"
+                       />
+                   )
+              </Editor_Note_GetUserInfo>
             </div>
+            (
+              state.forkFrom
+              =>> (
+                forkFrom =>
+                  <div className="EditorNote__forkFrom">
+                    <p>
+                      "Forked from"->str
+                      <Router.Link
+                        route=(Route.Note({noteId: forkFrom, data: None}))>
+                        {j|/s/$(forkFrom)|j}->str
+                      </Router.Link>
+                    </p>
+                  </div>
+              )
+            )
           </div>
           <Editor_Blocks
             lang
-            blocks
+            blocks=state.blocks^
             registerExecuteCallback=(
               callback => send(RegisterExecuteCallback(callback))
             )
             registerShortcut
             onUpdate=(blocks => send(BlockUpdate(blocks)))
-            readOnly
           />
         </main>
       </>;
@@ -302,14 +305,15 @@ module WithShortcut = {
 
   let make =
       (
+        ~hasSavePermission,
+        ~noteId,
+        ~noteState,
         ~lang=?,
-        ~blocks,
-        ~noteOwner=?,
-        ~noteLastEdited=?,
         ~title=?,
-        ~noteSaveStatus,
-        ~isEditable,
-        ~onSave,
+        ~blocks,
+        ~noteOwnerId,
+        ~noteLastEdited,
+        ~forkFrom=?,
         _children,
       ) => {
     ...component,
@@ -318,14 +322,15 @@ module WithShortcut = {
         ...(
              registerShortcut =>
                <Editor_Note
-                 ?lang
-                 blocks
-                 ?noteOwner
-                 ?noteLastEdited
-                 ?title
-                 noteSaveStatus
-                 isEditable
-                 onSave
+                 initialHasSavePermission=hasSavePermission
+                 initialNoteId=noteId
+                 initialNoteState=noteState
+                 initialLang=?lang
+                 initialTitle=?title
+                 initialBlocks=blocks
+                 initialNoteOwnerId=noteOwnerId
+                 initialNoteLastEdited=noteLastEdited
+                 initialForkFrom=?forkFrom
                  registerShortcut
                />
            )
