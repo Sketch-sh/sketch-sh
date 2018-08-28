@@ -277,7 +277,7 @@ module Editor_Note = {
                 forkFrom =>
                   <div className="EditorNote__forkFrom">
                     <p>
-                      "Fork from"->str
+                      "Forked from"->str
                       <Router.Link
                         route=(Route.Note({noteId: forkFrom, data: None}))>
                         {j|/s/$(forkFrom)|j}->str
