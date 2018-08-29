@@ -376,29 +376,26 @@ let make =
         /* Clear all widgets and execute all blocks */
         ReasonReact.SideEffects(
           (
-            self =>
-              Js.Promise.(
-                Editor_Worker.executeMany(. lang, allCodeToExecute)
-                |> then_(results => {
-                     results
-                     ->(
-                         Belt.List.forEachU((. (blockId, result)) => {
-                           let widgets = executeResultToWidget(result);
-                           self.send(Block_AddWidgets(blockId, widgets));
-                         })
-                       );
-
-                     resolve();
-                   })
-                |> then_(() => {
-                     if (focusNextBlock) {
-                       self.send(Block_FocusNextBlockOrCreate(blockTyp));
-                     };
-                     resolve();
-                   })
-                |> catch(error => resolve(Js.log(error)))
-                |> ignore
-              )
+            self => {
+              if (focusNextBlock) {
+                self.send(Block_FocusNextBlockOrCreate(blockTyp));
+              };
+              Toplevel_Consumer.execute(
+                lang,
+                allCodeToExecute,
+                fun
+                | Belt.Result.Error(error) => Notify.error(error)
+                | Belt.Result.Ok(blocks) =>
+                  blocks
+                  ->(
+                      Belt.List.forEachU(
+                        (. {Toplevel.Types.id: blockId, result}) => {
+                        let widgets = executeResultToWidget(result);
+                        self.send(Block_AddWidgets(blockId, widgets));
+                      })
+                    ),
+              );
+            }
           ),
         );
       | Block_UpdateValue(blockId, newValue, diff) =>
