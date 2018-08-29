@@ -5,7 +5,6 @@ open Editor_Types;
 open Block;
 
 let parse = Js.Json.parseExn;
-
 /*
  * NOTE: If you change JSON encode/decode
  * - NEVER change the json value of decode

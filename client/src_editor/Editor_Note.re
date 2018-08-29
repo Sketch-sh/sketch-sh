@@ -18,11 +18,13 @@ module Editor_Note = {
     noteOwnerId: id,
     noteLastEdited: option(Js.Json.t),
     forkStatus,
+    isLinkMenuOpen: bool,
   };
 
   type action =
     | TitleUpdate(string)
     | BlockUpdate(array(Block.block))
+    | ToggleLinkMenu
     | LinkUpdate(array(Link.link))
     | RegisterExecuteCallback(unit => unit)
     | UpdateNoteSaveStatus(saveStatus)
@@ -62,6 +64,7 @@ module Editor_Note = {
       noteOwnerId: initialNoteOwnerId,
       noteLastEdited: initialNoteLastEdited,
       forkStatus: ForkStatus_Initial,
+      isLinkMenuOpen: false,
     },
     didUpdate: ({oldSelf, newSelf}) =>
       if (newSelf.state.editorContentStatus
@@ -95,6 +98,8 @@ module Editor_Note = {
               }
           ),
         )
+      | ToggleLinkMenu =>
+        ReasonReact.Update({...state, isLinkMenuOpen: !state.isLinkMenuOpen})
       | LinkUpdate(links) =>
         state.links := links;
         ReasonReact.Update({...state, editorContentStatus: Ec_Dirty});
@@ -271,6 +276,22 @@ module Editor_Note = {
                      </span>
                    </fieldset>
               </UI_Balloon>
+              <UI_Balloon message="Link sketches" position=Down>
+                ...<button
+                     className=(
+                       ClassNames.make([
+                         "EditorNote__linkMenu",
+                         ClassNames.ifTrue(
+                           state.isLinkMenuOpen,
+                           "EditorNote__linkMenu--open",
+                         ),
+                       ])
+                     )
+                     ariaLabel="Toggle link menu"
+                     onClick=(_ => send(ToggleLinkMenu))>
+                     <Fi.Link />
+                   </button>
+              </UI_Balloon>
               <Editor_Note_GetUserInfo userId=state.noteOwnerId>
                 ...(
                      fun
@@ -300,6 +321,11 @@ module Editor_Note = {
               )
             )
           </div>
+          (
+            state.isLinkMenuOpen ?
+              <Editor_Links onLinkAdd=(link => ()) links=state.links^ /> :
+              ReasonReact.null
+          )
           <Editor_Blocks
             lang
             blocks=state.blocks^
