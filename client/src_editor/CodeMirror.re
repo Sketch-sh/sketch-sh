@@ -204,6 +204,8 @@ module Editor = {
   [@bs.send] external setValue: (editor, string) => unit = "";
   [@bs.send] external setOption: (editor, string, 'a) => unit = "";
   [@bs.send] external getOption: (editor, string) => 'a = "";
+  [@bs.send] external getWrapperElement: editor => Dom.element = "";
+
   module GetOption = {
     [@bs.send]
     external indentUnit: (editor, [@bs.as "indentUnit"] _) => int =
