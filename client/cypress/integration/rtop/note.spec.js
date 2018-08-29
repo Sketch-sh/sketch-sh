@@ -367,4 +367,38 @@ context("Edge cases", () => {
       expect(win.editor.getValue()).to.equal(content);
     });
   });
+  it("should not report lineWidget at line -1", () => {
+    let content = `module AdgroupStore = {
+  let get = adgroupID => "THIS IS AN ADGROUP";
+};
+
+module PageStore = {
+  let get = pageID => "THIS IS A PAGE";
+};
+
+
+let containerize = (~pageID, ~adgroupID, component) => {
+  component(~page=PageStore.get(pageID), ~adgroup=AdgroupStore.get(adgroupID), ~children=[], ());
+};
+
+module MyComponent = {
+  let createElement = (~page, ~adgroup, ~children, ()) => {
+    ();
+    ();
+  };
+  let createElement = containerize(createElement);
+};
+
+print_string("SDFlj");
+
+let renderThis = <MyComponent adgroupID="34" pageID="99"/>`;
+    cy.visit("new/reason");
+    assertBlocks(1);
+
+    cy.window().then(win => {
+      expect(win.editor.setValue(content));
+      shortcut("{ctrl}{enter}");
+      assertErrorsOrWarnings(1);
+    });
+  });
 });
