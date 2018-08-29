@@ -9,6 +9,7 @@ let getEditor = (state, ~default, ~f) =>
   };
 
 [@bs.module "./cm_open_link.js"] external linkHandler: 'a => unit = "";
+[@bs.module "./cm_open_link.js"] external register: 'a => unit = "";
 
 let make =
     (
@@ -37,10 +38,11 @@ let make =
       setEditor=(
         editor => {
           state.editor := Some(editor);
-          let wrapper = editor->CodeMirror.Editor.getWrapperElement;
-          Webapi.Dom.(
-            wrapper |> Element.addMouseDownEventListener(linkHandler)
-          );
+          register(editor);
+          /* let wrapper = editor->CodeMirror.Editor.getWrapperElement;
+             Webapi.Dom.(
+               wrapper |> Element.addMouseDownEventListener(linkHandler)
+             ); */
         }
       )
       options=(
