@@ -8,6 +8,8 @@ let getEditor = (state, ~default, ~f) =>
   | Some(editor) => f(editor)
   };
 
+[@bs.module "./cm_open_link.js"] external linkHandler: 'a => unit = "";
+
 let make =
     (
       ~value,
@@ -35,7 +37,10 @@ let make =
       setEditor=(
         editor => {
           state.editor := Some(editor);
-          ();
+          let wrapper = editor->CodeMirror.Editor.getWrapperElement;
+          Webapi.Dom.(
+            wrapper |> Element.addMouseDownEventListener(linkHandler)
+          );
         }
       )
       options=(
