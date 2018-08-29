@@ -13,6 +13,7 @@ let renderErrorIndicator = (colStart, colEnd, content) =>
 let executeResultToWidget = (result: list(Worker_Types.blockData)) => {
   open Worker_Types;
   open Editor_Types;
+  let clampLineNumber = line => max(0, line);
 
   let widgets =
     result
@@ -22,6 +23,7 @@ let executeResultToWidget = (result: list(Worker_Types.blockData)) => {
           (. acc, exeResult) => {
             let {block_result: result, block_loc} = exeResult;
             let (_, {line}) = block_loc;
+            let line = line->clampLineNumber;
 
             let evaluate =
               result.blockResult_evaluate
