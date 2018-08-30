@@ -198,7 +198,7 @@ let make =
             switch (newSelf.state.blocksCopy) {
             | None => ()
             | Some(_) =>
-              if (diff->CodeMirror.EditorChange.originGet == "+input") {
+              if (diff->CodeMirror.EditorChange.originGet != "setValue") {
                 Js.log("first edit after lang change");
                 newSelf.send(Block_CleanBlocksCopy);
               }
