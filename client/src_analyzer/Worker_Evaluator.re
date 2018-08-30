@@ -32,7 +32,7 @@ module Types = {
     };
   };
 
-  type linkResult = Belt.Result.t(bool, exn);
+  type linkResult = Worker_Types.linkResult;
 };
 
 module type EvaluatorSig = {
@@ -50,7 +50,7 @@ module type EvaluatorSig = {
   let parseMLI: string => Types.Refmt.interfaceAST;
   let printML: Types.Refmt.implementationAST => string;
   let printMLI: Types.Refmt.interfaceAST => string;
-  let insertModule: (string, string) => Types.linkResult;
+  let insertModule: (. string, string) => Types.linkResult;
 };
 
 module Make = (B: EvaluatorSig) => {
@@ -76,5 +76,5 @@ module Make = (B: EvaluatorSig) => {
   let printREI = B.printREI;
   let printML = B.printML;
   let printMLI = B.printMLI;
-  let insertModule = (name, content) => B.insertModule(name, content);
+  let insertModule = (. name, content) => B.insertModule(. name, content);
 };

@@ -106,7 +106,7 @@ module Block = {
 
 module Link = {
   type internalLink = {
-    revision_at: string,
+    revision_at: Js.Json.t,
     sketch_id: string,
     name: string,
     lang,

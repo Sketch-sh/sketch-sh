@@ -180,3 +180,14 @@ let getFirstLineFromDiff = (diff: CodeMirror.EditorChange.t) => {
 
   line;
 };
+
+let concatCodeBlocksToString = blocks =>
+  blocks
+  ->(
+      Belt.Array.reduceU("", (. acc, {b_data}) =>
+        switch (b_data) {
+        | B_Text(_) => acc
+        | B_Code({bc_value}) => acc ++ bc_value
+        }
+      )
+    );

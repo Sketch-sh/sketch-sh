@@ -101,6 +101,7 @@ module Editor_Note = {
       | ToggleLinkMenu =>
         ReasonReact.Update({...state, isLinkMenuOpen: !state.isLinkMenuOpen})
       | LinkUpdate(links) =>
+        Notify.info("Link loaded successfully");
         state.links := links;
         ReasonReact.Update({...state, editorContentStatus: Ec_Dirty});
       | BlockUpdate(blocks) =>
@@ -323,12 +324,16 @@ module Editor_Note = {
           </div>
           (
             state.isLinkMenuOpen ?
-              <Editor_Links onLinkAdd=(link => ()) links=state.links^ /> :
+              <Editor_Links
+                onUpdate=(links => send(LinkUpdate(links)))
+                links=state.links^
+              /> :
               ReasonReact.null
           )
           <Editor_Blocks
             lang
             blocks=state.blocks^
+            links=state.links^
             registerExecuteCallback=(
               callback => send(RegisterExecuteCallback(callback))
             )

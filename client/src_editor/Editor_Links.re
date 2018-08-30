@@ -2,14 +2,14 @@ Modules.require("./Editor_Links.css");
 
 module GetLink = [%graphql
   {|
-    query getNote (
-      $noteId: String!
-    ) {
-      note: note (where: {id : {_eq: $noteId}}) {
-        ...GqlFragment.Editor.EditorNote
+      query getNote (
+        $noteId: String!
+      ) {
+        note: note (where: {id : {_eq: $noteId}}) {
+          ...GqlFragment.Editor.EditorNote
+        }
       }
-    }
-  |}
+    |}
 ];
 
 module GetLinkComponent = ReasonApollo.CreateQuery(GetLink);
@@ -26,11 +26,12 @@ type link =
 type linkStatus =
   | NotAsked
   | Error
-  | Loading;
+  | Loading
+  | Fetched;
 
 type action =
   | Link_Add(uiLink)
-  | Link_Fetched
+  | Link_Fetched(Link.link)
   | Link_Update(Link.link)
   | Link_Delete;
 
@@ -59,9 +60,14 @@ module EmptyLink = {
     | UpdateName(string);
 
   let component = ReasonReact.reducerComponent("Editor_EmptyLink");
-  let make = (~status, ~onSubmit, ~name="", ~id="", _children) => {
+  let make = (~status, ~onSubmit, ~onFetched=?, ~name="", ~id="", _children) => {
     ...component,
     initialState: () => {name, id},
+    didMount: _ =>
+      switch (onFetched) {
+      | None => ()
+      | Some(f) => f()
+      },
     reducer: (action, state) =>
       switch (action) {
       | UpdateId(id) => ReasonReact.Update({...state, id})
@@ -69,6 +75,7 @@ module EmptyLink = {
       },
     render: ({send, state}) =>
       <div>
+        (status == Loading ? "loading"->str : ReasonReact.null)
         <input
           className="link__input"
           value=state.id
@@ -93,31 +100,45 @@ module EmptyLink = {
 
 let component = ReasonReact.reducerComponent("Editor_Links");
 
-let make = (~links, ~onLinkAdd, _children) => {
+let make = (~links, ~onUpdate, _children) => {
   ...component,
   initialState: () => {links, fetchingLink: None},
   reducer: (action: action, state: state) =>
     switch (action) {
     | Link_Add((name, id)) =>
       ReasonReact.Update({...state, fetchingLink: Some((name, id))})
-    | Link_Fetched => ReasonReact.Update({...state, fetchingLink: None})
+    | Link_Fetched(link) =>
+      ReasonReact.UpdateWithSideEffects(
+        {...state, fetchingLink: None},
+        (
+          _ => {
+            let links = Belt.Array.concat(state.links, [|link|]);
+
+            links->Belt.Array.length->string_of_int->Js.log;
+            onUpdate(links);
+          }
+        ),
+      )
     | _ => ReasonReact.NoUpdate
     },
-  render: ({send, state}) =>
+  render: ({send, state}) => {
+    let existingLinks =
+      links
+      ->Belt.Array.mapU(
+          (. link: Link.link) =>
+            switch (link) {
+            | Internal({sketch_id, name}) => singleLink(name, sketch_id)
+            | External () => ReasonReact.null
+            },
+        );
+    existingLinks->Belt.Array.length->string_of_int->Js.log;
+
     <div className="links__container">
       <span className="links__disclaimer">
         "Add a link to another sketch by pasting it's id and giving it a module name"
         ->str
       </span>
-      <div
-        /* state.links->Belt.Array.mapU(
-           (. link) =>
-             switch (link) {
-             | Internal({sketch_id, name}) => singleLink(name, sketch_id)
-             | External () => ReasonReact.null
-             })
-           ->ReasonReact.array */
-      />
+      <div> existingLinks->ReasonReact.array </div>
       (
         switch (state.fetchingLink) {
         | None =>
@@ -146,22 +167,39 @@ let make = (~links, ~onLinkAdd, _children) => {
                        onSubmit=(uiLink => send(Link_Add(uiLink)))
                      />
                    | Data(response) =>
-                     let notes = response##note;
-                     let note = Belt.Array.getUnsafe(notes, 0);
-                     Js.log(note##id);
-                     Js.log(note##title);
-                     onLinkAdd(note);
-                     send(Link_Fetched) |> ignore;
+                     let note = response##note[0];
+
+                     /* TODO handle links that also have links */
+                     let (lang, _links, blocks) =
+                       switch (note##data) {
+                       | None => (Editor_Types.RE, [||], [||])
+                       | Some(data) => Editor_Json.V1.decode(data)
+                       };
+
+                     let link: Link.link =
+                       Internal({
+                         revision_at: note##updated_at,
+                         sketch_id: note##id,
+                         name,
+                         lang,
+                         code:
+                           Editor_Blocks_Utils.concatCodeBlocksToString(
+                             blocks,
+                           ),
+                       });
+
                      <EmptyLink
-                       status=Loading
+                       status=Fetched
                        id
                        name
                        onSubmit=(uiLink => send(Link_Add(uiLink)))
+                       onFetched=(() => send(Link_Fetched(link)))
                      />;
                    }
                )
           </GetLinkComponent>;
         }
       )
-    </div>,
+    </div>;
+  },
 };

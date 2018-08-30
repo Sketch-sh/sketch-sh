@@ -76,6 +76,7 @@ let component = ReasonReact.reducerComponent("Editor_Page");
 let make =
     (
       ~lang=RE,
+      ~links: array(Link.link),
       ~blocks: array(block),
       ~readOnly=false,
       ~onUpdate,
@@ -230,24 +231,28 @@ let make =
         (
           self =>
             Js.Promise.(
-              Editor_Worker.executeMany(. lang, allCodeToExecute)
-              |> then_(results => {
-                   results
-                   ->(
-                       Belt.List.forEachU((. (blockId, result)) => {
-                         let widgets = executeResultToWidget(result);
-                         self.send(Block_AddWidgets(blockId, widgets));
-                       })
-                     );
+              Editor_Worker.linkMany(. Array.to_list(links))
+              |> then_(results =>
+                   Editor_Worker.executeMany(. lang, allCodeToExecute)
+                   |> then_(results => {
+                        results
+                        ->(
+                            Belt.List.forEachU((. (blockId, result)) => {
+                              let widgets = executeResultToWidget(result);
+                              self.send(Block_AddWidgets(blockId, widgets));
+                            })
+                          );
 
-                   resolve();
-                 })
-              |> then_(() => {
-                   if (focusNextBlock) {
-                     self.send(Block_FocusNextBlockOrCreate);
-                   };
-                   resolve();
-                 })
+                        resolve();
+                      })
+                   |> then_(() => {
+                        if (focusNextBlock) {
+                          self.send(Block_FocusNextBlockOrCreate);
+                        };
+                        resolve();
+                      })
+                   |> catch(error => resolve(Js.log(error)))
+                 )
               |> catch(error => resolve(Js.log(error)))
               |> ignore
             )

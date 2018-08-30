@@ -26,4 +26,4 @@ type blockData = {
   block_loc: (pos, pos),
 };
 
-type linkResult = Belt.Result.t(bool, exn);
+type linkResult = Belt.Result.t(unit, string);

@@ -32,9 +32,11 @@ module V1 = {
     let langDecoder: Js.Json.t => lang =
       json => json |> string |> stringToLang;
 
+    external jsonIdentity: Js.Json.t => Js.Json.t = "%identity";
+
     let internalBlockDecoder: Js.Json.t => Link.internalLink =
       json => {
-        revision_at: json |> field("timestamp", string),
+        revision_at: json |> field("timestamp", jsonIdentity),
         sketch_id: json |> field("id", string),
         name: json |> field("name", string),
         lang: json |> field("lang", langDecoder),
@@ -102,7 +104,7 @@ module V1 = {
             ("sketch_id", string(internalLink.sketch_id)),
             ("name", string(internalLink.name)),
             ("lang", internalLink.lang |> langToString |> string),
-            ("timestamp", string(internalLink.revision_at)),
+            ("timestamp", internalLink.revision_at),
             ("code", string(internalLink.code)),
           ])
         | External () => object_([])
