@@ -157,6 +157,7 @@ module Editor_Note = {
         },
       render: ({state, send}) => {
         let {editorContentStatus, lang} = state;
+        Js.log(lang->langToString);
         <>
           <UI_Topbar.Actions>
             ...(
