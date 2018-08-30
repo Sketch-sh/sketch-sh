@@ -32,6 +32,13 @@ let obj = {
       | Error(error) => Error(error)
       }
     ),
+  "mlToMl": code =>
+    Belt.Result.(
+      switch (Evaluator.parseML(code)) {
+      | Ok(ast) => Ok(Evaluator.printML(ast))
+      | Error(error) => Error(error)
+      }
+    ),
 };
 
 Comlink.(comlink->(expose(obj, Worker.self)));

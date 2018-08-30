@@ -19,10 +19,16 @@ type action =
   | Block_UpdateValue(id, string, CodeMirror.EditorChange.t)
   | Block_AddWidgets(id, array(Widget.t))
   | Block_FocusUp(id)
-  | Block_FocusDown(id);
+  | Block_FocusDown(id)
+  | Block_RefmtAsLang(lang)
+  | Block_RefmtOnDemand
+  | Block_CleanBlocksCopy
+  | Block_MapRefmtToBlocks(string, id, bool);
 
 type state = {
+  lang,
   blocks: array(block),
+  blocksCopy: option(array(block)),
   deletedBlockMeta: array(deletedBlockMeta),
   stateUpdateReason: option(action),
   focusedBlock: option((id, blockTyp, focusChangeType)),
@@ -84,7 +90,9 @@ let make =
       _children,
     ) => {
   let makeInitialState = () => {
+    lang,
     blocks: blocks->syncLineNumber,
+    blocksCopy: None,
     deletedBlockMeta: [||],
     stateUpdateReason: None,
     focusedBlock: None,
@@ -129,12 +137,27 @@ let make =
               self.send(Block_Execute(true));
             },
           );
+        let unReg3 =
+          registerShortcut(
+            ~global=true,
+            "ctrl+shift+i",
+            event => {
+              open Webapi.Dom;
+              event->KeyboardEvent.preventDefault;
+              self.send(Block_RefmtOnDemand);
+            },
+          );
         self.onUnmount(() => {
           unReg();
           unReg2();
+          unReg3();
         });
       };
     },
+    willUpdate: ({oldSelf, newSelf}) =>
+      if (oldSelf.state.lang != newSelf.state.lang) {
+        newSelf.send(Block_RefmtAsLang(newSelf.state.lang));
+      },
     didUpdate: ({oldSelf, newSelf}) =>
       if (oldSelf.state.blocks !== newSelf.state.blocks) {
         switch (newSelf.state.stateUpdateReason) {
@@ -147,18 +170,134 @@ let make =
           | Block_FocusUp(_)
           | Block_FocusDown(_)
           | Block_FocusNextBlockOrCreate
+          | Block_CaptureQueuedMeta(_, _, _)
+          | Block_QueueDelete(_)
+          | Block_RefmtAsLang(_)
+          | Block_CleanBlocksCopy
+          | Block_RefmtOnDemand
           | Block_Execute(_) => ()
           | Block_Add(_, _)
-          | Block_QueueDelete(_)
           | Block_DeleteQueued(_)
           | Block_Restore(_)
-          | Block_CaptureQueuedMeta(_, _, _)
-          | Block_UpdateValue(_, _, _) => onUpdate(newSelf.state.blocks)
+          | Block_MapRefmtToBlocks(_, _, _) => onUpdate(newSelf.state.blocks)
+          | Block_UpdateValue(_, _, diff) =>
+            switch (newSelf.state.blocksCopy) {
+            | None => ()
+            | Some(_) =>
+              if (diff->CodeMirror.EditorChange.originGet == "+input") {
+                Js.log("first edit after lang change");
+                newSelf.send(Block_CleanBlocksCopy);
+              }
+            };
+            onUpdate(newSelf.state.blocks);
           }
         };
       },
     reducer: (action, state) =>
       switch (action) {
+      | Block_CleanBlocksCopy =>
+        ReasonReact.Update({
+          ...state,
+          blocksCopy: None,
+          stateUpdateReason: Some(action),
+        })
+      | Block_RefmtOnDemand =>
+        ReasonReact.SideEffects(
+          (
+            ({send, state}) =>
+              switch (state.lang) {
+              | ML => () /* pretty print currently unavailable in OCaml */
+              | RE =>
+                let callback = (code, blockId) =>
+                  send(Block_MapRefmtToBlocks(code, blockId, false));
+                state.blocks
+                ->Belt.Array.forEachU(
+                    (
+                      (. {b_id, b_data}) =>
+                        switch (b_data) {
+                        | B_Text(_) => ()
+                        | B_Code({bc_value}) =>
+                          Editor_Blocks_Refmt.prettyPrintRe(
+                            bc_value,
+                            b_id,
+                            callback,
+                          )
+                        }
+                    ),
+                  );
+              }
+          ),
+        )
+      | Block_RefmtAsLang(lang) =>
+        ReasonReact.UpdateWithSideEffects(
+          {
+            ...state,
+            blocksCopy: Some(state.blocks),
+            stateUpdateReason: Some(action),
+          },
+          (
+            ({send}) => {
+              let callback = (code, blockId) =>
+                send(Block_MapRefmtToBlocks(code, blockId, true));
+              state.blocks
+              ->Belt.Array.forEachU(
+                  (. {b_id, b_data}) =>
+                    switch (b_data) {
+                    | B_Text(_) => ()
+                    | B_Code({bc_value}) =>
+                      Editor_Blocks_Refmt.refmtAsLangSibling(
+                        bc_value,
+                        lang,
+                        b_id,
+                        callback,
+                      )
+                      ->ignore
+                    },
+                );
+            }
+          ),
+        )
+      | Block_MapRefmtToBlocks(newValue, blockId, executeWhenDone) =>
+        let blockIndex = state.blocks->getBlockIndex(blockId);
+        ReasonReact.UpdateWithSideEffects(
+          {
+            ...state,
+            stateUpdateReason: Some(action),
+            blocks:
+              state.blocks
+              ->(
+                  Belt.Array.mapWithIndexU((. i, block) => {
+                    let {b_data} = block;
+                    if (i != blockIndex) {
+                      block;
+                    } else {
+                      switch (b_data) {
+                      | B_Code(bcode) => {
+                          ...block,
+                          b_data:
+                            B_Code({
+                              ...bcode,
+                              bc_value: newValue,
+                              bc_widgets: [||],
+                            }),
+                        }
+                      | B_Text(_) => block
+                      };
+                    };
+                  })
+                ),
+          },
+          (
+            ({send}) =>
+              executeWhenDone ?
+                switch (state.blocks->findLastCodeBlock) {
+                | Some(b_id) =>
+                  b_id == blockId ? send(Block_Execute(false)) : ()
+                | None => ()
+                } :
+                ()
+          ),
+        );
       | Block_AddWidgets(blockId, widgets) =>
         ReasonReact.Update({
           ...state,
@@ -167,16 +306,15 @@ let make =
             state.blocks
             ->(
                 Belt.Array.mapU((. block) => {
-                  let {b_id, b_data, b_deleted} = block;
+                  let {b_id, b_data} = block;
                   if (b_id != blockId) {
                     block;
                   } else {
                     switch (b_data) {
                     | B_Text(_) => block
                     | B_Code(bcode) => {
-                        b_id,
+                        ...block,
                         b_data: B_Code({...bcode, bc_widgets: widgets}),
-                        b_deleted,
                       }
                     };
                   };
@@ -270,13 +408,13 @@ let make =
             state.blocks
             ->(
                 Belt.Array.mapWithIndexU((. i, block) => {
-                  let {b_id, b_data, b_deleted} = block;
+                  let {b_data} = block;
                   if (i < blockIndex) {
                     block;
                   } else if (i == blockIndex) {
                     switch (b_data) {
                     | B_Code(bcode) => {
-                        b_id,
+                        ...block,
                         b_data:
                           B_Code({
                             ...bcode,
@@ -293,13 +431,8 @@ let make =
                                 );
                             },
                           }),
-                        b_deleted,
                       }
-                    | B_Text(_) => {
-                        b_id,
-                        b_data: B_Text(newValue),
-                        b_deleted,
-                      }
+                    | B_Text(_) => {...block, b_data: B_Text(newValue)}
                     };
                   } else {
                     switch (b_data) {
@@ -315,15 +448,13 @@ let make =
             ->syncLineNumber,
         });
       | Block_QueueDelete(blockId) =>
-        let queueTimeout = (self, b_data) => {
+        let queueTimeout = (send, b_data) => {
           let timeoutId =
             Js.Global.setTimeout(
-              () => self.ReasonReact.send(Block_DeleteQueued(blockId)),
+              () => send(Block_DeleteQueued(blockId)),
               10000,
             );
-          self.ReasonReact.send(
-            Block_CaptureQueuedMeta(blockId, timeoutId, b_data),
-          );
+          send(Block_CaptureQueuedMeta(blockId, timeoutId, b_data));
           ();
         };
         if (isLastBlock(state.blocks)) {
@@ -339,7 +470,7 @@ let make =
                 stateUpdateReason: Some(action),
                 focusedBlock: None,
               },
-              (self => queueTimeout(self, state.blocks[0].b_data)),
+              (({send}) => queueTimeout(send, state.blocks[0].b_data)),
             )
           };
         } else {
@@ -364,12 +495,15 @@ let make =
                   focusedBlock == blockId ? None : state.focusedBlock
                 },
             },
-            (self => queueTimeout(self, state.blocks[blockIndex].b_data)),
+            (
+              ({send}) => queueTimeout(send, state.blocks[blockIndex].b_data)
+            ),
           );
         };
       | Block_DeleteQueued(blockId) =>
         if (isLastBlock(state.blocks) || Belt.Array.length(state.blocks) == 0) {
           ReasonReact.Update({
+            ...state,
             blocks: [|newBlock|],
             deletedBlockMeta:
               state.deletedBlockMeta
@@ -379,6 +513,7 @@ let make =
           });
         } else {
           ReasonReact.Update({
+            ...state,
             blocks:
               state.blocks
               ->(Belt.Array.keepU((. {b_id}) => b_id != blockId))

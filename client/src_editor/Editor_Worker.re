@@ -27,6 +27,9 @@ type toplevel = {
   mlToRe:
     (. string) =>
     Js.Promise.t(Belt.Result.t(string, Worker_Evaluator.Types.Refmt.error)),
+  mlToMl:
+    (. string) =>
+    Js.Promise.t(Belt.Result.t(string, Worker_Evaluator.Types.Refmt.error)),
 };
 let worker = ToplevelWorker.make();
 let toplevel: toplevel = Comlink.comlink->(Comlink.proxy(worker));
@@ -37,3 +40,4 @@ let executeMany = toplevel->executeManyGet;
 let reToMl = toplevel->reToMlGet;
 let reToRe = toplevel->reToReGet;
 let mlToRe = toplevel->mlToReGet;
+let mlToMl = toplevel->mlToMlGet;
