@@ -396,26 +396,29 @@ let make =
                 self.send(Block_FocusNextBlockOrCreate(blockTyp));
               };
               onExecute(true);
-              Toplevel_Consumer.execute(
-                lang,
-                allCodeToExecute,
-                fun
-                | Belt.Result.Error(error) => {
-                    onExecute(false);
-                    Notify.error(error);
-                  }
-                | Belt.Result.Ok(blocks) => {
-                    onExecute(false);
-                    blocks
-                    ->(
-                        Belt.List.forEachU(
-                          (. {Toplevel.Types.id: blockId, result}) => {
-                          let widgets = executeResultToWidget(result);
-                          self.send(Block_AddWidgets(blockId, widgets));
-                        })
-                      );
-                  },
-              );
+              let id =
+                Toplevel_Consumer.execute(
+                  lang,
+                  allCodeToExecute,
+                  fun
+                  | Belt.Result.Error(error) => {
+                      onExecute(false);
+                      Notify.error(error);
+                    }
+                  | Belt.Result.Ok(blocks) => {
+                      onExecute(false);
+                      blocks
+                      ->(
+                          Belt.List.forEachU(
+                            (. {Toplevel.Types.id: blockId, result}) => {
+                            let widgets = executeResultToWidget(result);
+                            self.send(Block_AddWidgets(blockId, widgets));
+                          })
+                        );
+                    },
+                );
+
+              self.onUnmount(() => Toplevel_Consumer.cancel(id));
             }
           ),
         );

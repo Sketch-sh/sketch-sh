@@ -15,7 +15,7 @@ let clearTimeout =
   | None => ()
   | Some(timeoutId) => Js.Global.clearTimeout(timeoutId);
 
-let make = (~delayMs=1500, ~loading: bool, children) => {
+let make = (~delayMs=1000, ~loading: bool, children) => {
   ...component,
   initialState: () => {
     loading,

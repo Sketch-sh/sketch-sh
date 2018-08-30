@@ -39,11 +39,13 @@ let getWorker = () =>
     newWorker;
   | Some(worker) => worker
   };
-let terminalWorker = id => {
+let terminate = id => {
   ongoingCallbacks->MapStr.remove(id);
   getWorker()->Toplevel.Top.terminate;
   toplevelWorker := None;
 };
+
+let cancel = id => ongoingCallbacks->MapStr.remove(id);
 
 let run = (payload, callback, timeoutCallback) => {
   let messageId = Utils.generateId();
@@ -54,13 +56,17 @@ let run = (payload, callback, timeoutCallback) => {
   let timeoutId =
     Js.Global.setTimeout(
       () => {
-        terminalWorker(messageId);
-        timeoutCallback();
+        switch (ongoingCallbacks->MapStr.get(messageId)) {
+        | None => ()
+        | Some(_) => timeoutCallback()
+        };
+        terminate(messageId);
       },
       timeoutSeconds^ * 1000,
     );
 
   ongoingCallbacks->MapStr.set(messageId, (timeoutId, callback));
+  messageId;
 };
 
 let execute = (lang, blocks, callback) =>
