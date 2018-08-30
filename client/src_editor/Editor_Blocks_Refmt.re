@@ -1,9 +1,7 @@
 open Editor_Types;
-open Editor_Blocks;
 
-/* could not get the component to call this properly when living in this file  */
-let refmtAsLangSibling = (code, lang, blockId, send) =>
-  switch (lang) {
+let refmtAsLangSibling = (code, toLang, blockId, callback) =>
+  switch (toLang) {
   | RE =>
     Js.Promise.(
       Editor_Worker.mlToRe(. code)
@@ -14,12 +12,24 @@ let refmtAsLangSibling = (code, lang, blockId, send) =>
            result
            |> (
              fun
-             | Ok(re) => send(Block_MapRefmtToBlocks(re, blockId))
-             | Error(error) => Js.log(error)
+             | Ok(re) => callback(re, blockId)
+             | Error(error) => {
+                 Js.log2(code, error);
+                 Notify.error(
+                   "There was an error reformatting your ML code to ML, check the console for details",
+                 );
+               }
            );
            resolve();
          })
-      |> catch(error => resolve(Js.log(error)))
+      |> catch(error => {
+           Js.log2(code, error);
+           resolve(
+             Notify.error(
+               "There was an error reformatting your ML code to RE, check the console for details",
+             ),
+           );
+         })
     )
   | ML =>
     Js.Promise.(
@@ -31,49 +41,52 @@ let refmtAsLangSibling = (code, lang, blockId, send) =>
            result
            |> (
              fun
-             | Ok(ml) => send(Block_MapRefmtToBlocks(ml, blockId))
-             | Error(error) => Js.log(error)
+             | Ok(ml) => callback(ml, blockId)
+             | Error(error) => {
+                 Js.log2(code, error);
+                 Notify.error(
+                   "There was an error reformatting your RE code to ML, check the console for details",
+                 );
+               }
            );
            resolve();
          })
-      |> catch(error => resolve(Js.log(error)))
+      |> catch(error => {
+           Js.log2(code, error);
+           resolve(
+             Notify.error(
+               "There was an error reformatting your RE code to ML, check the console for details",
+             ),
+           );
+         })
     )
   };
 
-/*
-     these can be used to minimize the unwanted transformations of long code blocks over time
-     running the first transformation through this should put it in it's final state (I think)
- */
-let mlToMlRefmt = code =>
+let prettyPrintRe = (code, blockId, callback) =>
   Js.Promise.(
-    Editor_Worker.mlToMl(. code)
+    Editor_Worker.reToRe(. code)
     |> then_(
          (result: Belt.Result.t(string, Worker_Evaluator.Types.Refmt.error)) => {
          result
          |> (
            fun
-           | Ok(ml) => Js.log(ml)
-           | Error(error) => Js.log(error)
+           | Ok(re) => callback(re, blockId)
+           | Error(error) => {
+               Js.log2(code, error);
+               Notify.error(
+                 "There was an error pretty printing your code, check the console for details",
+               );
+             }
          );
          resolve();
        })
-    |> catch(error => resolve(Js.log(error)))
-    |> ignore
-  );
-
-let reToReRefmt = code =>
-  Js.Promise.(
-    Editor_Worker.mlToMl(. code)
-    |> then_(
-         (result: Belt.Result.t(string, Worker_Evaluator.Types.Refmt.error)) => {
-         result
-         |> (
-           fun
-           | Ok(ml) => Js.log(ml)
-           | Error(error) => Js.log(error)
+    |> catch(error => {
+         Js.log2(code, error);
+         resolve(
+           Notify.error(
+             "There was an error pretty printing your code, check the console for details",
+           ),
          );
-         resolve();
        })
-    |> catch(error => resolve(Js.log(error)))
     |> ignore
   );

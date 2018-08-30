@@ -101,7 +101,18 @@ let make =
     ...component,
     initialState: makeInitialState,
     willReceiveProps: ({state}) =>
-      if (blocks != state.blocks) {
+      if (state.lang != lang) {
+        Js.log2("state.blocks", state.blocks[1]);
+        Js.log2("blocksCopy", state.blocks[1]);
+        switch (state.blocksCopy) {
+        | None => makeInitialState()
+        | Some(blocksCopy) => {
+            ...makeInitialState(),
+            blocks: blocksCopy,
+            blocksCopy: Some(blocks),
+          }
+        };
+      } else if (blocks != state.blocks) {
         makeInitialState();
       } else {
         state;
@@ -156,7 +167,10 @@ let make =
     },
     willUpdate: ({oldSelf, newSelf}) =>
       if (oldSelf.state.lang != newSelf.state.lang) {
-        newSelf.send(Block_RefmtAsLang(newSelf.state.lang));
+        switch (newSelf.state.blocksCopy) {
+        | None => newSelf.send(Block_RefmtAsLang(lang))
+        | Some(_) => ()
+        };
       },
     didUpdate: ({oldSelf, newSelf}) =>
       if (oldSelf.state.blocks !== newSelf.state.blocks) {
@@ -175,11 +189,11 @@ let make =
           | Block_RefmtAsLang(_)
           | Block_CleanBlocksCopy
           | Block_RefmtOnDemand
+          | Block_MapRefmtToBlocks(_, _, _)
           | Block_Execute(_) => ()
           | Block_Add(_, _)
           | Block_DeleteQueued(_)
-          | Block_Restore(_)
-          | Block_MapRefmtToBlocks(_, _, _) => onUpdate(newSelf.state.blocks)
+          | Block_Restore(_) => onUpdate(newSelf.state.blocks)
           | Block_UpdateValue(_, _, diff) =>
             switch (newSelf.state.blocksCopy) {
             | None => ()
@@ -204,7 +218,7 @@ let make =
       | Block_RefmtOnDemand =>
         ReasonReact.SideEffects(
           (
-            ({send, state}) =>
+            ({send}) =>
               switch (state.lang) {
               | ML => () /* pretty print currently unavailable in OCaml */
               | RE =>
@@ -229,6 +243,7 @@ let make =
           ),
         )
       | Block_RefmtAsLang(lang) =>
+        Js.log("Block_RefmtAsLang");
         ReasonReact.UpdateWithSideEffects(
           {
             ...state,
@@ -256,7 +271,7 @@ let make =
                 );
             }
           ),
-        )
+        );
       | Block_MapRefmtToBlocks(newValue, blockId, executeWhenDone) =>
         let blockIndex = state.blocks->getBlockIndex(blockId);
         ReasonReact.UpdateWithSideEffects(

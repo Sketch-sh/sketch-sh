@@ -103,10 +103,7 @@ module Editor_Note = {
           state.blocks := blocks;
           ReasonReact.Update({...state, editorContentStatus: Ec_Dirty});
         | ChangeLang(lang) =>
-          ReasonReact.UpdateWithSideEffects(
-            {...state, lang, editorContentStatus: Ec_Dirty},
-            (self => self.send(Execute)),
-          )
+          ReasonReact.Update({...state, lang, editorContentStatus: Ec_Dirty})
         | UpdateNoteSaveStatus(saveStatus) =>
           switch (state.editorContentStatus, saveStatus) {
           | (_, SaveStatus_Initial) => ReasonReact.NoUpdate
@@ -215,6 +212,38 @@ module Editor_Note = {
                        className=buttonClassName
                        forkStatus=state.forkStatus
                      />
+                     <UI_Balloon message="Sketch language" position=Down>
+                       ...<fieldset
+                            className="EditorNote__lang"
+                            ariaLabel="Language toggle">
+                            <span>
+                              <input
+                                type_="radio"
+                                id="RE"
+                                name="language"
+                                checked=(lang == RE)
+                                onChange=(_ => send(ChangeLang(RE)))
+                              />
+                              <label
+                                htmlFor="RE" className="EditorNote__lang--RE">
+                                "RE"->str
+                              </label>
+                            </span>
+                            <span>
+                              <input
+                                type_="radio"
+                                id="ML"
+                                name="language"
+                                checked=(lang == ML)
+                                onChange=(_ => send(ChangeLang(ML)))
+                              />
+                              <label
+                                htmlFor="ML" className="EditorNote__lang--ML">
+                                "ML"->str
+                              </label>
+                            </span>
+                          </fieldset>
+                     </UI_Balloon>
                    </>
                )
           </UI_Topbar.Actions>
@@ -235,36 +264,6 @@ module Editor_Note = {
                 onChange=(event => valueFromEvent(event)->TitleUpdate->send)
               />
               <div className="EditorNote__metadata--info">
-                <UI_Balloon message="Sketch language" position=Down>
-                  ...<fieldset
-                       className="EditorNote__lang"
-                       ariaLabel="Language toggle">
-                       <span>
-                         <input
-                           type_="radio"
-                           id="RE"
-                           name="language"
-                           checked=(lang == RE)
-                           onChange=(_ => send(ChangeLang(RE)))
-                         />
-                         <label htmlFor="RE" className="EditorNote__lang--RE">
-                           "RE"->str
-                         </label>
-                       </span>
-                       <span>
-                         <input
-                           type_="radio"
-                           id="ML"
-                           name="language"
-                           checked=(lang == ML)
-                           onChange=(_ => send(ChangeLang(ML)))
-                         />
-                         <label htmlFor="ML" className="EditorNote__lang--ML">
-                           "ML"->str
-                         </label>
-                       </span>
-                     </fieldset>
-                </UI_Balloon>
                 <Editor_Note_GetUserInfo userId=state.noteOwnerId>
                   ...(
                        fun
