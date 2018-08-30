@@ -67,18 +67,15 @@ module SaveButton = {
              )
              ?className
              onClick=(_ => self.send(Save))>
-             (
-               switch (editorContentStatus) {
-               | Ec_Saving =>
-                 <>
-                   <Fi.Loader className="EditorNav__button--spin" />
-                   "Saving"->str
-                 </>
-               | Ec_Saved
-               | Ec_Dirty
-               | Ec_Pristine => <> <Fi.Save /> "Save"->str </>
-               }
-             )
+             <UI_LoadingWrapper loading=(editorContentStatus == Ec_Saving)>
+               ...(
+                    loading =>
+                      loading ?
+                        <Fi.Loader className="EditorNav__button--spin" /> :
+                        <Fi.Save />
+                  )
+             </UI_LoadingWrapper>
+             "Save"->str
            </button>
       </UI_Balloon>,
   };
