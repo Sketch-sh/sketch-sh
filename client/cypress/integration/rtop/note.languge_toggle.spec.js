@@ -10,6 +10,11 @@ import {
 } from "../../helpers/editor_helpers";
 
 context("language toggle", () => {
+  it("click on new sketch in toolbar would create new reason sketch", () => {
+    cy.visit("/");
+    cy.get(`a[href="/new/reason"]`);
+  });
+
   it("should have language switcher", () => {
     cy.visit("new/reason");
 
