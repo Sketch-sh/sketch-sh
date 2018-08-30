@@ -19,10 +19,6 @@ open Editor_Types;
 
 type uiLink = (string, string);
 
-type link =
-  | ReadyLink(Link.link)
-  | UiLink(uiLink);
-
 type linkStatus =
   | NotAsked
   | Error
@@ -33,21 +29,30 @@ type action =
   | Link_Add(uiLink)
   | Link_Fetched(Link.link)
   | Link_Update(Link.link)
-  | Link_Delete;
+  | Link_Delete(Link.link);
 
 type state = {
   links: array(Link.link),
   fetchingLink: option((string, string)),
 };
 
-let singleLink = (name, id) =>
-  <div className="link__container">
-    <input className="link__input" defaultValue=id placeholder="id" />
-    <input className="link__input" defaultValue=name placeholder="name" />
-    <button className="link__button link__button--danger">
-      <Fi.Trash2 />
-    </button>
-  </div>;
+module SingleLink = {
+  let component = ReasonReact.statelessComponent("Editor_SingleLink");
+
+  let make = (~name, ~id, ~onDelete, _children) => {
+    ...component,
+    render: _ =>
+      <div>
+        <input className="link__input" defaultValue=id placeholder="id" />
+        <input className="link__input" defaultValue=name placeholder="name" />
+        <button
+          className="link__button link__button--danger"
+          onClick=(_ => onDelete())>
+          <Fi.Trash2 />
+        </button>
+      </div>,
+  };
+};
 
 module EmptyLink = {
   type state = {
@@ -112,9 +117,26 @@ let make = (~links, ~onUpdate, _children) => {
         {...state, fetchingLink: None},
         (
           _ => {
-            let links = Belt.Array.concat(state.links, [|link|]);
+            let links = Belt.Array.concat(links, [|link|]);
 
-            links->Belt.Array.length->string_of_int->Js.log;
+            onUpdate(links);
+          }
+        ),
+      )
+    | Link_Delete(linkToDelete) =>
+      ReasonReact.SideEffects(
+        (
+          _ => {
+            open Editor_Types.Link;
+            let links =
+              Belt.Array.keepU(links, (. link) =>
+                switch (link, linkToDelete) {
+                | (Internal(linkA), Internal(linkB)) =>
+                  linkA.sketch_id != linkB.sketch_id
+                | _ => true
+                }
+              );
+
             onUpdate(links);
           }
         ),
@@ -127,11 +149,15 @@ let make = (~links, ~onUpdate, _children) => {
       ->Belt.Array.mapU(
           (. link: Link.link) =>
             switch (link) {
-            | Internal({sketch_id, name}) => singleLink(name, sketch_id)
+            | Internal({sketch_id, name}) =>
+              <SingleLink
+                id=sketch_id
+                name
+                onDelete=(() => send(Link_Delete(link)))
+              />
             | External () => ReasonReact.null
             },
         );
-    existingLinks->Belt.Array.length->string_of_int->Js.log;
 
     <div className="links__container">
       <span className="links__disclaimer">
