@@ -6,8 +6,7 @@ let toplevelWorker = ref(None);
 module MapStr = Belt.MutableMap.String;
 
 type callback =
-  | ExecuteCallback(Belt.Result.t(list(blockResult), string) => unit)
-    : callback;
+  | ExecuteCallback(Belt.Result.t(list(blockResult), string) => unit);
 
 let ongoingCallbacks: MapStr.t((Js.Global.timeoutId, callback)) =
   MapStr.make();
@@ -50,7 +49,7 @@ let run = (payload, callback, timeoutCallback) => {
   let messageId = Utils.generateId();
 
   getWorker()
-  |> Toplevel.Top.postMessageToWorker({t_id: messageId, t_message: payload});
+  ->Toplevel.Top.postMessageToWorker({t_id: messageId, t_message: payload});
 
   let timeoutId =
     Js.Global.setTimeout(

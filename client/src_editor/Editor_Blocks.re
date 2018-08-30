@@ -88,6 +88,7 @@ let make =
       ~blocks: array(block),
       ~readOnly=false,
       ~onUpdate,
+      ~onExecute,
       ~registerExecuteCallback=?,
       ~registerShortcut: option(Shortcut.subscribeFun)=?,
       _children,
@@ -372,28 +373,48 @@ let make =
           ReasonReact.NoUpdate;
         };
       | Block_Execute(focusNextBlock, blockTyp) =>
-        let allCodeToExecute = state.blocks->codeBlockDataPairs;
-        /* Clear all widgets and execute all blocks */
+        let allCodeToExecute =
+          state.blocks
+          ->(
+              Belt.Array.reduceU([], (. acc, {b_id, b_data, b_deleted}) =>
+                b_deleted ?
+                  acc :
+                  (
+                    switch (b_data) {
+                    | B_Text(_) => acc
+                    | B_Code({bc_value}) => [(b_id, bc_value), ...acc]
+                    }
+                  )
+              )
+            )
+          ->Belt.List.reverse;
+
         ReasonReact.SideEffects(
           (
             self => {
               if (focusNextBlock) {
                 self.send(Block_FocusNextBlockOrCreate(blockTyp));
               };
+              onExecute(true);
               Toplevel_Consumer.execute(
                 lang,
                 allCodeToExecute,
                 fun
-                | Belt.Result.Error(error) => Notify.error(error)
-                | Belt.Result.Ok(blocks) =>
-                  blocks
-                  ->(
-                      Belt.List.forEachU(
-                        (. {Toplevel.Types.id: blockId, result}) => {
-                        let widgets = executeResultToWidget(result);
-                        self.send(Block_AddWidgets(blockId, widgets));
-                      })
-                    ),
+                | Belt.Result.Error(error) => {
+                    onExecute(false);
+                    Notify.error(error);
+                  }
+                | Belt.Result.Ok(blocks) => {
+                    onExecute(false);
+                    blocks
+                    ->(
+                        Belt.List.forEachU(
+                          (. {Toplevel.Types.id: blockId, result}) => {
+                          let widgets = executeResultToWidget(result);
+                          self.send(Block_AddWidgets(blockId, widgets));
+                        })
+                      );
+                  },
               );
             }
           ),

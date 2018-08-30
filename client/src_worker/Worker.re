@@ -14,13 +14,13 @@ module Make = (Config: Config) => {
   let make = Config.make;
 
   module Top = {
-    [@bs.send.pipe: worker]
-    external postMessageToWorker: 'a => unit = "postMessage";
+    [@bs.send]
+    external postMessageToWorker: (worker, 'a) => unit = "postMessage";
     [@bs.set]
     external onMessageFromWorker:
       (worker, {. "data": Config.workerToTopData} => unit) => unit =
       "onmessage";
-    [@bs.send.pipe: worker] external terminate: unit = "terminate";
+    [@bs.send] external terminate: worker => unit = "terminate";
   };
 
   module Worker = {
