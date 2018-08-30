@@ -1,8 +1,13 @@
 open Worker_Binding;
 
-[@bs.module] external toplevelPath: string = "../public/toplevel.js";
+%bs.raw
+{|
+  importScripts("/libs/exported-unit.cmis.js");
+  importScripts("/libs/stdlib.cmis.js");
+  importScripts("/libs/toplevel.js");
 
-Worker.importScripts(toplevelPath);
+  importScripts("https://libraries.sketch.sh/owl_base.loader.sketch.js");
+|};
 
 module Analyze = Worker_Analyze.Make(Worker_BrowserEvaluator);
 module Evaluator = Worker_Evaluator.Make(Worker_BrowserEvaluator);

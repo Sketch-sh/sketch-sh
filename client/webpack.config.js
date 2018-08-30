@@ -104,7 +104,10 @@ const base = {
         ],
       },
       {
-        test: /\.(png|jpg|gif)$|toplevel.js$/,
+        test: file =>
+          file.endsWith("toplevel.js") ||
+          file.endsWith("cmis.js") ||
+          file.endsWith("cma.js"),
         loader: "file-loader?name=[name].[hash].[ext]",
       },
     ],
