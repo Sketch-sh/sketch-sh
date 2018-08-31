@@ -19,27 +19,36 @@ let linkCollector = (tokens: array(Token.t), ~line): list(extractedToken) => {
         (NotTracking, []),
         ((state, result), token) =>
           switch (token->Token.typGet->Js.Nullable.toOption) {
-          | Some("link") =>
-            let string = token->Token.stringGet;
+          | Some(typ) =>
+            if (typ
+                |> Js.String.split(" ")
+                |> Js.Array.indexOf("link") != (-1)) {
+              let string = token->Token.stringGet;
 
-            let state =
+              let state =
+                switch (state) {
+                | NotTracking =>
+                  Tracking({
+                    content: string,
+                    colStart: token->Token.startGet,
+                    colEnd: token->Token.end_Get,
+                    line,
+                  })
+                | Tracking(data) =>
+                  let {content, colStart: _} = data;
+                  Tracking({
+                    ...data,
+                    content: content ++ string,
+                    colEnd: token->Token.end_Get,
+                  });
+                };
+              (state, result);
+            } else {
               switch (state) {
-              | NotTracking =>
-                Tracking({
-                  content: string,
-                  colStart: token->Token.startGet,
-                  colEnd: token->Token.end_Get,
-                  line,
-                })
-              | Tracking(data) =>
-                let {content, colStart: _} = data;
-                Tracking({
-                  ...data,
-                  content: content ++ string,
-                  colEnd: token->Token.end_Get,
-                });
+              | NotTracking => (state, result)
+              | Tracking(data) => (NotTracking, [data, ...result])
               };
-            (state, result);
+            }
           | _ =>
             switch (state) {
             | NotTracking => (state, result)

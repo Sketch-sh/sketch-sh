@@ -67,4 +67,33 @@ describe("linkCollector", () => {
          {colStart: 5, colEnd: 22, content: "https://sketch.sh", line: 1},
        ]
   );
+
+  let data = [%bs.raw
+    {|
+     [
+      {start: 0, end: 1, string: "-", type: "variable-2", state: null},
+      {start: 1, end: 2, string: " ", type: "variable-2", state: null},
+      {start: 2, end: 3, string: "[", type: "link variable-2", state: null},
+      {start: 3, end: 4, string: "t", type: "link variable-2", state: null},
+      {start: 4, end: 5, string: "h", type: "link variable-2", state: null},
+      {start: 5, end: 6, string: "a", type: "link variable-2", state: null},
+      {start: 6, end: 7, string: "n", type: "link variable-2", state: null},
+      {start: 7, end: 8, string: "g", type: "link variable-2", state: null},
+      {start: 8, end: 9, string: "n", type: "link variable-2", state: null},
+      {start: 9, end: 10, string: "g", type: "link variable-2", state: null},
+      {start: 10, end: 11, string: "o", type: "link variable-2", state: null},
+      {start: 11, end: 12, string: "c", type: "link variable-2", state: null},
+      {start: 12, end: 13, string: "8", type: "link variable-2", state: null},
+      {start: 13, end: 14, string: "9", type: "link variable-2", state: null},
+      {start: 14, end: 15, string: "]", type: "link variable-2", state: null},
+      {start: 15, end: 16, string: "(", type: "string url variable-2", state: null},
+      {start: 16, end: 46, string: "https://github.com/thangngoc89", type: "string url variable-2", state: null},
+      {start: 46, end: 47, string: ")", type: "string url variable-2", state: null}
+     ]
+    |}
+  ];
+  test("with multiple type in a token", () =>
+    expect(linkCollector(data, ~line=1))
+    == [{colStart: 2, colEnd: 15, content: "[thangngoc89]", line: 1}]
+  );
 });
