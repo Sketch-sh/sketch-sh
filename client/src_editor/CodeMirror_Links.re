@@ -82,7 +82,8 @@ let createLinkHandleNode = text => {
   let marker = document |> Document.createElement("span");
   marker->Element.setClassName("cm-link cm-link-marker");
 
-  let textNode = document |> Document.createTextNode(text);
+  let textNode = document |> Document.createElement("span");
+  textNode->Element.setInnerText(text);
   marker |> Element.appendChild(textNode);
 
   let widget = document |> Document.createElement("a");
@@ -92,7 +93,7 @@ let createLinkHandleNode = text => {
   widget->Element.setInnerHTML(icon);
 
   marker |> Element.appendChild(widget);
-  marker;
+  (marker, textNode);
 };
 
 /*
@@ -114,7 +115,7 @@ let breakMark = (cm, marker) =>
     );
 
 let linkToMarker = (cm, doc, link) => {
-  let domElem = createLinkHandleNode(link.content);
+  let (marker, textNode) = createLinkHandleNode(link.content);
 
   let marker =
     doc
@@ -127,13 +128,13 @@ let linkToMarker = (cm, doc, link) => {
               ~clearOnEnter=true,
               ~clearWhenEmpty=true,
               ~handleMouseEvents=false,
-              ~replacedWith=domElem,
+              ~replacedWith=marker,
               (),
             ),
         )
       );
   Webapi.Dom.(
-    domElem |> Element.addClickEventListener(_event => breakMark(cm, marker))
+    textNode |> Element.addClickEventListener(_event => breakMark(cm, marker))
   );
   marker;
 };
