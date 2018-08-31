@@ -5,12 +5,12 @@ open Worker_Binding;
 Worker.importScripts(toplevelPath);
 
 module Analyze = Worker_Analyze.Make(Worker_BrowserEvaluator);
-module Evaluator = Worker_Evaluator.Make(Worker_BrowserEvaluator);
+module Refmt = Worker_Refmt.Make(Worker_BrowserEvaluator);
 
 let obj = {
   "execute": Analyze.execute,
   "executeMany": Analyze.executeMany,
-  "refmtMany": Analyze.refmtMany,
+  "refmtMany": Refmt.refmtMany,
 };
 
 Comlink.(comlink->(expose(obj, Worker.self)));
