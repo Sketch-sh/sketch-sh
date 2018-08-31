@@ -198,9 +198,7 @@ let make =
             | _ =>
               switch (newSelf.state.blocksCopy) {
               | None => ()
-              | Some(_) =>
-                Js.log("first edit after lang change");
-                newSelf.send(Block_CleanBlocksCopy);
+              | Some(_) => newSelf.send(Block_CleanBlocksCopy)
               };
               onUpdate(newSelf.state.blocks);
             }
@@ -261,9 +259,9 @@ let make =
                     | B_Text(_) => ()
                     | B_Code({bc_value}) =>
                       Editor_Blocks_Refmt.refmtAsLangSibling(
+                        b_id,
                         bc_value,
                         lang,
-                        b_id,
                         callback,
                       )
                       ->ignore

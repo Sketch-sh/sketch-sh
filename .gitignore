@@ -7,6 +7,3 @@ lib
 client/build
 client/src/*.js
 !client/src/entry.js
-
-# temporary! Just needed a place to paste stuff...
-client/src/REFMT_RESULTS.re

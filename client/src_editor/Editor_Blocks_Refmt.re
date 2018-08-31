@@ -1,6 +1,11 @@
 open Editor_Types;
 
-let refmtAsLangSibling = (code, toLang, blockId, callback) =>
+let logRefmtError = (code, error) => {
+  Js.log2("Code:\n", code);
+  Js.log2("Error:\n", error);
+};
+
+let refmtAsLangSibling = (blockId, code, toLang, callback) =>
   switch (toLang) {
   | RE =>
     Js.Promise.(
@@ -14,7 +19,7 @@ let refmtAsLangSibling = (code, toLang, blockId, callback) =>
              fun
              | Ok(re) => callback(re, blockId)
              | Error(error) => {
-                 Js.log2(code, error);
+                 logRefmtError(code, error);
                  Notify.error(
                    "There was an error reformatting your ML code to RE, check the console for details",
                  );
@@ -23,7 +28,7 @@ let refmtAsLangSibling = (code, toLang, blockId, callback) =>
            resolve();
          })
       |> catch(error => {
-           Js.log2(code, error);
+           logRefmtError(code, error);
            resolve(
              Notify.error(
                "There was an error reformatting your ML code to RE, check the console for details",
@@ -43,7 +48,7 @@ let refmtAsLangSibling = (code, toLang, blockId, callback) =>
              fun
              | Ok(ml) => callback(ml, blockId)
              | Error(error) => {
-                 Js.log2(code, error);
+                 logRefmtError(code, error);
                  Notify.error(
                    "There was an error reformatting your RE code to ML, check the console for details",
                  );
@@ -52,7 +57,7 @@ let refmtAsLangSibling = (code, toLang, blockId, callback) =>
            resolve();
          })
       |> catch(error => {
-           Js.log2(code, error);
+           logRefmtError(code, error);
            resolve(
              Notify.error(
                "There was an error reformatting your RE code to ML, check the console for details",
@@ -72,7 +77,7 @@ let prettyPrintRe = (code, blockId, callback) =>
            fun
            | Ok(re) => callback(re, blockId)
            | Error(error) => {
-               Js.log2(code, error);
+               logRefmtError(code, error);
                Notify.error(
                  "There was an error pretty printing your code, check the console for details",
                );
@@ -81,7 +86,7 @@ let prettyPrintRe = (code, blockId, callback) =>
          resolve();
        })
     |> catch(error => {
-         Js.log2(code, error);
+         logRefmtError(code, error);
          resolve(
            Notify.error(
              "There was an error pretty printing your code, check the console for details",
