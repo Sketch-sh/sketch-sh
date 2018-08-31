@@ -166,10 +166,8 @@ let make =
     },
     didUpdate: ({oldSelf, newSelf}) => {
       if (oldSelf.state.lang != lang) {
-        switch (newSelf.state.blocksCopy) {
-        | None =>
-          Js.log("no blocksCopy, refmt everything");
-          newSelf.send(Block_RefmtAsLang(lang));
+        switch (oldSelf.state.blocksCopy) {
+        | None => newSelf.send(Block_RefmtAsLang(lang))
         | Some(_) => ()
         };
       };
@@ -195,21 +193,22 @@ let make =
           | Block_DeleteQueued(_)
           | Block_Restore(_) => onUpdate(newSelf.state.blocks)
           | Block_UpdateValue(_, _, diff) =>
-            switch (newSelf.state.blocksCopy) {
-            | None => ()
-            | Some(_) =>
-              if (diff->CodeMirror.EditorChange.originGet != "setValue") {
+            switch (diff->CodeMirror.EditorChange.originGet) {
+            | "setValue" => ()
+            | _ =>
+              switch (newSelf.state.blocksCopy) {
+              | None => ()
+              | Some(_) =>
                 Js.log("first edit after lang change");
                 newSelf.send(Block_CleanBlocksCopy);
-              }
-            };
-            onUpdate(newSelf.state.blocks);
+              };
+              onUpdate(newSelf.state.blocks);
+            }
           }
         };
       };
     },
-    reducer: (action, state) => {
-      Js.log(action);
+    reducer: (action, state) =>
       switch (action) {
       | Block_CleanBlocksCopy =>
         ReasonReact.Update({
@@ -698,8 +697,7 @@ let make =
               Some((lowerBlockId, blockTyp, FcTyp_BlockFocusDown)),
           })
         };
-      };
-    },
+      },
     render: ({send, state}) =>
       <>
         state.blocks

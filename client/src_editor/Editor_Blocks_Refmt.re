@@ -16,7 +16,7 @@ let refmtAsLangSibling = (code, toLang, blockId, callback) =>
              | Error(error) => {
                  Js.log2(code, error);
                  Notify.error(
-                   "There was an error reformatting your ML code to ML, check the console for details",
+                   "There was an error reformatting your ML code to RE, check the console for details",
                  );
                }
            );
