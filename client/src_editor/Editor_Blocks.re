@@ -21,9 +21,9 @@ type action =
   | Block_FocusUp(id)
   | Block_FocusDown(id)
   | Block_RefmtAsLang(lang)
-  | Block_RefmtOnDemand
+  | Block_PrettyPrintRE
   | Block_CleanBlocksCopy
-  | Block_MapRefmtToBlocks(string, id, bool);
+  | Block_MapRefmtToBlocks(list((id, string)), bool);
 
 type state = {
   lang,
@@ -154,7 +154,7 @@ let make =
             event => {
               open Webapi.Dom;
               event->KeyboardEvent.preventDefault;
-              self.send(Block_RefmtOnDemand);
+              self.send(Block_PrettyPrintRE);
             },
           );
         self.onUnmount(() => {
@@ -186,8 +186,8 @@ let make =
           | Block_QueueDelete(_)
           | Block_RefmtAsLang(_)
           | Block_CleanBlocksCopy
-          | Block_RefmtOnDemand
-          | Block_MapRefmtToBlocks(_, _, _)
+          | Block_PrettyPrintRE
+          | Block_MapRefmtToBlocks(_, _)
           | Block_Execute(_) => ()
           | Block_Add(_, _)
           | Block_DeleteQueued(_)
@@ -214,31 +214,22 @@ let make =
           blocksCopy: None,
           stateUpdateReason: Some(action),
         })
-      | Block_RefmtOnDemand =>
+      | Block_PrettyPrintRE =>
         ReasonReact.SideEffects(
           (
-            ({send}) =>
-              switch (state.lang) {
-              | ML => () /* pretty print currently unavailable in OCaml */
-              | RE =>
-                let callback = (code, blockId) =>
-                  send(Block_MapRefmtToBlocks(code, blockId, false));
-                state.blocks
-                ->Belt.Array.forEachU(
-                    (
-                      (. {b_id, b_data}) =>
-                        switch (b_data) {
-                        | B_Text(_) => ()
-                        | B_Code({bc_value}) =>
-                          Editor_Blocks_Refmt.prettyPrintRe(
-                            bc_value,
-                            b_id,
-                            callback,
-                          )
-                        }
-                    ),
-                  );
-              }
+            ({state, send}) =>
+              Js.Promise.(
+                Editor_Worker.refmtMany(.
+                  lang,
+                  state.blocks->codeBlockDataPairs,
+                  true,
+                )
+                |> then_(results =>
+                     resolve(send(Block_MapRefmtToBlocks(results, false)))
+                   )
+                |> catch(error => resolve(Js.log(error)))
+              )
+              |> ignore
           ),
         )
       | Block_RefmtAsLang(lang) =>
@@ -249,29 +240,22 @@ let make =
             stateUpdateReason: Some(action),
           },
           (
-            ({state, send}) => {
-              let callback = (code, blockId) =>
-                send(Block_MapRefmtToBlocks(code, blockId, true));
-              state.blocks
-              ->Belt.Array.forEachU(
-                  (. {b_id, b_data}) =>
-                    switch (b_data) {
-                    | B_Text(_) => ()
-                    | B_Code({bc_value}) =>
-                      Editor_Blocks_Refmt.refmtAsLangSibling(
-                        b_id,
-                        bc_value,
-                        lang,
-                        callback,
-                      )
-                      ->ignore
-                    },
-                );
-            }
+            ({state, send}) =>
+              Js.Promise.(
+                Editor_Worker.refmtMany(.
+                  lang,
+                  state.blocks->codeBlockDataPairs,
+                  false,
+                )
+                |> then_(results =>
+                     resolve(send(Block_MapRefmtToBlocks(results, true)))
+                   )
+                |> catch(error => resolve(Js.log(error)))
+              )
+              |> ignore
           ),
         )
-      | Block_MapRefmtToBlocks(newValue, blockId, executeWhenDone) =>
-        let blockIndex = state.blocks->getBlockIndex(blockId);
+      | Block_MapRefmtToBlocks(newValues, executeWhenDone) =>
         ReasonReact.UpdateWithSideEffects(
           {
             ...state,
@@ -279,38 +263,28 @@ let make =
             blocks:
               state.blocks
               ->(
-                  Belt.Array.mapWithIndexU((. i, block) => {
-                    let {b_data} = block;
-                    if (i != blockIndex) {
-                      block;
-                    } else {
-                      switch (b_data) {
-                      | B_Code(bcode) => {
-                          ...block,
-                          b_data:
-                            B_Code({
-                              ...bcode,
-                              bc_value: newValue,
-                              bc_widgets: [||],
-                            }),
-                        }
-                      | B_Text(_) => block
+                  Belt.Array.mapU((. block) => {
+                    let {b_data, b_id} = block;
+                    switch (b_data) {
+                    | B_Code(bcode) =>
+                      let result =
+                        newValues |> List.find(pair => fst(pair) == b_id);
+                      {
+                        ...block,
+                        b_data:
+                          B_Code({
+                            ...bcode,
+                            bc_value: snd(result),
+                            bc_widgets: [||],
+                          }),
                       };
+                    | B_Text(_) => block
                     };
                   })
                 ),
           },
-          (
-            ({send}) =>
-              executeWhenDone ?
-                switch (state.blocks->findLastCodeBlock) {
-                | Some(b_id) =>
-                  b_id == blockId ? send(Block_Execute(false)) : ()
-                | None => ()
-                } :
-                ()
-          ),
-        );
+          (({send}) => executeWhenDone ? send(Block_Execute(false)) : ()),
+        )
       | Block_AddWidgets(blockId, widgets) =>
         ReasonReact.Update({
           ...state,
@@ -368,22 +342,7 @@ let make =
           ReasonReact.NoUpdate;
         };
       | Block_Execute(focusNextBlock) =>
-        let allCodeToExecute =
-          state.blocks
-          ->(
-              Belt.Array.reduceU([], (. acc, {b_id, b_data, b_deleted}) =>
-                b_deleted ?
-                  acc :
-                  (
-                    switch (b_data) {
-                    | B_Text(_) => acc
-                    | B_Code({bc_value}) => [(b_id, bc_value), ...acc]
-                    }
-                  )
-              )
-            )
-          ->Belt.List.reverse;
-
+        let allCodeToExecute = state.blocks->codeBlockDataPairs;
         /* Clear all widgets and execute all blocks */
         ReasonReact.SideEffects(
           (
