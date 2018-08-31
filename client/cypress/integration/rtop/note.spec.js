@@ -118,13 +118,13 @@ context("keyboard shortcuts", () => {
         force: true
       });
 
-    shortcut("{shift}{cmd}{enter}");
+    shortcut("{shift}{ctrl}{enter}");
     assertValue(1);
     assertBlocks(2);
     assertCodeBlocks(1);
     assertTextBlocks(1);
 
-    shortcut("{shift}{cmd}{enter}");
+    shortcut("{shift}{ctrl}{enter}");
     assertCodeBlocks(1);
     assertTextBlocks(2);
 
@@ -135,12 +135,12 @@ context("keyboard shortcuts", () => {
         force: true
       });
 
-    shortcut("{shift}{cmd}{enter}");
+    shortcut("{shift}{ctrl}{enter}");
     assertCodeBlocks(1);
     assertTextBlocks(2);
 
-    shortcut("{shift}{cmd}{enter}");
-    shortcut("{shift}{cmd}{enter}");
+    shortcut("{shift}{ctrl}{enter}");
+    shortcut("{shift}{ctrl}{enter}");
     assertCodeBlocks(1);
     assertTextBlocks(4);
 
@@ -150,7 +150,7 @@ context("keyboard shortcuts", () => {
       .find("textarea")
       .focus();
 
-    shortcut("{shift}{cmd}{enter}");
+    shortcut("{shift}{ctrl}{enter}");
     assertCodeBlocks(2);
     assertTextBlocks(4);
 
