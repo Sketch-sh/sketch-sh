@@ -29,8 +29,8 @@ describe("linkCollector", () => {
     |}
   ];
   test("1 link", () =>
-    expect(linkCollector(data))
-    == [{colStart: 5, colEnd: 22, content: "https://sketch.sh"}]
+    expect(linkCollector(data, ~line=1))
+    == [{colStart: 5, colEnd: 22, content: "https://sketch.sh", line: 1}]
   );
 
   let data = [%bs.raw
@@ -61,10 +61,10 @@ describe("linkCollector", () => {
     |}
   ];
   test("with a link at the end", () =>
-    expect(linkCollector(data))
+    expect(linkCollector(data, ~line=1))
     == [
-         {colStart: 33, colEnd: 54, content: "https://google.com.vn"},
-         {colStart: 5, colEnd: 22, content: "https://sketch.sh"},
+         {colStart: 33, colEnd: 54, content: "https://google.com.vn", line: 1},
+         {colStart: 5, colEnd: 22, content: "https://sketch.sh", line: 1},
        ]
   );
 });
