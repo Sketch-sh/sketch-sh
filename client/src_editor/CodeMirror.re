@@ -180,6 +180,20 @@ module EditorChange = {
   };
 };
 
+module TextMarker = {
+  type t;
+
+  [@bs.send] external clear: t => unit = "";
+
+  [@bs.deriving abstract]
+  type findResult = {
+    from: Position.t,
+    [@bs.as "to"]
+    to_: Position.t,
+  };
+  [@bs.send] external find: t => findResult = "";
+};
+
 module Doc = {
   type t;
 
@@ -197,6 +211,60 @@ module Doc = {
   [@bs.send] external setCursor: (t, Position.t) => unit = "";
 
   [@bs.send] external clearHistory: t => unit = "";
+
+  [@bs.deriving abstract]
+  type markTextOption = {
+    [@bs.optional]
+    className: string,
+    [@bs.optional]
+    inclusiveLeft: bool,
+    [@bs.optional]
+    inclusiveRight: bool,
+    [@bs.optional]
+    atomic: bool,
+    [@bs.optional]
+    collapsed: bool,
+    [@bs.optional]
+    clearOnEnter: bool,
+    [@bs.optional]
+    clearWhenEmpty: bool,
+    [@bs.optional]
+    replacedWith: Dom.element,
+    [@bs.optional]
+    handleMouseEvents: bool,
+    [@bs.optional]
+    readOnly: bool,
+    [@bs.optional]
+    addToHistory: bool,
+    [@bs.optional]
+    startStyle: string,
+    [@bs.optional]
+    endStyle: string,
+    [@bs.optional]
+    css: string,
+    [@bs.optional]
+    title: string,
+    [@bs.optional]
+    shared: bool,
+  };
+  [@bs.send]
+  external markText:
+    (t, ~from: Position.t, ~to_: Position.t, ~option: markTextOption) =>
+    TextMarker.t =
+    "";
+};
+
+module Token = {
+  [@bs.deriving abstract]
+  type t = {
+    start: int,
+    [@bs.as "end"]
+    end_: int,
+    string,
+    [@bs.as "type"]
+    typ: Js.Nullable.t(string),
+    state: Js.Json.t,
+  };
 };
 
 module Editor = {
@@ -206,6 +274,10 @@ module Editor = {
   [@bs.send] external getOption: (editor, string) => 'a = "";
   [@bs.send] external getWrapperElement: editor => Dom.element = "";
   [@bs.send] external operation: (editor, (. unit) => 'a) => 'a = "";
+  [@bs.send]
+  external getLineTokens:
+    (editor, ~line: int, ~precise: bool) => array(Token.t) =
+    "";
 
   module GetOption = {
     [@bs.send]
