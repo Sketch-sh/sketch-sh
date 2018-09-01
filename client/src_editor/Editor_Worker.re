@@ -21,7 +21,8 @@ type toplevel = {
     (. lang, list((id, string))) =>
     Js.Promise.t(list((id, list(Worker_Types.blockData)))),
   refmtMany:
-    (. lang, list((id, string)), bool) => Js.Promise.t(list((id, string))),
+    (. lang, list((id, string)), bool) =>
+    Js.Promise.t(Worker_Evaluator.Types.Refmt.refmtManyResult),
 };
 
 let worker = ToplevelWorker.make();

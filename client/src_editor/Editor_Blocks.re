@@ -21,9 +21,12 @@ type action =
   | Block_FocusUp(id)
   | Block_FocusDown(id)
   | Block_RefmtAsLang(lang)
-  | Block_PrettyPrintRE
+  | Block_PrettyPrint
   | Block_CleanBlocksCopy
-  | Block_MapRefmtToBlocks(list((id, string)), bool);
+  | Block_MapRefmtToBlocks(
+      Worker_Evaluator.Types.Refmt.refmtManyResult,
+      bool,
+    );
 
 type state = {
   lang,
@@ -162,11 +165,11 @@ let make =
         let unReg4 =
           registerShortcut(
             ~global=true,
-            "ctrl+shift+i",
+            "mod+shift+i",
             event => {
               open Webapi.Dom;
               event->KeyboardEvent.preventDefault;
-              self.send(Block_PrettyPrintRE);
+              self.send(Block_PrettyPrint);
             },
           );
         self.onUnmount(() => {
@@ -198,7 +201,7 @@ let make =
           | Block_QueueDelete(_)
           | Block_RefmtAsLang(_)
           | Block_CleanBlocksCopy
-          | Block_PrettyPrintRE
+          | Block_PrettyPrint
           | Block_MapRefmtToBlocks(_, _)
           | Block_FocusNextBlockOrCreate(_)
           | Block_Execute(_, _) => ()
@@ -227,24 +230,30 @@ let make =
           blocksCopy: None,
           stateUpdateReason: Some(action),
         })
-      | Block_PrettyPrintRE =>
-        ReasonReact.SideEffects(
-          (
-            ({state, send}) =>
-              Js.Promise.(
-                Editor_Worker.refmtMany(.
-                  lang,
-                  state.blocks->codeBlockDataPairs,
-                  true,
+      | Block_PrettyPrint =>
+        switch (lang) {
+        | ML =>
+          Notify.error("ML not currently supported");
+          ReasonReact.NoUpdate;
+        | RE =>
+          ReasonReact.SideEffects(
+            (
+              ({state, send}) =>
+                Js.Promise.(
+                  Editor_Worker.refmtMany(.
+                    lang,
+                    state.blocks->codeBlockDataPairs,
+                    true,
+                  )
+                  |> then_(results =>
+                       Block_MapRefmtToBlocks(results, false)->send->resolve
+                     )
+                  |> catch(error => resolve(Js.log(error)))
                 )
-                |> then_(results =>
-                     Block_MapRefmtToBlocks(results, false)->send->resolve
-                   )
-                |> catch(error => resolve(Js.log(error)))
-              )
-              |> ignore
-          ),
-        )
+                |> ignore
+            ),
+          )
+        }
       | Block_RefmtAsLang(lang) =>
         ReasonReact.UpdateWithSideEffects(
           {
@@ -268,7 +277,7 @@ let make =
               |> ignore
           ),
         )
-      | Block_MapRefmtToBlocks(newValues, executeWhenDone) =>
+      | Block_MapRefmtToBlocks(results, executeWhenDone) =>
         ReasonReact.UpdateWithSideEffects(
           {
             ...state,
@@ -279,18 +288,16 @@ let make =
                   Belt.Array.mapU((. block) => {
                     let {b_data, b_id} = block;
                     switch (b_data) {
-                    | B_Code(bcode) =>
-                      let result =
-                        newValues |> List.find(pair => fst(pair) == b_id);
-                      {
+                    | B_Code(bcode) => {
                         ...block,
                         b_data:
                           B_Code({
                             ...bcode,
-                            bc_value: snd(result),
+                            bc_value:
+                              getBlockRefmtResult(results, b_id, lang),
                             bc_widgets: [||],
                           }),
-                      };
+                      }
                     | B_Text(_) => block
                     };
                   })
