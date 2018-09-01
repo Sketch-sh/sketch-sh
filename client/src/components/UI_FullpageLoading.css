@@ -7,4 +7,11 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  flex-direction: column;
+  background: rgba(255, 255, 255, 0.9);
+}
+
+.UI_FullpageLoading--logo {
+  opacity: 0.8;
+  margin-bottom: var(--space3);
 }

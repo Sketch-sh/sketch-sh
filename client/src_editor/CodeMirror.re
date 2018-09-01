@@ -205,6 +205,7 @@ module Editor = {
   [@bs.send] external setOption: (editor, string, 'a) => unit = "";
   [@bs.send] external getOption: (editor, string) => 'a = "";
   [@bs.send] external getWrapperElement: editor => Dom.element = "";
+  [@bs.send] external operation: (editor, (. unit) => 'a) => 'a = "";
 
   module GetOption = {
     [@bs.send]

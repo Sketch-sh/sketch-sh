@@ -8,8 +8,8 @@ open Editor_Blocks_Utils;
 
 type action =
   | Block_Add(id, blockTyp)
-  | Block_Execute(bool)
-  | Block_FocusNextBlockOrCreate
+  | Block_Execute(bool, blockTyp)
+  | Block_FocusNextBlockOrCreate(blockTyp)
   | Block_QueueDelete(id)
   | Block_DeleteQueued(id)
   | Block_Restore(id)
@@ -117,10 +117,11 @@ let make =
         state;
       },
     didMount: self => {
-      self.send(Block_Execute(false));
+      self.send(Block_Execute(false, BTyp_Code));
       switch (registerExecuteCallback) {
       | None => ()
-      | Some(register) => register(() => self.send(Block_Execute(false)))
+      | Some(register) =>
+        register(() => self.send(Block_Execute(false, BTyp_Code)))
       };
       switch (registerShortcut) {
       | None => ()
@@ -133,7 +134,7 @@ let make =
               open Webapi.Dom;
 
               event->KeyboardEvent.preventDefault;
-              self.send(Block_Execute(false));
+              self.send(Block_Execute(false, BTyp_Code));
             },
           );
         let unReg2 =
@@ -144,10 +145,21 @@ let make =
               open Webapi.Dom;
 
               event->KeyboardEvent.preventDefault;
-              self.send(Block_Execute(true));
+              self.send(Block_Execute(true, BTyp_Code));
             },
           );
         let unReg3 =
+          registerShortcut(
+            ~global=true,
+            "mod+shift+enter",
+            event => {
+              open Webapi.Dom;
+
+              event->KeyboardEvent.preventDefault;
+              self.send(Block_Execute(true, BTyp_Text));
+            },
+          );
+        let unReg4 =
           registerShortcut(
             ~global=true,
             "ctrl+shift+i",
@@ -161,6 +173,7 @@ let make =
           unReg();
           unReg2();
           unReg3();
+          unReg4();
         });
       };
     },
@@ -168,7 +181,7 @@ let make =
       if (oldSelf.state.lang != lang) {
         switch (oldSelf.state.blocksCopy) {
         | None => newSelf.send(Block_RefmtAsLang(lang))
-        | Some(_) => newSelf.send(Block_Execute(false))
+        | Some(_) => newSelf.send(Block_Execute(false, BTyp_Code))
         };
       };
       if (oldSelf.state.blocks !== newSelf.state.blocks) {
@@ -181,14 +194,14 @@ let make =
           | Block_AddWidgets(_, _)
           | Block_FocusUp(_)
           | Block_FocusDown(_)
-          | Block_FocusNextBlockOrCreate
           | Block_CaptureQueuedMeta(_, _, _)
           | Block_QueueDelete(_)
           | Block_RefmtAsLang(_)
           | Block_CleanBlocksCopy
           | Block_PrettyPrintRE
           | Block_MapRefmtToBlocks(_, _)
-          | Block_Execute(_) => ()
+          | Block_FocusNextBlockOrCreate(_)
+          | Block_Execute(_, _) => ()
           | Block_Add(_, _)
           | Block_DeleteQueued(_)
           | Block_Restore(_) => onUpdate(newSelf.state.blocks)
@@ -283,7 +296,7 @@ let make =
                   })
                 ),
           },
-          (({send}) => executeWhenDone ? send(Block_Execute(false)) : ()),
+          (({send}) => executeWhenDone ? send(Block_Execute(false, BTyp_Code)) : ()),
         )
       | Block_AddWidgets(blockId, widgets) =>
         ReasonReact.Update({
@@ -308,9 +321,10 @@ let make =
                 })
               ),
         })
-      | Block_FocusNextBlockOrCreate =>
+      | Block_FocusNextBlockOrCreate(blockTyp) =>
         let blockLength = state.blocks->Belt.Array.length;
-        let nextBlockIndex =
+
+        let currentBlockIndex =
           switch (state.focusedBlock) {
           | None => blockLength - 1
           | Some((id, _blockTyp, _)) =>
@@ -323,25 +337,32 @@ let make =
           let {b_id, b_data} = state.blocks[index];
           (b_id, blockDataToBlockTyp(b_data));
         };
-        if (nextBlockIndex == blockLength - 1) {
+        if (currentBlockIndex == blockLength - 1) {
           ReasonReact.SideEffects(
             (
               ({send}) =>
-                send(Block_Add(findBlockId(nextBlockIndex)->fst, BTyp_Code))
+                send(
+                  Block_Add(findBlockId(currentBlockIndex)->fst, blockTyp),
+                )
             ),
           );
-        } else if (nextBlockIndex < blockLength - 1) {
-          let (blockId, blockTyp) = findBlockId(nextBlockIndex + 1);
+        } else if (currentBlockIndex < blockLength - 1) {
+          let (nextBlockId, nextBlockTyp) =
+            findBlockId(currentBlockIndex + 1);
           ReasonReact.Update({
             ...state,
             stateUpdateReason: Some(action),
             focusedBlock:
-              Some((blockId, blockTyp, FcTyp_BlockExecuteAndFocusNextBlock)),
+              Some((
+                nextBlockId,
+                nextBlockTyp,
+                FcTyp_BlockExecuteAndFocusNextBlock,
+              )),
           });
         } else {
           ReasonReact.NoUpdate;
         };
-      | Block_Execute(focusNextBlock) =>
+      | Block_Execute(focusNextBlock, blockTyp) =>
         let allCodeToExecute = state.blocks->codeBlockDataPairs;
         /* Clear all widgets and execute all blocks */
         ReasonReact.SideEffects(
@@ -363,7 +384,7 @@ let make =
                    })
                 |> then_(() => {
                      if (focusNextBlock) {
-                       self.send(Block_FocusNextBlockOrCreate);
+                       self.send(Block_FocusNextBlockOrCreate(blockTyp));
                      };
                      resolve();
                    })
