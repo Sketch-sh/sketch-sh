@@ -1,4 +1,5 @@
 [%%debugger.chrome];
+open Utils;
 open CodeMirror;
 
 type extractedToken = {
@@ -6,6 +7,8 @@ type extractedToken = {
   colEnd: int,
   line: int,
   content: string,
+  /* True when link is in this [title](https://example.com) */
+  withTitle: bool,
 };
 
 type collectorState =
@@ -20,9 +23,8 @@ let linkCollector = (tokens: array(Token.t), ~line): list(extractedToken) => {
         ((state, result), token) =>
           switch (token->Token.typGet->Js.Nullable.toOption) {
           | Some(typ) =>
-            if (typ
-                |> Js.String.split(" ")
-                |> Js.Array.indexOf("link") != (-1)) {
+            let splitted = typ |> Js.String.split(" ");
+            if (inArray(splitted, "link") || inArray(splitted, "url")) {
               let string = token->Token.stringGet;
 
               let state =
@@ -33,6 +35,7 @@ let linkCollector = (tokens: array(Token.t), ~line): list(extractedToken) => {
                     colStart: token->Token.startGet,
                     colEnd: token->Token.end_Get,
                     line,
+                    withTitle: false,
                   })
                 | Tracking(data) =>
                   let {content, colStart: _} = data;
@@ -40,6 +43,7 @@ let linkCollector = (tokens: array(Token.t), ~line): list(extractedToken) => {
                     ...data,
                     content: content ++ string,
                     colEnd: token->Token.end_Get,
+                    withTitle: inArray(splitted, "url"),
                   });
                 };
               (state, result);
@@ -48,7 +52,7 @@ let linkCollector = (tokens: array(Token.t), ~line): list(extractedToken) => {
               | NotTracking => (state, result)
               | Tracking(data) => (NotTracking, [data, ...result])
               };
-            }
+            };
           | _ =>
             switch (state) {
             | NotTracking => (state, result)
@@ -86,10 +90,15 @@ let icon = {|<svg viewBox="0 0 24 24">
   <line x1="10" y1="14" x2="21" y2="3"></line>
 </svg>|};
 
+let urlRegex = [%re
+  {|/^(http:\/\/www\.|https:\/\/www\.|http:\/\/|https:\/\/)?[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(:[0-9]{1,5})?(\/.*)?$/|}
+];
+let withTitleRegex = [%re "/\[([^\[\]]+)\]\(([^)]+)/"];
+
 let createLinkHandleNode = text => {
   open Webapi.Dom;
   let marker = document |> Document.createElement("span");
-  marker->Element.setClassName("cm-link cm-link-marker");
+  marker->Element.setClassName("cm-link-marker cm-link");
 
   let textNode = document |> Document.createElement("span");
   textNode->Element.setInnerText(text);
@@ -104,6 +113,60 @@ let createLinkHandleNode = text => {
   marker |> Element.appendChild(widget);
   (marker, textNode);
 };
+
+/*
+ *  <span class="cm-link-marker">
+ *    <span>
+ *      <span class="cm-link">[title]</span>
+ *      <span class="cm-string cm-url">(url)</span>
+ *    </span>
+ *    <a href=..>icon</a>
+ *  </span>
+ */
+let createLinkHandleNodeWithTitle = (~href, ~title) => {
+  open Webapi.Dom;
+  let marker = document |> Document.createElement("span");
+  marker->Element.setClassName("cm-link-marker");
+
+  let textNode = document |> Document.createElement("span");
+  textNode
+  ->Element.setInnerHTML(
+      {j|
+        <span class="cm-link">[$(title)]</span>
+        <span class="cm-string cm-url">($(href))</span>
+      |j},
+    );
+  marker |> Element.appendChild(textNode);
+
+  let widget = document |> Document.createElement("a");
+  widget |> Element.setAttribute("href", href);
+  widget |> Element.setAttribute("target", "_blank");
+  widget |> Element.setAttribute("rel", "noopener noreferrer");
+  widget->Element.setInnerHTML(icon);
+
+  marker |> Element.appendChild(widget);
+  (marker, textNode);
+};
+
+let createLinkHandleNode = (text, withTitle) =>
+  if (withTitle) {
+    let split = text |> Js.String.splitByRe(withTitleRegex);
+
+    if (split |> Array.length == 4) {
+      let href = split[2];
+      if (urlRegex |> Js.Re.test(href)) {
+        Some(createLinkHandleNodeWithTitle(~href, ~title=split[1]));
+      } else {
+        None;
+      };
+    } else {
+      None;
+    };
+  } else if (urlRegex |> Js.Re.test(text)) {
+    Some(createLinkHandleNode(text));
+  } else {
+    None;
+  };
 
 /*
  * break text marker
@@ -123,37 +186,48 @@ let breakMark = (cm, marker) =>
       },
     );
 
-let linkToMarker = (cm, doc, link) => {
-  let (marker, textNode) = createLinkHandleNode(link.content);
-
-  let marker =
-    doc
-    ->(
-        Doc.markText(
-          ~from=Position.make(~line=link.line, ~ch=link.colStart, ()),
-          ~to_=Position.make(~line=link.line, ~ch=link.colEnd, ()),
-          ~option=
-            Doc.markTextOption(
-              ~clearOnEnter=true,
-              ~clearWhenEmpty=true,
-              ~handleMouseEvents=false,
-              ~replacedWith=marker,
-              (),
-            ),
-        )
-      );
-  Webapi.Dom.(
-    textNode |> Element.addClickEventListener(_event => breakMark(cm, marker))
-  );
-  marker;
-};
+let linkToMarker = (cm, doc, link) =>
+  switch (createLinkHandleNode(link.content, link.withTitle)) {
+  | None => None
+  | Some((markerNode, textNode)) =>
+    let marker =
+      doc
+      ->(
+          Doc.markText(
+            ~from=Position.make(~line=link.line, ~ch=link.colStart, ()),
+            ~to_=Position.make(~line=link.line, ~ch=link.colEnd, ()),
+            ~option=
+              Doc.markTextOption(
+                ~clearOnEnter=true,
+                ~clearWhenEmpty=true,
+                ~handleMouseEvents=false,
+                ~replacedWith=markerNode,
+                (),
+              ),
+          )
+        );
+    textNode
+    |> Webapi.Dom.Element.addClickEventListener(_event =>
+         breakMark(cm, marker)
+       );
+    Some(marker);
+  };
 
 let setMarkers = (cm, cachedMarkers) => {
   let doc = cm->Editor.getDoc;
   let lastLine = cm->Editor.lineCount;
   let allLinks = cm->(getAllLinks(~start=0, ~end_=lastLine));
 
-  cachedMarkers := allLinks->Belt.List.map(linkToMarker(cm, doc));
+  cachedMarkers :=
+    allLinks
+    ->Belt.List.reduce(
+        [],
+        (acc, link) =>
+          switch (linkToMarker(cm, doc, link)) {
+          | None => acc
+          | Some(marker) => [marker, ...acc]
+          },
+      );
 };
 
 let register = cm => {

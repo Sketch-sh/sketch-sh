@@ -30,7 +30,15 @@ describe("linkCollector", () => {
   ];
   test("1 link", () =>
     expect(linkCollector(data, ~line=1))
-    == [{colStart: 5, colEnd: 22, content: "https://sketch.sh", line: 1}]
+    == [
+         {
+           colStart: 5,
+           colEnd: 22,
+           content: "https://sketch.sh",
+           line: 1,
+           withTitle: false,
+         },
+       ]
   );
 
   let data = [%bs.raw
@@ -63,8 +71,20 @@ describe("linkCollector", () => {
   test("with a link at the end", () =>
     expect(linkCollector(data, ~line=1))
     == [
-         {colStart: 33, colEnd: 54, content: "https://google.com.vn", line: 1},
-         {colStart: 5, colEnd: 22, content: "https://sketch.sh", line: 1},
+         {
+           colStart: 33,
+           colEnd: 54,
+           content: "https://google.com.vn",
+           line: 1,
+           withTitle: false,
+         },
+         {
+           colStart: 5,
+           colEnd: 22,
+           content: "https://sketch.sh",
+           line: 1,
+           withTitle: false,
+         },
        ]
   );
 
@@ -94,6 +114,14 @@ describe("linkCollector", () => {
   ];
   test("with multiple type in a token", () =>
     expect(linkCollector(data, ~line=1))
-    == [{colStart: 2, colEnd: 15, content: "[thangngoc89]", line: 1}]
+    == [
+         {
+           colStart: 2,
+           colEnd: 15,
+           content: "[thangngoc89]",
+           line: 1,
+           withTitle: false,
+         },
+       ]
   );
 });

@@ -123,6 +123,10 @@ a:focus {
   justify-content: center;
 }
 
+.cm-link-marker > span {
+  display: inherit;
+}
+
 .cm-link-marker a {
   padding: 0 0 0 2px;
 }
