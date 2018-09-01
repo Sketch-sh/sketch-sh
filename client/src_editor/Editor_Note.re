@@ -103,7 +103,19 @@ module Editor_Note = {
           state.blocks := blocks;
           ReasonReact.Update({...state, editorContentStatus: Ec_Dirty});
         | ChangeLang(lang) =>
-          ReasonReact.Update({...state, lang, editorContentStatus: Ec_Dirty})
+          let refmtNotificationKey = "rtop:refmt-acknowledge";
+          Dom.Storage.(
+            switch (localStorage |> getItem(refmtNotificationKey)) {
+            | Some(_) => ()
+            | None =>
+              Notify.info(
+                "When you change languages, we will auto-format your code into the target language's syntax. Multiple transformations result in unusual formatting with large code blocks, and comments are removed when converting ReasonML into OCaml. To avoid this, we preserve the previous state, but once you make an edit after changing languages, there will be side-effects.",
+                ~sticky=true,
+              );
+              localStorage |> setItem(refmtNotificationKey, "acknowledged");
+            }
+          );
+          ReasonReact.Update({...state, lang, editorContentStatus: Ec_Dirty});
         | UpdateNoteSaveStatus(saveStatus) =>
           switch (state.editorContentStatus, saveStatus) {
           | (_, SaveStatus_Initial) => ReasonReact.NoUpdate
@@ -112,7 +124,7 @@ module Editor_Note = {
           | (Ec_Dirty, SaveStatus_Done({lastEdited: _})) =>
             ReasonReact.Update({...state, editorContentStatus: Ec_Dirty})
           | (_, SaveStatus_Done({lastEdited})) =>
-            Notify.info("Saved successfully");
+            Notify.info("Saved successfully", ~sticky=false);
             ReasonReact.UpdateWithSideEffects(
               {
                 ...state,
@@ -134,7 +146,7 @@ module Editor_Note = {
         | UpdateForkStatus(forkStatus) =>
           switch (forkStatus) {
           | ForkStatus_Done({newId, forkFrom, lastEdited, owner}) =>
-            Notify.info("Forked successfully");
+            Notify.info("Forked successfully", ~sticky=false);
             ReasonReact.UpdateWithSideEffects(
               {
                 ...state,

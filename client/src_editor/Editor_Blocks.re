@@ -295,7 +295,6 @@ let make =
                             ...bcode,
                             bc_value:
                               getBlockRefmtResult(results, b_id, lang),
-                            bc_widgets: [||],
                           }),
                       }
                     | B_Text(_) => block
