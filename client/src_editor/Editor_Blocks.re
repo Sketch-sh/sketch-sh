@@ -296,7 +296,10 @@ let make =
                   })
                 ),
           },
-          (({send}) => executeWhenDone ? send(Block_Execute(false, BTyp_Code)) : ()),
+          (
+            ({send}) =>
+              executeWhenDone ? send(Block_Execute(false, BTyp_Code)) : ()
+          ),
         )
       | Block_AddWidgets(blockId, widgets) =>
         ReasonReact.Update({
@@ -375,7 +378,6 @@ let make =
                      ->(
                          Belt.List.forEachU((. (blockId, result)) => {
                            let widgets = executeResultToWidget(result);
-                           Js.log2(blockId, widgets);
                            self.send(Block_AddWidgets(blockId, widgets));
                          })
                        );
