@@ -55,7 +55,7 @@ module Make = (ESig: Worker_Evaluator.EvaluatorSig) => {
               prettyPrint ?
                 prettyPrintRe(code) : refmtAsLanguage(code, targetLang);
             switch (result) {
-            | Ok(newCode) => (blockId, newCode)
+            | Ok(newCode) => (blockId, Js.String.trim(newCode))
             | Error(error) =>
               logRefmtError(code, error, targetLang);
               (blockId, code);

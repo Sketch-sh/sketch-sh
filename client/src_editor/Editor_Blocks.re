@@ -168,7 +168,7 @@ let make =
       if (oldSelf.state.lang != lang) {
         switch (oldSelf.state.blocksCopy) {
         | None => newSelf.send(Block_RefmtAsLang(lang))
-        | Some(_) => ()
+        | Some(_) => newSelf.send(Block_Execute(false))
         };
       };
       if (oldSelf.state.blocks !== newSelf.state.blocks) {
@@ -225,7 +225,7 @@ let make =
                   true,
                 )
                 |> then_(results =>
-                     resolve(send(Block_MapRefmtToBlocks(results, false)))
+                     Block_MapRefmtToBlocks(results, false)->send->resolve
                    )
                 |> catch(error => resolve(Js.log(error)))
               )
@@ -248,7 +248,7 @@ let make =
                   false,
                 )
                 |> then_(results =>
-                     resolve(send(Block_MapRefmtToBlocks(results, true)))
+                     Block_MapRefmtToBlocks(results, true)->send->resolve
                    )
                 |> catch(error => resolve(Js.log(error)))
               )
@@ -354,6 +354,7 @@ let make =
                      ->(
                          Belt.List.forEachU((. (blockId, result)) => {
                            let widgets = executeResultToWidget(result);
+                           Js.log2(blockId, widgets);
                            self.send(Block_AddWidgets(blockId, widgets));
                          })
                        );
