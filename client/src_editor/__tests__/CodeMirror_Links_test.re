@@ -117,10 +117,10 @@ describe("linkCollector", () => {
     == [
          {
            colStart: 2,
-           colEnd: 15,
-           content: "[thangngoc89]",
+           colEnd: 47,
+           content: "[thangngoc89](https://github.com/thangngoc89)",
            line: 1,
-           withTitle: false,
+           withTitle: true,
          },
        ]
   );

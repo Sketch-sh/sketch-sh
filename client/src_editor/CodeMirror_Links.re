@@ -93,7 +93,7 @@ let icon = {|<svg viewBox="0 0 24 24">
 let urlRegex = [%re
   {|/^(http:\/\/www\.|https:\/\/www\.|http:\/\/|https:\/\/)?[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(:[0-9]{1,5})?(\/.*)?$/|}
 ];
-let withTitleRegex = [%re "/\[([^\[\]]+)\]\(([^)]+)/"];
+let withTitleRegex = [%re {|/\[([^\[\]]+)\]\(([^)]+)/|}];
 
 let createLinkHandleNode = text => {
   open Webapi.Dom;
