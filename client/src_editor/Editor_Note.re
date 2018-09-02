@@ -103,10 +103,19 @@ module Editor_Note = {
           state.blocks := blocks;
           ReasonReact.Update({...state, editorContentStatus: Ec_Dirty});
         | ChangeLang(lang) =>
-          ReasonReact.UpdateWithSideEffects(
-            {...state, lang, editorContentStatus: Ec_Dirty},
-            (self => self.send(Execute)),
-          )
+          let refmtNotificationKey = "rtop:refmt-acknowledge";
+          Dom.Storage.(
+            switch (localStorage |> getItem(refmtNotificationKey)) {
+            | Some(_) => ()
+            | None =>
+              Notify.info(
+                "When you change languages, we will auto-format your code into the target language's syntax. Multiple transformations result in unusual formatting with large code blocks, and comments are removed when converting ReasonML into OCaml. To avoid this, we preserve the previous state, but once you make an edit after changing languages, there will be side-effects.",
+                ~sticky=true,
+              );
+              localStorage |> setItem(refmtNotificationKey, "acknowledged");
+            }
+          );
+          ReasonReact.Update({...state, lang, editorContentStatus: Ec_Dirty});
         | UpdateNoteSaveStatus(saveStatus) =>
           switch (state.editorContentStatus, saveStatus) {
           | (_, SaveStatus_Initial) => ReasonReact.NoUpdate
@@ -115,7 +124,7 @@ module Editor_Note = {
           | (Ec_Dirty, SaveStatus_Done({lastEdited: _})) =>
             ReasonReact.Update({...state, editorContentStatus: Ec_Dirty})
           | (_, SaveStatus_Done({lastEdited})) =>
-            Notify.info("Saved successfully");
+            Notify.info("Saved successfully", ~sticky=false);
             ReasonReact.UpdateWithSideEffects(
               {
                 ...state,
@@ -137,7 +146,7 @@ module Editor_Note = {
         | UpdateForkStatus(forkStatus) =>
           switch (forkStatus) {
           | ForkStatus_Done({newId, forkFrom, lastEdited, owner}) =>
-            Notify.info("Forked successfully");
+            Notify.info("Forked successfully", ~sticky=false);
             ReasonReact.UpdateWithSideEffects(
               {
                 ...state,
@@ -215,6 +224,38 @@ module Editor_Note = {
                        className=buttonClassName
                        forkStatus=state.forkStatus
                      />
+                     <UI_Balloon message="Sketch language" position=Down>
+                       ...<fieldset
+                            className="EditorNote__lang"
+                            ariaLabel="Language toggle">
+                            <span>
+                              <input
+                                type_="radio"
+                                id="RE"
+                                name="language"
+                                checked=(lang == RE)
+                                onChange=(_ => send(ChangeLang(RE)))
+                              />
+                              <label
+                                htmlFor="RE" className="EditorNote__lang--RE">
+                                "RE"->str
+                              </label>
+                            </span>
+                            <span>
+                              <input
+                                type_="radio"
+                                id="ML"
+                                name="language"
+                                checked=(lang == ML)
+                                onChange=(_ => send(ChangeLang(ML)))
+                              />
+                              <label
+                                htmlFor="ML" className="EditorNote__lang--ML">
+                                "ML"->str
+                              </label>
+                            </span>
+                          </fieldset>
+                     </UI_Balloon>
                    </>
                )
           </UI_Topbar.Actions>
@@ -235,36 +276,6 @@ module Editor_Note = {
                 onChange=(event => valueFromEvent(event)->TitleUpdate->send)
               />
               <div className="EditorNote__metadata--info">
-                <UI_Balloon message="Sketch language" position=Down>
-                  ...<fieldset
-                       className="EditorNote__lang"
-                       ariaLabel="Language toggle">
-                       <span>
-                         <input
-                           type_="radio"
-                           id="RE"
-                           name="language"
-                           checked=(lang == RE)
-                           onChange=(_ => send(ChangeLang(RE)))
-                         />
-                         <label htmlFor="RE" className="EditorNote__lang--RE">
-                           "RE"->str
-                         </label>
-                       </span>
-                       <span>
-                         <input
-                           type_="radio"
-                           id="ML"
-                           name="language"
-                           checked=(lang == ML)
-                           onChange=(_ => send(ChangeLang(ML)))
-                         />
-                         <label htmlFor="ML" className="EditorNote__lang--ML">
-                           "ML"->str
-                         </label>
-                       </span>
-                     </fieldset>
-                </UI_Balloon>
                 <Editor_Note_GetUserInfo userId=state.noteOwnerId>
                   ...(
                        fun

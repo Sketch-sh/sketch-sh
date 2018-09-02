@@ -19,10 +19,19 @@ type action =
   | Block_UpdateValue(id, string, CodeMirror.EditorChange.t)
   | Block_AddWidgets(id, array(Widget.t))
   | Block_FocusUp(id)
-  | Block_FocusDown(id);
+  | Block_FocusDown(id)
+  | Block_RefmtAsLang(lang)
+  | Block_PrettyPrint
+  | Block_CleanBlocksCopy
+  | Block_MapRefmtToBlocks(
+      Worker_Evaluator.Types.Refmt.refmtManyResult,
+      bool,
+    );
 
 type state = {
+  lang,
   blocks: array(block),
+  blocksCopy: option(array(block)),
   deletedBlockMeta: array(deletedBlockMeta),
   stateUpdateReason: option(action),
   focusedBlock: option((id, blockTyp, focusChangeType)),
@@ -84,7 +93,9 @@ let make =
       _children,
     ) => {
   let makeInitialState = () => {
+    lang,
     blocks: blocks->syncLineNumber,
+    blocksCopy: None,
     deletedBlockMeta: [||],
     stateUpdateReason: None,
     focusedBlock: None,
@@ -93,7 +104,17 @@ let make =
     ...component,
     initialState: makeInitialState,
     willReceiveProps: ({state}) =>
-      if (blocks != state.blocks) {
+      if (state.lang != lang) {
+        switch (state.blocksCopy) {
+        | None => {...state, lang}
+        | Some(blocksCopy) => {
+            ...state,
+            lang,
+            blocks: blocksCopy,
+            blocksCopy: None,
+          }
+        };
+      } else if (blocks != state.blocks) {
         makeInitialState();
       } else {
         state;
@@ -141,14 +162,31 @@ let make =
               self.send(Block_Execute(true, BTyp_Text));
             },
           );
+        let unReg4 =
+          registerShortcut(
+            ~global=true,
+            "mod+shift+i",
+            event => {
+              open Webapi.Dom;
+              event->KeyboardEvent.preventDefault;
+              self.send(Block_PrettyPrint);
+            },
+          );
         self.onUnmount(() => {
           unReg();
           unReg2();
           unReg3();
+          unReg4();
         });
       };
     },
-    didUpdate: ({oldSelf, newSelf}) =>
+    didUpdate: ({oldSelf, newSelf}) => {
+      if (oldSelf.state.lang != lang) {
+        switch (oldSelf.state.blocksCopy) {
+        | None => newSelf.send(Block_RefmtAsLang(lang))
+        | Some(_) => newSelf.send(Block_Execute(false, BTyp_Code))
+        };
+      };
       if (oldSelf.state.blocks !== newSelf.state.blocks) {
         switch (newSelf.state.stateUpdateReason) {
         | None => ()
@@ -159,19 +197,116 @@ let make =
           | Block_AddWidgets(_, _)
           | Block_FocusUp(_)
           | Block_FocusDown(_)
+          | Block_CaptureQueuedMeta(_, _, _)
+          | Block_QueueDelete(_)
+          | Block_RefmtAsLang(_)
+          | Block_CleanBlocksCopy
+          | Block_PrettyPrint
+          | Block_MapRefmtToBlocks(_, _)
           | Block_FocusNextBlockOrCreate(_)
           | Block_Execute(_, _) => ()
           | Block_Add(_, _)
-          | Block_QueueDelete(_)
           | Block_DeleteQueued(_)
-          | Block_Restore(_)
-          | Block_CaptureQueuedMeta(_, _, _)
-          | Block_UpdateValue(_, _, _) => onUpdate(newSelf.state.blocks)
+          | Block_Restore(_) => onUpdate(newSelf.state.blocks)
+          | Block_UpdateValue(_, _, diff) =>
+            switch (diff->CodeMirror.EditorChange.originGet) {
+            | "setValue" => ()
+            | _ =>
+              switch (newSelf.state.blocksCopy) {
+              | None => ()
+              | Some(_) => newSelf.send(Block_CleanBlocksCopy)
+              };
+              onUpdate(newSelf.state.blocks);
+            }
           }
         };
-      },
+      };
+    },
     reducer: (action, state) =>
       switch (action) {
+      | Block_CleanBlocksCopy =>
+        ReasonReact.Update({
+          ...state,
+          blocksCopy: None,
+          stateUpdateReason: Some(action),
+        })
+      | Block_PrettyPrint =>
+        switch (lang) {
+        | ML =>
+          Notify.error("ML not currently supported");
+          ReasonReact.NoUpdate;
+        | RE =>
+          ReasonReact.SideEffects(
+            (
+              ({state, send}) =>
+                Js.Promise.(
+                  Editor_Worker.refmtMany(.
+                    lang,
+                    state.blocks->codeBlockDataPairs,
+                    true,
+                  )
+                  |> then_(results =>
+                       Block_MapRefmtToBlocks(results, false)->send->resolve
+                     )
+                  |> catch(error => resolve(Js.log(error)))
+                )
+                |> ignore
+            ),
+          )
+        }
+      | Block_RefmtAsLang(lang) =>
+        ReasonReact.UpdateWithSideEffects(
+          {
+            ...state,
+            blocksCopy: Some(state.blocks),
+            stateUpdateReason: Some(action),
+          },
+          (
+            ({state, send}) =>
+              Js.Promise.(
+                Editor_Worker.refmtMany(.
+                  lang,
+                  state.blocks->codeBlockDataPairs,
+                  false,
+                )
+                |> then_(results =>
+                     Block_MapRefmtToBlocks(results, true)->send->resolve
+                   )
+                |> catch(error => resolve(Js.log(error)))
+              )
+              |> ignore
+          ),
+        )
+      | Block_MapRefmtToBlocks(results, executeWhenDone) =>
+        ReasonReact.UpdateWithSideEffects(
+          {
+            ...state,
+            stateUpdateReason: Some(action),
+            blocks:
+              state.blocks
+              ->(
+                  Belt.Array.mapU((. block) => {
+                    let {b_data, b_id} = block;
+                    switch (b_data) {
+                    | B_Code(bcode) => {
+                        ...block,
+                        b_data:
+                          B_Code({
+                            ...bcode,
+                            bc_value:
+                              getBlockRefmtResult(results, b_id, lang),
+                          }),
+                      }
+                    | B_Text(_) => block
+                    };
+                  })
+                ),
+          },
+          (
+            ({send}) =>
+              executeWhenDone ? send(Block_Execute(false, BTyp_Code)) : ()
+          ),
+        )
       | Block_AddWidgets(blockId, widgets) =>
         ReasonReact.Update({
           ...state,
@@ -180,16 +315,15 @@ let make =
             state.blocks
             ->(
                 Belt.Array.mapU((. block) => {
-                  let {b_id, b_data, b_deleted} = block;
+                  let {b_id, b_data} = block;
                   if (b_id != blockId) {
                     block;
                   } else {
                     switch (b_data) {
                     | B_Text(_) => block
                     | B_Code(bcode) => {
-                        b_id,
+                        ...block,
                         b_data: B_Code({...bcode, bc_widgets: widgets}),
-                        b_deleted,
                       }
                     };
                   };
@@ -238,22 +372,7 @@ let make =
           ReasonReact.NoUpdate;
         };
       | Block_Execute(focusNextBlock, blockTyp) =>
-        let allCodeToExecute =
-          state.blocks
-          ->(
-              Belt.Array.reduceU([], (. acc, {b_id, b_data, b_deleted}) =>
-                b_deleted ?
-                  acc :
-                  (
-                    switch (b_data) {
-                    | B_Text(_) => acc
-                    | B_Code({bc_value}) => [(b_id, bc_value), ...acc]
-                    }
-                  )
-              )
-            )
-          ->Belt.List.reverse;
-
+        let allCodeToExecute = state.blocks->codeBlockDataPairs;
         /* Clear all widgets and execute all blocks */
         ReasonReact.SideEffects(
           (
@@ -291,13 +410,13 @@ let make =
             state.blocks
             ->(
                 Belt.Array.mapWithIndexU((. i, block) => {
-                  let {b_id, b_data, b_deleted} = block;
+                  let {b_data} = block;
                   if (i < blockIndex) {
                     block;
                   } else if (i == blockIndex) {
                     switch (b_data) {
                     | B_Code(bcode) => {
-                        b_id,
+                        ...block,
                         b_data:
                           B_Code({
                             ...bcode,
@@ -314,13 +433,8 @@ let make =
                                 );
                             },
                           }),
-                        b_deleted,
                       }
-                    | B_Text(_) => {
-                        b_id,
-                        b_data: B_Text(newValue),
-                        b_deleted,
-                      }
+                    | B_Text(_) => {...block, b_data: B_Text(newValue)}
                     };
                   } else {
                     switch (b_data) {
@@ -336,15 +450,13 @@ let make =
             ->syncLineNumber,
         });
       | Block_QueueDelete(blockId) =>
-        let queueTimeout = (self, b_data) => {
+        let queueTimeout = (send, b_data) => {
           let timeoutId =
             Js.Global.setTimeout(
-              () => self.ReasonReact.send(Block_DeleteQueued(blockId)),
+              () => send(Block_DeleteQueued(blockId)),
               10000,
             );
-          self.ReasonReact.send(
-            Block_CaptureQueuedMeta(blockId, timeoutId, b_data),
-          );
+          send(Block_CaptureQueuedMeta(blockId, timeoutId, b_data));
           ();
         };
         if (isLastBlock(state.blocks)) {
@@ -360,7 +472,7 @@ let make =
                 stateUpdateReason: Some(action),
                 focusedBlock: None,
               },
-              (self => queueTimeout(self, state.blocks[0].b_data)),
+              (({send}) => queueTimeout(send, state.blocks[0].b_data)),
             )
           };
         } else {
@@ -385,12 +497,15 @@ let make =
                   focusedBlock == blockId ? None : state.focusedBlock
                 },
             },
-            (self => queueTimeout(self, state.blocks[blockIndex].b_data)),
+            (
+              ({send}) => queueTimeout(send, state.blocks[blockIndex].b_data)
+            ),
           );
         };
       | Block_DeleteQueued(blockId) =>
         if (isLastBlock(state.blocks) || Belt.Array.length(state.blocks) == 0) {
           ReasonReact.Update({
+            ...state,
             blocks: [|newBlock|],
             deletedBlockMeta:
               state.deletedBlockMeta
@@ -400,6 +515,7 @@ let make =
           });
         } else {
           ReasonReact.Update({
+            ...state,
             blocks:
               state.blocks
               ->(Belt.Array.keepU((. {b_id}) => b_id != blockId))

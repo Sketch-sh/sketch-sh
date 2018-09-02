@@ -1,99 +1,101 @@
 .EditorNote {
-  min-width: 768px;
+	min-width: 768px;
 }
 
 .EditorNote__metadata {
-  margin-left: calc(var(--cm-gutter-width) + 8px);
+	margin-left: calc(var(--cm-gutter-width) + 8px);
 }
 
 .EditorNote__metadata--title {
-  width: 100%;
-  display: block;
-  font-size: var(--f2);
-  font-weight: 700;
-  color: var(--cm-text);
-  font-family: var(--font-monospace);
-  border: none;
-  /* margin: 0 0 0 8px; */
-  padding: 0;
-  background-color: transparent;
+	width: 100%;
+	display: block;
+	font-size: var(--f2);
+	font-weight: 700;
+	color: var(--cm-text);
+	font-family: var(--font-monospace);
+	border: none;
+	/* margin: 0 0 0 8px; */
+	padding: 0;
+	background-color: transparent;
 }
 
 .EditorNote__metadata--info {
-  /* margin: 0 0 0 8px; */
-  display: flex;
-  flex-direction: row-reverse;
-  align-items: center;
+	/* margin: 0 0 0 8px; */
+	display: flex;
+	flex-direction: row-reverse;
+	align-items: center;
 }
 
 .EditorNote__owner {
-  flex: 1;
+	flex: 1;
 }
 
 .EditorNote__lang {
-  font-size: var(--f5);
-  display: block;
-  border: 0;
-  padding: 0;
-  margin: 0;
+	font-size: var(--f5);
+	display: block;
+	border: 0;
+	padding: 0;
+	margin: 0;
 }
 
 .EditorNote__lang--RE {
-  border-radius: 2px 0 0 2px;
-  background: #da4139;
+	border-radius: 2px 0 0 2px;
+	background: var(--c-text-sub2);
 }
+
 .EditorNote__lang--ML {
-  background: #ed6f0c;
-  border-radius: 0 2px 2px 0;
+	background: var(--c-text-sub2);
+	border-radius: 0 2px 2px 0;
 }
 
 .EditorNote__lang input[type="radio"] {
-  border: 0;
-  clip: rect(0px, 0px, 0px, 0px);
-  height: 1px;
-  margin: -1px;
-  overflow: hidden;
-  padding: 0;
-  position: absolute;
-  width: 1px;
+	border: 0;
+	clip: rect(0px, 0px, 0px, 0px);
+	height: 1px;
+	margin: -1px;
+	overflow: hidden;
+	padding: 0;
+	position: absolute;
+	width: 1px;
 
-  & + label {
-    cursor: pointer;
-    padding: var(--space1);
-    border: 0;
-    outline: 0;
-    color: var(--c-text-inverse);
-    opacity: 0.2;
-  }
+	&+label {
+		cursor: pointer;
+		padding: var(--space1);
+		border: 0;
+		outline: 0;
+		color: var(--c-text-inverse);
+		opacity: 0.2;
+	}
 
-  &:checked + label {
-    opacity: 1;
-  }
+	&:checked+label {
+		opacity: 1;
+	}
 
-  &:focus + label {
-    outline: auto 5px -webkit-focus-ring-color;
-  }
+	&:focus+label {
+		outline: auto 5px -webkit-focus-ring-color;
+	}
 }
 
 @keyframes spin {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(359deg);
-  }
+	0% {
+		transform: rotate(0deg);
+	}
+
+	100% {
+		transform: rotate(359deg);
+	}
 }
 
 .EditorNav__button--spin {
-  animation: spin 2s infinite linear;
+	animation: spin 2s infinite linear;
 }
 
 .EditorNote__forkFrom {
-  color: var(--c-text-sub2);
-  font-weight: 300;
+	color: var(--c-text-sub2);
+	font-weight: 300;
 
-  & a {
-    color: var(--c-text-sub2);
-    margin-left: var(--space1);
-  }
+	& a {
+		color: var(--c-text-sub2);
+		margin-left: var(--space1);
+	}
 }

@@ -79,16 +79,17 @@ module Make = (ESig: Worker_Evaluator.EvaluatorSig) => {
       loop(0, [], None);
     };
 
+  open Editor_Types;
+
   let executeMany:
-    (. Editor_Types.lang, list((string, string))) =>
-    list((string, list(blockData))) =
+    (. lang, list((id, string))) => list((id, list(blockData))) =
     (. lang, codeBlocks) => {
       /* Reset before evaluating several blocks */
       Evaluator.reset();
 
       switch (lang) {
-      | Editor_Types.ML => Evaluator.mlSyntax()
-      | Editor_Types.RE => Evaluator.reSyntax()
+      | ML => Evaluator.mlSyntax()
+      | RE => Evaluator.reSyntax()
       };
       /*
        * Execute blocks in order
