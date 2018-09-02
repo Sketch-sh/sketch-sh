@@ -321,6 +321,7 @@ module Editor_Note = {
               )
             </div>
             <Editor_Blocks
+              key=state.noteId
               lang
               blocks=state.blocks^
               registerExecuteCallback=(
