@@ -34,7 +34,7 @@ module V1 = {
 
     external jsonIdentity: Js.Json.t => Js.Json.t = "%identity";
 
-    let internalBlockDecoder: Js.Json.t => Link.internalLink =
+    let internalLinkDecoder: Js.Json.t => Link.internalLink =
       json => {
         revision_at: json |> field("timestamp", jsonIdentity),
         sketch_id: json |> field("id", string),
@@ -47,8 +47,7 @@ module V1 = {
       json => {
         let kind = json |> field("kind", string);
         switch (kind) {
-        | "internal" =>
-          Internal(json |> field("value", internalBlockDecoder))
+        | "internal" => Internal(json |> field("value", internalLinkDecoder))
         | _ => External()
         };
       };
@@ -96,16 +95,23 @@ module V1 = {
           ("deleted", bool(b_deleted)),
         ]);
 
-    let linkDecoder: Link.link => Js.Json.t =
+    let internalLinkEncoder: Link.internalLink => Js.Json.t =
+      internalLink =>
+        object_([
+          ("sketch_id", string(internalLink.sketch_id)),
+          ("name", string(internalLink.name)),
+          ("lang", internalLink.lang |> langToString |> string),
+          ("timestamp", internalLink.revision_at),
+          ("code", string(internalLink.code)),
+        ]);
+
+    let linkEncoder: Link.link => Js.Json.t =
       link =>
         switch (link) {
         | Internal(internalLink) =>
           object_([
-            ("sketch_id", string(internalLink.sketch_id)),
-            ("name", string(internalLink.name)),
-            ("lang", internalLink.lang |> langToString |> string),
-            ("timestamp", internalLink.revision_at),
-            ("code", string(internalLink.code)),
+            ("kind", "internal" |> string),
+            ("value", internalLink |> internalLinkEncoder),
           ])
         | External () => object_([])
         };
@@ -114,10 +120,11 @@ module V1 = {
       (lang, links, blocks) =>
         object_([
           ("lang", lang |> langToString |> string),
-          ("links", links->mapToJsonArray(linkDecoder)),
+          ("links", links->mapToJsonArray(linkEncoder)),
           ("blocks", blocks->mapToJsonArray(blockEncoder)),
         ]);
   };
+
   let decode = JsonDecode.decode;
   let encode = JsonEncode.encode;
 };

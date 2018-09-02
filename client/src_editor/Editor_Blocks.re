@@ -226,13 +226,13 @@ let make =
           )
         ->Belt.List.reverse;
 
-      /* Clear all widgets and execute all blocks */
+      /* Clear all widgets and execute all links and blocks */
       ReasonReact.SideEffects(
         (
           self =>
             Js.Promise.(
               Editor_Worker.linkMany(. Array.to_list(links))
-              |> then_(results =>
+              |> then_(_results =>
                    Editor_Worker.executeMany(. lang, allCodeToExecute)
                    |> then_(results => {
                         results
@@ -251,9 +251,8 @@ let make =
                         };
                         resolve();
                       })
-                   |> catch(error => resolve(Js.log(error)))
                  )
-              |> catch(error => resolve(Js.log(error)))
+              |> catch(error => resolve(logError(error)))
               |> ignore
             )
         ),

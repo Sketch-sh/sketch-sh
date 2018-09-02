@@ -80,7 +80,6 @@ module EmptyLink = {
       },
     render: ({send, state}) =>
       <div>
-        (status == Loading ? "loading"->str : ReasonReact.null)
         <input
           className="link__input"
           value=state.id
@@ -97,7 +96,14 @@ module EmptyLink = {
           className="link__button"
           onClick=(_ => onSubmit((state.name, state.id)))
           disabled=(status == Loading)>
-          <Fi.Plus />
+          (
+            switch (status) {
+            | NotAsked => <Fi.Plus />
+            | Loading => <Fi.Loader />
+            | Error => "TODO"->str
+            | Fetched => <Fi.Trash2 />
+            }
+          )
         </button>
       </div>,
   };
