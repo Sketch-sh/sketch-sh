@@ -121,8 +121,10 @@ context("language toggle", () => {
         { force: true }
       );
     shortcut("{ctrl}{enter}");
+    assertValue(2);
     assertErrorsOrWarnings(0);
     cy.get("input[id=ML]").check({ force: true });
+    assertValue(2);
     cy.get("@block1")
       .find(".widget__value")
       .first()
