@@ -70,10 +70,7 @@ let blocks = [|
 
 external toJson: 'a => Js.Json.t = "%identity";
 
-let wrapInBlocks = blocks => {
-  "blocks": blocks,
-  "links": [|{"kind": "code", "value": "let a = 3;"}|],
-};
+let wrapInBlocks = blocks => {"blocks": blocks};
 
 let blocks =
   blocks

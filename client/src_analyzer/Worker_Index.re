@@ -1,4 +1,4 @@
-open Worker_Binding;
+open! Worker_Binding;
 
 [@bs.module] external toplevelPath: string = "../public/toplevel.js";
 

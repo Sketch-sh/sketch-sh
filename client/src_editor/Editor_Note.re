@@ -11,6 +11,7 @@ module Editor_Note = {
     noteState,
     lang,
     title: string,
+    links: ref(array(Link.link)),
     blocks: ref(array(Block.block)),
     editorContentStatus,
     executeCallback: option(unit => unit),
@@ -22,6 +23,7 @@ module Editor_Note = {
 
   type action =
     | TitleUpdate(string)
+    | LinkUpdate(array(Link.link))
     | BlockUpdate(array(Block.block))
     | RegisterExecuteCallback(unit => unit)
     | UpdateNoteSaveStatus(saveStatus)
@@ -55,6 +57,7 @@ module Editor_Note = {
       lang: initialLang,
       title: initialTitle,
       editorContentStatus: Ec_Pristine,
+      links: ref(initialLinks),
       blocks: ref(initialBlocks),
       executeCallback: None,
       noteOwnerId: initialNoteOwnerId,
@@ -103,6 +106,9 @@ module Editor_Note = {
                 }
             ),
           )
+        | LinkUpdate(links) =>
+          state.links := links;
+          ReasonReact.Update({...state, editorContentStatus: Ec_Dirty});
         | BlockUpdate(blocks) =>
           state.blocks := blocks;
           ReasonReact.Update({...state, editorContentStatus: Ec_Dirty});
@@ -329,6 +335,11 @@ module Editor_Note = {
                 )
               )
             </div>
+            <Editor_Links
+              key=(state.noteId ++ string_of_int(Array.length(state.links^)))
+              links=state.links^
+              onUpdate=(links => send(LinkUpdate(links)))
+            />
             <Editor_Blocks
               key=state.noteId
               lang
