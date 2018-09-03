@@ -38,6 +38,7 @@ module Editor_Note = {
         ~initialNoteState: noteState,
         ~initialLang: lang=RE,
         ~initialTitle: string="",
+        ~initialLinks: array(Link.link),
         ~initialBlocks: array(Block.block),
         ~initialNoteOwnerId: id,
         ~initialNoteLastEdited: option(Js.Json.t),
@@ -202,7 +203,11 @@ module Editor_Note = {
                        getCurrentData=(
                          () => (
                            state.title,
-                           Editor_Json.V1.encode(state.lang, state.blocks^),
+                           Editor_Json.V1.encode(
+                             state.lang,
+                             [||],
+                             state.blocks^,
+                           ),
                          )
                        )
                        registerShortcut
@@ -218,7 +223,11 @@ module Editor_Note = {
                        getCurrentData=(
                          () => (
                            state.title,
-                           Editor_Json.V1.encode(state.lang, state.blocks^),
+                           Editor_Json.V1.encode(
+                             state.lang,
+                             [||],
+                             state.blocks^,
+                           ),
                          )
                        )
                        className=buttonClassName
@@ -331,6 +340,7 @@ module WithShortcut = {
         ~noteState,
         ~lang=?,
         ~title=?,
+        ~links,
         ~blocks,
         ~noteOwnerId,
         ~noteLastEdited,
@@ -348,6 +358,7 @@ module WithShortcut = {
                  initialNoteState=noteState
                  initialLang=?lang
                  initialTitle=?title
+                 initialLinks=?links
                  initialBlocks=blocks
                  initialNoteOwnerId=noteOwnerId
                  initialNoteLastEdited=noteLastEdited

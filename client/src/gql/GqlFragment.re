@@ -1,5 +1,5 @@
-/* module Editor = [%graphql
-     {|
+module Editor = [%graphql
+  {|
        fragment editorNote on note {
          __typename
          id
@@ -10,7 +10,7 @@
          fork_from
        }
      |}
-   ]; */
+];
 module User = [%graphql
   {|
     fragment userInfo on user_public {
