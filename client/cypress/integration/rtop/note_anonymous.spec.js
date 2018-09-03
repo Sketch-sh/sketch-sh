@@ -181,6 +181,7 @@ context("fork", () => {
         cy.get("@save").click();
         cy.get("@save").should("be.disabled");
 
+        cy.wait(1000);
         cy.get(`a[href="/s/${getId(secondUrl)}/"]`).click();
         cy.url().should("eq", secondUrl);
         assertBlocks(1);
