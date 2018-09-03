@@ -20,13 +20,10 @@ type action =
   | Block_AddWidgets(id, array(Widget.t))
   | Block_FocusUp(id)
   | Block_FocusDown(id)
-  | Block_RefmtAsLang(lang)
+  | Block_ChangeLanguage
   | Block_PrettyPrint
   | Block_CleanBlocksCopy
-  | Block_MapRefmtToBlocks(
-      Worker_Evaluator.Types.Refmt.refmtManyResult,
-      bool,
-    );
+  | Block_MapRefmtToBlocks(list((id, string)));
 
 type state = {
   lang,
@@ -88,6 +85,7 @@ let make =
       ~blocks: array(block),
       ~readOnly=false,
       ~onUpdate,
+      ~onExecute,
       ~registerExecuteCallback=?,
       ~registerShortcut: option(Shortcut.subscribeFun)=?,
       _children,
@@ -105,17 +103,7 @@ let make =
     initialState: makeInitialState,
     willReceiveProps: ({state}) =>
       if (state.lang != lang) {
-        switch (state.blocksCopy) {
-        | None => {...state, lang}
-        | Some(blocksCopy) => {
-            ...state,
-            lang,
-            blocks: blocksCopy,
-            blocksCopy: None,
-          }
-        };
-      } else if (blocks != state.blocks) {
-        makeInitialState();
+        {...state, lang};
       } else {
         state;
       },
@@ -182,12 +170,14 @@ let make =
     },
     didUpdate: ({oldSelf, newSelf}) => {
       if (oldSelf.state.lang != lang) {
-        switch (oldSelf.state.blocksCopy) {
-        | None => newSelf.send(Block_RefmtAsLang(lang))
-        | Some(_) => newSelf.send(Block_Execute(false, BTyp_Code))
-        };
+        newSelf.send(Block_ChangeLanguage);
       };
       if (oldSelf.state.blocks !== newSelf.state.blocks) {
+        let cleanBlocksCopy = () =>
+          switch (newSelf.state.blocksCopy) {
+          | None => ()
+          | Some(_) => newSelf.send(Block_CleanBlocksCopy)
+          };
         switch (newSelf.state.stateUpdateReason) {
         | None => ()
         | Some(action) =>
@@ -199,26 +189,30 @@ let make =
           | Block_FocusDown(_)
           | Block_CaptureQueuedMeta(_, _, _)
           | Block_QueueDelete(_)
-          | Block_RefmtAsLang(_)
+          | Block_ChangeLanguage
           | Block_CleanBlocksCopy
-          | Block_PrettyPrint
-          | Block_MapRefmtToBlocks(_, _)
           | Block_FocusNextBlockOrCreate(_)
           | Block_Execute(_, _) => ()
+          | Block_PrettyPrint
+          | Block_MapRefmtToBlocks(_)
           | Block_Add(_, _)
           | Block_DeleteQueued(_)
-          | Block_Restore(_) => onUpdate(newSelf.state.blocks)
+          | Block_Restore(_)
+          | Block_UpdateValue(_, _, _) => onUpdate(newSelf.state.blocks)
+          };
+
+          switch (action) {
+          | Block_Add(_, _)
+          | Block_Restore(_)
+          | Block_DeleteQueued(_)
+          | Block_PrettyPrint => cleanBlocksCopy()
           | Block_UpdateValue(_, _, diff) =>
             switch (diff->CodeMirror.EditorChange.originGet) {
             | "setValue" => ()
-            | _ =>
-              switch (newSelf.state.blocksCopy) {
-              | None => ()
-              | Some(_) => newSelf.send(Block_CleanBlocksCopy)
-              };
-              onUpdate(newSelf.state.blocks);
+            | _ => cleanBlocksCopy()
             }
-          }
+          | _ => ()
+          };
         };
       };
     },
@@ -233,51 +227,97 @@ let make =
       | Block_PrettyPrint =>
         switch (lang) {
         | ML =>
-          Notify.error("ML not currently supported");
+          Notify.info("Prettify ML code is not currently supported");
           ReasonReact.NoUpdate;
         | RE =>
           ReasonReact.SideEffects(
             (
-              ({state, send}) =>
-                Js.Promise.(
-                  Editor_Worker.refmtMany(.
-                    lang,
-                    state.blocks->codeBlockDataPairs,
-                    true,
-                  )
-                  |> then_(results =>
-                       Block_MapRefmtToBlocks(results, false)->send->resolve
-                     )
-                  |> catch(error => resolve(Js.log(error)))
-                )
-                |> ignore
+              self => {
+                let id =
+                  Toplevel_Consumer.refmt(
+                    PrettyPrintRe,
+                    self.state.blocks->codeBlockDataPairs,
+                    fun
+                    | Belt.Result.Error(error) => Notify.error(error)
+                    | Belt.Result.Ok({hasError, result}) =>
+                      if (hasError) {
+                        /* TODO: Map syntax error to block position */
+                        Notify.error(
+                          "An error happens while formatting your code. It's usually a syntax error",
+                        );
+                      } else {
+                        let result =
+                          result
+                          ->Belt.List.reduce(
+                              [],
+                              (
+                                (acc, {refmt_id, refmt_value}) =>
+                                  switch (refmt_value) {
+                                  | Ok(code) => [(refmt_id, code), ...acc]
+                                  | Error(_) => acc
+                                  }
+                              ),
+                            );
+                        self.send(Block_MapRefmtToBlocks(result));
+                      },
+                  );
+                self.onUnmount(() => Toplevel_Consumer.cancel(id));
+              }
             ),
           )
         }
-      | Block_RefmtAsLang(lang) =>
-        ReasonReact.UpdateWithSideEffects(
-          {
-            ...state,
-            blocksCopy: Some(state.blocks),
-            stateUpdateReason: Some(action),
-          },
-          (
-            ({state, send}) =>
-              Js.Promise.(
-                Editor_Worker.refmtMany(.
-                  lang,
-                  state.blocks->codeBlockDataPairs,
-                  false,
-                )
-                |> then_(results =>
-                     Block_MapRefmtToBlocks(results, true)->send->resolve
-                   )
-                |> catch(error => resolve(Js.log(error)))
-              )
-              |> ignore
-          ),
-        )
-      | Block_MapRefmtToBlocks(results, executeWhenDone) =>
+      | Block_ChangeLanguage =>
+        switch (state.blocksCopy) {
+        | None =>
+          ReasonReact.UpdateWithSideEffects(
+            {...state, blocksCopy: Some(state.blocks)},
+            (
+              self => {
+                let operation =
+                  switch (state.lang) {
+                  | ML => Toplevel.Types.ReToMl
+                  | RE => Toplevel.Types.MlToRe
+                  };
+                let id =
+                  Toplevel_Consumer.refmt(
+                    operation,
+                    self.state.blocks->codeBlockDataPairs,
+                    fun
+                    | Belt.Result.Error(error) => Notify.error(error)
+                    | Belt.Result.Ok({hasError, result}) =>
+                      if (hasError) {
+                        /* TODO: Map syntax error to block position */
+                        Notify.error(
+                          "An error happens while formatting your code. It might be a syntax error",
+                        );
+                      } else {
+                        let result =
+                          result
+                          ->Belt.List.reduce(
+                              [],
+                              (
+                                (acc, {refmt_id, refmt_value}) =>
+                                  switch (refmt_value) {
+                                  | Ok(code) => [(refmt_id, code), ...acc]
+                                  | Error(_) => acc
+                                  }
+                              ),
+                            );
+                        self.send(Block_MapRefmtToBlocks(result));
+                      },
+                  );
+                self.onUnmount(() => Toplevel_Consumer.cancel(id));
+              }
+            ),
+          )
+        | Some(blocksCopy) =>
+          ReasonReact.UpdateWithSideEffects(
+            {...state, blocksCopy: None, blocks: blocksCopy},
+            (self => self.send(Block_Execute(false, BTyp_Code))),
+          )
+        }
+
+      | Block_MapRefmtToBlocks(results) =>
         ReasonReact.UpdateWithSideEffects(
           {
             ...state,
@@ -293,8 +333,15 @@ let make =
                         b_data:
                           B_Code({
                             ...bcode,
-                            bc_value:
-                              getBlockRefmtResult(results, b_id, lang),
+                            /* TODO: Don't remove widgets but executing and replace with latest widget */
+                            bc_widgets: [||],
+                            bc_value: {
+                              /* TODO: Handle Not_Found case */
+                              let (_id, code) =
+                                results
+                                |> List.find(((id, _code)) => id == b_id);
+                              code;
+                            },
                           }),
                       }
                     | B_Text(_) => block
@@ -302,10 +349,7 @@ let make =
                   })
                 ),
           },
-          (
-            ({send}) =>
-              executeWhenDone ? send(Block_Execute(false, BTyp_Code)) : ()
-          ),
+          (({send}) => send(Block_Execute(false, BTyp_Code))),
         )
       | Block_AddWidgets(blockId, widgets) =>
         ReasonReact.Update({
@@ -372,33 +416,39 @@ let make =
           ReasonReact.NoUpdate;
         };
       | Block_Execute(focusNextBlock, blockTyp) =>
-        let allCodeToExecute = state.blocks->codeBlockDataPairs;
-        /* Clear all widgets and execute all blocks */
+        let allCodeToExecute = codeBlockDataPairs(state.blocks);
+
         ReasonReact.SideEffects(
           (
-            self =>
-              Js.Promise.(
-                Editor_Worker.executeMany(. lang, allCodeToExecute)
-                |> then_(results => {
-                     results
-                     ->(
-                         Belt.List.forEachU((. (blockId, result)) => {
-                           let widgets = executeResultToWidget(result);
-                           self.send(Block_AddWidgets(blockId, widgets));
-                         })
-                       );
+            self => {
+              if (focusNextBlock) {
+                self.send(Block_FocusNextBlockOrCreate(blockTyp));
+              };
+              onExecute(true);
+              let id =
+                Toplevel_Consumer.execute(
+                  lang,
+                  allCodeToExecute,
+                  fun
+                  | Belt.Result.Error(error) => {
+                      onExecute(false);
+                      Notify.error(error);
+                    }
+                  | Belt.Result.Ok(blocks) => {
+                      onExecute(false);
+                      blocks
+                      ->(
+                          Belt.List.forEachU(
+                            (. {Toplevel.Types.id: blockId, result}) => {
+                            let widgets = executeResultToWidget(result);
+                            self.send(Block_AddWidgets(blockId, widgets));
+                          })
+                        );
+                    },
+                );
 
-                     resolve();
-                   })
-                |> then_(() => {
-                     if (focusNextBlock) {
-                       self.send(Block_FocusNextBlockOrCreate(blockTyp));
-                     };
-                     resolve();
-                   })
-                |> catch(error => resolve(Js.log(error)))
-                |> ignore
-              )
+              self.onUnmount(() => Toplevel_Consumer.cancel(id));
+            }
           ),
         );
       | Block_UpdateValue(blockId, newValue, diff) =>

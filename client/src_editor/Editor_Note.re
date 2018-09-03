@@ -17,6 +17,7 @@ module Editor_Note = {
     noteOwnerId: id,
     noteLastEdited: option(Js.Json.t),
     forkStatus,
+    isExecuting: bool,
   };
 
   type action =
@@ -26,7 +27,8 @@ module Editor_Note = {
     | UpdateNoteSaveStatus(saveStatus)
     | UpdateForkStatus(forkStatus)
     | Execute
-    | ChangeLang(lang);
+    | ChangeLang(lang)
+    | IsExecuting(bool);
 
   let component = ReasonReact.reducerComponent("Editor_Page");
 
@@ -58,6 +60,7 @@ module Editor_Note = {
       noteOwnerId: initialNoteOwnerId,
       noteLastEdited: initialNoteLastEdited,
       forkStatus: ForkStatus_Initial,
+      isExecuting: false,
     };
     {
       ...component,
@@ -167,6 +170,8 @@ module Editor_Note = {
             ReasonReact.Update({...state, forkStatus});
           | _ => ReasonReact.Update({...state, forkStatus})
           }
+        | IsExecuting(isExecuting) =>
+          ReasonReact.Update({...state, isExecuting})
         },
       render: ({state, send}) => {
         let {editorContentStatus, lang} = state;
@@ -180,6 +185,7 @@ module Editor_Note = {
                        length=Fit
                        message="Execute code (Ctrl+Enter)">
                        ...<button
+                            disabled=state.isExecuting
                             className=buttonClassName
                             onClick=(
                               _ =>
@@ -188,7 +194,16 @@ module Editor_Note = {
                                 | Some(callback) => callback()
                                 }
                             )>
-                            <Fi.Terminal />
+                            <UI_LoadingWrapper loading=state.isExecuting>
+                              ...(
+                                   loading =>
+                                     loading ?
+                                       <Fi.Loader
+                                         className="EditorNav__button--spin"
+                                       /> :
+                                       <Fi.Play />
+                                 )
+                            </UI_LoadingWrapper>
                             "Run"->str
                           </button>
                      </UI_Balloon>
@@ -315,6 +330,7 @@ module Editor_Note = {
               )
             </div>
             <Editor_Blocks
+              key=state.noteId
               lang
               blocks=state.blocks^
               registerExecuteCallback=(
@@ -322,6 +338,7 @@ module Editor_Note = {
               )
               registerShortcut
               onUpdate=(blocks => send(BlockUpdate(blocks)))
+              onExecute=(isExecuting => send(IsExecuting(isExecuting)))
             />
           </main>
         </>;
