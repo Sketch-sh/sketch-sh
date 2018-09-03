@@ -62,7 +62,9 @@ const base = {
     rules: [
       {
         test: file =>
-          file.endsWith(".worker.js") || file.endsWith("Worker_Index.bs.js"),
+          file.endsWith(".worker.js") ||
+          file.endsWith("Worker_Index.bs.js") ||
+          file.endsWith("Toplevel_Worker.bs.js"),
         exclude: ["public"],
         use: { loader: "worker-loader" },
       },

@@ -1,3 +1,4 @@
+[%%debugger.chrome];
 Modules.require("./App.css");
 open Utils;
 open Route;

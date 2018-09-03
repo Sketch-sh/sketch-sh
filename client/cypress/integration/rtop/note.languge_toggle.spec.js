@@ -7,6 +7,7 @@ import {
   assertErrorsOrWarnings,
   assertValue,
   shortcut,
+  assertLastBlockValue,
 } from "../../helpers/editor_helpers";
 
 context("language toggle", () => {
@@ -17,7 +18,6 @@ context("language toggle", () => {
 
   it("should have language switcher", () => {
     cy.visit("new/reason");
-
     cy.get(`fieldset[aria-label="Language toggle"]`).should("be.visible");
   });
 
@@ -65,9 +65,9 @@ context("language toggle", () => {
   });
 
   it("should persist language to database - OCaml", () => {
-    cy.visit("new/reason");
+    cy.visit("new/ocaml");
 
-    cy.get("input[id=ML]").check({ force: true });
+    // cy.get("input[id=ML]").check({ force: true });
 
     cy.get(".block__container")
       .first()
@@ -123,7 +123,17 @@ context("language toggle", () => {
     shortcut("{ctrl}{enter}");
     assertErrorsOrWarnings(0);
     cy.get("input[id=ML]").check({ force: true });
-    assertErrorsOrWarnings(1);
+    cy.get("@block1")
+      .find(".widget__value")
+      .first()
+      .contains(`val value : string = "awesome"\n`);
+    assertLastBlockValue(
+      `let value = (("awesome")[@reason.raw_literal "awesome"])
+;;match value with
+  | (("awesome")[@reason.raw_literal "awesome"]) -> true
+  | _ -> false`
+    );
+    assertErrorsOrWarnings(0);
   });
 });
 

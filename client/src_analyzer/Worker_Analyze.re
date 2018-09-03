@@ -80,10 +80,11 @@ module Make = (ESig: Worker_Evaluator.EvaluatorSig) => {
     };
 
   open Editor_Types;
+  open Toplevel.Types;
 
   let executeMany:
-    (. lang, list((id, string))) => list((id, list(blockData))) =
-    (. lang, codeBlocks) => {
+    (Editor_Types.lang, list(blockInput)) => list(Toplevel.Types.blockResult) =
+    (lang, codeBlocks) => {
       /* Reset before evaluating several blocks */
       Evaluator.reset();
 
@@ -98,11 +99,13 @@ module Make = (ESig: Worker_Evaluator.EvaluatorSig) => {
       let rec loop = (blocks, acc) =>
         switch (blocks) {
         | [] => acc
-        | [(id, code), ...rest] =>
+        | [{binput_id: id, binput_value: code}, ...rest] =>
           let (result, hasError) = execute(. false, code);
 
+          let currentBlockResult = {Toplevel.Types.id, Toplevel.Types.result};
           hasError ?
-            [(id, result), ...acc] : loop(rest, [(id, result), ...acc]);
+            [currentBlockResult, ...acc] :
+            loop(rest, [currentBlockResult, ...acc]);
         };
       loop(codeBlocks, []);
     };

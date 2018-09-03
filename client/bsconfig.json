@@ -1,5 +1,5 @@
 {
-  "name": "rtop-web",
+  "name": "sketch",
   "reason": {
     "react-jsx": 2
   },
@@ -10,6 +10,7 @@
     "shared",
     "src_editor",
     "src_analyzer",
+    "src_worker",
     {
       "dir": "src_analyzer/__tests__",
       "type": "dev"
