@@ -737,6 +737,19 @@ let make =
       },
     render: ({send, state}) =>
       <>
+        <div className="block__container">
+          <div className="block__deleted">
+            <h3> "This block has been removed"->str </h3>
+            <p> "It will be permanently deleted after 10 seconds"->str </p>
+            <div className="block__deleted--buttons">
+              <button ariaLabel="Restore block">
+                <Fi.RefreshCw />
+                "Restore"->str
+              </button>
+            </div>
+            <div className="block__deleted--progress" />
+          </div>
+        </div>
         state.blocks
         ->(
             Belt.Array.mapU((. {b_id, b_data, b_deleted}) =>
