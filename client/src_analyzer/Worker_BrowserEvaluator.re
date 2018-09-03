@@ -5,7 +5,7 @@ open Worker_Evaluator.Types;
 [@bs.val] external mlSyntax: unit => unit = "evaluator.mlSyntax";
 [@bs.val] external reSyntax: unit => unit = "evaluator.reasonSyntax";
 [@bs.val]
-external insertModule: (. string, string) => Worker_Evaluator.Types.linkResult =
+external insertModule: (. string, string, string) => LinkResult.js_linkResult =
   "evaluator.insertModule";
 
 /* Implementation */

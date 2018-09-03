@@ -14,5 +14,6 @@ external mlSyntax: unit => unit = "mlSyntax";
 external reSyntax: unit => unit = "reasonSyntax";
 
 [@bs.scope "evaluator"] [@bs.module "../public/reason_v2.js"]
-external insertModule: (. string, string) => Worker_Evaluator.Types.linkResult =
+external insertModule:
+  (. string, string, string) => Worker_Evaluator.Types.LinkResult.js_linkResult =
   "insertModule";
