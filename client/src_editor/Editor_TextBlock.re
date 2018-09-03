@@ -35,7 +35,7 @@ let make =
       setEditor=(
         editor => {
           state.editor := Some(editor);
-          ();
+          CodeMirror_Links.register(editor);
         }
       )
       options=(

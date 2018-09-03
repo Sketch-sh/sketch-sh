@@ -19,7 +19,9 @@ let make = _children => {
   render: _self =>
     <header className="Topbar">
       <div className="Topbar__left">
-        <Router.Link route=Route.Home className="Topbar__home">
+        <Router.Link
+          route=Route.Home className="Topbar__home" title="Sketch.sh Homepage">
+          <Logo size=0.2 />
           "Sketch.sh"->str
         </Router.Link>
         <div id className="Topbar__actions" />
@@ -27,8 +29,9 @@ let make = _children => {
       <div className="Topbar__right">
         <UI_Balloon position=Down message="New sketch">
           ...<Router.Link
-               route=Route.NoteTemplateChoose
-               className="Topbar__action Topbar__action--highlight">
+               route=(Route.NoteNew(RE))
+               className="Topbar__action Topbar__action--highlight"
+               title="Create new Sketch">
                <Fi.Plus />
                "New Sketch"->str
              </Router.Link>

@@ -30,6 +30,8 @@ module Types = {
       loc: Js.Nullable.t(loc),
       message: string,
     };
+
+    type refmtManyResult = list((Editor_Types.id, string, option(error)));
   };
 
   type linkResult = Worker_Types.linkResult;

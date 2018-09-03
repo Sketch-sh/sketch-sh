@@ -30,8 +30,21 @@ fun
 
 let a: string = 1;|};
 
-let text7 = {|## Authors:
+let text7 = {|## Pretty print code
 
+Press Ctrl+Shift+I to pretty print Reason code. Try me!
+
+**Note:** This feature is currently unavailable in Ocaml sketches |};
+
+let code8 = {|let rec loop = (i) => if (i <= 3) {
+          loop(i)
+        }
+    else
+    {
+      i;
+    };|};
+
+let text9 = {|## Authors:
 This project is brought to you by
 - [thangngoc89](https://github.com/thangngoc89)
 
@@ -51,6 +64,8 @@ let blocks = [|
   {"kind": "text", "value": text5},
   {"kind": "code", "value": code6},
   {"kind": "text", "value": text7},
+  {"kind": "code", "value": code8},
+  {"kind": "text", "value": text9},
 |];
 
 external toJson: 'a => Js.Json.t = "%identity";

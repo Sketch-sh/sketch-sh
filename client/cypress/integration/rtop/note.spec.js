@@ -35,7 +35,9 @@ context("keyboard shortcuts", () => {
 
     cy.get("textarea")
       .first()
-      .type("let a: string = 1;", { force: true });
+      .type("let a: string = 1;", {
+        force: true
+      });
     shortcut("{ctrl}s");
 
     cy.get("@save").should("be.disabled");
@@ -51,13 +53,15 @@ context("keyboard shortcuts", () => {
     cy.get("@save").should("be.disabled");
   });
 
-  it("shift+enter execute and focus next block/or create new block", () => {
+  it("shift+enter execute and focus next block/or create new  code block", () => {
     assertBlocks(1);
     cy.get(".block__container")
       .first()
       .find("textarea")
       .as("block1")
-      .type("let a = 1;", { force: true });
+      .type("let a = 1;", {
+        force: true
+      });
 
     shortcut("{shift}{enter}");
     assertValue(1);
@@ -67,7 +71,9 @@ context("keyboard shortcuts", () => {
       .eq(1)
       .find("textarea")
       .as("block2")
-      .type("print_int(a);", { force: true });
+      .type("print_int(a);", {
+        force: true
+      });
 
     shortcut("{shift}{enter}");
     assertValue(2);
@@ -102,6 +108,54 @@ context("keyboard shortcuts", () => {
     assertBlocks(5);
   });
 
+  it("shift+enter+ctrl execute and focus next block/or create new text block", () => {
+    assertBlocks(1);
+    cy.get(".block__container")
+      .first()
+      .find("textarea")
+      .as("block1")
+      .type("let a = 1;", {
+        force: true
+      });
+
+    shortcut("{shift}{ctrl}{enter}");
+    assertValue(1);
+    assertBlocks(2);
+    assertCodeBlocks(1);
+    assertTextBlocks(1);
+
+    shortcut("{shift}{ctrl}{enter}");
+    assertCodeBlocks(1);
+    assertTextBlocks(2);
+
+    cy.get(".block__container .text-editor")
+      .first()
+      .find("textarea")
+      .type("this thing is working", {
+        force: true
+      });
+
+    shortcut("{shift}{ctrl}{enter}");
+    assertCodeBlocks(1);
+    assertTextBlocks(2);
+
+    shortcut("{shift}{ctrl}{enter}");
+    shortcut("{shift}{ctrl}{enter}");
+    assertCodeBlocks(1);
+    assertTextBlocks(4);
+
+    shortcut("{shift}{enter}");
+    cy.get(".block__container .text-editor")
+      .eq(3)
+      .find("textarea")
+      .focus();
+
+    shortcut("{shift}{ctrl}{enter}");
+    assertCodeBlocks(2);
+    assertTextBlocks(4);
+
+  });
+
   it("ctrl+enter should execute without creating new block", () => {
     assertBlocks(1);
 
@@ -109,15 +163,21 @@ context("keyboard shortcuts", () => {
       .first()
       .find("textarea")
       .as("block1")
-      .type("let a: string = 1;", { force: true });
+      .type("let a: string = 1;", {
+        force: true
+      });
     assertErrorsOrWarnings(0);
 
     shortcut("{ctrl}{enter}");
     assertErrorsOrWarnings(1);
 
     cy.get("@block1")
-      .clear({ force: true })
-      .type("let a = 1;", { force: true });
+      .clear({
+        force: true
+      })
+      .type("let a = 1;", {
+        force: true
+      });
     assertErrorsOrWarnings(0);
 
     shortcut("{ctrl}{enter}");
@@ -192,7 +252,9 @@ context("Block controls", () => {
       assertCodeBlocks(5);
       cy.get(".block__container")
         .eq(1)
-        .find(".block__deleted", { timeout: 10000 })
+        .find(".block__deleted", {
+          timeout: 10000
+        })
         .should("not.exist");
     });
     it("have restore button in toolbar as well", () => {
@@ -252,7 +314,9 @@ context("Block controls", () => {
         .as("block1")
         .find("textarea")
         .as("code1")
-        .type("let a = 1;", { force: true });
+        .type("let a = 1;", {
+          force: true
+        });
       shortcut("{shift}{enter}");
       assertCodeBlocks(2);
       cy.get(".block__container")
@@ -260,7 +324,9 @@ context("Block controls", () => {
         .as("block2")
         .find("textarea")
         .as("code2")
-        .type("print_int(a);", { force: true });
+        .type("print_int(a);", {
+          force: true
+        });
       shortcut("{ctrl}{enter}");
       assertValue(2);
 
@@ -309,7 +375,9 @@ context("Edge cases", () => {
       .first()
       .find("textarea")
       .as("block1")
-      .type("let a = 1;", { force: true });
+      .type("let a = 1;", {
+        force: true
+      });
 
     cy.get("@title")
       .focus()
@@ -327,7 +395,9 @@ context("Edge cases", () => {
       .first()
       .find("textarea")
       .as("block1")
-      .type("let x = 1; let y = 2; let z = 3;", { force: true });
+      .type("let x = 1; let y = 2; let z = 3;", {
+        force: true
+      });
     shortcut("{ctrl}{enter}");
     assertValue(3);
 
@@ -350,7 +420,9 @@ context("Edge cases", () => {
       .first()
       .find("textarea")
       .as("block1")
-      .type(content, { force: true });
+      .type(content, {
+        force: true
+      });
     shortcut("{ctrl}s");
 
     cy.url().should("match", /s\/.+/, "should be new route");
@@ -362,9 +434,45 @@ context("Edge cases", () => {
     cy.window().then(win => {
       expect(win.editor.getValue()).to.equal(content);
     });
-    cy.get("@block1").type("{ctrl}z", { force: true });
+    cy.get("@block1").type("{ctrl}z", {
+      force: true
+    });
     cy.window().then(win => {
       expect(win.editor.getValue()).to.equal(content);
+    });
+  });
+  it("should not report lineWidget at line -1", () => {
+    let content = `module AdgroupStore = {
+  let get = adgroupID => "THIS IS AN ADGROUP";
+};
+
+module PageStore = {
+  let get = pageID => "THIS IS A PAGE";
+};
+
+
+let containerize = (~pageID, ~adgroupID, component) => {
+  component(~page=PageStore.get(pageID), ~adgroup=AdgroupStore.get(adgroupID), ~children=[], ());
+};
+
+module MyComponent = {
+  let createElement = (~page, ~adgroup, ~children, ()) => {
+    ();
+    ();
+  };
+  let createElement = containerize(createElement);
+};
+
+print_string("SDFlj");
+
+let renderThis = <MyComponent adgroupID="34" pageID="99"/>`;
+    cy.visit("new/reason");
+    assertBlocks(1);
+
+    cy.window().then(win => {
+      expect(win.editor.setValue(content));
+      shortcut("{ctrl}{enter}");
+      assertErrorsOrWarnings(1);
     });
   });
 });

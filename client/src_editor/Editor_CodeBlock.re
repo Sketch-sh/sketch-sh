@@ -67,94 +67,99 @@ let make =
           if (widgets != state.codeBlockWidgets) {
             let cachedLineWidgets = state.lineWidgets^;
 
-            cachedLineWidgets
-            ->(
-                Belt.List.forEachU((. lw)
-                  /* TODO: should I remove the domNode ?
-                     Potential memory leaks? */
-                  => lw->CodeMirror.LineWidget.clear)
-              );
+            editor
+            ->CodeMirror.Editor.operation(
+                (.) => {
+                  cachedLineWidgets
+                  ->(
+                      Belt.List.forEachU((. lw)
+                        /* TODO: should I remove the domNode ?
+                           Potential memory leaks? */
+                        => lw->CodeMirror.LineWidget.clear)
+                    );
 
-            state.lineWidgets :=
-              widgets
-              ->(
-                  Belt.Array.reduceU(
-                    [],
-                    (. acc, w) => {
-                      open Editor_Types.Widget;
-                      open Editor_LineWidget;
-                      let {lw_line: line, lw_data} = w;
-                      let newLineWidget =
-                        switch (lw_data) {
-                        | Lw_Error(content) =>
-                          editor
-                          ->(
-                              CodeMirror.Editor.addLineWidget(
-                                ~line,
-                                ~element=createErrorWidget(content),
-                                ~options=
-                                  CodeMirror.LineWidget.options(
-                                    ~coverGutter=false,
-                                    ~noHScroll=false,
-                                    ~above=false,
-                                    ~showIfHidden=false,
-                                    ~handleMouseEvents=true,
-                                  ),
-                              )
-                            )
-                        | Lw_Warning(content) =>
-                          editor
-                          ->(
-                              CodeMirror.Editor.addLineWidget(
-                                ~line,
-                                ~element=createWarningWidget(content),
-                                ~options=
-                                  CodeMirror.LineWidget.options(
-                                    ~coverGutter=false,
-                                    ~noHScroll=false,
-                                    ~above=false,
-                                    ~showIfHidden=false,
-                                    ~handleMouseEvents=true,
-                                  ),
-                              )
-                            )
-                        | Lw_Value(content) =>
-                          editor
-                          ->(
-                              CodeMirror.Editor.addLineWidget(
-                                ~line,
-                                ~element=createValueWidget(content),
-                                ~options=
-                                  CodeMirror.LineWidget.options(
-                                    ~coverGutter=false,
-                                    ~noHScroll=false,
-                                    ~above=false,
-                                    ~showIfHidden=false,
-                                    ~handleMouseEvents=true,
-                                  ),
-                              )
-                            )
-                        | Lw_Stdout(content) =>
-                          editor
-                          ->(
-                              CodeMirror.Editor.addLineWidget(
-                                ~line,
-                                ~element=createStdoutWidget(content),
-                                ~options=
-                                  CodeMirror.LineWidget.options(
-                                    ~coverGutter=false,
-                                    ~noHScroll=false,
-                                    ~above=false,
-                                    ~showIfHidden=false,
-                                    ~handleMouseEvents=true,
-                                  ),
-                              )
-                            )
-                        };
-                      [newLineWidget, ...acc];
-                    },
-                  )
-                );
+                  state.lineWidgets :=
+                    widgets
+                    ->(
+                        Belt.Array.reduceU(
+                          [],
+                          (. acc, w) => {
+                            open Editor_Types.Widget;
+                            open Editor_LineWidget;
+                            let {lw_line: line, lw_data} = w;
+                            let newLineWidget =
+                              switch (lw_data) {
+                              | Lw_Error(content) =>
+                                editor
+                                ->(
+                                    CodeMirror.Editor.addLineWidget(
+                                      ~line,
+                                      ~element=createErrorWidget(content),
+                                      ~options=
+                                        CodeMirror.LineWidget.options(
+                                          ~coverGutter=false,
+                                          ~noHScroll=false,
+                                          ~above=false,
+                                          ~showIfHidden=false,
+                                          ~handleMouseEvents=true,
+                                        ),
+                                    )
+                                  )
+                              | Lw_Warning(content) =>
+                                editor
+                                ->(
+                                    CodeMirror.Editor.addLineWidget(
+                                      ~line,
+                                      ~element=createWarningWidget(content),
+                                      ~options=
+                                        CodeMirror.LineWidget.options(
+                                          ~coverGutter=false,
+                                          ~noHScroll=false,
+                                          ~above=false,
+                                          ~showIfHidden=false,
+                                          ~handleMouseEvents=true,
+                                        ),
+                                    )
+                                  )
+                              | Lw_Value(content) =>
+                                editor
+                                ->(
+                                    CodeMirror.Editor.addLineWidget(
+                                      ~line,
+                                      ~element=createValueWidget(content),
+                                      ~options=
+                                        CodeMirror.LineWidget.options(
+                                          ~coverGutter=false,
+                                          ~noHScroll=false,
+                                          ~above=false,
+                                          ~showIfHidden=false,
+                                          ~handleMouseEvents=true,
+                                        ),
+                                    )
+                                  )
+                              | Lw_Stdout(content) =>
+                                editor
+                                ->(
+                                    CodeMirror.Editor.addLineWidget(
+                                      ~line,
+                                      ~element=createStdoutWidget(content),
+                                      ~options=
+                                        CodeMirror.LineWidget.options(
+                                          ~coverGutter=false,
+                                          ~noHScroll=false,
+                                          ~above=false,
+                                          ~showIfHidden=false,
+                                          ~handleMouseEvents=true,
+                                        ),
+                                    )
+                                  )
+                              };
+                            [newLineWidget, ...acc];
+                          },
+                        )
+                      );
+                },
+              );
           };
           widgets;
         },

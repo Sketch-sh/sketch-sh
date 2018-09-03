@@ -38,10 +38,12 @@
 .Topbar__left .Topbar__home {
   padding: var(--space3);
   font-weight: 500;
-  color: var(--c-text);
+  color: var(--c-primary);
+  display: flex;
+  align-items: center;
 
   &:visited {
-    color: var(--c-text);
+    color: var(--c-primary);
   }
 }
 

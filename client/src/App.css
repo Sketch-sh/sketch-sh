@@ -21,7 +21,7 @@
   --c-primary: #1874d5;
   --c-danger: #ff3860;
   --c-success: #23d160;
-  
+
   --c-text: #000;
   --c-text-sub: #444;
   --c-text-sub2: rgb(143, 166, 178);
@@ -115,4 +115,31 @@ a:focus {
 .btn-primary:hover {
   background: color-mod(var(--c-primary) lightness(-10%));
   color: var(--c-text-inverse);
+}
+
+.cm-link-marker {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cm-link-marker > span {
+  display: inherit;
+}
+
+.cm-link-marker a {
+  padding: 0 0 0 2px;
+}
+
+.cm-link-marker svg {
+  height: 16px;
+  width: 16px;
+  fill: none;
+  stroke: var(--c-primary);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.cm-link-marker svg:hover {
+  stroke: color-mod(var(--c-primary) lightness(-6%));
 }

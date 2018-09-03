@@ -1,3 +1,7 @@
+/*
+ * Block Execution Utils
+ */
+
 let renderErrorIndicator = (colStart, colEnd, content) =>
   String.make(colStart, ' ')
   ++ String.make(
@@ -13,6 +17,7 @@ let renderErrorIndicator = (colStart, colEnd, content) =>
 let executeResultToWidget = (result: list(Worker_Types.blockData)) => {
   open Worker_Types;
   open Editor_Types;
+  let clampLineNumber = line => max(0, line);
 
   let widgets =
     result
@@ -22,6 +27,7 @@ let executeResultToWidget = (result: list(Worker_Types.blockData)) => {
           (. acc, exeResult) => {
             let {block_result: result, block_loc} = exeResult;
             let (_, {line}) = block_loc;
+            let line = line->clampLineNumber;
 
             let evaluate =
               result.blockResult_evaluate
@@ -134,6 +140,17 @@ let syncLineNumber: array(block) => array(block) =
       )
     ->Utils.pluckAcc;
 
+let getFirstLineFromDiff = (diff: CodeMirror.EditorChange.t) => {
+  let fromPos = diff->CodeMirror.EditorChange.fromGet;
+  let line = fromPos->CodeMirror.Position.lineGet;
+
+  line;
+};
+
+/*
+ * New Block Utils
+ */
+
 let emptyCodeBlock = () =>
   B_Code({bc_value: "", bc_firstLineNumber: 1, bc_widgets: [||]});
 
@@ -149,6 +166,10 @@ let isEmpty =
   fun
   | B_Code({bc_value}) => String.length(bc_value) == 0
   | B_Text(value) => String.length(value) == 0;
+
+/*
+ * Block Position Utils
+ */
 
 let getBlockIndex = (blocks, blockId) =>
   blocks->Utils.arrayFindIndex(({b_id}) => b_id == blockId)
@@ -174,11 +195,33 @@ let findLastCodeBlock = blocks => {
   loop(length - 1);
 };
 
-let getFirstLineFromDiff = (diff: CodeMirror.EditorChange.t) => {
-  let fromPos = diff->CodeMirror.EditorChange.fromGet;
-  let line = fromPos->CodeMirror.Position.lineGet;
+/*
+ * Block Refmt Utils
+ */
 
-  line;
+let notifyRefmtError = (code, error, targetLang) => {
+  let fromLang = targetLang == Editor_Types.ML ? "RE" : "ML";
+  let toLang = targetLang == Editor_Types.ML ? "ML" : "RE";
+  let message = {j|There was a problem reformating your $fromLang code to $toLang|j};
+  Notify.error(message ++ ". Check the console for details.");
+  Js.log(message ++ "\n");
+  Js.log2("Code:\n", code);
+  Js.log2("Error:\n", error);
+};
+
+let getBlockRefmtResult = (results, blockId, lang) => {
+  let result =
+    results
+    |> List.find(data => {
+         let (id, _val, _error) = data;
+         id == blockId;
+       });
+  let (_b_id, bc_value, hasError) = result;
+  switch (hasError) {
+  | None => ()
+  | Some(error) => notifyRefmtError(bc_value, error, lang)
+  };
+  bc_value;
 };
 
 let concatCodeBlocksToString = blocks =>
@@ -191,3 +234,22 @@ let concatCodeBlocksToString = blocks =>
         }
       )
     );
+/*
+ * Ohter Block Utils
+ */
+
+let codeBlockDataPairs = blocks =>
+  blocks
+  ->(
+      Belt.Array.reduceU([], (. acc, {b_id, b_data, b_deleted}) =>
+        b_deleted ?
+          acc :
+          (
+            switch (b_data) {
+            | B_Text(_) => acc
+            | B_Code({bc_value}) => [(b_id, bc_value), ...acc]
+            }
+          )
+      )
+    )
+  ->Belt.List.reverse;

@@ -40,10 +40,11 @@
 
 .EditorNote__lang--RE {
   border-radius: 2px 0 0 2px;
-  background: #da4139;
+  background: var(--c-text-sub2);
 }
+
 .EditorNote__lang--ML {
-  background: #ed6f0c;
+  background: var(--c-text-sub2);
   border-radius: 0 2px 2px 0;
 }
 
@@ -79,6 +80,7 @@
   0% {
     transform: rotate(0deg);
   }
+
   100% {
     transform: rotate(359deg);
   }

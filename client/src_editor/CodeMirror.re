@@ -77,7 +77,8 @@ module EditorConfiguration = {
     dragDrop: bool,
     [@bs.optional] /** When given , this will be called when the editor is handling a dragenter , dragover , or drop event.
         It will be passed the editor instance and the event object as arguments.
-        The callback can choose to handle the event itself , in which case it should return true to indicate that CodeMirror should not do anything further. */ /* TODO */ /* onDragEvent?: (instance: CodeMirror.Editor, event: Event) => boolean; */ /** This provides a rather low - level hook into CodeMirror's key handling.
+        The callback can choose to handle the event itself , in which case it should return true to indicate that CodeMirror should not do anything further. */ /* TODO */ /* onDragEvent?: (instance: CodeMirror.Editor, event: Event) => boolean; */
+                                                                    /** This provides a rather low - level hook into CodeMirror's key handling.
         If provided, this function will be called on every keydown, keyup, and keypress event that CodeMirror captures.
         It will be passed two arguments, the editor instance and the key event.
         This key event is pretty much the raw key event, except that a stop() method is always added to it.
@@ -180,6 +181,20 @@ module EditorChange = {
   };
 };
 
+module TextMarker = {
+  type t;
+
+  [@bs.send] external clear: t => unit = "";
+
+  [@bs.deriving abstract]
+  type findResult = {
+    from: Position.t,
+    [@bs.as "to"]
+    to_: Position.t,
+  };
+  [@bs.send] external find: t => findResult = "";
+};
+
 module Doc = {
   type t;
 
@@ -197,6 +212,60 @@ module Doc = {
   [@bs.send] external setCursor: (t, Position.t) => unit = "";
 
   [@bs.send] external clearHistory: t => unit = "";
+
+  [@bs.deriving abstract]
+  type markTextOption = {
+    [@bs.optional]
+    className: string,
+    [@bs.optional]
+    inclusiveLeft: bool,
+    [@bs.optional]
+    inclusiveRight: bool,
+    [@bs.optional]
+    atomic: bool,
+    [@bs.optional]
+    collapsed: bool,
+    [@bs.optional]
+    clearOnEnter: bool,
+    [@bs.optional]
+    clearWhenEmpty: bool,
+    [@bs.optional]
+    replacedWith: Dom.element,
+    [@bs.optional]
+    handleMouseEvents: bool,
+    [@bs.optional]
+    readOnly: bool,
+    [@bs.optional]
+    addToHistory: bool,
+    [@bs.optional]
+    startStyle: string,
+    [@bs.optional]
+    endStyle: string,
+    [@bs.optional]
+    css: string,
+    [@bs.optional]
+    title: string,
+    [@bs.optional]
+    shared: bool,
+  };
+  [@bs.send]
+  external markText:
+    (t, ~from: Position.t, ~to_: Position.t, ~option: markTextOption) =>
+    TextMarker.t =
+    "";
+};
+
+module Token = {
+  [@bs.deriving abstract]
+  type t = {
+    start: int,
+    [@bs.as "end"]
+    end_: int,
+    string,
+    [@bs.as "type"]
+    typ: Js.Nullable.t(string),
+    state: Js.Json.t,
+  };
 };
 
 module Editor = {
@@ -204,6 +273,13 @@ module Editor = {
   [@bs.send] external setValue: (editor, string) => unit = "";
   [@bs.send] external setOption: (editor, string, 'a) => unit = "";
   [@bs.send] external getOption: (editor, string) => 'a = "";
+  [@bs.send] external getWrapperElement: editor => Dom.element = "";
+  [@bs.send] external operation: (editor, (. unit) => 'a) => 'a = "";
+  [@bs.send]
+  external getLineTokens:
+    (editor, ~line: int, ~precise: bool) => array(Token.t) =
+    "";
+
   module GetOption = {
     [@bs.send]
     external indentUnit: (editor, [@bs.as "indentUnit"] _) => int =
