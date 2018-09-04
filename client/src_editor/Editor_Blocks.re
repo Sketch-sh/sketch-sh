@@ -426,15 +426,35 @@ let make =
                 self.send(Block_FocusNextBlockOrCreate(blockTyp));
               };
               onExecute(true);
+              /* TODO add cancel for link */
+              /* TODO unify API for link and execute */
+              open Belt.Result;
 
-              /* TODO add cancel for link, and map */
               let _linkId =
                 Toplevel_Consumer.link(
                   Array.to_list(links),
                   result => {
                     switch (result) {
-                    | Belt.Result.Error(error) => Notify.error(error)
-                    | Belt.Result.Ok(_links) => ()
+                    | Error(error) => Notify.error(error)
+                    | Ok(executedLinks) =>
+                      executedLinks
+                      ->Belt.List.forEachU(
+                          (
+                            (. (link, linkResult)) => {
+                              let name = getNameFromLink(link);
+                              switch (linkResult) {
+                              | Ok () => ()
+                              | Error(message) =>
+                                /* TODO clear up error message */
+                                Notify.error(
+                                  {j|
+                                Module "$name" failed to link: $message
+                              |j},
+                                )
+                              };
+                            }
+                          ),
+                        )
                     };
 
                     let id =

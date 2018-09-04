@@ -65,6 +65,7 @@ module EmptyLink = {
     | UpdateName(string);
 
   let component = ReasonReact.reducerComponent("Editor_EmptyLink");
+
   let make = (~status, ~onSubmit, ~onFetched=?, ~name="", ~id="", _children) => {
     ...component,
     initialState: () => {name, id},
