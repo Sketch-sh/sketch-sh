@@ -244,7 +244,7 @@ let make =
                       if (hasError) {
                         /* TODO: Map syntax error to block position */
                         Notify.error(
-                          "An error happens while formatting your code. It's usually a syntax error",
+                          "An error happened while formatting your code. It's usually a syntax error",
                         );
                       } else {
                         let result =
@@ -289,7 +289,7 @@ let make =
                       if (hasError) {
                         /* TODO: Map syntax error to block position */
                         Notify.error(
-                          "An error happens while formatting your code. It might be a syntax error",
+                          "An error happened while formatting your code. It might be a syntax error",
                         );
                       } else {
                         let result =
@@ -445,11 +445,8 @@ let make =
                               switch (linkResult) {
                               | Ok () => ()
                               | Error(message) =>
-                                /* TODO clear up error message */
                                 Notify.error(
-                                  {j|
-                                Module "$name" failed to link: $message
-                              |j},
+                                  {j|Module "$name" failed to link: $message|j},
                                 )
                               };
                             }
