@@ -158,6 +158,7 @@ let make = (~links, ~onUpdate, _children) => {
             | Internal({sketch_id, name}) =>
               <SingleLink
                 id=sketch_id
+                key=sketch_id
                 name
                 onDelete=(() => send(Link_Delete(link)))
               />

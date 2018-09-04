@@ -98,7 +98,7 @@ module V1 = {
     let internalLinkEncoder: Link.internalLink => Js.Json.t =
       internalLink =>
         object_([
-          ("sketch_id", string(internalLink.sketch_id)),
+          ("id", string(internalLink.sketch_id)),
           ("name", string(internalLink.name)),
           ("lang", internalLink.lang |> langToString |> string),
           ("timestamp", internalLink.revision_at),
