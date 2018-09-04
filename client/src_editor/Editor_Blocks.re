@@ -1,3 +1,7 @@
+/*
+ * Tips: Fold code at level 2 would help alot with readability
+ * If you're using VSCode, use <C-K> <C-2>
+ */
 [%%debugger.chrome];
 Modules.require("./Editor_Blocks.css");
 
@@ -734,7 +738,7 @@ let make =
         newSelf.send(Block_ChangeLanguage);
       };
       if (oldSelf.state.blocks !== newSelf.state.blocks) {
-        let cleanBlocksCopy = () =>
+        let cleanBlocksCopyHelper = () =>
           switch (newSelf.state.blocksCopy) {
           | None => ()
           | Some(_) => newSelf.send(Block_CleanBlocksCopy)
@@ -766,11 +770,11 @@ let make =
           | Block_Add(_, _)
           | Block_Restore(_)
           | Block_DeleteQueued(_)
-          | Block_PrettyPrint => cleanBlocksCopy()
+          | Block_PrettyPrint => cleanBlocksCopyHelper()
           | Block_UpdateValue(_, _, diff) =>
             switch (diff->CodeMirror.EditorChange.originGet) {
             | "setValue" => ()
-            | _ => cleanBlocksCopy()
+            | _ => cleanBlocksCopyHelper()
             }
           | _ => ()
           };
