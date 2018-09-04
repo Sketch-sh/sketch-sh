@@ -83,6 +83,12 @@ module Actions = {
         ),
       )
     };
+  /*
+   * Focus up helper
+   * - Find current block index
+   * - If it's the FIRST or not in blocks (should never happen) then ignore
+   * - Else focus on upper block
+   */
   let focusUp = (action, state, blockId) => {
     let blockIndex =
       state.blocks->arrayFindIndex(({b_id}) => blockId == b_id);
@@ -101,6 +107,12 @@ module Actions = {
       });
     };
   };
+  /*
+   * Focus down helper
+   * - Find current block index
+   * - If it's the LAST or not in blocks (should never happen) then ignore
+   * - Else focus on lower block
+   */
   let focusDown = (action, state, blockId) => {
     let length = state.blocks->Belt.Array.length;
     let blockIndex =

@@ -5,7 +5,7 @@ let mapCode = (blocks: array(Block.block), cb) =>
       (. block) => {
         let {Block.b_id, b_deleted, b_data} = block;
         switch (b_data) {
-        | B_Code(data) => cb(~block, ~id=b_id, ~deleted=b_deleted, ~data)
+        | B_Code(bcode) => cb(~block, ~id=b_id, ~deleted=b_deleted, ~bcode)
         | B_Text(_) => block
         };
       },
