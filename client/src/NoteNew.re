@@ -21,11 +21,13 @@ let make = (~blocks=defaultBlocks, ~title=?, ~lang, _children) => {
                | Anonymous => Config.anonymousUserId
                | Login(userId) => userId
                };
+             let noteId = Utils.generateId();
              <Editor_Note
+               key=noteId
                hasSavePermission=true
                noteOwnerId=userId
                noteLastEdited=None
-               noteId=(Utils.generateId())
+               noteId
                noteState=NoteState_New
                blocks
                lang
