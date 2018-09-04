@@ -1,6 +1,7 @@
 [%%debugger.chrome];
 Modules.require("./reason-mode.js");
 Modules.require("codemirror/addon/edit/matchbrackets");
+Modules.require("codemirror/addon/edit/closebrackets");
 Modules.require("codemirror/addon/comment/comment");
 Modules.require("codemirror/addon/display/placeholder");
 Modules.require("codemirror/mode/gfm/gfm");
@@ -150,13 +151,6 @@ let make =
                 if (lineGet(cursor) == lastLine && lastChar == cursor->chGet) {
                   onBlockDown();
                 };
-              | "/" =>
-                if (event->KeyboardEvent.ctrlKey) {
-                  event->KeyboardEventRe.preventDefault;
-                  editor->(CodeMirror.Editor.toggleComment());
-                } else {
-                  ();
-                }
               | _ => ()
               };
             })

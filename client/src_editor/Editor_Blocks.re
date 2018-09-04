@@ -326,26 +326,33 @@ let make =
               state.blocks
               ->(
                   Belt.Array.mapU((. block) => {
-                    let {b_data, b_id} = block;
-                    switch (b_data) {
-                    | B_Code(bcode) => {
-                        ...block,
-                        b_data:
-                          B_Code({
-                            ...bcode,
-                            /* TODO: Don't remove widgets but executing and replace with latest widget */
-                            bc_widgets: [||],
-                            bc_value: {
-                              /* TODO: Handle Not_Found case */
-                              let (_id, code) =
-                                results
-                                |> List.find(((id, _code)) => id == b_id);
-                              code;
-                            },
-                          }),
-                      }
-                    | B_Text(_) => block
-                    };
+                    let {b_data, b_id, b_deleted} = block;
+                    b_deleted ?
+                      block :
+                      (
+                        switch (b_data) {
+                        | B_Code(bcode) =>
+                          let mappedBlock =
+                            results
+                            ->Belt.List.getBy(
+                                (((id, _code)) => id == b_id),
+                              );
+                          switch (mappedBlock) {
+                          | None => block
+                          | Some((_id, code)) => {
+                              ...block,
+                              b_data:
+                                B_Code({
+                                  ...bcode,
+                                  /* TODO: Don't remove widgets but executing and replace with latest widget */
+                                  bc_widgets: [||],
+                                  bc_value: code,
+                                }),
+                            }
+                          };
+                        | B_Text(_) => block
+                        }
+                      );
                   })
                 ),
           },
