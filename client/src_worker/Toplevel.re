@@ -27,6 +27,7 @@ module Types = {
     | PrettyPrintRe;
 
   type topToWorkerMessage =
+    | Link(list(Editor_Types.Link.link))
     | Execute(Editor_Types.lang, list(blockInput))
     | Refmt(refmtTypes, list(blockInput));
 
@@ -37,6 +38,7 @@ module Types = {
 
   type workerToTopMessage =
     | Ready
+    | LinkResult(list((Editor_Types.Link.link, Worker_Types.linkResult)))
     | ExecuteResult(Belt.Result.t(list(blockResult), string))
     | RefmtResult(Belt.Result.t(refmtOk, string));
 

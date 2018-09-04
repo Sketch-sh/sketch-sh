@@ -15,6 +15,7 @@ self
       let {t_id, t_message} = event##data;
       let result =
         switch (t_message) {
+        | Link(links) => LinkResult(Analyze.linkMany(. links))
         | Execute(lang, blocks) =>
           ExecuteResult(Belt.Result.Ok(Analyze.executeMany(lang, blocks)))
         | Refmt(lang, blocks) =>

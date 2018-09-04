@@ -82,6 +82,7 @@ let component = ReasonReact.reducerComponent("Editor_Page");
 let make =
     (
       ~lang=RE,
+      ~links: array(Link.link),
       ~blocks: array(block),
       ~readOnly=false,
       ~onUpdate,
@@ -425,29 +426,45 @@ let make =
                 self.send(Block_FocusNextBlockOrCreate(blockTyp));
               };
               onExecute(true);
-              let id =
-                Toplevel_Consumer.execute(
-                  lang,
-                  allCodeToExecute,
-                  fun
-                  | Belt.Result.Error(error) => {
-                      onExecute(false);
-                      Notify.error(error);
-                    }
-                  | Belt.Result.Ok(blocks) => {
-                      onExecute(false);
-                      blocks
-                      ->(
-                          Belt.List.forEachU(
-                            (. {Toplevel.Types.id: blockId, result}) => {
-                            let widgets = executeResultToWidget(result);
-                            self.send(Block_AddWidgets(blockId, widgets));
-                          })
-                        );
-                    },
-                );
 
-              self.onUnmount(() => Toplevel_Consumer.cancel(id));
+              /* TODO add cancel for link, and map */
+              let _linkId =
+                Toplevel_Consumer.link(
+                  Array.to_list(links),
+                  result => {
+                    switch (result) {
+                    | Belt.Result.Error(error) => Notify.error(error)
+                    | Belt.Result.Ok(_links) => ()
+                    };
+
+                    let id =
+                      Toplevel_Consumer.execute(
+                        lang,
+                        allCodeToExecute,
+                        fun
+                        | Belt.Result.Error(error) => {
+                            onExecute(false);
+                            Notify.error(error);
+                          }
+                        | Belt.Result.Ok(blocks) => {
+                            onExecute(false);
+                            blocks
+                            ->(
+                                Belt.List.forEachU(
+                                  (. {Toplevel.Types.id: blockId, result}) => {
+                                  let widgets = executeResultToWidget(result);
+                                  self.send(
+                                    Block_AddWidgets(blockId, widgets),
+                                  );
+                                })
+                              );
+                          },
+                      );
+
+                    self.onUnmount(() => Toplevel_Consumer.cancel(id));
+                  },
+                );
+              ();
             }
           ),
         );

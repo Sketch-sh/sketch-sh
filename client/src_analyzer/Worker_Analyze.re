@@ -81,6 +81,35 @@ module Make = (ESig: Worker_Evaluator.EvaluatorSig) => {
       loop(0, [], None);
     };
 
+  open Toplevel.Types;
+
+  let executeMany:
+    (Editor_Types.lang, list(blockInput)) => list(Toplevel.Types.blockResult) =
+    (lang, codeBlocks) => {
+      /* Reset before evaluating several blocks */
+
+      switch (lang) {
+      | ML => Evaluator.mlSyntax()
+      | RE => Evaluator.reSyntax()
+      };
+      /*
+       * Execute blocks in order
+       * Stop when encountering error in a block
+       */
+      let rec loop = (blocks, acc) =>
+        switch (blocks) {
+        | [] => acc
+        | [{binput_id: id, binput_value: code}, ...rest] =>
+          let (result, hasError) = execute(. false, code);
+
+          let currentBlockResult = {Toplevel.Types.id, Toplevel.Types.result};
+          hasError ?
+            [currentBlockResult, ...acc] :
+            loop(rest, [currentBlockResult, ...acc]);
+        };
+      loop(codeBlocks, []);
+    };
+
   let link: (. lang, string, string) => linkResult =
     (. lang, name, code) => {
       open Evaluator;
@@ -96,7 +125,7 @@ module Make = (ESig: Worker_Evaluator.EvaluatorSig) => {
         switch (js_linkResult->LinkResult.kindGet) {
         | "Ok" => Ok()
         | "Error" => Error(js_linkResult->LinkResult.valueGet)
-        | kind => raise(Invalid_argument("Unknown link result " ++ kind))
+        | _kind => Error("unknown link result")
         }
       );
     };
@@ -130,35 +159,5 @@ module Make = (ESig: Worker_Evaluator.EvaluatorSig) => {
             loop(rest, [(name, result), ...acc]);
         };
       loop(links, []);
-    };
-
-  open Toplevel.Types;
-
-  let executeMany:
-    (Editor_Types.lang, list(blockInput)) => list(Toplevel.Types.blockResult) =
-    (lang, codeBlocks) => {
-      /* Reset before evaluating several blocks */
-      /* Evaluator.reset(); */
-
-      switch (lang) {
-      | ML => Evaluator.mlSyntax()
-      | RE => Evaluator.reSyntax()
-      };
-      /*
-       * Execute blocks in order
-       * Stop when encountering error in a block
-       */
-      let rec loop = (blocks, acc) =>
-        switch (blocks) {
-        | [] => acc
-        | [{binput_id: id, binput_value: code}, ...rest] =>
-          let (result, hasError) = execute(. false, code);
-
-          let currentBlockResult = {Toplevel.Types.id, Toplevel.Types.result};
-          hasError ?
-            [currentBlockResult, ...acc] :
-            loop(rest, [currentBlockResult, ...acc]);
-        };
-      loop(codeBlocks, []);
     };
 };

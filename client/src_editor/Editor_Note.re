@@ -371,6 +371,7 @@ module Editor_Note = {
               key=state.noteId
               lang
               blocks=state.blocks^
+              links=state.links^
               registerExecuteCallback=(
                 callback => send(RegisterExecuteCallback(callback))
               )
