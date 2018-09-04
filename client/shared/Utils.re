@@ -119,8 +119,6 @@ let generateId = () =>
     22,
   );
 
-let pluckAcc = ((acc, _)) => acc;
-
 external toNullable: string => Js.Nullable.t(string) = "%identity";
 
 let inArray = (arr, value) => arr |> Js.Array.indexOf(value) != (-1);

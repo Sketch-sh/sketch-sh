@@ -1,3 +1,15 @@
+open Editor_Types;
+let mapCode = (blocks: array(Block.block), cb) =>
+  blocks
+  ->Belt.Array.mapU(
+      (. block) => {
+        let {Block.b_id, b_deleted, b_data} = block;
+        switch (b_data) {
+        | B_Code(bcode) => cb(~block, ~id=b_id, ~deleted=b_deleted, ~bcode)
+        | B_Text(_) => block
+        };
+      },
+    );
 /*
  * Block Execution Utils
  */
@@ -16,7 +28,6 @@ let renderErrorIndicator = (colStart, colEnd, content) =>
 
 let executeResultToWidget = (result: list(Worker_Types.blockData)) => {
   open Worker_Types;
-  open Editor_Types;
   let clampLineNumber = line => max(0, line);
 
   let widgets =
@@ -138,7 +149,7 @@ let syncLineNumber: array(block) => array(block) =
           },
         )
       )
-    ->Utils.pluckAcc;
+    ->fst;
 
 let getFirstLineFromDiff = (diff: CodeMirror.EditorChange.t) => {
   let fromPos = diff->CodeMirror.EditorChange.fromGet;
@@ -155,12 +166,6 @@ let emptyCodeBlock = () =>
   B_Code({bc_value: "", bc_firstLineNumber: 1, bc_widgets: [||]});
 
 let emptyTextBlock = () => B_Text("");
-
-let newBlock = {
-  b_id: Utils.generateId(),
-  b_data: emptyCodeBlock(),
-  b_deleted: false,
-};
 
 let isEmpty =
   fun
@@ -196,26 +201,7 @@ let findLastCodeBlock = blocks => {
 };
 
 /*
- * Block Refmt Utils
- */
-
-/* let getBlockRefmtResult = (results, blockId) => {
-     let result =
-       results
-       |> List.find(data => {
-            let (id, code) = data;
-            id == blockId;
-          });
-     let (_b_id, bc_value, hasError) = result;
-     switch (hasError) {
-     | None => ()
-     | Some(error) => notifyRefmtError(bc_value, error, lang)
-     };
-     bc_value;
-   }; */
-
-/*
- * Ohter Block Utils
+ * Other Block Utils
  */
 
 let codeBlockDataPairs = blocks =>
