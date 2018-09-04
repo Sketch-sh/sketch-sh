@@ -188,6 +188,7 @@ let make =
           ~styleActiveLine=true,
           ~viewportMargin=infinity,
           ~matchBrackets=true,
+          ~autoCloseBrackets=true,
           ~lineWrapping=true,
           ~smartIndent=false,
           ~firstLineNumber,
@@ -198,6 +199,8 @@ let make =
 
             Js.Dict.set(key, "Tab", "indentMore");
             Js.Dict.set(key, "Shift-Tab", "indentLess");
+            Js.Dict.set(key, "Cmd-/", "toggleComment");
+            Js.Dict.set(key, "Ctrl-/", "toggleComment");
             key;
           },
           (),
