@@ -1,3 +1,15 @@
+/*
+ * Unload
+ * This is a helper to prevent route transition
+ * when there is unsaved content
+ * Example:
+ *  let derivedMessageFromState: state => option(string) =
+ *  let unloadHandler = (message, self) => {
+ *    message := derivedMessageFromState(self.ReasonReact.state)
+ *    ();
+ *  };
+ *  Router.Unload.register(self.handle(unloadHandler));
+ */
 module Unload: {
   type message = ref(option(string));
   type callback = option(message => unit);
@@ -5,16 +17,18 @@ module Unload: {
   let register: (message => unit) => unit;
   let unregister: unit => unit;
 
+  /*
+   * Provider
+   * Put this in any component
+   */
   module Provider: {
     let make:
-      React.childless =>
-      React.component(unit, ReasonReact.noRetainedProps, unit);
+      React.childless => React.component(unit, React.noRetainedProps, unit);
   };
 };
 
 let redirect: string => unit;
 let push: Route.t => unit;
-
 let pushSilent: Route.t => unit;
 let replaceSilent: Route.t => unit;
 
@@ -27,11 +41,7 @@ module Link: {
       ~className: string=?,
       ~popup: bool=?,
       ~role: string=?,
-      array(ReasonReact.reactElement)
+      array(React.reactElement)
     ) =>
-    ReasonReact.component(
-      ReasonReact.stateless,
-      ReasonReact.noRetainedProps,
-      ReasonReact.actionless,
-    );
+    React.component(React.stateless, React.noRetainedProps, React.actionless);
 };
