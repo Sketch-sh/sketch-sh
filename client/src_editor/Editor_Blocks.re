@@ -326,46 +326,28 @@ module Actions = {
       state.deletedBlockMeta :=
         (state.deletedBlockMeta^)->TimeoutMap.set(blockId, timeoutId);
     };
-    if (isLastBlock(state.blocks)) {
-      switch (isEmpty(state.blocks[0].b_data)) {
-      | true => ReasonReact.NoUpdate
-      | _ =>
-        ReasonReact.UpdateWithSideEffects(
-          {
-            ...state,
-            blocks:
-              [|newBlock, {...state.blocks[0], b_deleted: true}|]
-              ->syncLineNumber,
-            stateUpdateReason: Some(action),
-            focusedBlock: None,
+    ReasonReact.UpdateWithSideEffects(
+      {
+        ...state,
+        blocks:
+          state.blocks
+          ->(
+              Belt.Array.mapU((. block) => {
+                let {b_id} = block;
+                b_id == blockId ? {...block, b_deleted: true} : block;
+              })
+            )
+          ->syncLineNumber,
+        stateUpdateReason: Some(action),
+        focusedBlock:
+          switch (state.focusedBlock) {
+          | None => None
+          | Some((focusedBlock, _, _)) =>
+            focusedBlock == blockId ? None : state.focusedBlock
           },
-          (self => queueTimeout(self)),
-        )
-      };
-    } else {
-      ReasonReact.UpdateWithSideEffects(
-        {
-          ...state,
-          blocks:
-            state.blocks
-            ->(
-                Belt.Array.mapU((. block) => {
-                  let {b_id} = block;
-                  b_id == blockId ? {...block, b_deleted: true} : block;
-                })
-              )
-            ->syncLineNumber,
-          stateUpdateReason: Some(action),
-          focusedBlock:
-            switch (state.focusedBlock) {
-            | None => None
-            | Some((focusedBlock, _, _)) =>
-              focusedBlock == blockId ? None : state.focusedBlock
-            },
-        },
-        self => queueTimeout(self),
-      );
-    };
+      },
+      queueTimeout,
+    );
   };
   let deleteQueued = (action, state, blockId) => {
     state.deletedBlockMeta :=
@@ -373,7 +355,13 @@ module Actions = {
     if (isLastBlock(state.blocks) || Belt.Array.length(state.blocks) == 0) {
       ReasonReact.Update({
         ...state,
-        blocks: [|newBlock|],
+        blocks: [|
+          {
+            b_id: Utils.generateId(),
+            b_data: emptyCodeBlock(),
+            b_deleted: false,
+          },
+        |],
         stateUpdateReason: Some(action),
         focusedBlock: None,
       });

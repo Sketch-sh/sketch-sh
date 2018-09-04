@@ -167,12 +167,6 @@ let emptyCodeBlock = () =>
 
 let emptyTextBlock = () => B_Text("");
 
-let newBlock = {
-  b_id: Utils.generateId(),
-  b_data: emptyCodeBlock(),
-  b_deleted: false,
-};
-
 let isEmpty =
   fun
   | B_Code({bc_value}) => String.length(bc_value) == 0
