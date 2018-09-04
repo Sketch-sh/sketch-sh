@@ -1,6 +1,7 @@
 [%%debugger.chrome];
 Modules.require("./reason-mode.js");
 Modules.require("codemirror/addon/edit/matchbrackets");
+Modules.require("codemirror/addon/edit/closebrackets");
 Modules.require("codemirror/addon/comment/comment");
 Modules.require("codemirror/addon/display/placeholder");
 Modules.require("codemirror/mode/gfm/gfm");

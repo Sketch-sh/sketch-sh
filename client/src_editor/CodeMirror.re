@@ -120,6 +120,8 @@ module EditorConfiguration = {
     [@bs.optional]
     matchBrackets: bool,
     [@bs.optional]
+    autoCloseBrackets: bool,
+    [@bs.optional]
     styleActiveLine: bool,
   };
 

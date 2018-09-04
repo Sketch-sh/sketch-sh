@@ -188,6 +188,7 @@ let make =
           ~styleActiveLine=true,
           ~viewportMargin=infinity,
           ~matchBrackets=true,
+          ~autoCloseBrackets=true,
           ~lineWrapping=true,
           ~smartIndent=false,
           ~firstLineNumber,
