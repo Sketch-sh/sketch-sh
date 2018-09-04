@@ -127,7 +127,7 @@ module Editor_Note = {
           | (Ec_Dirty, SaveStatus_Done({lastEdited: _})) =>
             ReasonReact.Update({...state, editorContentStatus: Ec_Dirty})
           | (_, SaveStatus_Done({lastEdited})) =>
-            Notify.info("Saved successfully", ~sticky=false);
+            Notify.success("Saved successfully", ~sticky=false);
             ReasonReact.UpdateWithSideEffects(
               {
                 ...state,
@@ -149,7 +149,7 @@ module Editor_Note = {
         | UpdateForkStatus(forkStatus) =>
           switch (forkStatus) {
           | ForkStatus_Done({newId, forkFrom, lastEdited, owner}) =>
-            Notify.info("Forked successfully", ~sticky=false);
+            Notify.success("Forked successfully", ~sticky=false);
             ReasonReact.UpdateWithSideEffects(
               {
                 ...state,
