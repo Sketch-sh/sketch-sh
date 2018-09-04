@@ -64,12 +64,6 @@ module Editor_Note = {
     {
       ...component,
       initialState: makeInitialState,
-      willReceiveProps: self =>
-        if (self.state.noteId != initialNoteId) {
-          makeInitialState();
-        } else {
-          self.state;
-        },
       didUpdate: ({oldSelf, newSelf}) =>
         if (newSelf.state.editorContentStatus
             != oldSelf.state.editorContentStatus) {

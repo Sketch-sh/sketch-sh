@@ -54,6 +54,7 @@ let make = (~noteInfo: Route.noteRouteConfig, _children: React.childless) => {
                                   };
                                 <RedirectSketchURL noteId>
                                   ...<Editor_Note
+                                       key=noteId
                                        noteOwnerId=note##user_id
                                        noteLastEdited=(Some(note##updated_at))
                                        noteId
