@@ -73,19 +73,26 @@ module Editor_Note = {
       didUpdate: ({oldSelf, newSelf}) =>
         if (newSelf.state.editorContentStatus
             != oldSelf.state.editorContentStatus) {
-          let unloadMessage =
-            switch (newSelf.state.editorContentStatus) {
-            | Ec_Saved
-            | Ec_Pristine => None
-            | _ => Some("Changes you made may not be saved")
-            };
-          Router.Unload.register(unloadMessage);
           /* This execute the code after save */
           if (newSelf.state.editorContentStatus == Ec_Saved) {
             newSelf.send(Execute);
           };
         },
-      didMount: ({onUnmount}) => onUnmount(Router.Unload.unregister),
+      didMount: self => {
+        let unloadHandler = (message, self) => {
+          message :=
+            (
+              switch (self.ReasonReact.state.editorContentStatus) {
+              | Ec_Saved
+              | Ec_Pristine => None
+              | _ => Some("Changes you made may not be saved")
+              }
+            );
+          ();
+        };
+        Router.Unload.register(self.handle(unloadHandler));
+        self.onUnmount(Router.Unload.unregister);
+      },
       reducer: (action, state) =>
         switch (action) {
         | TitleUpdate(title) =>
