@@ -17,6 +17,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Fixed
 
-- Can't navigate between forks
+- Can't navigate between forks.
   This is due to the component doesn't react to props changes (uncontrolled component)
   ([#148](https://github.com/Sketch-sh/sketch-sh/pull/148) - @thangngoc89)
+- Refmt restore deleted block when called
+  ([#169](https://github.com/Sketch-sh/sketch-sh/pull/169) - @thangngoc89)
