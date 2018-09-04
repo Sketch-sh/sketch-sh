@@ -11,24 +11,25 @@ module Editor_Note = {
     noteState,
     lang,
     title: string,
-    blocks: ref(array(Block.block)),
     editorContentStatus,
     executeCallback: option(unit => unit),
     noteOwnerId: id,
     noteLastEdited: option(Js.Json.t),
     forkStatus,
     isExecuting: bool,
+    blockCallback: ref(option(unit => array(Block.block))),
   };
 
   type action =
     | TitleUpdate(string)
-    | BlockUpdate(array(Block.block))
+    | BlockUpdate
     | RegisterExecuteCallback(unit => unit)
     | UpdateNoteSaveStatus(saveStatus)
     | UpdateForkStatus(forkStatus)
     | Execute
     | ChangeLang(lang)
-    | IsExecuting(bool);
+    | IsExecuting(bool)
+    | SetBlockCallback(unit => array(Block.block));
 
   let component = ReasonReact.reducerComponent("Editor_Page");
 
@@ -54,12 +55,12 @@ module Editor_Note = {
       lang: initialLang,
       title: initialTitle,
       editorContentStatus: Ec_Pristine,
-      blocks: ref(initialBlocks),
       executeCallback: None,
       noteOwnerId: initialNoteOwnerId,
       noteLastEdited: initialNoteLastEdited,
       forkStatus: ForkStatus_Initial,
       isExecuting: false,
+      blockCallback: ref(None),
     };
     {
       ...component,
@@ -103,9 +104,8 @@ module Editor_Note = {
                 }
             ),
           )
-        | BlockUpdate(blocks) =>
-          state.blocks := blocks;
-          ReasonReact.Update({...state, editorContentStatus: Ec_Dirty});
+        | BlockUpdate =>
+          ReasonReact.Update({...state, editorContentStatus: Ec_Dirty})
         | ChangeLang(lang) =>
           let refmtNotificationKey = "rtop:refmt-acknowledge";
           Dom.Storage.(
@@ -172,9 +172,20 @@ module Editor_Note = {
           }
         | IsExecuting(isExecuting) =>
           ReasonReact.Update({...state, isExecuting})
+        | SetBlockCallback(cb) =>
+          state.blockCallback := Some(cb);
+          ReasonReact.NoUpdate;
         },
       render: ({state, send}) => {
         let {editorContentStatus, lang} = state;
+        let getCurrentData = () => {
+          let blocks =
+            switch (state.blockCallback^) {
+            | None => initialBlocks
+            | Some(cb) => cb()
+            };
+          (state.title, Editor_Json.V1.encode(state.lang, blocks));
+        };
         <>
           <UI_Topbar.Actions>
             ...(
@@ -215,12 +226,7 @@ module Editor_Note = {
                        updateSaveStatus=(
                          saveStatus => saveStatus->UpdateNoteSaveStatus->send
                        )
-                       getCurrentData=(
-                         () => (
-                           state.title,
-                           Editor_Json.V1.encode(state.lang, state.blocks^),
-                         )
-                       )
+                       getCurrentData
                        registerShortcut
                        className=buttonClassName
                      />
@@ -231,12 +237,7 @@ module Editor_Note = {
                        updateForkStatus=(
                          forkStatus => forkStatus->UpdateForkStatus->send
                        )
-                       getCurrentData=(
-                         () => (
-                           state.title,
-                           Editor_Json.V1.encode(state.lang, state.blocks^),
-                         )
-                       )
+                       getCurrentData
                        className=buttonClassName
                        forkStatus=state.forkStatus
                      />
@@ -324,12 +325,15 @@ module Editor_Note = {
             <Editor_Blocks
               key=state.noteId
               lang
-              blocks=state.blocks^
+              blocks=initialBlocks
               registerExecuteCallback=(
                 callback => send(RegisterExecuteCallback(callback))
               )
+              registerGetBlocksCallback=(
+                callback => send(SetBlockCallback(callback))
+              )
               registerShortcut
-              onUpdate=(blocks => send(BlockUpdate(blocks)))
+              onUpdate=(() => send(BlockUpdate))
               onExecute=(isExecuting => send(IsExecuting(isExecuting)))
             />
           </main>

@@ -34,9 +34,10 @@ let make:
     ~lang: lang=?,
     ~blocks: array(Block.block),
     ~readOnly: bool=?,
-    ~onUpdate: array(Block.block) => unit,
+    ~onUpdate: unit => unit,
     ~onExecute: bool => 'a,
     ~registerExecuteCallback: (unit => unit) => unit=?,
+    ~registerGetBlocksCallback: (unit => array(Block.block)) => unit,
     ~registerShortcut: Shortcut.subscribeFun=?,
     React.childless
   ) =>

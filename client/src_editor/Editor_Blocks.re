@@ -603,6 +603,7 @@ let make =
       ~onUpdate,
       ~onExecute,
       ~registerExecuteCallback=?,
+      ~registerGetBlocksCallback,
       ~registerShortcut: option(Shortcut.subscribeFun)=?,
       _children: React.childless,
     ) => {
@@ -625,6 +626,9 @@ let make =
       },
     didMount: self => {
       self.send(Block_Execute(false, BTyp_Code));
+      registerGetBlocksCallback(
+        handleWithReturn(self, (self, ()) => self.ReasonReact.state.blocks),
+      );
       switch (registerExecuteCallback) {
       | None => ()
       | Some(register) =>
@@ -713,7 +717,7 @@ let make =
           | Block_Add(_, _)
           | Block_DeleteQueued(_)
           | Block_Restore(_)
-          | Block_UpdateValue(_, _, _) => onUpdate(newSelf.state.blocks)
+          | Block_UpdateValue(_, _, _) => onUpdate()
           };
 
           switch (action) {

@@ -22,6 +22,17 @@ let arrayFirst = (array, ~empty, ~render) =>
     warn2("This array contains more than 1 element", array);
     render(array[0]);
   };
+let handleWithReturn = (self, fn, thing) => {
+  let return = ref(None);
+  self.ReasonReact.handle(
+    (thing, self) => return := Some(fn(self, thing)),
+    thing,
+  );
+  switch (return^) {
+  | Some(return) => return
+  | None => failwith("handleWithReturn failed to get a valid return value")
+  };
+};
 
 /*
  Tap log: Log and return the value
