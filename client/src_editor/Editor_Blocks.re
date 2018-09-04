@@ -83,6 +83,43 @@ module Actions = {
         ),
       )
     };
+  let focusUp = (action, state, blockId) => {
+    let blockIndex =
+      state.blocks->arrayFindIndex(({b_id}) => blockId == b_id);
+    switch (blockIndex) {
+    | None
+    | Some(0) => ReasonReact.NoUpdate
+    | Some(index) =>
+      let upperBlockIndex = index - 1;
+      let {b_data, b_id} =
+        state.blocks->Belt.Array.getUnsafe(upperBlockIndex);
+      let blockTyp = blockDataToBlockTyp(b_data);
+      ReasonReact.Update({
+        ...state,
+        stateUpdateReason: Some(action),
+        focusedBlock: Some((b_id, blockTyp, FcTyp_BlockFocusUp)),
+      });
+    };
+  };
+  let focusDown = (action, state, blockId) => {
+    let length = state.blocks->Belt.Array.length;
+    let blockIndex =
+      state.blocks->arrayFindIndex(({b_id}) => blockId == b_id);
+    switch (blockIndex) {
+    | None => ReasonReact.NoUpdate
+    | Some(blockIndex) when blockIndex == length - 1 => ReasonReact.NoUpdate
+    | Some(index) =>
+      let lowerBlockIndex = index + 1;
+      let {b_data, b_id} =
+        state.blocks->Belt.Array.getUnsafe(lowerBlockIndex);
+      let blockTyp = blockDataToBlockTyp(b_data);
+      ReasonReact.Update({
+        ...state,
+        stateUpdateReason: Some(action),
+        focusedBlock: Some((b_id, blockTyp, FcTyp_BlockFocusDown)),
+      });
+    };
+  };
 };
 
 let blockControlsButtons = (blockId, isDeleted, send) =>
@@ -699,64 +736,8 @@ let make =
               )
             ->syncLineNumber,
         });
-      | Block_FocusUp(blockId) =>
-        let upperBlock = {
-          let rec loop = i =>
-            if (i >= 0) {
-              let {b_id} = state.blocks[i];
-              if (b_id == blockId && i != 0) {
-                let {b_id, b_data} = state.blocks[(i - 1)];
-                switch (b_data) {
-                | B_Code(_) => Some((b_id, BTyp_Code))
-                | B_Text(_) => Some((b_id, BTyp_Text))
-                };
-              } else {
-                loop(i - 1);
-              };
-            } else {
-              None;
-            };
-          loop(state.blocks->Belt.Array.length - 1);
-        };
-        switch (upperBlock) {
-        | None => ReasonReact.NoUpdate
-        | Some((upperBlockId, blockTyp)) =>
-          ReasonReact.Update({
-            ...state,
-            stateUpdateReason: Some(action),
-            focusedBlock: Some((upperBlockId, blockTyp, FcTyp_BlockFocusUp)),
-          })
-        };
-      | Block_FocusDown(blockId) =>
-        let lowerBlock = {
-          let length = state.blocks->Belt.Array.length;
-          let rec loop = i =>
-            if (i < length) {
-              let {b_id} = state.blocks[i];
-              if (b_id == blockId && i != length - 1) {
-                let {b_id, b_data} = state.blocks[(i + 1)];
-                switch (b_data) {
-                | B_Code(_) => Some((b_id, BTyp_Code))
-                | B_Text(_) => Some((b_id, BTyp_Text))
-                };
-              } else {
-                loop(i + 1);
-              };
-            } else {
-              None;
-            };
-          loop(0);
-        };
-        switch (lowerBlock) {
-        | None => ReasonReact.NoUpdate
-        | Some((lowerBlockId, blockTyp)) =>
-          ReasonReact.Update({
-            ...state,
-            stateUpdateReason: Some(action),
-            focusedBlock:
-              Some((lowerBlockId, blockTyp, FcTyp_BlockFocusDown)),
-          })
-        };
+      | Block_FocusUp(blockId) => Actions.focusUp(action, state, blockId)
+      | Block_FocusDown(blockId) => Actions.focusDown(action, state, blockId)
       },
     render: ({send, state}) =>
       <>

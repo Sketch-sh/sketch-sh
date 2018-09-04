@@ -28,7 +28,6 @@ let renderErrorIndicator = (colStart, colEnd, content) =>
 
 let executeResultToWidget = (result: list(Worker_Types.blockData)) => {
   open Worker_Types;
-  open Editor_Types;
   let clampLineNumber = line => max(0, line);
 
   let widgets =
