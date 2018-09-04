@@ -14,18 +14,20 @@ let make = (~blocks=defaultBlocks, ~title=?, ~lang, ~links=[||], _children) => {
   ...component,
   render: _self =>
     <AuthStatus.IsAuthenticated>
-      ...{
+      ...(
            user => {
              let userId =
                switch (user) {
                | Anonymous => Config.anonymousUserId
                | Login(userId) => userId
                };
+             let noteId = Utils.generateId();
              <Editor_Note
+               key=noteId
                hasSavePermission=true
                noteOwnerId=userId
                noteLastEdited=None
-               noteId={Utils.generateId()}
+               noteId
                noteState=NoteState_New
                blocks
                lang
@@ -33,6 +35,6 @@ let make = (~blocks=defaultBlocks, ~title=?, ~lang, ~links=[||], _children) => {
                links
              />;
            }
-         }
+         )
     </AuthStatus.IsAuthenticated>,
 };

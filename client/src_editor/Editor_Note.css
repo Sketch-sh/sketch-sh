@@ -120,3 +120,24 @@
 .EditorNote__linkMenu--open {
   color: var(--topbar-c-primary);
 }
+
+.EditorNote__linkMenu {
+  padding: 0 var(--space3);
+  color: var(--c-text-sub2);
+
+  background: none;
+  border: 0;
+  outline: none;
+  font-weight: 700;
+  transition: color 250ms ease;
+  cursor: pointer;
+  font-size: var(--f5);
+
+  & :hover {
+    color: var(--topbar-c-primary);
+  }
+}
+
+.EditorNote__linkMenu--open {
+  color: var(--topbar-c-primary);
+}

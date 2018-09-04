@@ -12,7 +12,7 @@ module Editor_Note = {
     lang,
     title: string,
     isLinkMenuOpen: bool,
-    links: ref(array(Link.link)),
+    links: array(Link.link),
     blocks: ref(array(Block.block)),
     editorContentStatus,
     executeCallback: option(unit => unit),
@@ -60,7 +60,7 @@ module Editor_Note = {
       title: initialTitle,
       editorContentStatus: Ec_Pristine,
       isLinkMenuOpen: false,
-      links: ref(initialLinks),
+      links: initialLinks,
       blocks: ref(initialBlocks),
       executeCallback: None,
       noteOwnerId: initialNoteOwnerId,
@@ -71,28 +71,29 @@ module Editor_Note = {
     {
       ...component,
       initialState: makeInitialState,
-      willReceiveProps: self =>
-        if (self.state.noteId != initialNoteId) {
-          makeInitialState();
-        } else {
-          self.state;
-        },
       didUpdate: ({oldSelf, newSelf}) =>
         if (newSelf.state.editorContentStatus
             != oldSelf.state.editorContentStatus) {
-          let unloadMessage =
-            switch (newSelf.state.editorContentStatus) {
-            | Ec_Saved
-            | Ec_Pristine => None
-            | _ => Some("Changes you made may not be saved")
-            };
-          Router.Unload.register(unloadMessage);
           /* This execute the code after save */
           if (newSelf.state.editorContentStatus == Ec_Saved) {
             newSelf.send(Execute);
           };
         },
-      didMount: ({onUnmount}) => onUnmount(Router.Unload.unregister),
+      didMount: self => {
+        let unloadHandler = (message, self) => {
+          message :=
+            (
+              switch (self.ReasonReact.state.editorContentStatus) {
+              | Ec_Saved
+              | Ec_Pristine => None
+              | _ => Some("Changes you made may not be saved")
+              }
+            );
+          ();
+        };
+        Router.Unload.register(self.handle(unloadHandler));
+        self.onUnmount(Router.Unload.unregister);
+      },
       reducer: (action, state) =>
         switch (action) {
         | TitleUpdate(title) =>
@@ -115,8 +116,7 @@ module Editor_Note = {
             isLinkMenuOpen: !state.isLinkMenuOpen,
           })
         | LinkUpdate(links) =>
-          state.links := links;
-          ReasonReact.Update({...state, editorContentStatus: Ec_Dirty});
+          ReasonReact.Update({...state, links, editorContentStatus: Ec_Dirty})
         | BlockUpdate(blocks) =>
           state.blocks := blocks;
           ReasonReact.Update({...state, editorContentStatus: Ec_Dirty});
@@ -142,7 +142,7 @@ module Editor_Note = {
           | (Ec_Dirty, SaveStatus_Done({lastEdited: _})) =>
             ReasonReact.Update({...state, editorContentStatus: Ec_Dirty})
           | (_, SaveStatus_Done({lastEdited})) =>
-            Notify.info("Saved successfully", ~sticky=false);
+            Notify.success("Saved successfully", ~sticky=false);
             ReasonReact.UpdateWithSideEffects(
               {
                 ...state,
@@ -164,7 +164,7 @@ module Editor_Note = {
         | UpdateForkStatus(forkStatus) =>
           switch (forkStatus) {
           | ForkStatus_Done({newId, forkFrom, lastEdited, owner}) =>
-            Notify.info("Forked successfully", ~sticky=false);
+            Notify.success("Forked successfully", ~sticky=false);
             ReasonReact.UpdateWithSideEffects(
               {
                 ...state,
@@ -234,7 +234,7 @@ module Editor_Note = {
                            state.title,
                            Editor_Json.V1.encode(
                              state.lang,
-                             state.links^,
+                             state.links,
                              state.blocks^,
                            ),
                          )
@@ -254,7 +254,7 @@ module Editor_Note = {
                            state.title,
                            Editor_Json.V1.encode(
                              state.lang,
-                             state.links^,
+                             state.links,
                              state.blocks^,
                            ),
                          )
@@ -360,9 +360,9 @@ module Editor_Note = {
               state.isLinkMenuOpen ?
                 <Editor_Links
                   key=(
-                    state.noteId ++ string_of_int(Array.length(state.links^))
+                    state.noteId ++ string_of_int(Array.length(state.links))
                   )
-                  links=state.links^
+                  links=state.links
                   onUpdate=(links => send(LinkUpdate(links)))
                 /> :
                 ReasonReact.null
@@ -371,7 +371,7 @@ module Editor_Note = {
               key=state.noteId
               lang
               blocks=state.blocks^
-              links=state.links^
+              links=state.links
               registerExecuteCallback=(
                 callback => send(RegisterExecuteCallback(callback))
               )

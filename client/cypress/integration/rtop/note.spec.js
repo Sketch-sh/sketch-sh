@@ -36,7 +36,7 @@ context("keyboard shortcuts", () => {
     cy.get("textarea")
       .first()
       .type("let a: string = 1;", {
-        force: true
+        force: true,
       });
     shortcut("{ctrl}s");
 
@@ -60,7 +60,7 @@ context("keyboard shortcuts", () => {
       .find("textarea")
       .as("block1")
       .type("let a = 1;", {
-        force: true
+        force: true,
       });
 
     shortcut("{shift}{enter}");
@@ -72,7 +72,7 @@ context("keyboard shortcuts", () => {
       .find("textarea")
       .as("block2")
       .type("print_int(a);", {
-        force: true
+        force: true,
       });
 
     shortcut("{shift}{enter}");
@@ -115,7 +115,7 @@ context("keyboard shortcuts", () => {
       .find("textarea")
       .as("block1")
       .type("let a = 1;", {
-        force: true
+        force: true,
       });
 
     shortcut("{shift}{ctrl}{enter}");
@@ -132,7 +132,7 @@ context("keyboard shortcuts", () => {
       .first()
       .find("textarea")
       .type("this thing is working", {
-        force: true
+        force: true,
       });
 
     shortcut("{shift}{ctrl}{enter}");
@@ -153,7 +153,6 @@ context("keyboard shortcuts", () => {
     shortcut("{shift}{ctrl}{enter}");
     assertCodeBlocks(2);
     assertTextBlocks(4);
-
   });
 
   it("ctrl+enter should execute without creating new block", () => {
@@ -164,7 +163,7 @@ context("keyboard shortcuts", () => {
       .find("textarea")
       .as("block1")
       .type("let a: string = 1;", {
-        force: true
+        force: true,
       });
     assertErrorsOrWarnings(0);
 
@@ -173,10 +172,10 @@ context("keyboard shortcuts", () => {
 
     cy.get("@block1")
       .clear({
-        force: true
+        force: true,
       })
       .type("let a = 1;", {
-        force: true
+        force: true,
       });
     assertErrorsOrWarnings(0);
 
@@ -186,176 +185,6 @@ context("keyboard shortcuts", () => {
     cy.get("@block1")
       .get(".widget__value")
       .should("contain", "let a: int = 1;");
-  });
-});
-
-context("Block controls", () => {
-  it("should be able to add new code block", () => {
-    cy.visit("new/reason");
-    assertBlocks(1);
-    assertCodeBlocks(1);
-    assertTextBlocks(0);
-
-    cy.get(".block__container")
-      .first()
-      .find(`button[aria-label="Add code block"]`)
-      .click();
-
-    assertCodeBlocks(2);
-    assertTextBlocks(0);
-
-    cy.get(".block__container")
-      .eq(1)
-      .find(`button[aria-label="Add code block"]`)
-      .click();
-
-    assertCodeBlocks(3);
-    assertTextBlocks(0);
-  });
-  it("should be able to add new text block", () => {
-    cy.visit("new/reason");
-    assertBlocks(1);
-    assertCodeBlocks(1);
-
-    cy.get(".block__container")
-      .first()
-      .find(`button[aria-label="Add text block"]`)
-      .click();
-
-    assertCodeBlocks(1);
-    assertTextBlocks(1);
-
-    cy.get(".block__container")
-      .eq(1)
-      .find(`button[aria-label="Add code block"]`)
-      .click();
-
-    assertCodeBlocks(2);
-    assertTextBlocks(1);
-  });
-  context("Block delete and restore", () => {
-    it("delete block -> timeout 10 seconds -> delete permantely", () => {
-      cy.visit("new/reason");
-      shortcut("{shift}{enter}");
-      shortcut("{shift}{enter}");
-      shortcut("{shift}{enter}");
-      shortcut("{shift}{enter}");
-      shortcut("{shift}{enter}");
-
-      assertCodeBlocks(6);
-
-      cy.get(".block__container")
-        .eq(1)
-        .find(`button[aria-label="Delete block"]`)
-        .click();
-
-      assertCodeBlocks(5);
-      cy.get(".block__container")
-        .eq(1)
-        .find(".block__deleted", {
-          timeout: 10000
-        })
-        .should("not.exist");
-    });
-    it("have restore button in toolbar as well", () => {
-      cy.visit("new/reason");
-      shortcut("{shift}{enter}");
-      shortcut("{shift}{enter}");
-
-      assertCodeBlocks(3);
-
-      cy.get(".block__container")
-        .eq(1)
-        .find(".block__controls")
-        .find(`button[aria-label="Delete block"]`)
-        .click();
-      assertCodeBlocks(2);
-
-      cy.get(".block__container")
-        .eq(1)
-        .find(".block__controls")
-        .find(`button[aria-label="Delete block"]`)
-        .should("not.exist");
-
-      cy.get(".block__container")
-        .eq(1)
-        .find(".block__controls")
-        .find(`button[aria-label="Restore block"]`)
-        .click();
-      assertCodeBlocks(3);
-    });
-    it("can restore temporaty deleted block", () => {
-      cy.visit("new/reason");
-      shortcut("{shift}{enter}");
-      shortcut("{shift}{enter}");
-      shortcut("{shift}{enter}");
-      shortcut("{shift}{enter}");
-      shortcut("{shift}{enter}");
-
-      assertCodeBlocks(6);
-
-      cy.get(".block__container")
-        .eq(1)
-        .find(`button[aria-label="Delete block"]`)
-        .click();
-      assertCodeBlocks(5);
-
-      cy.get(".block__container")
-        .eq(1)
-        .find(".block__deleted")
-        .find(`button[aria-label="Restore block"]`)
-        .click();
-      assertCodeBlocks(6);
-    });
-    it("remove temporary deleted block from execution", () => {
-      cy.visit("new/reason");
-      cy.get(".block__container")
-        .eq(0)
-        .as("block1")
-        .find("textarea")
-        .as("code1")
-        .type("let a = 1;", {
-          force: true
-        });
-      shortcut("{shift}{enter}");
-      assertCodeBlocks(2);
-      cy.get(".block__container")
-        .eq(1)
-        .as("block2")
-        .find("textarea")
-        .as("code2")
-        .type("print_int(a);", {
-          force: true
-        });
-      shortcut("{ctrl}{enter}");
-      assertValue(2);
-
-      cy.get("@block1")
-        .find(`button[aria-label="Delete block"]`)
-        .click();
-      assertCodeBlocks(1);
-      shortcut("{ctrl}{enter}");
-
-      assertValue(0);
-      assertErrorsOrWarnings(1);
-    });
-
-    it("sync line number when temporary block shows up", () => {
-      cy.visit("new/reason");
-      shortcut("{shift}{enter}");
-      shortcut("{shift}{enter}");
-      assertCodeBlocks(3);
-
-      cy.get(".block__container")
-        .eq(1)
-        .find(`button[aria-label="Delete block"]`)
-        .click();
-      assertCodeBlocks(2);
-
-      cy.window().then(win => {
-        expect(win.editor.getOption("firstLineNumber")).to.equal(2);
-      });
-    });
   });
 });
 
@@ -376,7 +205,7 @@ context("Edge cases", () => {
       .find("textarea")
       .as("block1")
       .type("let a = 1;", {
-        force: true
+        force: true,
       });
 
     cy.get("@title")
@@ -396,7 +225,7 @@ context("Edge cases", () => {
       .find("textarea")
       .as("block1")
       .type("let x = 1; let y = 2; let z = 3;", {
-        force: true
+        force: true,
       });
     shortcut("{ctrl}{enter}");
     assertValue(3);
@@ -421,7 +250,7 @@ context("Edge cases", () => {
       .find("textarea")
       .as("block1")
       .type(content, {
-        force: true
+        force: true,
       });
     shortcut("{ctrl}s");
 
@@ -435,7 +264,7 @@ context("Edge cases", () => {
       expect(win.editor.getValue()).to.equal(content);
     });
     cy.get("@block1").type("{ctrl}z", {
-      force: true
+      force: true,
     });
     cy.window().then(win => {
       expect(win.editor.getValue()).to.equal(content);

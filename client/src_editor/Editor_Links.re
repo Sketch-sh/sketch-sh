@@ -1,3 +1,4 @@
+[%%debugger.chrome];
 Modules.require("./Editor_Links.css");
 
 module GetLink = [%graphql
@@ -32,7 +33,7 @@ type action =
   | Link_Delete(Link.link);
 
 type state = {
-  links: array(Link.link),
+  /* links: array(Link.link), */
   fetchingLink: option((string, string)),
 };
 
@@ -72,7 +73,9 @@ module EmptyLink = {
     didMount: _ =>
       switch (onFetched) {
       | None => ()
-      | Some(f) => f()
+      | Some(f) =>
+        Log.green(~label="Empty Link", "calll onFetched");
+        f();
       },
     reducer: (action, state) =>
       switch (action) {
@@ -114,8 +117,10 @@ let component = ReasonReact.reducerComponent("Editor_Links");
 
 let make = (~links, ~onUpdate, _children) => {
   ...component,
-  initialState: () => {links, fetchingLink: None},
-  reducer: (action: action, state: state) =>
+  initialState: () => {fetchingLink: None},
+  reducer: (action: action, state: state) => {
+    Log.blue(~label="Editor_Links", action);
+    Js.log(action);
     switch (action) {
     | Link_Add((name, id)) =>
       ReasonReact.Update({...state, fetchingLink: Some((name, id))})
@@ -149,7 +154,8 @@ let make = (~links, ~onUpdate, _children) => {
         ),
       )
     | _ => ReasonReact.NoUpdate
-    },
+    };
+  },
   render: ({send, state}) => {
     let existingLinks =
       links
@@ -188,6 +194,7 @@ let make = (~links, ~onUpdate, _children) => {
                    switch (result) {
                    | Loading =>
                      <EmptyLink
+                       key="loading"
                        status=Loading
                        id
                        name
@@ -195,6 +202,7 @@ let make = (~links, ~onUpdate, _children) => {
                      />
                    | Error(_error) =>
                      <EmptyLink
+                       key="error"
                        status=Error
                        id
                        name
@@ -223,6 +231,7 @@ let make = (~links, ~onUpdate, _children) => {
                        });
 
                      <EmptyLink
+                       key="fetched"
                        status=Fetched
                        id
                        name

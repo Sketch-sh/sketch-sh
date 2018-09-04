@@ -187,9 +187,9 @@ module Package = {
     );
 };
 
-module Link = {
+module Play = {
   [@bs.module "react-icons/fi"]
-  external reactClass: ReasonReact.reactClass = "FiLink";
+  external reactClass: ReasonReact.reactClass = "FiPlay";
 
   let make = (~className="", children) =>
     ReasonReact.wrapJsForReason(
@@ -199,9 +199,9 @@ module Link = {
     );
 };
 
-module Play = {
+module Link = {
   [@bs.module "react-icons/fi"]
-  external reactClass: ReasonReact.reactClass = "FiPlay";
+  external reactClass: ReasonReact.reactClass = "FiLink";
 
   let make = (~className="", children) =>
     ReasonReact.wrapJsForReason(

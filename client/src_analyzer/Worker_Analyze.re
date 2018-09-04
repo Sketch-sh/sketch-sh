@@ -87,6 +87,7 @@ module Make = (ESig: Worker_Evaluator.EvaluatorSig) => {
     (Editor_Types.lang, list(blockInput)) => list(Toplevel.Types.blockResult) =
     (lang, codeBlocks) => {
       /* Reset before evaluating several blocks */
+      /* Evaluator.reset(); */
 
       switch (lang) {
       | ML => Evaluator.mlSyntax()
@@ -117,9 +118,7 @@ module Make = (ESig: Worker_Evaluator.EvaluatorSig) => {
       | ML => mlSyntax()
       | RE => reSyntax()
       };
-
       let lang = lang->langToString->String.lowercase;
-
       let js_linkResult = insertModule(. name, code, lang);
       Belt.Result.(
         switch (js_linkResult->LinkResult.kindGet) {
@@ -129,15 +128,12 @@ module Make = (ESig: Worker_Evaluator.EvaluatorSig) => {
         }
       );
     };
-
   exception Not_Implemented;
-
   let linkMany: (. list(Link.link)) => list((Link.link, linkResult)) =
     (. links) => {
       /* Reset before evaluating several blocks */
       Evaluator.reset();
       open Link;
-
       let rec loop = (links, acc) =>
         switch (links) {
         | [] => acc
@@ -147,13 +143,10 @@ module Make = (ESig: Worker_Evaluator.EvaluatorSig) => {
             | Internal(internalLink) =>
               let {lang, name, code} = internalLink;
               let result = link(. lang, name, code);
-
               (singleLink, result);
             | External(_) => raise(Not_Implemented)
             };
-
           let hasError = Belt.Result.isError(result);
-
           hasError ?
             [(name, result), ...acc] :
             loop(rest, [(name, result), ...acc]);
