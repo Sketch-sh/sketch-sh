@@ -4,20 +4,21 @@
  */
 
 module Unload = {
-  type callback = option(unit => unit);
+  type message = ref(option(string));
+  let message: message = ref(None);
 
-  let message: ref(option(string)) = ref(None);
+  type callback = option(message => unit);
   let cb: ref(callback) = ref(None);
 
   let unregister = () => {
     cb := None;
+    message := None;
     ();
   };
 
   let setMessage = content => message := content;
-  let register = (callback: (ref(option(string)), unit) => unit) => {
-    /* cb := Some(callback(message)); */
-    cb := Some(callback(message));
+  let register = (callback: message => unit) => {
+    cb := Some(callback);
     ();
   };
 
@@ -41,7 +42,7 @@ module Unload = {
               switch (cb^) {
               | None => Js.Nullable.null
               | Some(cb) =>
-                cb();
+                cb(message);
                 switch (message^) {
                 | None => Js.Nullable.null
                 | Some(message) =>
@@ -55,20 +56,15 @@ module Unload = {
   };
 };
 
-let redirect: string => unit = [%bs.raw
-  {|
-  function (url) {
-    window.location.href = url;
-  }
-|}
-];
+let redirect: string => unit =
+  url => Webapi.Dom.(location->Location.setHref(url));
 
 let pushUnsafe = url => {
   let allowRouteTransition =
     switch (Unload.cb^) {
     | None => true
     | Some(cb) =>
-      cb();
+      cb(Unload.message);
       switch (Unload.message^) {
       | None => true
       | Some(message) => Webapi.Dom.(Window.confirm(message, window))

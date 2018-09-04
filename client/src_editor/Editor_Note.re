@@ -79,20 +79,18 @@ module Editor_Note = {
           };
         },
       didMount: self => {
-        let derivedMessageFromStatus =
-          fun
-          | Ec_Saved
-          | Ec_Pristine => None
-          | _ => Some("Changes you made may not be saved");
-        let unloadHandler: (ref(option(string)), unit) => unit =
-          (message, ()) => {
-            message :=
-              derivedMessageFromStatus(
-                self.ReasonReact.state.editorContentStatus,
-              );
-            ();
-          };
-        Router.Unload.register(unloadHandler);
+        let unloadHandler = (message, self) => {
+          message :=
+            (
+              switch (self.ReasonReact.state.editorContentStatus) {
+              | Ec_Saved
+              | Ec_Pristine => None
+              | _ => Some("Changes you made may not be saved")
+              }
+            );
+          ();
+        };
+        Router.Unload.register(self.handle(unloadHandler));
         self.onUnmount(Router.Unload.unregister);
       },
       reducer: (action, state) =>
