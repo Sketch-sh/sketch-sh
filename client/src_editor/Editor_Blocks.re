@@ -41,6 +41,48 @@ module Actions = {
       blocksCopy: None,
       stateUpdateReason: Some(action),
     });
+  let prettyPrint = (_action, state) =>
+    switch (state.lang) {
+    | ML =>
+      Notify.info("Prettify ML code is not currently supported");
+      ReasonReact.NoUpdate;
+    | RE =>
+      ReasonReact.SideEffects(
+        (
+          self => {
+            let id =
+              Toplevel_Consumer.refmt(
+                PrettyPrintRe,
+                self.state.blocks->codeBlockDataPairs,
+                fun
+                | Belt.Result.Error(error) => Notify.error(error)
+                | Belt.Result.Ok({hasError, result}) =>
+                  if (hasError) {
+                    /* TODO: Map syntax error to block position */
+                    Notify.error(
+                      "An error happens while formatting your code. It's usually a syntax error",
+                    );
+                  } else {
+                    let result =
+                      result
+                      ->Belt.List.reduce(
+                          [],
+                          (
+                            (acc, {refmt_id, refmt_value}) =>
+                              switch (refmt_value) {
+                              | Ok(code) => [(refmt_id, code), ...acc]
+                              | Error(_) => acc
+                              }
+                          ),
+                        );
+                    self.send(Block_MapRefmtToBlocks(result));
+                  },
+              );
+            self.onUnmount(() => Toplevel_Consumer.cancel(id));
+          }
+        ),
+      )
+    };
 };
 
 let blockControlsButtons = (blockId, isDeleted, send) =>
@@ -228,48 +270,7 @@ let make =
     reducer: (action, state) =>
       switch (action) {
       | Block_CleanBlocksCopy => Actions.cleanBlocksCopy(action, state)
-      | Block_PrettyPrint =>
-        switch (lang) {
-        | ML =>
-          Notify.info("Prettify ML code is not currently supported");
-          ReasonReact.NoUpdate;
-        | RE =>
-          ReasonReact.SideEffects(
-            (
-              self => {
-                let id =
-                  Toplevel_Consumer.refmt(
-                    PrettyPrintRe,
-                    self.state.blocks->codeBlockDataPairs,
-                    fun
-                    | Belt.Result.Error(error) => Notify.error(error)
-                    | Belt.Result.Ok({hasError, result}) =>
-                      if (hasError) {
-                        /* TODO: Map syntax error to block position */
-                        Notify.error(
-                          "An error happens while formatting your code. It's usually a syntax error",
-                        );
-                      } else {
-                        let result =
-                          result
-                          ->Belt.List.reduce(
-                              [],
-                              (
-                                (acc, {refmt_id, refmt_value}) =>
-                                  switch (refmt_value) {
-                                  | Ok(code) => [(refmt_id, code), ...acc]
-                                  | Error(_) => acc
-                                  }
-                              ),
-                            );
-                        self.send(Block_MapRefmtToBlocks(result));
-                      },
-                  );
-                self.onUnmount(() => Toplevel_Consumer.cancel(id));
-              }
-            ),
-          )
-        }
+      | Block_PrettyPrint => Actions.prettyPrint(action, state)
       | Block_ChangeLanguage =>
         switch (state.blocksCopy) {
         | None =>
