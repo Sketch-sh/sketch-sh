@@ -84,12 +84,6 @@ module Block = {
     b_deleted: bool,
   };
 
-  type deletedBlockMeta = {
-    db_id: id,
-    db_data: blockData,
-    to_id: Js.Global.timeoutId,
-  };
-
   type focusChangeType =
     | FcTyp_EditorFocus
     | FcTyp_BlockNew

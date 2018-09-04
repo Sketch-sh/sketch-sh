@@ -12,8 +12,8 @@ type action =
   | Block_FocusNextBlockOrCreate(blockTyp)
   | Block_QueueDelete(id)
   | Block_DeleteQueued(id)
+  | Block_CaptureQueuedMeta(id, Js.Global.timeoutId)
   | Block_Restore(id)
-  | Block_CaptureQueuedMeta(id, Js.Global.timeoutId, blockData)
   | Block_Focus(id, blockTyp)
   | Block_Blur(id)
   | Block_UpdateValue(id, string, CodeMirror.EditorChange.t)
@@ -29,7 +29,7 @@ type state = {
   lang,
   blocks: array(block),
   blocksCopy: option(array(block)),
-  deletedBlockMeta: array(deletedBlockMeta),
+  deletedBlockMeta: array((id, Js.Global.timeoutId)),
   stateUpdateReason: option(action),
   focusedBlock: option((id, blockTyp, focusChangeType)),
 };
@@ -187,7 +187,7 @@ let make =
           | Block_AddWidgets(_, _)
           | Block_FocusUp(_)
           | Block_FocusDown(_)
-          | Block_CaptureQueuedMeta(_, _, _)
+          | Block_CaptureQueuedMeta(_)
           | Block_QueueDelete(_)
           | Block_ChangeLanguage
           | Block_CleanBlocksCopy
@@ -513,7 +513,7 @@ let make =
               () => send(Block_DeleteQueued(blockId)),
               10000,
             );
-          send(Block_CaptureQueuedMeta(blockId, timeoutId, b_data));
+          send(Block_CaptureQueuedMeta(blockId, timeoutId));
           ();
         };
         if (isLastBlock(state.blocks)) {
@@ -566,7 +566,11 @@ let make =
             blocks: [|newBlock|],
             deletedBlockMeta:
               state.deletedBlockMeta
-              ->(Belt.Array.keepU((. {db_id}) => db_id != blockId)),
+              ->(
+                  Belt.Array.keepU((. (timeoutBlockId, _timeoutId)) =>
+                    timeoutBlockId != blockId
+                  )
+                ),
             stateUpdateReason: Some(action),
             focusedBlock: None,
           });
@@ -579,7 +583,11 @@ let make =
               ->syncLineNumber,
             deletedBlockMeta:
               state.deletedBlockMeta
-              ->(Belt.Array.keepU((. {db_id}) => db_id != blockId)),
+              ->(
+                  Belt.Array.keepU((. (timeoutBlockId, _timeoutId)) =>
+                    timeoutBlockId != blockId
+                  )
+                ),
             stateUpdateReason: Some(action),
             focusedBlock:
               switch (state.focusedBlock) {
@@ -590,44 +598,49 @@ let make =
           });
         }
       | Block_Restore(blockId) =>
-        let blockIndex = state.blocks->getBlockIndex(blockId);
-
-        let restoreMeta =
+        let timeoutId =
           state.deletedBlockMeta
-          ->Belt.Array.keepU(((. {db_id}) => db_id == blockId));
+          ->arrayFind(
+              (((timeBlockId, _timeoutId)) => timeBlockId == blockId),
+            );
+        switch (timeoutId) {
+        | None => ReasonReact.NoUpdate
+        | Some((_timeoutBlockId, timeoutId)) =>
+          ReasonReact.UpdateWithSideEffects(
+            {
+              ...state,
+              blocks:
+                state.blocks
+                ->(
+                    Belt.Array.mapU((. block) => {
+                      let {b_id} = block;
 
-        let restoredBlock = {
-          ...state.blocks[blockIndex],
-          b_deleted: false,
-          b_data: restoreMeta[0].db_data,
-        };
-
-        ReasonReact.UpdateWithSideEffects(
-          {
-            ...state,
-            blocks:
-              state.blocks
-              ->(
-                  Belt.Array.mapWithIndexU((. i, block) =>
-                    i == blockIndex ? restoredBlock : block
+                      b_id == blockId ? {...block, b_deleted: false} : block;
+                    })
                   )
-                )
-              ->syncLineNumber,
-            deletedBlockMeta:
-              state.deletedBlockMeta
-              ->(Belt.Array.keepU((. {db_id}) => db_id != blockId)),
-            stateUpdateReason: Some(action),
-          },
-          (_self => Js.Global.clearTimeout(restoreMeta[0].to_id)),
-        );
-      | Block_CaptureQueuedMeta(blockId, timeoutId, data) =>
-        let meta = {db_id: blockId, to_id: timeoutId, db_data: data};
+                ->syncLineNumber,
+              deletedBlockMeta:
+                state.deletedBlockMeta
+                ->(
+                    Belt.Array.keepU((. (timeBlockId, _timeoutId)) =>
+                      timeBlockId != blockId
+                    )
+                  ),
+              stateUpdateReason: Some(action),
+            },
+            (_self => Js.Global.clearTimeout(timeoutId)),
+          )
+        };
+      | Block_CaptureQueuedMeta(blockId, timeoutId) =>
         ReasonReact.Update({
           ...state,
           deletedBlockMeta:
-            Belt.Array.concat(state.deletedBlockMeta, [|meta|]),
+            Belt.Array.concat(
+              state.deletedBlockMeta,
+              [|(blockId, timeoutId)|],
+            ),
           stateUpdateReason: Some(action),
-        });
+        })
       | Block_Focus(blockId, blockTyp) =>
         ReasonReact.Update({
           ...state,
