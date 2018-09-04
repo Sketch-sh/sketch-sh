@@ -6,7 +6,6 @@ type action =
   | Block_FocusNextBlockOrCreate(Block.blockTyp)
   | Block_QueueDelete(id)
   | Block_DeleteQueued(id)
-  | Block_CaptureQueuedMeta(id, Js.Global.timeoutId)
   | Block_Restore(id)
   | Block_Focus(id, Block.blockTyp)
   | Block_Blur(id)
@@ -19,11 +18,13 @@ type action =
   | Block_CleanBlocksCopy
   | Block_MapRefmtToBlocks(list((id, string)));
 
+module TimeoutMap = Belt.Map.String;
+
 type state = {
   lang,
   blocks: array(Block.block),
   blocksCopy: option(array(Block.block)),
-  deletedBlockMeta: array((id, Js.Global.timeoutId)),
+  deletedBlockMeta: ref(TimeoutMap.t(Js.Global.timeoutId)),
   stateUpdateReason: option(action),
   focusedBlock: option((id, Block.blockTyp, Block.focusChangeType)),
 };
