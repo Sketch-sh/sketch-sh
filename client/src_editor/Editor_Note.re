@@ -11,6 +11,7 @@ module Editor_Note = {
     noteState,
     lang,
     title: string,
+    isLinkMenuOpen: bool,
     links: ref(array(Link.link)),
     blocks: ref(array(Block.block)),
     editorContentStatus,
@@ -23,6 +24,7 @@ module Editor_Note = {
 
   type action =
     | TitleUpdate(string)
+    | ToggleLinkMenu
     | LinkUpdate(array(Link.link))
     | BlockUpdate(array(Block.block))
     | RegisterExecuteCallback(unit => unit)
@@ -57,6 +59,7 @@ module Editor_Note = {
       lang: initialLang,
       title: initialTitle,
       editorContentStatus: Ec_Pristine,
+      isLinkMenuOpen: false,
       links: ref(initialLinks),
       blocks: ref(initialBlocks),
       executeCallback: None,
@@ -106,6 +109,11 @@ module Editor_Note = {
                 }
             ),
           )
+        | ToggleLinkMenu =>
+          ReasonReact.Update({
+            ...state,
+            isLinkMenuOpen: !state.isLinkMenuOpen,
+          })
         | LinkUpdate(links) =>
           state.links := links;
           ReasonReact.Update({...state, editorContentStatus: Ec_Dirty});
@@ -318,6 +326,19 @@ module Editor_Note = {
                          />
                      )
                 </Editor_Note_GetUserInfo>
+                <UI_Balloon position=Down message="Link sketches">
+                  ...<button
+                       className=(
+                         ClassNames.make([
+                           "EditorNote__linkMenu",
+                           state.isLinkMenuOpen
+                           ->ClassNames.ifTrue("EditorNote__linkMenu--open"),
+                         ])
+                       )
+                       onClick=(_ => send(ToggleLinkMenu))>
+                       <Fi.Link />
+                     </button>
+                </UI_Balloon>
               </div>
               (
                 state.forkFrom
@@ -335,11 +356,17 @@ module Editor_Note = {
                 )
               )
             </div>
-            <Editor_Links
-              key=(state.noteId ++ string_of_int(Array.length(state.links^)))
-              links=state.links^
-              onUpdate=(links => send(LinkUpdate(links)))
-            />
+            (
+              state.isLinkMenuOpen ?
+                <Editor_Links
+                  key=(
+                    state.noteId ++ string_of_int(Array.length(state.links^))
+                  )
+                  links=state.links^
+                  onUpdate=(links => send(LinkUpdate(links)))
+                /> :
+                ReasonReact.null
+            )
             <Editor_Blocks
               key=state.noteId
               lang
