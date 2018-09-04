@@ -10,16 +10,14 @@ module Unload = {
   type callback = option(message => unit);
   let cb: ref(callback) = ref(None);
 
-  let unregister = () => {
-    cb := None;
-    message := None;
+  let register = (callback: message => unit) => {
+    cb := Some(callback);
     ();
   };
 
-  let setMessage = content => message := content;
-
-  let register = (callback: message => unit) => {
-    cb := Some(callback);
+  let unregister = () => {
+    cb := None;
+    message := None;
     ();
   };
 
