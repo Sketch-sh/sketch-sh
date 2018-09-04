@@ -4,15 +4,19 @@
  */
 
 module Unload = {
-  let cb: ref(option(string)) = ref(None);
+  type callback = option(unit => option(string));
+
+  let message: ref(option(string)) = ref(None);
+  let cb: ref(callback) = ref(None);
 
   let unregister = () => {
     cb := None;
     ();
   };
 
-  let register = message => {
-    cb := message;
+  let setMessage = content => message := content;
+  let register = callback => {
+    cb := Some(callback(setMessage));
     ();
   };
 
@@ -35,9 +39,13 @@ module Unload = {
             (. event) =>
               switch (cb^) {
               | None => Js.Nullable.null
-              | Some(message) =>
-                event##returnValue #= message;
-                Js.Nullable.return(message);
+              | Some(cb) =>
+                switch (cb()) {
+                | None => Js.Nullable.null
+                | Some(message) =>
+                  event##returnValue #= message;
+                  Js.Nullable.return(message);
+                }
               },
           ),
       render: _self => React.null,
@@ -54,12 +62,16 @@ let redirect: string => unit = [%bs.raw
 ];
 
 let pushUnsafe = url => {
-  let result =
+  let allowRouteTransition =
     switch (Unload.cb^) {
     | None => true
-    | Some(message) => Webapi.Dom.(Window.confirm(message, window))
+    | Some(cb) =>
+      switch (cb()) {
+      | None => true
+      | Some(message) => Webapi.Dom.(Window.confirm(message, window))
+      }
     };
-  if (result) {
+  if (allowRouteTransition) {
     ReasonReact.Router.push(url);
   };
 };
