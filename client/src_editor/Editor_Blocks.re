@@ -561,14 +561,14 @@ let make =
             ->syncLineNumber,
         });
       | Block_QueueDelete(blockId) =>
-        let queueTimeout = send => {
+        let queueTimeout = self => {
           let timeoutId =
             Js.Global.setTimeout(
-              () => send(Block_DeleteQueued(blockId)),
+              () => self.ReasonReact.send(Block_DeleteQueued(blockId)),
               10000,
             );
-          send(Block_CaptureQueuedMeta(blockId, timeoutId));
-          ();
+          self.onUnmount(() => Js.Global.clearTimeout(timeoutId));
+          self.ReasonReact.send(Block_CaptureQueuedMeta(blockId, timeoutId));
         };
         if (isLastBlock(state.blocks)) {
           switch (isEmpty(state.blocks[0].b_data)) {
@@ -583,21 +583,20 @@ let make =
                 stateUpdateReason: Some(action),
                 focusedBlock: None,
               },
-              (({send}) => queueTimeout(send)),
+              (self => queueTimeout(self)),
             )
           };
         } else {
-          let blockIndex = state.blocks->getBlockIndex(blockId);
           ReasonReact.UpdateWithSideEffects(
             {
               ...state,
               blocks:
                 state.blocks
                 ->(
-                    Belt.Array.mapWithIndexU((. i, block) =>
-                      i == blockIndex ?
-                        {...state.blocks[blockIndex], b_deleted: true} : block
-                    )
+                    Belt.Array.mapU((. block) => {
+                      let {b_id} = block;
+                      b_id == blockId ? {...block, b_deleted: true} : block;
+                    })
                   )
                 ->syncLineNumber,
               stateUpdateReason: Some(action),
@@ -608,7 +607,7 @@ let make =
                   focusedBlock == blockId ? None : state.focusedBlock
                 },
             },
-            (({send}) => queueTimeout(send)),
+            (self => queueTimeout(self)),
           );
         };
       | Block_DeleteQueued(blockId) =>
