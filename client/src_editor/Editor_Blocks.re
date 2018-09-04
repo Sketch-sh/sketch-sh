@@ -35,12 +35,21 @@ type state = {
 };
 
 module Actions = {
+  /*
+   * Clean blocks copy
+   * - This action is trigged when user made a changes to the content
+   * - Because refmt between 2 languages is destructive
+   *   We keep a copy of old state in `state.blocksCopy`
+   *   so when you switch back to original language
+   *   you'll get the original content
+   */
   let cleanBlocksCopy = (action, state) =>
     ReasonReact.Update({
       ...state,
       blocksCopy: None,
       stateUpdateReason: Some(action),
     });
+  /* TODO: Extract common part of prettyPrint and changeLanguage into a new function */
   let prettyPrint = (_action, state) =>
     switch (state.lang) {
     | ML =>
@@ -83,6 +92,104 @@ module Actions = {
         ),
       )
     };
+  let changeLanguage = (action, state) =>
+    switch (state.blocksCopy) {
+    | None =>
+      ReasonReact.UpdateWithSideEffects(
+        {
+          ...state,
+          blocksCopy: Some(state.blocks),
+          stateUpdateReason: Some(action),
+        },
+        (
+          self => {
+            let operation =
+              switch (state.lang) {
+              | ML => Toplevel.Types.ReToMl
+              | RE => Toplevel.Types.MlToRe
+              };
+            let id =
+              Toplevel_Consumer.refmt(
+                operation,
+                self.state.blocks->codeBlockDataPairs,
+                fun
+                | Belt.Result.Error(error) => Notify.error(error)
+                | Belt.Result.Ok({hasError, result}) =>
+                  if (hasError) {
+                    /* TODO: Map syntax error to block position */
+                    Notify.error(
+                      "An error happens while formatting your code. It might be a syntax error",
+                    );
+                  } else {
+                    let result =
+                      result
+                      ->Belt.List.reduce(
+                          [],
+                          (
+                            (acc, {refmt_id, refmt_value}) =>
+                              switch (refmt_value) {
+                              | Ok(code) => [(refmt_id, code), ...acc]
+                              | Error(_) => acc
+                              }
+                          ),
+                        );
+                    self.send(Block_MapRefmtToBlocks(result));
+                  },
+              );
+            self.onUnmount(() => Toplevel_Consumer.cancel(id));
+          }
+        ),
+      )
+    | Some(blocksCopy) =>
+      ReasonReact.UpdateWithSideEffects(
+        {
+          ...state,
+          blocksCopy: None,
+          blocks: blocksCopy,
+          stateUpdateReason: Some(action),
+        },
+        (self => self.send(Block_Execute(false, BTyp_Code))),
+      )
+    };
+  let mapRefmtToBlocks = (action, state, results) =>
+    ReasonReact.UpdateWithSideEffects(
+      {
+        ...state,
+        stateUpdateReason: Some(action),
+        blocks:
+          state.blocks
+          ->(
+              Belt.Array.mapU((. block) => {
+                let {b_data, b_id, b_deleted} = block;
+                b_deleted ?
+                  block :
+                  (
+                    switch (b_data) {
+                    | B_Code(bcode) =>
+                      let mappedBlock =
+                        results
+                        ->Belt.List.getBy((((id, _code)) => id == b_id));
+                      switch (mappedBlock) {
+                      | None => block
+                      | Some((_id, code)) => {
+                          ...block,
+                          b_data:
+                            B_Code({
+                              ...bcode,
+                              /* TODO: Don't remove widgets but executing and replace with latest widget */
+                              bc_widgets: [||],
+                              bc_value: code,
+                            }),
+                        }
+                      };
+                    | B_Text(_) => block
+                    }
+                  );
+              })
+            ),
+      },
+      ({send}) => send(Block_Execute(false, BTyp_Code)),
+    );
   /*
    * Focus up helper
    * - Find current block index
@@ -170,6 +277,318 @@ module Actions = {
                 };
               },
             )
+          )
+        ->syncLineNumber,
+    });
+  };
+  /*
+   * Block Focus and Blur
+   */
+  /* TODO: Why blockTyp is needed? */
+  let focus = (action, state, blockId, blockTyp) =>
+    ReasonReact.Update({
+      ...state,
+      stateUpdateReason: Some(action),
+      focusedBlock: Some((blockId, blockTyp, FcTyp_EditorFocus)),
+    });
+  let blur = (action, state, blockId) =>
+    switch (state.focusedBlock) {
+    | None => ReasonReact.NoUpdate
+    | Some((focusedBlockId, _, _)) =>
+      focusedBlockId == blockId ?
+        ReasonReact.Update({
+          ...state,
+          stateUpdateReason: Some(action),
+          focusedBlock: None,
+        }) :
+        ReasonReact.NoUpdate
+    };
+  /*
+   * Block delete and restore
+   * - QueueDelete:
+   *   + Pressed on BlockControls > DeleteButton
+   *   + Set b_deleted to true and show fake block
+   * - DeleteQueued: Timeout, remove blocks complete
+   */
+  let queueDelete = (action, state, blockId) => {
+    let queueTimeout = self => {
+      let timeoutId =
+        Js.Global.setTimeout(
+          () => self.ReasonReact.send(Block_DeleteQueued(blockId)),
+          10000,
+        );
+      self.onUnmount(() => Js.Global.clearTimeout(timeoutId));
+      self.ReasonReact.send(Block_CaptureQueuedMeta(blockId, timeoutId));
+    };
+    if (isLastBlock(state.blocks)) {
+      switch (isEmpty(state.blocks[0].b_data)) {
+      | true => ReasonReact.NoUpdate
+      | _ =>
+        ReasonReact.UpdateWithSideEffects(
+          {
+            ...state,
+            blocks:
+              [|newBlock, {...state.blocks[0], b_deleted: true}|]
+              ->syncLineNumber,
+            stateUpdateReason: Some(action),
+            focusedBlock: None,
+          },
+          (self => queueTimeout(self)),
+        )
+      };
+    } else {
+      ReasonReact.UpdateWithSideEffects(
+        {
+          ...state,
+          blocks:
+            state.blocks
+            ->(
+                Belt.Array.mapU((. block) => {
+                  let {b_id} = block;
+                  b_id == blockId ? {...block, b_deleted: true} : block;
+                })
+              )
+            ->syncLineNumber,
+          stateUpdateReason: Some(action),
+          focusedBlock:
+            switch (state.focusedBlock) {
+            | None => None
+            | Some((focusedBlock, _, _)) =>
+              focusedBlock == blockId ? None : state.focusedBlock
+            },
+        },
+        self => queueTimeout(self),
+      );
+    };
+  };
+  let deleteQueued = (action, state, blockId) =>
+    if (isLastBlock(state.blocks) || Belt.Array.length(state.blocks) == 0) {
+      ReasonReact.Update({
+        ...state,
+        blocks: [|newBlock|],
+        deletedBlockMeta:
+          state.deletedBlockMeta
+          ->(
+              Belt.Array.keepU((. (timeoutBlockId, _timeoutId)) =>
+                timeoutBlockId != blockId
+              )
+            ),
+        stateUpdateReason: Some(action),
+        focusedBlock: None,
+      });
+    } else {
+      ReasonReact.Update({
+        ...state,
+        blocks:
+          state.blocks
+          ->(Belt.Array.keepU((. {b_id}) => b_id != blockId))
+          ->syncLineNumber,
+        deletedBlockMeta:
+          state.deletedBlockMeta
+          ->(
+              Belt.Array.keepU((. (timeoutBlockId, _timeoutId)) =>
+                timeoutBlockId != blockId
+              )
+            ),
+        stateUpdateReason: Some(action),
+        focusedBlock:
+          switch (state.focusedBlock) {
+          | None => None
+          | Some((focusedBlock, _, _)) =>
+            focusedBlock == blockId ? None : state.focusedBlock
+          },
+      });
+    };
+  let restore = (action, state, blockId) => {
+    let timeoutId =
+      state.deletedBlockMeta
+      ->arrayFind(((timeBlockId, _timeoutId)) => timeBlockId == blockId);
+    switch (timeoutId) {
+    | None => ReasonReact.NoUpdate
+    | Some((_timeoutBlockId, timeoutId)) =>
+      ReasonReact.UpdateWithSideEffects(
+        {
+          ...state,
+          blocks:
+            state.blocks
+            ->(
+                Belt.Array.mapU((. block) => {
+                  let {b_id} = block;
+
+                  b_id == blockId ? {...block, b_deleted: false} : block;
+                })
+              )
+            ->syncLineNumber,
+          deletedBlockMeta:
+            state.deletedBlockMeta
+            ->(
+                Belt.Array.keepU((. (timeBlockId, _timeoutId)) =>
+                  timeBlockId != blockId
+                )
+              ),
+          stateUpdateReason: Some(action),
+        },
+        (_self => Js.Global.clearTimeout(timeoutId)),
+      )
+    };
+  };
+  let captureQueuedMeta = (action, state, blockId, timeoutId) =>
+    ReasonReact.Update({
+      ...state,
+      deletedBlockMeta:
+        Belt.Array.concat(state.deletedBlockMeta, [|(blockId, timeoutId)|]),
+      stateUpdateReason: Some(action),
+    });
+  /*
+   * Execution and helpers
+   * - Execute -> Map results to widgets
+   * - Execute with shortcuts -> Focus on next block,
+   *   if this is last then create new block
+   */
+  let execute = (action, state, focusNextBlock, blockTyp, onExecute, lang) => {
+    let allCodeToExecute = codeBlockDataPairs(state.blocks);
+
+    ReasonReact.UpdateWithSideEffects(
+      {...state, stateUpdateReason: Some(action)},
+      self => {
+        if (focusNextBlock) {
+          self.send(Block_FocusNextBlockOrCreate(blockTyp));
+        };
+        onExecute(true);
+        let id =
+          Toplevel_Consumer.execute(
+            lang,
+            allCodeToExecute,
+            fun
+            | Belt.Result.Error(error) => {
+                onExecute(false);
+                Notify.error(error);
+              }
+            | Belt.Result.Ok(blocks) => {
+                onExecute(false);
+                blocks
+                ->(
+                    Belt.List.forEachU(
+                      (. {Toplevel.Types.id: blockId, result}) => {
+                      let widgets = executeResultToWidget(result);
+                      self.send(Block_AddWidgets(blockId, widgets));
+                    })
+                  );
+              },
+          );
+
+        self.onUnmount(() => Toplevel_Consumer.cancel(id));
+      },
+    );
+  };
+  let addWidgets = (action, state, blockId, widgets) =>
+    ReasonReact.Update({
+      ...state,
+      stateUpdateReason: Some(action),
+      blocks:
+        state.blocks
+        ->(
+            Belt.Array.mapU((. block) => {
+              let {b_id, b_data} = block;
+              if (b_id != blockId) {
+                block;
+              } else {
+                switch (b_data) {
+                | B_Text(_) => block
+                | B_Code(bcode) => {
+                    ...block,
+                    b_data: B_Code({...bcode, bc_widgets: widgets}),
+                  }
+                };
+              };
+            })
+          ),
+    });
+  let focusNextBlockOrCreate = (action, state, blockTyp) => {
+    let blockLength = state.blocks->Belt.Array.length;
+
+    let currentBlockIndex =
+      switch (state.focusedBlock) {
+      | None => blockLength - 1
+      | Some((id, _blockTyp, _)) =>
+        switch (state.blocks->arrayFindIndex((({b_id}) => b_id == id))) {
+        | None => blockLength - 1
+        | Some(index) => index
+        }
+      };
+    let findBlockId = index => {
+      let {b_id, b_data} = state.blocks[index];
+      (b_id, blockDataToBlockTyp(b_data));
+    };
+    if (currentBlockIndex == blockLength - 1) {
+      ReasonReact.SideEffects(
+        ({send}) =>
+          send(Block_Add(findBlockId(currentBlockIndex)->fst, blockTyp)),
+      );
+    } else if (currentBlockIndex < blockLength - 1) {
+      let (nextBlockId, nextBlockTyp) = findBlockId(currentBlockIndex + 1);
+      ReasonReact.Update({
+        ...state,
+        stateUpdateReason: Some(action),
+        focusedBlock:
+          Some((
+            nextBlockId,
+            nextBlockTyp,
+            FcTyp_BlockExecuteAndFocusNextBlock,
+          )),
+      });
+    } else {
+      ReasonReact.NoUpdate;
+    };
+  };
+  /*
+   * Update value
+   * - Clean all widgets below the editing points to avoid stale state
+   */
+  let update = (action, state, blockId, newValue, diff) => {
+    let blockIndex = state.blocks->getBlockIndex(blockId);
+    ReasonReact.Update({
+      ...state,
+      stateUpdateReason: Some(action),
+      blocks:
+        state.blocks
+        ->(
+            Belt.Array.mapWithIndexU((. i, block) => {
+              let {b_data} = block;
+              if (i < blockIndex) {
+                block;
+              } else if (i == blockIndex) {
+                switch (b_data) {
+                | B_Code(bcode) => {
+                    ...block,
+                    b_data:
+                      B_Code({
+                        ...bcode,
+                        bc_value: newValue,
+                        bc_widgets: {
+                          let removeWidgetBelowMe = diff->getFirstLineFromDiff;
+                          let currentWidgets = bcode.bc_widgets;
+                          currentWidgets
+                          ->(
+                              Belt.Array.keepU((. {Widget.lw_line, _}) =>
+                                lw_line < removeWidgetBelowMe
+                              )
+                            );
+                        },
+                      }),
+                  }
+                | B_Text(_) => {...block, b_data: B_Text(newValue)}
+                };
+              } else {
+                switch (b_data) {
+                | B_Text(_) => block
+                | B_Code(bcode) => {
+                    ...block,
+                    b_data: B_Code({...bcode, bc_widgets: [||]}),
+                  }
+                };
+              };
+            })
           )
         ->syncLineNumber,
     });
@@ -362,396 +781,34 @@ let make =
       switch (action) {
       | Block_CleanBlocksCopy => Actions.cleanBlocksCopy(action, state)
       | Block_PrettyPrint => Actions.prettyPrint(action, state)
-      | Block_ChangeLanguage =>
-        switch (state.blocksCopy) {
-        | None =>
-          ReasonReact.UpdateWithSideEffects(
-            {...state, blocksCopy: Some(state.blocks)},
-            (
-              self => {
-                let operation =
-                  switch (state.lang) {
-                  | ML => Toplevel.Types.ReToMl
-                  | RE => Toplevel.Types.MlToRe
-                  };
-                let id =
-                  Toplevel_Consumer.refmt(
-                    operation,
-                    self.state.blocks->codeBlockDataPairs,
-                    fun
-                    | Belt.Result.Error(error) => Notify.error(error)
-                    | Belt.Result.Ok({hasError, result}) =>
-                      if (hasError) {
-                        /* TODO: Map syntax error to block position */
-                        Notify.error(
-                          "An error happens while formatting your code. It might be a syntax error",
-                        );
-                      } else {
-                        let result =
-                          result
-                          ->Belt.List.reduce(
-                              [],
-                              (
-                                (acc, {refmt_id, refmt_value}) =>
-                                  switch (refmt_value) {
-                                  | Ok(code) => [(refmt_id, code), ...acc]
-                                  | Error(_) => acc
-                                  }
-                              ),
-                            );
-                        self.send(Block_MapRefmtToBlocks(result));
-                      },
-                  );
-                self.onUnmount(() => Toplevel_Consumer.cancel(id));
-              }
-            ),
-          )
-        | Some(blocksCopy) =>
-          ReasonReact.UpdateWithSideEffects(
-            {...state, blocksCopy: None, blocks: blocksCopy},
-            (self => self.send(Block_Execute(false, BTyp_Code))),
-          )
-        }
-
+      | Block_ChangeLanguage => Actions.changeLanguage(action, state)
       | Block_MapRefmtToBlocks(results) =>
-        ReasonReact.UpdateWithSideEffects(
-          {
-            ...state,
-            stateUpdateReason: Some(action),
-            blocks:
-              state.blocks
-              ->(
-                  Belt.Array.mapU((. block) => {
-                    let {b_data, b_id, b_deleted} = block;
-                    b_deleted ?
-                      block :
-                      (
-                        switch (b_data) {
-                        | B_Code(bcode) =>
-                          let mappedBlock =
-                            results
-                            ->Belt.List.getBy(
-                                (((id, _code)) => id == b_id),
-                              );
-                          switch (mappedBlock) {
-                          | None => block
-                          | Some((_id, code)) => {
-                              ...block,
-                              b_data:
-                                B_Code({
-                                  ...bcode,
-                                  /* TODO: Don't remove widgets but executing and replace with latest widget */
-                                  bc_widgets: [||],
-                                  bc_value: code,
-                                }),
-                            }
-                          };
-                        | B_Text(_) => block
-                        }
-                      );
-                  })
-                ),
-          },
-          (({send}) => send(Block_Execute(false, BTyp_Code))),
-        )
+        Actions.mapRefmtToBlocks(action, state, results)
       | Block_AddWidgets(blockId, widgets) =>
-        ReasonReact.Update({
-          ...state,
-          stateUpdateReason: Some(action),
-          blocks:
-            state.blocks
-            ->(
-                Belt.Array.mapU((. block) => {
-                  let {b_id, b_data} = block;
-                  if (b_id != blockId) {
-                    block;
-                  } else {
-                    switch (b_data) {
-                    | B_Text(_) => block
-                    | B_Code(bcode) => {
-                        ...block,
-                        b_data: B_Code({...bcode, bc_widgets: widgets}),
-                      }
-                    };
-                  };
-                })
-              ),
-        })
+        Actions.addWidgets(action, state, blockId, widgets)
       | Block_FocusNextBlockOrCreate(blockTyp) =>
-        let blockLength = state.blocks->Belt.Array.length;
-
-        let currentBlockIndex =
-          switch (state.focusedBlock) {
-          | None => blockLength - 1
-          | Some((id, _blockTyp, _)) =>
-            switch (state.blocks->arrayFindIndex((({b_id}) => b_id == id))) {
-            | None => blockLength - 1
-            | Some(index) => index
-            }
-          };
-        let findBlockId = index => {
-          let {b_id, b_data} = state.blocks[index];
-          (b_id, blockDataToBlockTyp(b_data));
-        };
-        if (currentBlockIndex == blockLength - 1) {
-          ReasonReact.SideEffects(
-            (
-              ({send}) =>
-                send(
-                  Block_Add(findBlockId(currentBlockIndex)->fst, blockTyp),
-                )
-            ),
-          );
-        } else if (currentBlockIndex < blockLength - 1) {
-          let (nextBlockId, nextBlockTyp) =
-            findBlockId(currentBlockIndex + 1);
-          ReasonReact.Update({
-            ...state,
-            stateUpdateReason: Some(action),
-            focusedBlock:
-              Some((
-                nextBlockId,
-                nextBlockTyp,
-                FcTyp_BlockExecuteAndFocusNextBlock,
-              )),
-          });
-        } else {
-          ReasonReact.NoUpdate;
-        };
+        Actions.focusNextBlockOrCreate(action, state, blockTyp)
       | Block_Execute(focusNextBlock, blockTyp) =>
-        let allCodeToExecute = codeBlockDataPairs(state.blocks);
-
-        ReasonReact.SideEffects(
-          (
-            self => {
-              if (focusNextBlock) {
-                self.send(Block_FocusNextBlockOrCreate(blockTyp));
-              };
-              onExecute(true);
-              let id =
-                Toplevel_Consumer.execute(
-                  lang,
-                  allCodeToExecute,
-                  fun
-                  | Belt.Result.Error(error) => {
-                      onExecute(false);
-                      Notify.error(error);
-                    }
-                  | Belt.Result.Ok(blocks) => {
-                      onExecute(false);
-                      blocks
-                      ->(
-                          Belt.List.forEachU(
-                            (. {Toplevel.Types.id: blockId, result}) => {
-                            let widgets = executeResultToWidget(result);
-                            self.send(Block_AddWidgets(blockId, widgets));
-                          })
-                        );
-                    },
-                );
-
-              self.onUnmount(() => Toplevel_Consumer.cancel(id));
-            }
-          ),
-        );
+        Actions.execute(
+          action,
+          state,
+          focusNextBlock,
+          blockTyp,
+          onExecute,
+          lang,
+        )
       | Block_UpdateValue(blockId, newValue, diff) =>
-        let blockIndex = state.blocks->getBlockIndex(blockId);
-        ReasonReact.Update({
-          ...state,
-          stateUpdateReason: Some(action),
-          blocks:
-            state.blocks
-            ->(
-                Belt.Array.mapWithIndexU((. i, block) => {
-                  let {b_data} = block;
-                  if (i < blockIndex) {
-                    block;
-                  } else if (i == blockIndex) {
-                    switch (b_data) {
-                    | B_Code(bcode) => {
-                        ...block,
-                        b_data:
-                          B_Code({
-                            ...bcode,
-                            bc_value: newValue,
-                            bc_widgets: {
-                              let removeWidgetBelowMe =
-                                diff->getFirstLineFromDiff;
-                              let currentWidgets = bcode.bc_widgets;
-                              currentWidgets
-                              ->(
-                                  Belt.Array.keepU((. {Widget.lw_line, _}) =>
-                                    lw_line < removeWidgetBelowMe
-                                  )
-                                );
-                            },
-                          }),
-                      }
-                    | B_Text(_) => {...block, b_data: B_Text(newValue)}
-                    };
-                  } else {
-                    switch (b_data) {
-                    | B_Text(_) => block
-                    | B_Code(bcode) => {
-                        ...block,
-                        b_data: B_Code({...bcode, bc_widgets: [||]}),
-                      }
-                    };
-                  };
-                })
-              )
-            ->syncLineNumber,
-        });
+        Actions.update(action, state, blockId, newValue, diff)
       | Block_QueueDelete(blockId) =>
-        let queueTimeout = self => {
-          let timeoutId =
-            Js.Global.setTimeout(
-              () => self.ReasonReact.send(Block_DeleteQueued(blockId)),
-              10000,
-            );
-          self.onUnmount(() => Js.Global.clearTimeout(timeoutId));
-          self.ReasonReact.send(Block_CaptureQueuedMeta(blockId, timeoutId));
-        };
-        if (isLastBlock(state.blocks)) {
-          switch (isEmpty(state.blocks[0].b_data)) {
-          | true => ReasonReact.NoUpdate
-          | _ =>
-            ReasonReact.UpdateWithSideEffects(
-              {
-                ...state,
-                blocks:
-                  [|newBlock, {...state.blocks[0], b_deleted: true}|]
-                  ->syncLineNumber,
-                stateUpdateReason: Some(action),
-                focusedBlock: None,
-              },
-              (self => queueTimeout(self)),
-            )
-          };
-        } else {
-          ReasonReact.UpdateWithSideEffects(
-            {
-              ...state,
-              blocks:
-                state.blocks
-                ->(
-                    Belt.Array.mapU((. block) => {
-                      let {b_id} = block;
-                      b_id == blockId ? {...block, b_deleted: true} : block;
-                    })
-                  )
-                ->syncLineNumber,
-              stateUpdateReason: Some(action),
-              focusedBlock:
-                switch (state.focusedBlock) {
-                | None => None
-                | Some((focusedBlock, _, _)) =>
-                  focusedBlock == blockId ? None : state.focusedBlock
-                },
-            },
-            (self => queueTimeout(self)),
-          );
-        };
+        Actions.queueDelete(action, state, blockId)
       | Block_DeleteQueued(blockId) =>
-        if (isLastBlock(state.blocks) || Belt.Array.length(state.blocks) == 0) {
-          ReasonReact.Update({
-            ...state,
-            blocks: [|newBlock|],
-            deletedBlockMeta:
-              state.deletedBlockMeta
-              ->(
-                  Belt.Array.keepU((. (timeoutBlockId, _timeoutId)) =>
-                    timeoutBlockId != blockId
-                  )
-                ),
-            stateUpdateReason: Some(action),
-            focusedBlock: None,
-          });
-        } else {
-          ReasonReact.Update({
-            ...state,
-            blocks:
-              state.blocks
-              ->(Belt.Array.keepU((. {b_id}) => b_id != blockId))
-              ->syncLineNumber,
-            deletedBlockMeta:
-              state.deletedBlockMeta
-              ->(
-                  Belt.Array.keepU((. (timeoutBlockId, _timeoutId)) =>
-                    timeoutBlockId != blockId
-                  )
-                ),
-            stateUpdateReason: Some(action),
-            focusedBlock:
-              switch (state.focusedBlock) {
-              | None => None
-              | Some((focusedBlock, _, _)) =>
-                focusedBlock == blockId ? None : state.focusedBlock
-              },
-          });
-        }
-      | Block_Restore(blockId) =>
-        let timeoutId =
-          state.deletedBlockMeta
-          ->arrayFind(
-              (((timeBlockId, _timeoutId)) => timeBlockId == blockId),
-            );
-        switch (timeoutId) {
-        | None => ReasonReact.NoUpdate
-        | Some((_timeoutBlockId, timeoutId)) =>
-          ReasonReact.UpdateWithSideEffects(
-            {
-              ...state,
-              blocks:
-                state.blocks
-                ->(
-                    Belt.Array.mapU((. block) => {
-                      let {b_id} = block;
-
-                      b_id == blockId ? {...block, b_deleted: false} : block;
-                    })
-                  )
-                ->syncLineNumber,
-              deletedBlockMeta:
-                state.deletedBlockMeta
-                ->(
-                    Belt.Array.keepU((. (timeBlockId, _timeoutId)) =>
-                      timeBlockId != blockId
-                    )
-                  ),
-              stateUpdateReason: Some(action),
-            },
-            (_self => Js.Global.clearTimeout(timeoutId)),
-          )
-        };
+        Actions.deleteQueued(action, state, blockId)
+      | Block_Restore(blockId) => Actions.restore(action, state, blockId)
       | Block_CaptureQueuedMeta(blockId, timeoutId) =>
-        ReasonReact.Update({
-          ...state,
-          deletedBlockMeta:
-            Belt.Array.concat(
-              state.deletedBlockMeta,
-              [|(blockId, timeoutId)|],
-            ),
-          stateUpdateReason: Some(action),
-        })
+        Actions.captureQueuedMeta(action, state, blockId, timeoutId)
       | Block_Focus(blockId, blockTyp) =>
-        ReasonReact.Update({
-          ...state,
-          stateUpdateReason: Some(action),
-          focusedBlock: Some((blockId, blockTyp, FcTyp_EditorFocus)),
-        })
-      | Block_Blur(blockId) =>
-        switch (state.focusedBlock) {
-        | None => ReasonReact.NoUpdate
-        | Some((focusedBlockId, _, _)) =>
-          focusedBlockId == blockId ?
-            ReasonReact.Update({
-              ...state,
-              stateUpdateReason: Some(action),
-              focusedBlock: None,
-            }) :
-            ReasonReact.NoUpdate
-        }
+        Actions.focus(action, state, blockId, blockTyp)
+      | Block_Blur(blockId) => Actions.blur(action, state, blockId)
       | Block_Add(afterBlockId, blockTyp) =>
         Actions.add(action, state, afterBlockId, blockTyp)
       | Block_FocusUp(blockId) => Actions.focusUp(action, state, blockId)
