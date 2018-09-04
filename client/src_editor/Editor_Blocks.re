@@ -132,6 +132,48 @@ module Actions = {
       });
     };
   };
+  /*
+   * Add a new code/text block afterBlockId
+   * It also focus on the newly added block
+   */
+  let add = (action, state, afterBlockId, blockTyp) => {
+    let newBlockId = generateId();
+    ReasonReact.Update({
+      ...state,
+      stateUpdateReason: Some(action),
+      focusedBlock: Some((newBlockId, blockTyp, FcTyp_BlockNew)),
+      blocks:
+        state.blocks
+        ->(
+            Belt.Array.reduceU(
+              [||],
+              (. acc, block) => {
+                let {b_id} = block;
+                if (b_id != afterBlockId) {
+                  Belt.Array.concat(acc, [|block|]);
+                } else {
+                  Belt.Array.concat(
+                    acc,
+                    [|
+                      block,
+                      {
+                        b_id: newBlockId,
+                        b_data:
+                          switch (blockTyp) {
+                          | BTyp_Text => emptyTextBlock()
+                          | BTyp_Code => emptyCodeBlock()
+                          },
+                        b_deleted: false,
+                      },
+                    |],
+                  );
+                };
+              },
+            )
+          )
+        ->syncLineNumber,
+    });
+  };
 };
 
 let blockControlsButtons = (blockId, isDeleted, send) =>
@@ -711,42 +753,7 @@ let make =
             ReasonReact.NoUpdate
         }
       | Block_Add(afterBlockId, blockTyp) =>
-        let newBlockId = generateId();
-        ReasonReact.Update({
-          ...state,
-          stateUpdateReason: Some(action),
-          focusedBlock: Some((newBlockId, blockTyp, FcTyp_BlockNew)),
-          blocks:
-            state.blocks
-            ->(
-                Belt.Array.reduceU(
-                  [||],
-                  (. acc, block) => {
-                    let {b_id} = block;
-                    if (b_id != afterBlockId) {
-                      Belt.Array.concat(acc, [|block|]);
-                    } else {
-                      Belt.Array.concat(
-                        acc,
-                        [|
-                          block,
-                          {
-                            b_id: newBlockId,
-                            b_data:
-                              switch (blockTyp) {
-                              | BTyp_Text => emptyTextBlock()
-                              | BTyp_Code => emptyCodeBlock()
-                              },
-                            b_deleted: false,
-                          },
-                        |],
-                      );
-                    };
-                  },
-                )
-              )
-            ->syncLineNumber,
-        });
+        Actions.add(action, state, afterBlockId, blockTyp)
       | Block_FocusUp(blockId) => Actions.focusUp(action, state, blockId)
       | Block_FocusDown(blockId) => Actions.focusDown(action, state, blockId)
       },
