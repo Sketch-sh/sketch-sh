@@ -34,6 +34,15 @@ type state = {
   focusedBlock: option((id, blockTyp, focusChangeType)),
 };
 
+module Actions = {
+  let cleanBlocksCopy = (action, state) =>
+    ReasonReact.Update({
+      ...state,
+      blocksCopy: None,
+      stateUpdateReason: Some(action),
+    });
+};
+
 let blockControlsButtons = (blockId, isDeleted, send) =>
   <div className="block__controls--buttons">
     <UI_Balloon message="Add code block" position=Down>
@@ -88,7 +97,7 @@ let make =
       ~onExecute,
       ~registerExecuteCallback=?,
       ~registerShortcut: option(Shortcut.subscribeFun)=?,
-      _children,
+      _children: React.childless,
     ) => {
   let makeInitialState = () => {
     lang,
@@ -218,12 +227,7 @@ let make =
     },
     reducer: (action, state) =>
       switch (action) {
-      | Block_CleanBlocksCopy =>
-        ReasonReact.Update({
-          ...state,
-          blocksCopy: None,
-          stateUpdateReason: Some(action),
-        })
+      | Block_CleanBlocksCopy => Actions.cleanBlocksCopy(action, state)
       | Block_PrettyPrint =>
         switch (lang) {
         | ML =>

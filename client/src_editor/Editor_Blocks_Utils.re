@@ -1,3 +1,15 @@
+open Editor_Types;
+let mapCode = (blocks: array(Block.block), cb) =>
+  blocks
+  ->Belt.Array.mapU(
+      (. block) => {
+        let {Block.b_id, b_deleted, b_data} = block;
+        switch (b_data) {
+        | B_Code(data) => cb(~block, ~id=b_id, ~deleted=b_deleted, ~data)
+        | B_Text(_) => block
+        };
+      },
+    );
 /*
  * Block Execution Utils
  */
