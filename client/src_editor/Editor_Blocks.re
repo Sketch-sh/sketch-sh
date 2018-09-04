@@ -353,18 +353,34 @@ module Actions = {
     state.deletedBlockMeta :=
       (state.deletedBlockMeta^)->TimeoutMap.remove(blockId);
     if (isLastBlock(state.blocks) || Belt.Array.length(state.blocks) == 0) {
-      ReasonReact.Update({
-        ...state,
-        blocks: [|
-          {
-            b_id: Utils.generateId(),
-            b_data: emptyCodeBlock(),
-            b_deleted: false,
-          },
-        |],
-        stateUpdateReason: Some(action),
-        focusedBlock: None,
-      });
+      ReasonReact.UpdateWithSideEffects(
+        {
+          ...state,
+          blocks: [|
+            {
+              b_id: Utils.generateId(),
+              b_data: emptyCodeBlock(),
+              b_deleted: false,
+            },
+          |],
+          stateUpdateReason: Some(action),
+          focusedBlock: None,
+        },
+        _self => {
+          let deleteLastBlockAcknowledgedKey = "rtop:deleteLastBlockAcknowledged";
+          Dom.Storage.(
+            switch (localStorage |> getItem(deleteLastBlockAcknowledgedKey)) {
+            | Some(_) => ()
+            | None =>
+              Notify.info(
+                "When you deleted all blocks, an empty code block will be created for you",
+                ~sticky=true,
+              );
+              localStorage |> setItem(deleteLastBlockAcknowledgedKey, "1");
+            }
+          );
+        },
+      );
     } else {
       ReasonReact.Update({
         ...state,
