@@ -17,11 +17,20 @@ module Unload = {
   };
 
   let setMessage = content => message := content;
+
   let register = (callback: message => unit) => {
     cb := Some(callback);
     ();
   };
 
+  let getUnloadMessage: unit => option(string) =
+    () =>
+      switch (cb^) {
+      | None => None
+      | Some(cb) =>
+        cb(message);
+        message^;
+      };
   [@bs.deriving abstract]
   type window = {
     mutable onbeforeunload:
@@ -39,16 +48,11 @@ module Unload = {
         window
         ->onbeforeunloadSet(
             (. event) =>
-              switch (cb^) {
+              switch (getUnloadMessage()) {
               | None => Js.Nullable.null
-              | Some(cb) =>
-                cb(message);
-                switch (message^) {
-                | None => Js.Nullable.null
-                | Some(message) =>
-                  event##returnValue #= message;
-                  Js.Nullable.return(message);
-                };
+              | Some(message) =>
+                event##returnValue #= message;
+                Js.Nullable.return(message);
               },
           ),
       render: _self => React.null,
@@ -61,14 +65,9 @@ let redirect: string => unit =
 
 let pushUnsafe = url => {
   let allowRouteTransition =
-    switch (Unload.cb^) {
+    switch (Unload.getUnloadMessage()) {
     | None => true
-    | Some(cb) =>
-      cb(Unload.message);
-      switch (Unload.message^) {
-      | None => true
-      | Some(message) => Webapi.Dom.(Window.confirm(message, window))
-      };
+    | Some(message) => Webapi.Dom.(Window.confirm(message, window))
     };
   if (allowRouteTransition) {
     ReasonReact.Router.push(url);
