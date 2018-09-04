@@ -150,13 +150,6 @@ let make =
                 if (lineGet(cursor) == lastLine && lastChar == cursor->chGet) {
                   onBlockDown();
                 };
-              | "/" =>
-                if (event->KeyboardEvent.ctrlKey) {
-                  event->KeyboardEventRe.preventDefault;
-                  editor->(CodeMirror.Editor.toggleComment());
-                } else {
-                  ();
-                }
               | _ => ()
               };
             })
