@@ -507,7 +507,7 @@ let make =
             ->syncLineNumber,
         });
       | Block_QueueDelete(blockId) =>
-        let queueTimeout = (send, b_data) => {
+        let queueTimeout = send => {
           let timeoutId =
             Js.Global.setTimeout(
               () => send(Block_DeleteQueued(blockId)),
@@ -529,7 +529,7 @@ let make =
                 stateUpdateReason: Some(action),
                 focusedBlock: None,
               },
-              (({send}) => queueTimeout(send, state.blocks[0].b_data)),
+              (({send}) => queueTimeout(send)),
             )
           };
         } else {
@@ -554,9 +554,7 @@ let make =
                   focusedBlock == blockId ? None : state.focusedBlock
                 },
             },
-            (
-              ({send}) => queueTimeout(send, state.blocks[blockIndex].b_data)
-            ),
+            (({send}) => queueTimeout(send)),
           );
         };
       | Block_DeleteQueued(blockId) =>

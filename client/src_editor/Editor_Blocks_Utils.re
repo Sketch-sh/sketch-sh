@@ -138,7 +138,7 @@ let syncLineNumber: array(block) => array(block) =
           },
         )
       )
-    ->Utils.pluckAcc;
+    ->fst;
 
 let getFirstLineFromDiff = (diff: CodeMirror.EditorChange.t) => {
   let fromPos = diff->CodeMirror.EditorChange.fromGet;
@@ -196,26 +196,7 @@ let findLastCodeBlock = blocks => {
 };
 
 /*
- * Block Refmt Utils
- */
-
-/* let getBlockRefmtResult = (results, blockId) => {
-     let result =
-       results
-       |> List.find(data => {
-            let (id, code) = data;
-            id == blockId;
-          });
-     let (_b_id, bc_value, hasError) = result;
-     switch (hasError) {
-     | None => ()
-     | Some(error) => notifyRefmtError(bc_value, error, lang)
-     };
-     bc_value;
-   }; */
-
-/*
- * Ohter Block Utils
+ * Other Block Utils
  */
 
 let codeBlockDataPairs = blocks =>
