@@ -169,7 +169,7 @@ let make = (~links, ~onUpdate, _children) => {
 
     <div className="links__container">
       <span className="links__disclaimer">
-        "Add a link to another sketch by pasting it's id and giving it a module name"
+        "Add a link to another sketch by pasting its' id and giving it a module name"
         ->str
       </span>
       <div> existingLinks->ReasonReact.array </div>
