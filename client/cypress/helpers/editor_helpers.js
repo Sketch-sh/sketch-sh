@@ -13,6 +13,9 @@ const assertErrorsOrWarnings = howMany =>
   cy.get(".widget__lint").should("have.length", howMany);
 const assertValue = howMany =>
   cy.get(".widget__value").should("have.length", howMany);
+const assertStdout = howMany =>
+  cy.get(".widget__stdout").should("have.length", howMany);
+
 const shortcut = shortcut =>
   cy
     .get("body")
@@ -42,6 +45,7 @@ export {
   assertBlocks,
   assertCodeBlocks,
   assertTextBlocks,
+  assertStdout,
   assertErrorsOrWarnings,
   assertValue,
   shortcut,
