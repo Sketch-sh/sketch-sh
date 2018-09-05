@@ -22,7 +22,7 @@ let make = _children => {
         <Router.Link
           route=Route.Home className="Topbar__home" title="Sketch.sh Homepage">
           <Logo size=0.2 />
-          "Sketch.sh"->str
+          <span> "Sketch.sh"->str </span>
         </Router.Link>
         <div id className="Topbar__actions" />
       </div>
