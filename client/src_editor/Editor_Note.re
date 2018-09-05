@@ -218,7 +218,7 @@ module Editor_Note = {
                                        <Fi.Play />
                                  )
                             </UI_LoadingWrapper>
-                            "Run"->str
+                            <span> "Run"->str </span>
                           </button>
                      </UI_Balloon>
                      <Editor_Note_SaveButton

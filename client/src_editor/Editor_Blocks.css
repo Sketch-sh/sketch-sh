@@ -1,7 +1,8 @@
 .block__container {
   margin-top: var(--space4);
-  padding: 0px;
-  position: relative;
+  padding: 0;
+  /* Codemirror adds an overflow textarea that can't be get rid of */
+  overflow: hidden;
 }
 
 .block__controls {
@@ -50,7 +51,6 @@
 
 /* ////////// Deleted block //////////////// */
 .block__deleted {
-  margin-left: var(--cm-gutter-width);
   border-radius: 4px;
   padding: var(--space4);
   background: hsl(220, 80%, 95%);
@@ -58,12 +58,15 @@
   font-size: var(--f4);
   position: relative;
 }
+
 .block__deleted h3 {
   margin: var(--space2) 0;
 }
+
 .block__deleted p {
   margin: 0;
 }
+
 .block__deleted--progress {
   width: 0;
   position: absolute;
@@ -76,10 +79,12 @@
   opacity: 1;
   z-index: 1;
 }
+
 @keyframes width {
   0% {
     width: 100%;
   }
+
   100% {
     width: 0;
   }
@@ -89,19 +94,21 @@
   width: 0;
   opacity: 1;
 }
+
 .block__deleted--buttons {
   display: flex;
   justify-content: center;
   margin-top: var(--space3);
 }
-.block__deleted--buttons button {
+
+.block__deleted--button {
   z-index: 2;
   outline: none;
   display: flex;
   padding: var(--space3);
+  margin: 0 5px;
   border: 0;
   border-radius: 4px;
-  background-color: color-mod(#1874d5 a(0.2));
   transition: background-color 100ms ease-in-out;
   font-size: var(--f4);
   cursor: pointer;
@@ -111,6 +118,18 @@
   }
 }
 
-.block__deleted--buttons button:hover {
+.block__deleted--button.restore {
+  background-color: color-mod(#1874d5 a(0.2));
+}
+
+.block__deleted--button.restore:hover {
   background-color: color-mod(#1874d5 a(0.3));
+}
+
+.block__deleted--button.delete-immediately {
+  background-color: color-mod(#da4139 a(0.2));
+}
+
+.block__deleted--button.delete-immediately:hover {
+  background-color: color-mod(#da4139 a(0.3));
 }

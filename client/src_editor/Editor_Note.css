@@ -1,10 +1,10 @@
 .EditorNote {
-  min-width: 768px;
+  /* min-width: 768px; */
 }
 
-.EditorNote__metadata {
+/* .EditorNote__metadata {
   margin-left: calc(var(--cm-gutter-width) + 8px);
-}
+} */
 
 .EditorNote__metadata--title {
   width: 100%;
