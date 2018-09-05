@@ -13,19 +13,14 @@
   text-decoration: none;
   color: var(--c-primary);
   font-size: var(--f4);
-
-  &:hover .UI_SketchList__sketch--title {
-    color: var(--c-text);
-  }
 }
 
 .UI_SketchList__sketch--title {
   font-weight: 500;
   color: var(--c-text-sub);
-}
-
-.UI_SketchList__sketch--dash {
-  color: var(--c-text);
+  &:hover {
+    color: var(--c-text);
+  }
 }
 
 .UI_SketchList__sketch--lastEdited {
