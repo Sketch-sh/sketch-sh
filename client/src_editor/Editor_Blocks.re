@@ -343,7 +343,7 @@ module Actions = {
             | Some(_) => ()
             | None =>
               Notify.info(
-                "When you deleted all blocks, an empty code block will be created for you",
+                "When you delete all blocks, an empty code block will be created for you",
                 ~sticky=true,
               );
               localStorage |> setItem(deleteLastBlockAcknowledgedKey, "1");
@@ -780,10 +780,18 @@ let make =
                     </p>
                     <div className="block__deleted--buttons">
                       <button
+                        className="block__deleted--button restore"
                         onClick=(_ => send(Block_Restore(b_id)))
                         ariaLabel="Restore block">
                         <Fi.RefreshCw />
                         "Restore"->str
+                      </button>
+                      <button
+                        className="block__deleted--button delete-immediately"
+                        onClick=(_ => send(Block_DeleteQueued(b_id)))
+                        ariaLabel="Delete block immediately">
+                        <Fi.Trash2 />
+                        "Delete Immediately"->str
                       </button>
                     </div>
                     <div className="block__deleted--progress" />
