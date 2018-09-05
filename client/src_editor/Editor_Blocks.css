@@ -51,7 +51,6 @@
 
 /* ////////// Deleted block //////////////// */
 .block__deleted {
-  margin-left: var(--cm-gutter-width);
   border-radius: 4px;
   padding: var(--space4);
   background: hsl(220, 80%, 95%);
