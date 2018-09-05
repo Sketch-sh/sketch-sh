@@ -70,10 +70,6 @@ module WithUserInfo = {
                            }
                          )
                        </span>
-                       <span className="UI_SketchList__sketch--dash">
-                         " - "->str
-                       </span>
-                       ("/s/" ++ sketch##id)->str
                      </Router.Link>
                      <UI_SketchOwnerInfo
                        owner=sketch##owner
