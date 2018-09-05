@@ -703,7 +703,6 @@ let make =
           | Block_AddWidgets(_, _)
           | Block_FocusUp(_)
           | Block_FocusDown(_)
-          | Block_QueueDelete(_)
           | Block_ChangeLanguage
           | Block_CleanBlocksCopy
           | Block_FocusNextBlockOrCreate(_)
@@ -711,14 +710,16 @@ let make =
           | Block_PrettyPrint
           | Block_MapRefmtToBlocks(_)
           | Block_Add(_, _)
-          | Block_DeleteQueued(_)
           | Block_Restore(_)
+          | Block_QueueDelete(_)
+          | Block_DeleteQueued(_)
           | Block_UpdateValue(_, _, _) => onUpdate(newSelf.state.blocks)
           };
 
           switch (action) {
           | Block_Add(_, _)
           | Block_Restore(_)
+          | Block_QueueDelete(_)
           | Block_DeleteQueued(_)
           | Block_PrettyPrint => cleanBlocksCopyHelper()
           | Block_UpdateValue(_, _, diff) =>

@@ -153,6 +153,29 @@ context("Block controls > delete and restore", () => {
       .click();
     assertCodeBlocks(6);
   });
+  it("can delete immediately", () => {
+    cy.visit("new/reason");
+    shortcut("{shift}{enter}");
+    shortcut("{shift}{enter}");
+    shortcut("{shift}{enter}");
+    shortcut("{shift}{enter}");
+    shortcut("{shift}{enter}");
+
+    assertCodeBlocks(6);
+
+    cy.get(".block__container")
+      .eq(1)
+      .find(`button[aria-label="Delete block"]`)
+      .click();
+    assertCodeBlocks(5);
+
+    cy.get(".block__container")
+      .eq(1)
+      .find(".block__deleted")
+      .find(`button[aria-label="Delete block immediately"]`)
+      .click();
+    assertBlocks(5);
+  });
   it("remove temporary deleted block from execution", () => {
     cy.visit("new/reason");
     cy.get(".block__container")
@@ -201,5 +224,21 @@ context("Block controls > delete and restore", () => {
     cy.window().then(win => {
       expect(win.editor.getOption("firstLineNumber")).to.equal(2);
     });
+  });
+
+  it("delete queued should trigger Editor_Note state update", () => {
+    cy.visit("new/reason");
+    cy.get(".Topbar__action")
+      .contains("Save")
+      .as("save");
+
+    typeBlock(0, "let a = 1;");
+    shortcut("{ctrl}s");
+    cy.get("@save").should("be.disabled");
+    cy.get(".block__container")
+      .eq(0)
+      .find(`button[aria-label="Delete block"]`)
+      .click();
+    cy.get("@save").should("be.enabled");
   });
 });
