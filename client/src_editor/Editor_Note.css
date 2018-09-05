@@ -14,20 +14,19 @@
   color: var(--cm-text);
   font-family: var(--font-monospace);
   border: none;
-  /* margin: 0 0 0 8px; */
   padding: 0;
   background-color: transparent;
 }
 
 .EditorNote__metadata--info {
-  /* margin: 0 0 0 8px; */
   display: flex;
-  flex-direction: row-reverse;
   align-items: center;
 }
 
 .EditorNote__owner {
-  flex: 1;
+  @media screen and (max-width: 768px) {
+    flex: 1;
+  }
 }
 
 .EditorNote__lang {
