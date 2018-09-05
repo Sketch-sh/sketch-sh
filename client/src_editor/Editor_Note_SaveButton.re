@@ -75,7 +75,7 @@ module SaveButton = {
                         <Fi.Save />
                   )
              </UI_LoadingWrapper>
-             "Save"->str
+             <span> "Save"->str </span>
            </button>
       </UI_Balloon>,
   };

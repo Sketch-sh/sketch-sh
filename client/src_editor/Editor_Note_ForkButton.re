@@ -45,7 +45,7 @@ module ForkButton = {
                         <Fi.GitBranch />
                   )
              </UI_LoadingWrapper>
-             "Fork"->str
+             <span> "Fork"->str </span>
            </button>
       </UI_Balloon>,
   };

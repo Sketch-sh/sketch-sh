@@ -27,10 +27,6 @@ let make =
                          }
                        )
                      </span>
-                     <span className="UI_SketchList__sketch--dash">
-                       " - "->str
-                     </span>
-                     ("/s/" ++ sketch##id)->str
                    </Router.Link>
                    <div className="UI_SketchList__sketch--lastEdited">
                      "last edited"->str
