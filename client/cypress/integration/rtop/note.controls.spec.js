@@ -13,6 +13,7 @@ import {
   assertLastBlockValue,
   typeTitle,
   typeBlock,
+  aliasSaveButton,
 } from "../../helpers/editor_helpers";
 
 context("Block controls > Add", () => {
@@ -228,9 +229,7 @@ context("Block controls > delete and restore", () => {
 
   it("delete queued should trigger Editor_Note state update", () => {
     cy.visit("new/reason");
-    cy.get(".Topbar__action")
-      .contains("Save")
-      .as("save");
+    aliasSaveButton();
 
     typeBlock(0, "let a = 1;");
     shortcut("{ctrl}s");
