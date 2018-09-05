@@ -155,7 +155,10 @@ div.CodeMirror span.CodeMirror-nonmatchingbracket {
 .source-editor .CodeMirror {
   height: auto !important;
 }
+.source-editor .CodeMirror {
+  border: 1px solid #aaa;
+}
 
 .text-editor {
-  margin-left: var(--cm-gutter-width);
+  margin-left: -8px;
 }
