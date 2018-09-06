@@ -7,6 +7,7 @@
 }
 
 .link__container {
+  display: flex;
 }
 
 .link__input {
@@ -47,6 +48,12 @@
 .link__timestamp {
   color: var(--c-text-sub2);
   margin-left: var(--space2);
+}
+
+.link__timestamp__hint {
+  @media screen and (max-width: 768px) {
+    display: none;
+  }
 }
 
 .links__disclaimer {

@@ -22,7 +22,7 @@ type uiLink = (string, string);
 
 type linkStatus =
   | NotAsked
-  | Error
+  | Error(string)
   | Loading
   | Fetched;
 
@@ -43,7 +43,7 @@ module SingleLink = {
   let make = (~name, ~id, ~timestamp, ~onDelete, _children) => {
     ...component,
     render: _ =>
-      <div>
+      <div className="link__container">
         <input className="link__input" defaultValue=id placeholder="id" />
         <input className="link__input" defaultValue=name placeholder="name" />
         <button
@@ -52,7 +52,9 @@ module SingleLink = {
           <Fi.Trash2 />
         </button>
         <i className="link__timestamp">
-          "revision from "->str
+          <span className="link__timestamp__hint">
+            "revision from "->str
+          </span>
           <UI_DateTime date=timestamp />
         </i>
       </div>,
@@ -108,7 +110,7 @@ module EmptyLink = {
             switch (status) {
             | NotAsked => <Fi.PlusCircle />
             | Loading => <Fi.Loader />
-            | Error => "Loading failed. Retry?"->str
+            | Error(msg) => (msg ++ " Retry?")->str
             | Fetched => <Fi.Trash2 />
             }
           )
@@ -210,41 +212,52 @@ let make = (~links, ~onUpdate, _children) => {
                    | Error(_error) =>
                      <EmptyLink
                        key="error"
-                       status=Error
+                       status=(Error("Fetching failed."))
                        id
                        name
                        onSubmit=(uiLink => send(Link_Add(uiLink)))
                      />
                    | Data(response) =>
-                     let note = response##note[0];
+                     let note = response##note->Belt.Array.get(0);
 
-                     /* TODO handle links that also have links */
-                     let (lang, _links, blocks) =
-                       switch (note##data) {
-                       | None => (Editor_Types.RE, [||], [||])
-                       | Some(data) => Editor_Json.V1.decode(data)
-                       };
+                     switch (note) {
+                     | Some(note) =>
+                       /* TODO handle links that also have links */
+                       let (lang, _links, blocks) =
+                         switch (note##data) {
+                         | None => (Editor_Types.RE, [||], [||])
+                         | Some(data) => Editor_Json.V1.decode(data)
+                         };
 
-                     let link: Link.link =
-                       Internal({
-                         revision_at: note##updated_at,
-                         sketch_id: note##id,
-                         name,
-                         lang,
-                         code:
-                           Editor_Blocks_Utils.concatCodeBlocksToString(
-                             blocks,
-                           ),
-                       });
+                       let link: Link.link =
+                         Internal({
+                           revision_at: note##updated_at,
+                           sketch_id: note##id,
+                           name,
+                           lang,
+                           code:
+                             Editor_Blocks_Utils.concatCodeBlocksToString(
+                               blocks,
+                             ),
+                         });
 
-                     <EmptyLink
-                       key="fetched"
-                       status=Fetched
-                       id
-                       name
-                       onSubmit=(uiLink => send(Link_Add(uiLink)))
-                       onFetched=(() => send(Link_Fetched(link)))
-                     />;
+                       <EmptyLink
+                         key="fetched"
+                         status=Fetched
+                         id
+                         name
+                         onSubmit=(uiLink => send(Link_Add(uiLink)))
+                         onFetched=(() => send(Link_Fetched(link)))
+                       />;
+                     | None =>
+                       <EmptyLink
+                         key="error"
+                         status=(Error("No such link found."))
+                         id
+                         name
+                         onSubmit=(uiLink => send(Link_Add(uiLink)))
+                       />
+                     };
                    }
                )
           </GetLinkComponent>;
