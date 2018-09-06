@@ -11,6 +11,7 @@ import {
   assertLastBlockValue,
   typeTitle,
   typeBlock,
+  aliasSaveButton,
 } from "../../helpers/editor_helpers";
 
 import generate from "nanoid/generate";
@@ -28,10 +29,7 @@ context("create - edit", () => {
 
     let title = faker.lorem.words();
 
-    cy.get(".Topbar__action")
-      .contains("Save")
-      .as("save");
-
+    aliasSaveButton();
     cy.get("@save").should("be.disabled");
 
     cy.get(".EditorNote__metadata")
@@ -142,9 +140,7 @@ context("fork", () => {
     stub.withArgs("Do you want to fork your own Sketch?").returns(true);
 
     cy.on("window:confirm", stub);
-    cy.get(".Topbar__action")
-      .contains("Save")
-      .as("save");
+    aliasSaveButton();
 
     typeTitle("1");
     typeBlock(0, "1");

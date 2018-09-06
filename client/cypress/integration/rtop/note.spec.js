@@ -9,6 +9,7 @@ import {
   assertErrorsOrWarnings,
   assertValue,
   shortcut,
+  aliasSaveButton,
 } from "../../helpers/editor_helpers";
 
 context("keyboard shortcuts", () => {
@@ -19,9 +20,7 @@ context("keyboard shortcuts", () => {
   it("ctrl+s for save", () => {
     let title = faker.lorem.words();
 
-    cy.get(".Topbar__action")
-      .contains("Save")
-      .as("save");
+    aliasSaveButton();
 
     cy.get("@save").should("be.disabled");
 

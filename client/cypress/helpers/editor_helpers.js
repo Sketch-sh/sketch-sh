@@ -41,6 +41,14 @@ const typeBlock = (eq = 0, content) => {
     .find("textarea")
     .type(content, { force: true });
 };
+
+const aliasSaveButton = () => {
+  cy.get(".Topbar__action")
+    .contains("Save")
+    .parent()
+    .as("save");
+};
+
 export {
   assertBlocks,
   assertCodeBlocks,
@@ -52,4 +60,5 @@ export {
   assertLastBlockValue,
   typeTitle,
   typeBlock,
+  aliasSaveButton,
 };
