@@ -1,9 +1,5 @@
 .links__container {
   margin-top: var(--space3);
-
-  @media screen and (min-width: 769px) {
-    margin-left: calc(var(--cm-gutter-width) + 8px);
-  }
 }
 
 .link__container {

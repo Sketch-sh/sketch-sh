@@ -17,6 +17,7 @@ module GetLinkComponent = ReasonApollo.CreateQuery(GetLink);
 
 open Utils;
 open Editor_Types;
+open Editor_Types.Link;
 
 type name = string;
 type id = string;
@@ -36,9 +37,9 @@ type linkStatus =
 type action =
   | Link_Add((name, id))
   | Link_Retry((name, id))
-  | Link_Fetched(Link.link)
-  | Link_Update(Link.link)
-  | Link_Delete(Link.link);
+  | Link_Fetched(link)
+  | Link_Update(link)
+  | Link_Delete(link);
 
 type state = {
   /* links: array(Link.link), */
@@ -127,6 +128,12 @@ module EmptyLink = {
   };
 };
 
+let getIdFromLink = link =>
+  switch (link) {
+  | Internal(link) => link.sketch_id
+  | _ => failwith("There are no external links yet.")
+  };
+
 let component = ReasonReact.reducerComponent("Editor_Links");
 
 let make = (~links, ~onUpdate, _children) => {
@@ -146,6 +153,8 @@ let make = (~links, ~onUpdate, _children) => {
         {fetchingLink: None},
         (
           _ => {
+            let id = getIdFromLink(link);
+            Notify.info("Link " ++ id ++ " has been fetched.");
             let links = Belt.Array.concat(links, [|link|]);
 
             onUpdate(links);
@@ -156,7 +165,6 @@ let make = (~links, ~onUpdate, _children) => {
       ReasonReact.SideEffects(
         (
           _ => {
-            open Editor_Types.Link;
             let links =
               Belt.Array.keepU(links, (. link) =>
                 switch (link, linkToDelete) {
@@ -252,7 +260,11 @@ let make = (~links, ~onUpdate, _children) => {
                          });
 
                        <EmptyLink
-                         key=timestamp
+                         key=(
+                           note##updated_at
+                           |> Js.Json.decodeString
+                           |> Belt.Option.getExn
+                         )
                          status=Fetched
                          id
                          name
