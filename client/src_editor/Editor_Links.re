@@ -106,9 +106,9 @@ module EmptyLink = {
           disabled=(status == Loading)>
           (
             switch (status) {
-            | NotAsked => <Fi.Plus />
+            | NotAsked => <Fi.PlusCircle />
             | Loading => <Fi.Loader />
-            | Error => "TODO"->str
+            | Error => "Loading failed. Retry?"->str
             | Fetched => <Fi.Trash2 />
             }
           )
@@ -124,9 +124,10 @@ let make = (~links, ~onUpdate, _children) => {
   initialState: () => {fetchingLink: None},
   reducer: (action: action, state: state) => {
     Log.blue(~label="Editor_Links", action);
-    Js.log(action);
     switch (action) {
     | Link_Add((name, id)) =>
+      /* TODO fail if there's already a module with same name */
+      /* TODO fail if id is the same as current link */
       ReasonReact.Update({...state, fetchingLink: Some((name, id))})
     | Link_Fetched(link) =>
       ReasonReact.UpdateWithSideEffects(
@@ -188,6 +189,7 @@ let make = (~links, ~onUpdate, _children) => {
         switch (state.fetchingLink) {
         | None =>
           <EmptyLink
+            key="notAsked"
             status=NotAsked
             onSubmit=(uiLink => send(Link_Add(uiLink)))
           />
