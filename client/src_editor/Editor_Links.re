@@ -40,7 +40,7 @@ type state = {
 module SingleLink = {
   let component = ReasonReact.statelessComponent("Editor_SingleLink");
 
-  let make = (~name, ~id, ~onDelete, _children) => {
+  let make = (~name, ~id, ~timestamp, ~onDelete, _children) => {
     ...component,
     render: _ =>
       <div>
@@ -51,6 +51,10 @@ module SingleLink = {
           onClick=(_ => onDelete())>
           <Fi.Trash2 />
         </button>
+        <i className="link__timestamp">
+          "revision from "->str
+          <UI_DateTime date=timestamp />
+        </i>
       </div>,
   };
 };
@@ -162,11 +166,12 @@ let make = (~links, ~onUpdate, _children) => {
       ->Belt.Array.mapU(
           (. link: Link.link) =>
             switch (link) {
-            | Internal({sketch_id, name}) =>
+            | Internal({sketch_id, name, revision_at}) =>
               <SingleLink
                 id=sketch_id
                 key=sketch_id
                 name
+                timestamp=revision_at
                 onDelete=(() => send(Link_Delete(link)))
               />
             | External () => ReasonReact.null
@@ -175,7 +180,7 @@ let make = (~links, ~onUpdate, _children) => {
 
     <div className="links__container">
       <span className="links__disclaimer">
-        "Add a link to another sketch by pasting its' id and giving it a module name"
+        "Add a link to another sketch by pasting its id and giving it a module name"
         ->str
       </span>
       <div> existingLinks->ReasonReact.array </div>

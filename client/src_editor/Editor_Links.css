@@ -1,6 +1,9 @@
 .links__container {
-  margin-left: calc(var(--cm-gutter-width) + 8px);
   margin-top: var(--space3);
+
+  @media screen and (min-width: 769px) {
+    margin-left: calc(var(--cm-gutter-width) + 8px);
+  }
 }
 
 .link__container {
@@ -39,6 +42,11 @@
   &:hover {
     color: var(--c-danger) !important;
   }
+}
+
+.link__timestamp {
+  color: var(--c-text-sub2);
+  margin-left: var(--space2);
 }
 
 .links__disclaimer {
