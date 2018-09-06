@@ -174,7 +174,7 @@ let make = (~links, ~onUpdate, _children) => {
                 timestamp=revision_at
                 onDelete=(() => send(Link_Delete(link)))
               />
-            | External () => ReasonReact.null
+            | _ => failwith("There are no external links yet.")
             },
         );
 

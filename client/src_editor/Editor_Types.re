@@ -107,7 +107,7 @@ module Link = {
     code: string,
   };
 
-  type externalLink = unit;
+  type externalLink;
 
   type link =
     | Internal(internalLink)

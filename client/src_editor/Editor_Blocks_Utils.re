@@ -241,6 +241,6 @@ let getNameFromLink = link =>
   Editor_Types.Link.(
     switch (link) {
     | Internal(internalLink) => internalLink.name
-    | External () => raise(Not_Implemented)
+    | _ => failwith("There are no external links yet.")
     }
   );

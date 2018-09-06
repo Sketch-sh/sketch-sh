@@ -48,7 +48,7 @@ module V1 = {
         let kind = json |> field("kind", string);
         switch (kind) {
         | "internal" => Internal(json |> field("value", internalLinkDecoder))
-        | _ => External()
+        | _ => failwith("There is no such link kind.")
         };
       };
 
@@ -113,7 +113,7 @@ module V1 = {
             ("kind", "internal" |> string),
             ("value", internalLink |> internalLinkEncoder),
           ])
-        | External () => object_([])
+        | _ => failwith("There are no external links yet.")
         };
 
     let encode: (lang, array(Link.link), array(Block.block)) => Js.Json.t =
