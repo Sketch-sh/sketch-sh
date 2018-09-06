@@ -18,7 +18,14 @@ module GetLinkComponent = ReasonApollo.CreateQuery(GetLink);
 open Utils;
 open Editor_Types;
 
-type uiLink = (string, string);
+type name = string;
+type id = string;
+
+type uiLink = {
+  name: string,
+  id: string,
+  timestamp: string,
+};
 
 type linkStatus =
   | NotAsked
@@ -27,14 +34,15 @@ type linkStatus =
   | Fetched;
 
 type action =
-  | Link_Add(uiLink)
+  | Link_Add((name, id))
+  | Link_Retry((name, id))
   | Link_Fetched(Link.link)
   | Link_Update(Link.link)
   | Link_Delete(Link.link);
 
 type state = {
   /* links: array(Link.link), */
-  fetchingLink: option((string, string)),
+  fetchingLink: option(uiLink),
 };
 
 module SingleLink = {
@@ -89,7 +97,7 @@ module EmptyLink = {
       | UpdateName(name) => ReasonReact.Update({...state, name})
       },
     render: ({send, state}) =>
-      <div>
+      <div className="link__container">
         <input
           className="link__input"
           value=state.id
@@ -124,16 +132,18 @@ let component = ReasonReact.reducerComponent("Editor_Links");
 let make = (~links, ~onUpdate, _children) => {
   ...component,
   initialState: () => {fetchingLink: None},
-  reducer: (action: action, state: state) => {
+  reducer: (action, _state) => {
     Log.blue(~label="Editor_Links", action);
     switch (action) {
+    | Link_Retry((name, id))
     | Link_Add((name, id)) =>
+      let timestamp = Js.Date.make() |> Js.Date.toISOString;
       /* TODO fail if there's already a module with same name */
       /* TODO fail if id is the same as current link */
-      ReasonReact.Update({...state, fetchingLink: Some((name, id))})
+      ReasonReact.Update({fetchingLink: Some({name, id, timestamp})});
     | Link_Fetched(link) =>
       ReasonReact.UpdateWithSideEffects(
-        {...state, fetchingLink: None},
+        {fetchingLink: None},
         (
           _ => {
             let links = Belt.Array.concat(links, [|link|]);
@@ -195,7 +205,7 @@ let make = (~links, ~onUpdate, _children) => {
             status=NotAsked
             onSubmit=(uiLink => send(Link_Add(uiLink)))
           />
-        | Some((name, id)) =>
+        | Some({name, id, timestamp}) =>
           let getLinkQuery = GetLink.make(~noteId=id, ());
           <GetLinkComponent variables=getLinkQuery##variables>
             ...(
@@ -203,7 +213,7 @@ let make = (~links, ~onUpdate, _children) => {
                    switch (result) {
                    | Loading =>
                      <EmptyLink
-                       key="loading"
+                       key=timestamp
                        status=Loading
                        id
                        name
@@ -211,11 +221,11 @@ let make = (~links, ~onUpdate, _children) => {
                      />
                    | Error(_error) =>
                      <EmptyLink
-                       key="error"
+                       key=timestamp
                        status=(Error("Fetching failed."))
                        id
                        name
-                       onSubmit=(uiLink => send(Link_Add(uiLink)))
+                       onSubmit=(uiLink => send(Link_Retry(uiLink)))
                      />
                    | Data(response) =>
                      let note = response##note->Belt.Array.get(0);
@@ -242,7 +252,7 @@ let make = (~links, ~onUpdate, _children) => {
                          });
 
                        <EmptyLink
-                         key="fetched"
+                         key=timestamp
                          status=Fetched
                          id
                          name
@@ -251,11 +261,11 @@ let make = (~links, ~onUpdate, _children) => {
                        />;
                      | None =>
                        <EmptyLink
-                         key="error"
+                         key=timestamp
                          status=(Error("No such link found."))
                          id
                          name
-                         onSubmit=(uiLink => send(Link_Add(uiLink)))
+                         onSubmit=(uiLink => send(Link_Retry(uiLink)))
                        />
                      };
                    }

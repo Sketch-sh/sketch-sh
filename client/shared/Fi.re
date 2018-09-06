@@ -210,3 +210,15 @@ module Link = {
       children,
     );
 };
+
+module RefreshCCW = {
+  [@bs.module "react-icons/fi"]
+  external reactClass: ReasonReact.reactClass = "FiRefreshCCW";
+
+  let make = (~className="", children) =>
+    ReasonReact.wrapJsForReason(
+      ~reactClass,
+      ~props={"className": className},
+      children,
+    );
+};
