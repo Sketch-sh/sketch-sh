@@ -50,11 +50,8 @@ module Make = (ESig: Worker_Evaluator.EvaluatorSig) => {
 
   open Editor_Types;
 
-  let execute: (. bool, string) => (list(blockData), bool) =
-    (. reset, code) => {
-      if (reset) {
-        Evaluator.reset();
-      };
+  let execute: (. string) => (list(blockData), bool) =
+    (. code) => {
       let result = Evaluator.execute(code);
       let length = Belt.Array.length(result);
 
@@ -86,9 +83,6 @@ module Make = (ESig: Worker_Evaluator.EvaluatorSig) => {
   let executeMany:
     (Editor_Types.lang, list(blockInput)) => list(Toplevel.Types.blockResult) =
     (lang, codeBlocks) => {
-      /* Reset before evaluating several blocks */
-      /* Evaluator.reset(); */
-
       switch (lang) {
       | ML => Evaluator.mlSyntax()
       | RE => Evaluator.reSyntax()
@@ -101,7 +95,7 @@ module Make = (ESig: Worker_Evaluator.EvaluatorSig) => {
         switch (blocks) {
         | [] => acc
         | [{binput_id: id, binput_value: code}, ...rest] =>
-          let (result, hasError) = execute(. false, code);
+          let (result, hasError) = execute(. code);
 
           let currentBlockResult = {Toplevel.Types.id, Toplevel.Types.result};
           hasError ?
