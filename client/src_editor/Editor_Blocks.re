@@ -412,11 +412,10 @@ module Actions = {
           self.send(Block_FocusNextBlockOrCreate(blockTyp));
         };
         onExecute(true);
-        /* TODO add cancel for link */
         /* TODO unify API for link and execute */
         open Belt.Result;
 
-        let _linkId =
+        let linkId =
           Toplevel_Consumer.link(
             Array.to_list(links),
             result => {
@@ -465,7 +464,8 @@ module Actions = {
               self.onUnmount(() => Toplevel_Consumer.cancel(id));
             },
           );
-        ();
+
+        self.onUnmount(() => Toplevel_Consumer.cancel(linkId));
       },
     );
   };
