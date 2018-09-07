@@ -217,7 +217,8 @@ module Editor_Note = {
                                 | Some(callback) => callback()
                                 }
                             )>
-                            <UI_LoadingWrapper loading=state.isExecuting>
+                            <UI_LoadingWrapper
+                              loading=state.isExecuting delayMs=500>
                               ...(
                                    loading =>
                                      loading ?

@@ -128,7 +128,9 @@ module Make = (ESig: Worker_Evaluator.EvaluatorSig) => {
         }
       );
     };
+
   exception Not_Implemented;
+
   let linkMany: (. list(Link.link)) => list((Link.link, linkResult)) =
     (. links) => {
       /* Reset before evaluating several blocks */

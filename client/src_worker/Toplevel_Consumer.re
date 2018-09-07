@@ -87,17 +87,21 @@ let run = (payload, callback, timeoutCallback) => {
   messageId;
 };
 
-let link = (links, callback) =>
-  run(Link(links), LinkCallback(callback), () =>
-    callback(Belt.Result.Error("Evaluation timeout"))
-  );
+let execute = (~lang, ~blocks, ~links, ~linkCallback, ~executeCallback) => {
+  let linkId =
+    run(Link(links), LinkCallback(linkCallback), () =>
+      linkCallback(Belt.Result.Error("Linking timeout."))
+    );
 
-let execute = (lang, blocks, callback) =>
-  run(Execute(lang, blocks), ExecuteCallback(callback), () =>
-    callback(Belt.Result.Error("Evaluation timeout"))
-  );
+  let executeId =
+    run(Execute(lang, blocks), ExecuteCallback(executeCallback), () =>
+      executeCallback(Belt.Result.Error("Evaluation timeout."))
+    );
+
+  (linkId, executeId);
+};
 
 let refmt = (refmtTypes, blocks, callback) =>
   run(Refmt(refmtTypes, blocks), RefmtCallback(callback), () =>
-    callback(Belt.Result.Error("Evaluation timeout"))
+    callback(Belt.Result.Error("Evaluation timeout."))
   );

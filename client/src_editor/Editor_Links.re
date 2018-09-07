@@ -44,7 +44,7 @@ type action =
 type state = {fetchingLink: option(uiLink)};
 
 module SingleLink = {
-  let component = ReasonReact.statelessComponent("Editor_SingleLink");
+  let component = ReasonReact.statelessComponent("Editor_Links_SingleLink");
 
   let make = (~name, ~id, ~timestamp, ~onDelete, _children) => {
     ...component,
@@ -88,7 +88,7 @@ module EmptyLink = {
     | UpdateId(string)
     | UpdateName(string);
 
-  let component = ReasonReact.reducerComponent("Editor_EmptyLink");
+  let component = ReasonReact.reducerComponent("Editor_Links_EmptyLink");
 
   let make = (~status, ~onSubmit, ~onFetched=?, ~name="", ~id="", _children) => {
     ...component,

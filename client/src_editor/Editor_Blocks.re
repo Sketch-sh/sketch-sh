@@ -412,14 +412,14 @@ module Actions = {
           self.send(Block_FocusNextBlockOrCreate(blockTyp));
         };
         onExecute(true);
-        /* TODO unify API for link and execute */
         open Belt.Result;
-
-        let linkId =
-          Toplevel_Consumer.link(
-            Array.to_list(links),
-            result => {
-              switch (result) {
+        let (linkId, executeId) =
+          Toplevel_Consumer.execute(
+            ~lang,
+            ~blocks=allCodeToExecute,
+            ~links=Array.to_list(links),
+            ~linkCallback=
+              fun
               | Error(error) => Notify.error(error)
               | Ok(executedLinks) =>
                 executedLinks
@@ -436,36 +436,31 @@ module Actions = {
                         };
                       }
                     ),
-                  )
-              };
-
-              let id =
-                Toplevel_Consumer.execute(
-                  lang,
-                  allCodeToExecute,
-                  fun
-                  | Belt.Result.Error(error) => {
-                      onExecute(false);
-                      Notify.error(error);
-                    }
-                  | Belt.Result.Ok(blocks) => {
-                      onExecute(false);
-                      blocks
-                      ->(
-                          Belt.List.forEachU(
-                            (. {Toplevel.Types.id: blockId, result}) => {
-                            let widgets = executeResultToWidget(result);
-                            self.send(Block_AddWidgets(blockId, widgets));
-                          })
-                        );
-                    },
-                );
-
-              self.onUnmount(() => Toplevel_Consumer.cancel(id));
-            },
+                  ),
+            ~executeCallback=
+              fun
+              | Belt.Result.Error(error) => {
+                  onExecute(false);
+                  Notify.error(error);
+                }
+              | Belt.Result.Ok(blocks) => {
+                  onExecute(false);
+                  blocks
+                  ->(
+                      Belt.List.forEachU(
+                        (. {Toplevel.Types.id: blockId, result}) => {
+                        let widgets = executeResultToWidget(result);
+                        self.send(Block_AddWidgets(blockId, widgets));
+                      })
+                    );
+                },
           );
 
-        self.onUnmount(() => Toplevel_Consumer.cancel(linkId));
+        self.onUnmount(() => {
+          Toplevel_Consumer.cancel(linkId);
+
+          Toplevel_Consumer.cancel(executeId);
+        });
       },
     );
   };
