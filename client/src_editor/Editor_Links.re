@@ -18,6 +18,7 @@ module GetLinkComponent = ReasonApollo.CreateQuery(GetLink);
 open Utils;
 open Editor_Types;
 open Editor_Types.Link;
+open Editor_Links_Utils;
 
 type name = string;
 type id = string;
@@ -36,15 +37,11 @@ type linkStatus =
 
 type action =
   | Link_Add((name, id))
-  | Link_Retry((name, id))
   | Link_Fetched(link)
   | Link_Update(link)
   | Link_Delete(link);
 
-type state = {
-  /* links: array(Link.link), */
-  fetchingLink: option(uiLink),
-};
+type state = {fetchingLink: option(uiLink)};
 
 module SingleLink = {
   let component = ReasonReact.statelessComponent("Editor_SingleLink");
@@ -53,8 +50,18 @@ module SingleLink = {
     ...component,
     render: _ =>
       <div className="link__container">
-        <input className="link__input" defaultValue=id placeholder="id" />
-        <input className="link__input" defaultValue=name placeholder="name" />
+        <input
+          className="link__input"
+          defaultValue=id
+          placeholder="id"
+          disabled=true
+        />
+        <input
+          className="link__input"
+          defaultValue=name
+          placeholder="name"
+          disabled=true
+        />
         <button
           className="link__button link__button--danger"
           onClick=(_ => onDelete())>
@@ -62,7 +69,7 @@ module SingleLink = {
         </button>
         <i className="link__timestamp">
           <span className="link__timestamp__hint">
-            "revision from "->str
+            "Revision from "->str
           </span>
           <UI_DateTime date=timestamp />
         </i>
@@ -74,6 +81,7 @@ module EmptyLink = {
   type state = {
     name: string,
     id: string,
+    dirty: bool,
   };
 
   type action =
@@ -84,18 +92,16 @@ module EmptyLink = {
 
   let make = (~status, ~onSubmit, ~onFetched=?, ~name="", ~id="", _children) => {
     ...component,
-    initialState: () => {name, id},
+    initialState: () => {name, id, dirty: false},
     didMount: _ =>
       switch (onFetched) {
       | None => ()
-      | Some(f) =>
-        Log.green(~label="Empty Link", "calll onFetched");
-        f();
+      | Some(f) => f()
       },
     reducer: (action, state) =>
       switch (action) {
-      | UpdateId(id) => ReasonReact.Update({...state, id})
-      | UpdateName(name) => ReasonReact.Update({...state, name})
+      | UpdateId(id) => ReasonReact.Update({...state, id, dirty: true})
+      | UpdateName(name) => ReasonReact.Update({...state, name, dirty: true})
       },
     render: ({send, state}) =>
       <div className="link__container">
@@ -113,14 +119,24 @@ module EmptyLink = {
         />
         <button
           className="link__button"
-          onClick=(_ => onSubmit((state.name, state.id)))
+          onClick=(
+            _ =>
+              if (state.name != "" && state.id != "") {
+                onSubmit((state.name, state.id));
+              }
+          )
           disabled=(status == Loading)>
           (
-            switch (status) {
-            | NotAsked => <Fi.PlusCircle />
-            | Loading => <Fi.Loader />
-            | Error(msg) => (msg ++ " Retry?")->str
-            | Fetched => <Fi.Trash2 />
+            switch (status, state.dirty) {
+            | (NotAsked, _) => <Fi.PlusCircle />
+            | (Loading, _) => <Fi.Loader />
+            | (Error(message), false) =>
+              <>
+                <Fi.PlusCircle />
+                <i className="link__button__error"> ("  " ++ message)->str </i>
+              </>
+            | (Error(_), true) => <Fi.PlusCircle />
+            | (Fetched, _) => <Fi.Trash2 />
             }
           )
         </button>
@@ -128,26 +144,43 @@ module EmptyLink = {
   };
 };
 
-let getIdFromLink = link =>
-  switch (link) {
-  | Internal(link) => link.sketch_id
-  | _ => failwith("There are no external links yet.")
-  };
-
 let component = ReasonReact.reducerComponent("Editor_Links");
 
-let make = (~links, ~onUpdate, _children) => {
+let make = (~currentSketchId, ~links, ~onUpdate, _children) => {
   ...component,
   initialState: () => {fetchingLink: None},
-  reducer: (action, _state) => {
-    Log.blue(~label="Editor_Links", action);
+  reducer: (action, _state) =>
     switch (action) {
-    | Link_Retry((name, id))
     | Link_Add((name, id)) =>
       let timestamp = Js.Date.make() |> Js.Date.toISOString;
-      /* TODO fail if there's already a module with same name */
-      /* TODO fail if id is the same as current link */
-      ReasonReact.Update({fetchingLink: Some({name, id, timestamp})});
+
+      if (id == currentSketchId) {
+        ReasonReact.SideEffects(
+          (_ => Notify.error("Cannot link current sketch.")),
+        );
+      } else {
+        let linkWithSameNameExists =
+          arrayFind(links, l => getNameFromLink(l) == name);
+
+        switch (linkWithSameNameExists) {
+        | Some(_) =>
+          ReasonReact.SideEffects(
+            (_ => Notify.error("Link with same module name already exists.")),
+          )
+        | None =>
+          let linkWithSameIdExists =
+            arrayFind(links, l => getIdFromLink(l) == id);
+
+          switch (linkWithSameIdExists) {
+          | Some(_) =>
+            ReasonReact.SideEffects(
+              (_ => Notify.error("Link with same id already exists.")),
+            )
+          | None =>
+            ReasonReact.Update({fetchingLink: Some({name, id, timestamp})})
+          };
+        };
+      };
     | Link_Fetched(link) =>
       ReasonReact.UpdateWithSideEffects(
         {fetchingLink: None},
@@ -155,8 +188,8 @@ let make = (~links, ~onUpdate, _children) => {
           _ => {
             let id = getIdFromLink(link);
             Notify.info("Link " ++ id ++ " has been fetched.");
-            let links = Belt.Array.concat(links, [|link|]);
 
+            let links = Belt.Array.concat(links, [|link|]);
             onUpdate(links);
           }
         ),
@@ -179,8 +212,7 @@ let make = (~links, ~onUpdate, _children) => {
         ),
       )
     | _ => ReasonReact.NoUpdate
-    };
-  },
+    },
   render: ({send, state}) => {
     let existingLinks =
       links
@@ -201,7 +233,7 @@ let make = (~links, ~onUpdate, _children) => {
 
     <div className="links__container">
       <span className="links__disclaimer">
-        "Add a link to another sketch by pasting its id and giving it a module name"
+        "Add a link to another sketch by pasting its id and assigning it a module name."
         ->str
       </span>
       <div> existingLinks->ReasonReact.array </div>
@@ -228,13 +260,15 @@ let make = (~links, ~onUpdate, _children) => {
                        onSubmit=(uiLink => send(Link_Add(uiLink)))
                      />
                    | Error(_error) =>
+                     Notify.error("Fetching link " ++ id ++ " failed.");
+
                      <EmptyLink
                        key=timestamp
                        status=(Error("Fetching failed."))
                        id
                        name
-                       onSubmit=(uiLink => send(Link_Retry(uiLink)))
-                     />
+                       onSubmit=(uiLink => send(Link_Add(uiLink)))
+                     />;
                    | Data(response) =>
                      let note = response##note->Belt.Array.get(0);
 
@@ -272,13 +306,15 @@ let make = (~links, ~onUpdate, _children) => {
                          onFetched=(() => send(Link_Fetched(link)))
                        />;
                      | None =>
+                       Notify.error("Link " ++ id ++ " not found.");
+
                        <EmptyLink
                          key=timestamp
                          status=(Error("No such link found."))
                          id
                          name
-                         onSubmit=(uiLink => send(Link_Retry(uiLink)))
-                       />
+                         onSubmit=(uiLink => send(Link_Add(uiLink)))
+                       />;
                      };
                    }
                )

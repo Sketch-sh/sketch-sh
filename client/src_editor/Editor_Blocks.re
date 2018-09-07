@@ -9,6 +9,7 @@ open Utils;
 open Editor_Types;
 open Editor_Types.Block;
 open Editor_Blocks_Utils;
+open Editor_Links_Utils;
 
 type action =
   | Block_Add(id, blockTyp)

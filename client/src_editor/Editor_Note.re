@@ -371,6 +371,7 @@ module Editor_Note = {
                   key=(
                     state.noteId ++ string_of_int(Array.length(state.links))
                   )
+                  currentSketchId=state.noteId
                   links=state.links
                   onUpdate=(links => send(LinkUpdate(links)))
                 /> :

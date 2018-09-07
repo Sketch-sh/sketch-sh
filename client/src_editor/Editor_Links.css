@@ -13,7 +13,6 @@
   color: var(--c-text-sub2);
   font-family: var(--font-monospace);
   border: none;
-  /* border: 1px solid var(--c-text-sub2); */
   margin-right: var(--space2);
   background-color: transparent;
 }
@@ -29,10 +28,17 @@
   margin-left: var(--space3);
   cursor: pointer;
   font-size: var(--f5);
+  display: flex;
+  justify-content: center;
 
   &:hover {
     color: var(--topbar-c-primary);
   }
+}
+
+.link__button__error {
+  color: var(--c-danger);
+  margin-left: var(--space2);
 }
 
 .link__button--danger {
