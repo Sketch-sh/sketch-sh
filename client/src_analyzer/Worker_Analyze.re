@@ -116,10 +116,9 @@ module Make = (ESig: Worker_Evaluator.EvaluatorSig) => {
             | External(_) => raise(Not_Implemented)
             };
 
-          let hasError = Belt.Result.isError(result);
           let linkResult: Toplevel.Types.linkResult = {link, result};
-          hasError ?
-            [linkResult, ...acc] : loop(rest, [linkResult, ...acc]);
+
+          loop(rest, [linkResult, ...acc]);
         };
 
       loop(links, []);
