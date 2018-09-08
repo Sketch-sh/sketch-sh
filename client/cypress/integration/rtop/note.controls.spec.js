@@ -177,6 +177,49 @@ context("Block controls > delete and restore", () => {
       .click();
     assertBlocks(5);
   });
+  it("delete immediately should not remove last block - #182", () => {
+    cy.visit("new/reason");
+    shortcut("{shift}{enter}");
+
+    assertCodeBlocks(2);
+    typeBlock(0, "0");
+    typeBlock(1, "1");
+    cy.get(".block__container")
+      .eq(0)
+      .find(`button[aria-label="Delete block"]`)
+      .click();
+    assertCodeBlocks(1);
+
+    cy.wait(2000);
+    cy.get(".block__container")
+      .eq(0)
+      .find(".block__deleted")
+      .find(`button[aria-label="Delete block immediately"]`)
+      .click();
+    assertBlocks(1);
+
+    cy.wait(10000);
+    assertBlocks(1);
+    assertLastBlockValue("1");
+  });
+  it.only("should append an empty code blocks when all blocks are deleted", () => {
+    cy.visit("new/reason");
+
+    typeBlock(0, "let a = 1;");
+    assertCodeBlocks(1);
+    cy.get(".block__container")
+      .eq(0)
+      .find(`button[aria-label="Delete block"]`)
+      .click();
+    cy.get(".block__container")
+      .eq(0)
+      .find(".block__deleted")
+      .find(`button[aria-label="Delete block immediately"]`)
+      .click();
+    assertCodeBlocks(1);
+    assertLastBlockValue("");
+    cy.get(".Notify.Notify--info").contains("When you delete all blocks")
+  });
   it("remove temporary deleted block from execution", () => {
     cy.visit("new/reason");
     cy.get(".block__container")

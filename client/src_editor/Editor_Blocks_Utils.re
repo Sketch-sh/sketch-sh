@@ -184,8 +184,6 @@ let getBlockIndex = (blocks, blockId) =>
     | Some(i) => i
   );
 
-let isLastBlock = blocks => Belt.Array.length(blocks) == 1;
-
 let findLastCodeBlock = blocks => {
   let length = Array.length(blocks);
   let rec loop = i =>
