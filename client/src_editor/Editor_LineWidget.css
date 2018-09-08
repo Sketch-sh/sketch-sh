@@ -33,7 +33,7 @@
 
 .widget__value {
   white-space: pre;
-  opacity: 0.5;
+  color: hsl(0, 0%, 60%);
 }
 .widget__value--truncated {
   display: none;
@@ -75,5 +75,28 @@
   }
   & .widget__value__button {
     display: none;
+  }
+}
+
+.widget__copyButton {
+  position: absolute;
+  right: 0;
+  border: 0;
+  outline: 0;
+  background: none;
+  cursor: pointer;
+  z-index: 2;
+
+  & > svg {
+    width: 24px;
+    height: 24px;
+    fill: none;
+    stroke: hsl(0, 0%, 70%);
+    stroke-width: 2;
+    stroke-linejoin: round;
+
+    &:hover {
+      stroke: var(--cm-text);
+    }
   }
 }

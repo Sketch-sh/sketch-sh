@@ -1,3 +1,4 @@
+module D = Webapi.Dom;
 Modules.require("./Editor_LineWidget.css");
 
 type cb = unit => unit;
@@ -33,6 +34,26 @@ let createLintWidget = (modifier, html) => {
 let createErrorWidget = createLintWidget(Error);
 let createWarningWidget = createLintWidget(Warning);
 
+let copyButton = text => {
+  open Webapi.Dom;
+  let button = document |> Document.createElement("button");
+  button->Element.setClassName("widget__copyButton");
+  button |> Element.setAttribute("title", "Copy to clipboard");
+  button
+  ->D.Element.setInnerHTML(
+      {|<svg viewBox="0 0 24 24">
+      <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+      <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+  </svg>|},
+    );
+  button
+  |> Element.addClickEventListener(_ => {
+       Notify.info("Copied to clipboard");
+       Copy.copy(text) |> ignore;
+     });
+  button;
+};
+
 let toggleFold = ele => {
   open Webapi.Dom;
   let classList = ele |> Element.classList;
@@ -50,6 +71,10 @@ let createValueWidget = text => {
   open Webapi.Dom;
   let widget = document |> Document.createElement("div");
   widget->Element.setClassName("widget__foldable");
+
+  if (text != "- : unit = ()\n") {
+    widget |> Element.appendChild(copyButton(text));
+  };
 
   let toggle = document |> Document.createElement("div");
   toggle
@@ -112,6 +137,8 @@ let createStdoutWidget = text => {
   open Webapi.Dom;
   let widget = document |> Document.createElement("div");
   widget->Element.setClassName("widget__stdout");
+
+  widget |> Element.appendChild(copyButton(text));
 
   let textNode = document |> Document.createTextNode(text);
   widget |> Element.appendChild(textNode);
