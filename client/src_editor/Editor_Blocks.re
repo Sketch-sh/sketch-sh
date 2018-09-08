@@ -320,9 +320,15 @@ module Actions = {
     );
   };
   let deleteQueued = (action, state, blockId) => {
+    /* Remove timeout in case user click on Delete immediately */
+    switch ((state.deletedBlockMeta^)->TimeoutMap.get(blockId)) {
+    | None => ()
+    | Some(id) => Js.Global.clearTimeout(id)
+    };
     state.deletedBlockMeta :=
       (state.deletedBlockMeta^)->TimeoutMap.remove(blockId);
-    if (isLastBlock(state.blocks) || Belt.Array.length(state.blocks) == 0) {
+    if (Belt.Array.length(state.blocks) == 0) {
+      Log.blue(~label="isLastBlock", state.blocks);
       ReasonReact.UpdateWithSideEffects(
         {
           ...state,
