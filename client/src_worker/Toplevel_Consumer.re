@@ -6,14 +6,9 @@ let toplevelWorker = ref(None);
 module MapStr = Belt.MutableMap.String;
 
 type callback =
-  | LinkCallback(
-      Belt.Result.t(
-        list((Editor_Types.Link.link, Worker_Types.linkResult)),
-        string,
-      ) =>
-      unit,
+  | ExecuteCallback(
+      Belt.Result.t((list(linkResult), list(blockResult)), string) => unit,
     )
-  | ExecuteCallback(Belt.Result.t(list(blockResult), string) => unit)
   | RefmtCallback(Belt.Result.t(refmtOk, string) => unit);
 
 let ongoingCallbacks: MapStr.t((Js.Global.timeoutId, callback)) =
@@ -28,11 +23,6 @@ let workerListener = event => {
     Js.Global.clearTimeout(timeoutId);
     switch (message) {
     | Ready => () /* Ignore this for now */
-    | LinkResult(result) =>
-      switch (callback) {
-      | LinkCallback(callback) => callback(Belt.Result.Ok(result))
-      | _ => ()
-      }
     | ExecuteResult(result) =>
       switch (callback) {
       | ExecuteCallback(callback) => callback(result)
@@ -87,19 +77,10 @@ let run = (payload, callback, timeoutCallback) => {
   messageId;
 };
 
-let execute = (~lang, ~blocks, ~links, ~linkCallback, ~executeCallback) => {
-  let linkId =
-    run(Link(links), LinkCallback(linkCallback), () =>
-      linkCallback(Belt.Result.Error("Linking timeout."))
-    );
-
-  let executeId =
-    run(Execute(lang, blocks), ExecuteCallback(executeCallback), () =>
-      executeCallback(Belt.Result.Error("Evaluation timeout."))
-    );
-
-  (linkId, executeId);
-};
+let execute = (~lang, ~blocks, ~links, callback) =>
+  run(Execute(lang, blocks, links), ExecuteCallback(callback), () =>
+    callback(Belt.Result.Error("Evaluation timeout."))
+  );
 
 let refmt = (refmtTypes, blocks, callback) =>
   run(Refmt(refmtTypes, blocks), RefmtCallback(callback), () =>

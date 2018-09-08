@@ -413,54 +413,53 @@ module Actions = {
         };
         onExecute(true);
         open Belt.Result;
-        let (linkId, executeId) =
+
+        let executeId =
           Toplevel_Consumer.execute(
             ~lang,
             ~blocks=allCodeToExecute,
             ~links=Array.to_list(links),
-            ~linkCallback=
-              fun
-              | Error(error) => Notify.error(error)
-              | Ok(executedLinks) =>
-                executedLinks
+            fun
+            | Error(error) => {
+                onExecute(false);
+                Notify.error(error);
+              }
+            | Ok((linksWithResults, blocksWithResults)) => {
+                onExecute(false);
+
+                blocksWithResults
+                ->(
+                    Belt.List.forEachU(
+                      (. {Toplevel.Types.id: blockId, result}) => {
+                      let widgets = executeResultToWidget(result);
+                      self.send(Block_AddWidgets(blockId, widgets));
+                    })
+                  );
+
+                linksWithResults
                 ->Belt.List.forEachU(
                     (
-                      (. (link, linkResult)) => {
-                        let name = getNameFromLink(link);
-                        switch (linkResult) {
+                      (. linkResult) => {
+                        let linkResult: Toplevel.Types.linkResult = linkResult;
+                        let link: Editor_Types.Link.link = linkResult.link;
+                        let result: Worker_Types.linkResult =
+                          linkResult.result;
+
+                        switch (result) {
                         | Ok () => ()
                         | Error(message) =>
+                          let name = getNameFromLink(link);
                           Notify.error(
                             {j|Module "$name" failed to link: $message|j},
-                          )
+                          );
                         };
                       }
                     ),
-                  ),
-            ~executeCallback=
-              fun
-              | Belt.Result.Error(error) => {
-                  onExecute(false);
-                  Notify.error(error);
-                }
-              | Belt.Result.Ok(blocks) => {
-                  onExecute(false);
-                  blocks
-                  ->(
-                      Belt.List.forEachU(
-                        (. {Toplevel.Types.id: blockId, result}) => {
-                        let widgets = executeResultToWidget(result);
-                        self.send(Block_AddWidgets(blockId, widgets));
-                      })
-                    );
-                },
+                  );
+              },
           );
 
-        self.onUnmount(() => {
-          Toplevel_Consumer.cancel(linkId);
-
-          Toplevel_Consumer.cancel(executeId);
-        });
+        self.onUnmount(() => Toplevel_Consumer.cancel(executeId));
       },
     );
   };
