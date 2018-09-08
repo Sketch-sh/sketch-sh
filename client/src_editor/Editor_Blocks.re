@@ -328,7 +328,6 @@ module Actions = {
     state.deletedBlockMeta :=
       (state.deletedBlockMeta^)->TimeoutMap.remove(blockId);
     if (Belt.Array.length(state.blocks) == 0) {
-      Log.blue(~label="isLastBlock", state.blocks);
       ReasonReact.UpdateWithSideEffects(
         {
           ...state,
