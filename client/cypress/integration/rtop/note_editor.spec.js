@@ -37,6 +37,25 @@ a`);
   });
 });
 
+context("Copy value", () => {
+  it("should have copy button for stdout and value", () => {
+    cy.visit("new/reason");
+
+    typeBlock(0, "let a = 1; print_int(a);");
+    shortcut("{ctrl}{enter}");
+    assertStdout(1);
+    cy.get(".widget__copyButton").should("have.length", 2);
+  });
+  it("should not show copy button for unit", () => {
+    cy.visit("new/reason");
+
+    typeBlock(0, 'print_endline("foo")');
+    shortcut("{ctrl}{enter}");
+    assertStdout(1);
+    cy.get(".widget__copyButton").should("have.length", 1);
+  });
+});
+
 context("Foldable value", () => {
   it("should be foldable with large value", () => {
     cy.visit("new/reason");

@@ -35,6 +35,7 @@
     "butter-toast": "^2.1.2",
     "codemirror": "^5.39.2",
     "comlink": "^3.0.3",
+    "copy-text-to-clipboard": "^1.0.4",
     "fontfaceobserver": "^2.0.13",
     "graphql": "^0.13.2",
     "graphql-tag": "^2.9.2",
