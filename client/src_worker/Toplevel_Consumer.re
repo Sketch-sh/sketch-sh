@@ -1,6 +1,6 @@
 open Toplevel.Types;
 
-let timeoutSeconds = ref(10);
+let timeoutSeconds = ref(180);
 let toplevelWorker = ref(None);
 
 module MapStr = Belt.MutableMap.String;

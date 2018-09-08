@@ -321,21 +321,25 @@ module Actions = {
     );
   };
   let deleteQueued = (action, state, blockId) => {
+    /* Remove timeout in case user click on Delete immediately */
+    switch ((state.deletedBlockMeta^)->TimeoutMap.get(blockId)) {
+    | None => ()
+    | Some(id) => Js.Global.clearTimeout(id)
+    };
     state.deletedBlockMeta :=
       (state.deletedBlockMeta^)->TimeoutMap.remove(blockId);
-    if (isLastBlock(state.blocks) || Belt.Array.length(state.blocks) == 0) {
+    let blocksAfterDelete =
+      state.blocks->(Belt.Array.keepU((. {b_id}) => b_id != blockId));
+    if (Array.length(blocksAfterDelete) == 0) {
+      let newBlockId = Utils.generateId();
       ReasonReact.UpdateWithSideEffects(
         {
           ...state,
           blocks: [|
-            {
-              b_id: Utils.generateId(),
-              b_data: emptyCodeBlock(),
-              b_deleted: false,
-            },
+            {b_id: newBlockId, b_data: emptyCodeBlock(), b_deleted: false},
           |],
           stateUpdateReason: Some(action),
-          focusedBlock: None,
+          focusedBlock: Some((newBlockId, BTyp_Code, FcTyp_BlockNew)),
         },
         _self => {
           let deleteLastBlockAcknowledgedKey = "rtop:deleteLastBlockAcknowledged";
@@ -355,10 +359,7 @@ module Actions = {
     } else {
       ReasonReact.Update({
         ...state,
-        blocks:
-          state.blocks
-          ->(Belt.Array.keepU((. {b_id}) => b_id != blockId))
-          ->syncLineNumber,
+        blocks: blocksAfterDelete->syncLineNumber,
         stateUpdateReason: Some(action),
         focusedBlock:
           switch (state.focusedBlock) {
