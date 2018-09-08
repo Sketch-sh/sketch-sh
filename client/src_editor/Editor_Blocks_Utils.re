@@ -233,4 +233,3 @@ let concatCodeBlocksToString = blocks =>
         }
       )
     );
-exception Not_Implemented;
