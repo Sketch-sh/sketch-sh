@@ -66,8 +66,8 @@ let createValueWidget = text => {
   let countLine = Js.Array.length(split);
 
   if (countLine >= 10) {
-    let toggleClassList = toggle |> Element.classList;
-    toggleClassList |> DomTokenList.add("widget__foldable--show-gutter");
+    let widgetCL = widget |> Element.classList;
+    widgetCL |> DomTokenList.add("widget__foldable--show");
 
     let firstTenLinesPos =
       split

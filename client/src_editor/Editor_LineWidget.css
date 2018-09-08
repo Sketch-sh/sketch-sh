@@ -49,23 +49,24 @@
   color: inherit;
 }
 
-.widget__foldable {
+.widget__foldable.widget__foldable--show {
   display: flex;
+  margin-left: -12px;
 }
-.widget__foldable .widget__foldable__gutter {
-  padding-right: 3px;
-  flex: 0 0 29px;
-  text-align: right;
-}
-.widget__foldable--show-gutter.widget__foldable__gutter {
-  cursor: pointer;
-}
-.widget__foldable--show-gutter.widget__foldable__gutter:after {
-  content: "\25B8";
-}
-.widget__foldable--folded
-  .widget__foldable--show-gutter.widget__foldable__gutter:after {
-  content: "\25BE";
+.widget__foldable--show {
+  & .widget__foldable__gutter {
+    padding-right: 3px;
+    text-align: right;
+  }
+  & .widget__foldable__gutter {
+    cursor: pointer;
+  }
+  & .widget__foldable__gutter:after {
+    content: "\25B8";
+  }
+  &.widget__foldable--folded .widget__foldable__gutter:after {
+    content: "\25BE";
+  }
 }
 
 .widget__foldable--folded {

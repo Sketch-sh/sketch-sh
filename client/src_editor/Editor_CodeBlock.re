@@ -132,7 +132,7 @@ let make =
                                         ~element,
                                         ~options=
                                           CodeMirror.LineWidget.options(
-                                            ~coverGutter=true,
+                                            ~coverGutter=false,
                                             ~noHScroll=false,
                                             ~above=false,
                                             ~showIfHidden=false,

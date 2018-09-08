@@ -50,7 +50,7 @@ context("Foldable value", () => {
       .find("button")
       .should("be.visible");
 
-    cy.get(".widget__foldable--show-gutter")
+    cy.get(".widget__foldable__gutter")
       .as("toggleFold")
       .should("exist")
       .click();
@@ -79,6 +79,6 @@ context("Foldable value", () => {
       .find("button")
       .should("not.exist");
 
-    cy.get(".widget__foldable--show-gutter").should("not.exist");
+    cy.get(".widget__foldable__gutter").should("not.visible");
   });
 });

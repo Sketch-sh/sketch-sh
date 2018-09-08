@@ -128,14 +128,15 @@
 
 .cm-s-rtop .CodeMirror-gutters {
   background: transparent;
+  z-index: 1;
 }
 
 /* Sizing */
-.CodeMirror pre, .CodeMirror .pre {
+.CodeMirror pre,
+.CodeMirror .pre {
   padding: var(--cm-padding-v) var(--cm-padding-h);
 }
 
-/* Default styles for common addons */
 div.CodeMirror span.CodeMirror-matchingbracket {
   color: #0b0;
 }
