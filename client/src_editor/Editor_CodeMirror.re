@@ -7,6 +7,7 @@ Modules.require("codemirror/addon/display/placeholder");
 Modules.require("codemirror/mode/gfm/gfm");
 Modules.require("codemirror/mode/mllike/mllike");
 Modules.require("codemirror/lib/codemirror.css");
+Modules.require("codemirror/addon/fold/foldgutter.css");
 Modules.require("./cm-theme.css");
 
 /* open Utils; */

@@ -131,7 +131,7 @@
 }
 
 /* Sizing */
-.CodeMirror pre {
+.CodeMirror pre, .CodeMirror .pre {
   padding: var(--cm-padding-v) var(--cm-padding-h);
 }
 
