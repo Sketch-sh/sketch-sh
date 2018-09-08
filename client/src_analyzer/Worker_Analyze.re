@@ -81,12 +81,14 @@ module Make = (ESig: Worker_Evaluator.EvaluatorSig) => {
   open Toplevel.Types;
 
   let executeMany:
-    (Editor_Types.lang, list(blockInput)) => list(Toplevel.Types.blockResult) =
-    (lang, codeBlocks) => {
+    (. Editor_Types.lang, list(blockInput)) =>
+    list(Toplevel.Types.blockResult) =
+    (. lang, codeBlocks) => {
       switch (lang) {
       | ML => Evaluator.mlSyntax()
       | RE => Evaluator.reSyntax()
       };
+
       /*
        * Execute blocks in order
        * Stop when encountering error in a block
@@ -108,6 +110,7 @@ module Make = (ESig: Worker_Evaluator.EvaluatorSig) => {
   let link: (. lang, string, string) => linkResult =
     (. lang, name, code) => {
       open Evaluator;
+
       switch (lang) {
       | ML => mlSyntax()
       | RE => reSyntax()
@@ -127,9 +130,10 @@ module Make = (ESig: Worker_Evaluator.EvaluatorSig) => {
 
   let linkMany: (. list(Link.link)) => list((Link.link, linkResult)) =
     (. links) => {
-      /* Reset before evaluating several blocks */
-      Evaluator.reset();
       open Link;
+
+      Evaluator.reset();
+
       let rec loop = (links, acc) =>
         switch (links) {
         | [] => acc
