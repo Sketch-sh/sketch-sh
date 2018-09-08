@@ -47,10 +47,15 @@ let copyButton = text => {
   </svg>|},
     );
   button
-  |> Element.addClickEventListener(_ => {
-       Notify.info("Copied to clipboard");
-       Copy.copy(text) |> ignore;
-     });
+  |> Element.addClickEventListener(_ =>
+       if (Copy.copy(text)) {
+         Notify.info("Copied to clipboard");
+       } else {
+         Notify.error(
+           "An error happens when trying to copy content to clipboard. Please try again",
+         );
+       }
+     );
   button;
 };
 

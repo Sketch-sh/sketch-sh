@@ -37,6 +37,8 @@ a`);
   });
 });
 
+context("Copy value", () => {});
+
 context("Foldable value", () => {
   it("should be foldable with large value", () => {
     cy.visit("new/reason");
