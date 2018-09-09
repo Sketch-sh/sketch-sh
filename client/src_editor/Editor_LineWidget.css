@@ -45,8 +45,9 @@
   border: 0;
   cursor: pointer;
   padding: 0;
-  font-size: var(--f6);
+  font-size: 1rem;
   color: inherit;
+  font-family: var(--font-monospace);
 }
 
 .widget__foldable.widget__foldable--show {

@@ -92,21 +92,24 @@ let createValueWidget = text => {
   div->Element.setClassName("widget__value pre");
   widget |> Element.appendChild(div);
 
-  let split = text |> Js.String.splitAtMost("\n", ~limit=10);
+  let split = text |> Js.String.splitAtMost("\n", ~limit=11);
   let countLine = Js.Array.length(split);
 
-  if (countLine >= 10) {
+  if (countLine > 10) {
     let widgetCL = widget |> Element.classList;
     widgetCL |> DomTokenList.add("widget__foldable--show");
 
-    let firstTenLinesPos =
+    split->Belt.Array.truncateToLengthUnsafe(5);
+
+    let firstFiveLinesPos =
       split
       ->Belt.Array.reduce(
           0,
           (pos, line) => pos + Js.String.length(line) + 1,
         );
-    let display = text |> Js.String.substring(~from=0, ~to_=firstTenLinesPos);
-    let truncated = text |> Js.String.substringToEnd(~from=firstTenLinesPos);
+    let display =
+      text |> Js.String.substring(~from=0, ~to_=firstFiveLinesPos);
+    let truncated = text |> Js.String.substringToEnd(~from=firstFiveLinesPos);
 
     let displayNode = document |> Document.createElement("span");
     displayNode->Element.setInnerText(display);
@@ -114,7 +117,7 @@ let createValueWidget = text => {
 
     let buttonNode = document |> Document.createElement("button");
     buttonNode->Element.setClassName("widget__value__button");
-    buttonNode->Element.setInnerText("<truncated...>");
+    buttonNode->Element.setInnerText("(click to see more output)");
     div |> Element.appendChild(buttonNode);
 
     let toggleEventListener = _event => {
