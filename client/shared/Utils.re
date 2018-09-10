@@ -60,22 +60,23 @@ let listFindOpt = (p, l) =>
   | Not_found => None
   };
 
-let countLine = s => {
-  let length = String.length(s);
-
-  let rec countLine' = (i, result) =>
-    if (i < length) {
-      switch (s.[i]) {
-      | '\n' => countLine'(i + 1, result + 1)
-      | _ => countLine'(i + 1, result)
-      };
-    } else {
-      result;
-    };
-  countLine'(0, 0);
-};
-
 let js_countLine = s => s |> Js.String.split("\n") |> Js.Array.length;
+let countLine = js_countLine;
+
+/* let countLine = s => {
+     let length = String.length(s);
+
+     let rec countLine' = (i, result) =>
+       if (i < length) {
+         switch (s.[i]) {
+         | '\n' => countLine'(i + 1, result + 1)
+         | _ => countLine'(i + 1, result)
+         };
+       } else {
+         result;
+       };
+     countLine'(0, 0);
+   }; */
 
 let min = (min, value) => value < min ? min : value;
 

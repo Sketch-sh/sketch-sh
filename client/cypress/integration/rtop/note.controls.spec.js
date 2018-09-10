@@ -202,7 +202,7 @@ context("Block controls > delete and restore", () => {
     assertBlocks(1);
     assertLastBlockValue("1");
   });
-  it.only("should append an empty code blocks when all blocks are deleted", () => {
+  it("should append an empty code blocks when all blocks are deleted", () => {
     cy.visit("new/reason");
 
     typeBlock(0, "let a = 1;");

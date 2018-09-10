@@ -122,21 +122,28 @@ let make =
                                     )
                                   )
                               | Lw_Value(content) =>
-                                editor
-                                ->(
-                                    CodeMirror.Editor.addLineWidget(
-                                      ~line,
-                                      ~element=createValueWidget(content),
-                                      ~options=
-                                        CodeMirror.LineWidget.options(
-                                          ~coverGutter=false,
-                                          ~noHScroll=false,
-                                          ~above=false,
-                                          ~showIfHidden=false,
-                                          ~handleMouseEvents=true,
-                                        ),
-                                    )
-                                  )
+                                let (element, setCallback) =
+                                  createValueWidget(content);
+                                let newLineWidget =
+                                  editor
+                                  ->(
+                                      CodeMirror.Editor.addLineWidget(
+                                        ~line,
+                                        ~element,
+                                        ~options=
+                                          CodeMirror.LineWidget.options(
+                                            ~coverGutter=false,
+                                            ~noHScroll=false,
+                                            ~above=false,
+                                            ~showIfHidden=false,
+                                            ~handleMouseEvents=true,
+                                          ),
+                                      )
+                                    );
+                                setCallback(() =>
+                                  newLineWidget->CodeMirror.LineWidget.changed
+                                );
+                                newLineWidget;
                               | Lw_Stdout(content) =>
                                 editor
                                 ->(
