@@ -52,6 +52,12 @@ let make = (~noteInfo: Route.noteRouteConfig, _children: React.childless) => {
                                   | Anonymous =>
                                     response##note_edit_token->Array.length > 0
                                   };
+
+                                let blocks =
+                                  Editor_Blocks_Utils.filterDeletedBlocks(
+                                    blocks,
+                                  );
+
                                 <RedirectSketchURL noteId>
                                   ...<Editor_Note
                                        key=noteId
