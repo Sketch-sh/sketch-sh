@@ -218,7 +218,12 @@ module Editor_Note = {
                        getCurrentData=(
                          () => (
                            state.title,
-                           Editor_Json.V1.encode(state.lang, state.blocks^),
+                           Editor_Json.V1.encode(
+                             state.lang,
+                             Editor_Blocks_Utils.filterDeletedBlocks(
+                               state.blocks^,
+                             ),
+                           ),
                          )
                        )
                        registerShortcut
@@ -234,7 +239,12 @@ module Editor_Note = {
                        getCurrentData=(
                          () => (
                            state.title,
-                           Editor_Json.V1.encode(state.lang, state.blocks^),
+                           Editor_Json.V1.encode(
+                             state.lang,
+                             Editor_Blocks_Utils.filterDeletedBlocks(
+                               state.blocks^,
+                             ),
+                           ),
                          )
                        )
                        className=buttonClassName
