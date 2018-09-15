@@ -245,7 +245,9 @@ module Editor_Note = {
                            Editor_Json.V1.encode(
                              state.lang,
                              state.links,
-                             state.blocks^,
+                             Editor_Blocks_Utils.filterDeletedBlocks(
+                               state.blocks^,
+                             ),
                            ),
                          )
                        )
@@ -265,7 +267,9 @@ module Editor_Note = {
                            Editor_Json.V1.encode(
                              state.lang,
                              state.links,
-                             state.blocks^,
+                             Editor_Blocks_Utils.filterDeletedBlocks(
+                               state.blocks^,
+                             ),
                            ),
                          )
                        )

@@ -233,3 +233,15 @@ let concatCodeBlocksToString = blocks =>
         }
       )
     );
+
+let filterDeletedBlocks = blocks => {
+  let blocksAfterDelete =
+    blocks->Belt.Array.keep(({b_deleted}) => b_deleted != true);
+
+  if (Array.length(blocksAfterDelete) == 0) {
+    let newBlockId = Utils.generateId();
+    [|{b_id: newBlockId, b_data: emptyCodeBlock(), b_deleted: false}|];
+  } else {
+    blocksAfterDelete;
+  };
+};
