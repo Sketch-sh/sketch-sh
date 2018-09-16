@@ -50,12 +50,11 @@ module SingleLink = {
     ...component,
     render: _ =>
       <div className="link__container">
-        <input
+        <Router.Link
           className="link__input"
-          defaultValue=id
-          placeholder="id"
-          disabled=true
-        />
+          route=(Route.Note({noteId: id, data: None}))>
+          id->str
+        </Router.Link>
         <input
           className="link__input"
           defaultValue=name
