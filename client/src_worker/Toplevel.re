@@ -1,7 +1,5 @@
 [%%debugger.chrome];
 
-open Worker_Types;
-
 module Types = {
   type blockInput = {
     binput_id: string,
@@ -9,7 +7,11 @@ module Types = {
   };
   type blockResult = {
     id: string,
-    result: list(blockData),
+    result: list(Worker_Types.blockData),
+  };
+  type linkResult = {
+    link: Editor_Types.Link.link,
+    result: Worker_Types.linkResult,
   };
   type refmtResult = {
     refmt_id: string,
@@ -27,7 +29,11 @@ module Types = {
     | PrettyPrintRe;
 
   type topToWorkerMessage =
-    | Execute(Editor_Types.lang, list(blockInput))
+    | Execute(
+        Editor_Types.lang,
+        list(blockInput),
+        list(Editor_Types.Link.link),
+      )
     | Refmt(refmtTypes, list(blockInput));
 
   type topToWorkerData = {
@@ -37,7 +43,9 @@ module Types = {
 
   type workerToTopMessage =
     | Ready
-    | ExecuteResult(Belt.Result.t(list(blockResult), string))
+    | ExecuteResult(
+        Belt.Result.t((list(linkResult), list(blockResult)), string),
+      )
     | RefmtResult(Belt.Result.t(refmtOk, string));
 
   type workerToTopData = {

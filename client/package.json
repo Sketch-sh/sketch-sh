@@ -21,7 +21,7 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "@glennsl/bs-json": "^2.0.0",
+    "@glennsl/bs-json": "^3.0.0",
     "apollo-cache-inmemory": "^1.2.6",
     "apollo-client": "^2.3.7",
     "apollo-link": "^1.2.2",

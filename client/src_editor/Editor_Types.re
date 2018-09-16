@@ -17,6 +17,11 @@ let langToString =
   | ML => "ML"
   | RE => "RE";
 
+let langToExtension =
+  fun
+  | ML => ".ml"
+  | RE => ".re";
+
 type noteState =
   | NoteState_New
   | NoteState_Old;
@@ -91,4 +96,20 @@ module Block = {
     | FcTyp_BlockFocusDown
     /* Shift+Enter shortcut */
     | FcTyp_BlockExecuteAndFocusNextBlock;
+};
+
+module Link = {
+  type internalLink = {
+    revision_at: Js.Json.t,
+    sketch_id: string,
+    name: string,
+    lang,
+    code: string,
+  };
+
+  type externalLink;
+
+  type link =
+    | Internal(internalLink)
+    | External(externalLink);
 };

@@ -10,7 +10,7 @@ let defaultBlocks = [|
 
 let component = ReasonReact.statelessComponent("Note_New");
 
-let make = (~blocks=defaultBlocks, ~title=?, ~lang, _children) => {
+let make = (~blocks=defaultBlocks, ~title=?, ~lang, ~links=[||], _children) => {
   ...component,
   render: _self =>
     <AuthStatus.IsAuthenticated>
@@ -32,6 +32,7 @@ let make = (~blocks=defaultBlocks, ~title=?, ~lang, _children) => {
                blocks
                lang
                ?title
+               links
              />;
            }
          )

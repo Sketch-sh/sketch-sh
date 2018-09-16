@@ -223,6 +223,17 @@ let codeBlockDataPairs = blocks =>
     ->Belt.List.reverse
   );
 
+let concatCodeBlocksToString = blocks =>
+  blocks
+  ->(
+      Belt.Array.reduceU("", (. acc, {b_data}) =>
+        switch (b_data) {
+        | B_Text(_) => acc
+        | B_Code({bc_value}) => acc ++ bc_value
+        }
+      )
+    );
+
 let filterDeletedBlocks = blocks => {
   let blocksAfterDelete =
     blocks->Belt.Array.keep(({b_deleted}) => b_deleted != true);

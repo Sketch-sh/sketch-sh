@@ -14,7 +14,7 @@ module Transformer: {
     if (compareResult == 1) {
       formatingDate |> DateFns.format(formatPattern);
     } else {
-      formatingDate |> DateFns.distanceInWordsToNow;
+      formatingDate |> DateFns.distanceInWordsToNow(~addSuffix=true);
     };
   };
 };

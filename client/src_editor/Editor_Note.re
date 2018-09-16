@@ -11,6 +11,8 @@ module Editor_Note = {
     noteState,
     lang,
     title: string,
+    isLinkMenuOpen: bool,
+    links: array(Link.link),
     blocks: ref(array(Block.block)),
     editorContentStatus,
     executeCallback: option(unit => unit),
@@ -22,6 +24,8 @@ module Editor_Note = {
 
   type action =
     | TitleUpdate(string)
+    | ToggleLinkMenu
+    | LinkUpdate(array(Link.link))
     | BlockUpdate(array(Block.block))
     | RegisterExecuteCallback(unit => unit)
     | UpdateNoteSaveStatus(saveStatus)
@@ -40,6 +44,7 @@ module Editor_Note = {
         ~initialNoteState: noteState,
         ~initialLang: lang=RE,
         ~initialTitle: string="",
+        ~initialLinks: array(Link.link),
         ~initialBlocks: array(Block.block),
         ~initialNoteOwnerId: id,
         ~initialNoteLastEdited: option(Js.Json.t),
@@ -54,6 +59,8 @@ module Editor_Note = {
       lang: initialLang,
       title: initialTitle,
       editorContentStatus: Ec_Pristine,
+      isLinkMenuOpen: false,
+      links: initialLinks,
       blocks: ref(initialBlocks),
       executeCallback: None,
       noteOwnerId: initialNoteOwnerId,
@@ -97,6 +104,22 @@ module Editor_Note = {
           ReasonReact.SideEffects(
             (
               ({state}) =>
+                switch (state.executeCallback) {
+                | None => ()
+                | Some(callback) => callback()
+                }
+            ),
+          )
+        | ToggleLinkMenu =>
+          ReasonReact.Update({
+            ...state,
+            isLinkMenuOpen: !state.isLinkMenuOpen,
+          })
+        | LinkUpdate(links) =>
+          ReasonReact.UpdateWithSideEffects(
+            {...state, links, editorContentStatus: Ec_Dirty},
+            (
+              _ =>
                 switch (state.executeCallback) {
                 | None => ()
                 | Some(callback) => callback()
@@ -194,7 +217,8 @@ module Editor_Note = {
                                 | Some(callback) => callback()
                                 }
                             )>
-                            <UI_LoadingWrapper loading=state.isExecuting>
+                            <UI_LoadingWrapper
+                              loading=state.isExecuting delayMs=500>
                               ...(
                                    loading =>
                                      loading ?
@@ -220,6 +244,7 @@ module Editor_Note = {
                            state.title,
                            Editor_Json.V1.encode(
                              state.lang,
+                             state.links,
                              Editor_Blocks_Utils.filterDeletedBlocks(
                                state.blocks^,
                              ),
@@ -241,6 +266,7 @@ module Editor_Note = {
                            state.title,
                            Editor_Json.V1.encode(
                              state.lang,
+                             state.links,
                              Editor_Blocks_Utils.filterDeletedBlocks(
                                state.blocks^,
                              ),
@@ -314,6 +340,19 @@ module Editor_Note = {
                          />
                      )
                 </Editor_Note_GetUserInfo>
+                <UI_Balloon position=Down message="Link sketches">
+                  ...<button
+                       className=(
+                         ClassNames.make([
+                           "EditorNote__linkMenu",
+                           state.isLinkMenuOpen
+                           ->ClassNames.ifTrue("EditorNote__linkMenu--open"),
+                         ])
+                       )
+                       onClick=(_ => send(ToggleLinkMenu))>
+                       <Fi.Link />
+                     </button>
+                </UI_Balloon>
               </div>
               (
                 state.forkFrom
@@ -331,10 +370,23 @@ module Editor_Note = {
                 )
               )
             </div>
+            (
+              state.isLinkMenuOpen ?
+                <Editor_Links
+                  key=(
+                    state.noteId ++ string_of_int(Array.length(state.links))
+                  )
+                  currentSketchId=state.noteId
+                  links=state.links
+                  onUpdate=(links => send(LinkUpdate(links)))
+                /> :
+                ReasonReact.null
+            )
             <Editor_Blocks
               key=state.noteId
               lang
               blocks=state.blocks^
+              links=state.links
               registerExecuteCallback=(
                 callback => send(RegisterExecuteCallback(callback))
               )
@@ -359,6 +411,7 @@ module WithShortcut = {
         ~noteState,
         ~lang=?,
         ~title=?,
+        ~links,
         ~blocks,
         ~noteOwnerId,
         ~noteLastEdited,
@@ -376,6 +429,7 @@ module WithShortcut = {
                  initialNoteState=noteState
                  initialLang=?lang
                  initialTitle=?title
+                 initialLinks=links
                  initialBlocks=blocks
                  initialNoteOwnerId=noteOwnerId
                  initialNoteLastEdited=noteLastEdited

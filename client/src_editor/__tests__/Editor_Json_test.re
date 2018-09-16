@@ -5,7 +5,6 @@ open Editor_Types;
 open Block;
 
 let parse = Js.Json.parseExn;
-
 /*
  * NOTE: If you change JSON encode/decode
  * - NEVER change the json value of decode
@@ -18,8 +17,9 @@ describe("decode", () => {
   open Expect;
   open! Expect.Operators;
   test("with fallback lang to RE", () => {
-    let (lang, blocks) =
+    let (lang, links, blocks) =
       {|{
+      "links": [],
       "blocks": [
         {
           "id": "1",
@@ -40,9 +40,10 @@ describe("decode", () => {
       ->parse
       ->decode;
 
-    expect((lang, blocks))
+    expect((lang, links, blocks))
     == (
          RE,
+         [||],
          [|
            {
              b_id: "1",
@@ -60,9 +61,10 @@ describe("decode", () => {
   });
 
   test("decode lang correctly - ML", () => {
-    let (lang, blocks) =
+    let (lang, links, blocks) =
       {|{
       "lang": "ML",
+      "links": [],
       "blocks": [
         {
           "id": "1",
@@ -83,9 +85,10 @@ describe("decode", () => {
       ->parse
       ->decode;
 
-    expect((lang, blocks))
+    expect((lang, links, blocks))
     == (
          ML,
+         [||],
          [|
            {
              b_id: "1",
@@ -102,9 +105,10 @@ describe("decode", () => {
        );
   });
   test("decode lang correctly - RE", () => {
-    let (lang, blocks) =
+    let (lang, links, blocks) =
       {|{
       "lang": "RE",
+      "links": [],
       "blocks": [
         {
           "id": "1",
@@ -125,9 +129,10 @@ describe("decode", () => {
       ->parse
       ->decode;
 
-    expect((lang, blocks))
+    expect((lang, links, blocks))
     == (
          RE,
+         [||],
          [|
            {
              b_id: "1",
@@ -144,9 +149,10 @@ describe("decode", () => {
        );
   });
   test("decode deleted blocks", () => {
-    let (lang, blocks) =
+    let (lang, links, blocks) =
       {|{
       "lang": "RE",
+      "links": [],
       "blocks": [
         {
           "id": "1",
@@ -169,9 +175,10 @@ describe("decode", () => {
       ->parse
       ->decode;
 
-    expect((lang, blocks))
+    expect((lang, links, blocks))
     == (
          RE,
+         [||],
          [|
            {
              b_id: "1",
@@ -196,6 +203,7 @@ describe("encode", () => {
     let json =
       {|{
       "lang": "RE",
+      "links": [],
       "blocks": [
         {
           "id": "1",
@@ -220,6 +228,7 @@ describe("encode", () => {
     expect(
       encode(
         RE,
+        [||],
         [|
           {
             b_id: "1",
@@ -241,6 +250,7 @@ describe("encode", () => {
     let json =
       {|{
       "lang": "ML",
+      "links": [],
       "blocks": [
         {
           "id": "1",
@@ -265,6 +275,7 @@ describe("encode", () => {
     expect(
       encode(
         ML,
+        [||],
         [|
           {
             b_id: "1",

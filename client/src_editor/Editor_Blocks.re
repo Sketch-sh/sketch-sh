@@ -9,6 +9,7 @@ open Utils;
 open Editor_Types;
 open Editor_Types.Block;
 open Editor_Blocks_Utils;
+open Editor_Links_Utils;
 
 type action =
   | Block_Add(id, blockTyp)
@@ -66,7 +67,7 @@ module Actions = {
           if (hasError) {
             /* TODO: Map syntax error to block position */
             Notify.error(
-              "An error happens while formatting your code. It might be a syntax error",
+              "An error happened while formatting your code. It might be a syntax error",
             );
           } else {
             let result =
@@ -401,7 +402,8 @@ module Actions = {
    * - Execute with shortcuts -> Focus on next block,
    *   if this is last then create new block
    */
-  let execute = (action, state, focusNextBlock, blockTyp, onExecute, lang) => {
+  let execute =
+      (action, state, focusNextBlock, blockTyp, onExecute, lang, links) => {
     let allCodeToExecute = codeBlockDataPairs(state.blocks);
 
     ReasonReact.UpdateWithSideEffects(
@@ -411,18 +413,22 @@ module Actions = {
           self.send(Block_FocusNextBlockOrCreate(blockTyp));
         };
         onExecute(true);
-        let id =
+        open Belt.Result;
+
+        let executeId =
           Toplevel_Consumer.execute(
-            lang,
-            allCodeToExecute,
+            ~lang,
+            ~blocks=allCodeToExecute,
+            ~links=Array.to_list(links),
             fun
-            | Belt.Result.Error(error) => {
+            | Error(error) => {
                 onExecute(false);
                 Notify.error(error);
               }
-            | Belt.Result.Ok(blocks) => {
+            | Ok((linksWithResults, blocksWithResults)) => {
                 onExecute(false);
-                blocks
+
+                blocksWithResults
                 ->(
                     Belt.List.forEachU(
                       (. {Toplevel.Types.id: blockId, result}) => {
@@ -430,10 +436,31 @@ module Actions = {
                       self.send(Block_AddWidgets(blockId, widgets));
                     })
                   );
+
+                linksWithResults
+                ->Belt.List.forEachU(
+                    (
+                      (. linkResult) => {
+                        let linkResult: Toplevel.Types.linkResult = linkResult;
+                        let link: Editor_Types.Link.link = linkResult.link;
+                        let result: Worker_Types.linkResult =
+                          linkResult.result;
+
+                        switch (result) {
+                        | Ok () => ()
+                        | Error(message) =>
+                          let name = getNameFromLink(link);
+                          Notify.error(
+                            {j|Module "$name" failed to link: $message|j},
+                          );
+                        };
+                      }
+                    ),
+                  );
               },
           );
 
-        self.onUnmount(() => Toplevel_Consumer.cancel(id));
+        self.onUnmount(() => Toplevel_Consumer.cancel(executeId));
       },
     );
   };
@@ -599,6 +626,7 @@ let component = ReasonReact.reducerComponent("Editor_Page");
 let make =
     (
       ~lang=RE,
+      ~links: array(Link.link),
       ~blocks: array(block),
       ~readOnly=false,
       ~onUpdate,
@@ -752,6 +780,7 @@ let make =
           blockTyp,
           onExecute,
           lang,
+          links,
         )
       | Block_UpdateValue(blockId, newValue, diff) =>
         Actions.update(action, state, blockId, newValue, diff)

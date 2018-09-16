@@ -14,7 +14,6 @@ module Types = {
       stdout: string,
     };
   };
-  type phraseResult = Belt.Result.t(PhraseContent.t, PhraseContent.t);
   [@bs.deriving abstract]
   type js_phraseResult = {
     kind: string,
@@ -33,6 +32,14 @@ module Types = {
 
     type refmtManyResult = list((Editor_Types.id, string, option(error)));
   };
+
+  module LinkResult = {
+    [@bs.deriving abstract]
+    type js_linkResult = {
+      kind: string,
+      value: string,
+    };
+  };
 };
 
 module type EvaluatorSig = {
@@ -50,6 +57,8 @@ module type EvaluatorSig = {
   let parseMLI: string => Types.Refmt.interfaceAST;
   let printML: Types.Refmt.implementationAST => string;
   let printMLI: Types.Refmt.interfaceAST => string;
+  let insertModule:
+    (. string, string, string) => Types.LinkResult.js_linkResult;
 };
 
 module Make = (B: EvaluatorSig) => {
@@ -75,4 +84,6 @@ module Make = (B: EvaluatorSig) => {
   let printREI = B.printREI;
   let printML = B.printML;
   let printMLI = B.printMLI;
+  let insertModule =
+    (. name, content, lang) => B.insertModule(. name, content, lang);
 };

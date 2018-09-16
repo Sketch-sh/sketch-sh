@@ -32,6 +32,7 @@ type state = {
 let make:
   (
     ~lang: lang=?,
+    ~links: array(Link.link),
     ~blocks: array(Block.block),
     ~readOnly: bool=?,
     ~onUpdate: array(Block.block) => unit,

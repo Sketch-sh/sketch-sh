@@ -6,7 +6,9 @@ let toplevelWorker = ref(None);
 module MapStr = Belt.MutableMap.String;
 
 type callback =
-  | ExecuteCallback(Belt.Result.t(list(blockResult), string) => unit)
+  | ExecuteCallback(
+      Belt.Result.t((list(linkResult), list(blockResult)), string) => unit,
+    )
   | RefmtCallback(Belt.Result.t(refmtOk, string) => unit);
 
 let ongoingCallbacks: MapStr.t((Js.Global.timeoutId, callback)) =
@@ -75,12 +77,12 @@ let run = (payload, callback, timeoutCallback) => {
   messageId;
 };
 
-let execute = (lang, blocks, callback) =>
-  run(Execute(lang, blocks), ExecuteCallback(callback), () =>
-    callback(Belt.Result.Error("Evaluation timeout"))
+let execute = (~lang, ~blocks, ~links, callback) =>
+  run(Execute(lang, blocks, links), ExecuteCallback(callback), () =>
+    callback(Belt.Result.Error("Evaluation timeout."))
   );
 
 let refmt = (refmtTypes, blocks, callback) =>
   run(Refmt(refmtTypes, blocks), RefmtCallback(callback), () =>
-    callback(Belt.Result.Error("Evaluation timeout"))
+    callback(Belt.Result.Error("Evaluation timeout."))
   );

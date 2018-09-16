@@ -27,7 +27,7 @@
   var blockKeywords = "try catch match with else for if switch while do begin end in module sig struct".split(
     " "
   );
-  var atoms = "unit int string int32 int64 float bool option mod land lor lxor lsl lsr asr".split(
+  var atoms = "unit int char exn string int32 int64 float bool option mod land lor lxor lsl lsr asr".split(
     " "
   );
   var builtins = "true false Error Ok None Some".split(" ");

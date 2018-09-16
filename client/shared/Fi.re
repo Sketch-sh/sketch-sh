@@ -198,3 +198,27 @@ module Play = {
       children,
     );
 };
+
+module Link = {
+  [@bs.module "react-icons/fi"]
+  external reactClass: ReasonReact.reactClass = "FiLink";
+
+  let make = (~className="", children) =>
+    ReasonReact.wrapJsForReason(
+      ~reactClass,
+      ~props={"className": className},
+      children,
+    );
+};
+
+module RefreshCCW = {
+  [@bs.module "react-icons/fi"]
+  external reactClass: ReasonReact.reactClass = "FiRefreshCcw";
+
+  let make = (~className="", children) =>
+    ReasonReact.wrapJsForReason(
+      ~reactClass,
+      ~props={"className": className},
+      children,
+    );
+};

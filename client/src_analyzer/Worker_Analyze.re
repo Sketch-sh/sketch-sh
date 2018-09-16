@@ -48,11 +48,10 @@ module Make = (ESig: Worker_Evaluator.EvaluatorSig) => {
     (loc, result);
   };
 
-  let execute: (. bool, string) => (list(blockData), bool) =
-    (. reset, code) => {
-      if (reset) {
-        Evaluator.reset();
-      };
+  open Editor_Types;
+
+  let execute: (. string) => (list(blockData), bool) =
+    (. code) => {
       let result = Evaluator.execute(code);
       let length = Belt.Array.length(result);
 
@@ -79,14 +78,64 @@ module Make = (ESig: Worker_Evaluator.EvaluatorSig) => {
       loop(0, [], None);
     };
 
-  open Editor_Types;
-  open Toplevel.Types;
+  let link: (. lang, string, string) => linkResult =
+    (. lang, name, code) => {
+      open Evaluator;
+
+      switch (lang) {
+      | ML => mlSyntax()
+      | RE => reSyntax()
+      };
+      let lang = lang->langToString->String.lowercase;
+      let js_linkResult = insertModule(. name, code, lang);
+      Belt.Result.(
+        switch (js_linkResult->LinkResult.kindGet) {
+        | "Ok" => Ok()
+        | "Error" => Error(js_linkResult->LinkResult.valueGet)
+        | _kind => Error("unknown link result")
+        }
+      );
+    };
+
+  exception Not_Implemented;
+
+  let linkMany: (. list(Link.link)) => list(Toplevel.Types.linkResult) =
+    (. links) => {
+      open Link;
+
+      let rec loop = (links, acc) =>
+        switch (links) {
+        | [] => acc
+        | [singleLink, ...rest] =>
+          let (link, result) =
+            switch (singleLink) {
+            | Internal(internalLink) =>
+              let {lang, name, code} = internalLink;
+              let result = link(. lang, name, code);
+              (singleLink, result);
+            | External(_) => raise(Not_Implemented)
+            };
+
+          let linkResult: Toplevel.Types.linkResult = {link, result};
+
+          loop(rest, [linkResult, ...acc]);
+        };
+
+      loop(links, []);
+    };
 
   let executeMany:
-    (Editor_Types.lang, list(blockInput)) => list(Toplevel.Types.blockResult) =
-    (lang, codeBlocks) => {
-      /* Reset before evaluating several blocks */
+    (
+      . Editor_Types.lang,
+      list(Toplevel.Types.blockInput),
+      list(Link.link)
+    ) =>
+    (list(Toplevel.Types.linkResult), list(Toplevel.Types.blockResult)) =
+    (. lang, codeBlocks, links) => {
       Evaluator.reset();
+
+      let linkResults = linkMany(. links);
+      open Toplevel.Types;
 
       switch (lang) {
       | ML => Evaluator.mlSyntax()
@@ -100,13 +149,15 @@ module Make = (ESig: Worker_Evaluator.EvaluatorSig) => {
         switch (blocks) {
         | [] => acc
         | [{binput_id: id, binput_value: code}, ...rest] =>
-          let (result, hasError) = execute(. false, code);
+          let (result, hasError) = execute(. code);
 
-          let currentBlockResult = {Toplevel.Types.id, Toplevel.Types.result};
+          let currentBlockResult = {id, result};
           hasError ?
             [currentBlockResult, ...acc] :
             loop(rest, [currentBlockResult, ...acc]);
         };
-      loop(codeBlocks, []);
+      let executeResults = loop(codeBlocks, []);
+
+      (linkResults, executeResults);
     };
 };
