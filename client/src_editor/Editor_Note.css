@@ -140,3 +140,7 @@
 .EditorNote__linkMenu--open {
   color: var(--topbar-c-primary);
 }
+.EditorNote__links {
+  font-weight: 700;
+  color: var(--c-text-sub2);
+}
