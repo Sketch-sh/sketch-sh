@@ -123,3 +123,12 @@ let generateId = () =>
 external toNullable: string => Js.Nullable.t(string) = "%identity";
 
 let inArray = (arr, value) => arr |> Js.Array.indexOf(value) != (-1);
+
+let joinWithComma =
+  Belt.Array.reduce(_, "", (str, acc) =>
+    if (str === "") {
+      acc;
+    } else {
+      acc ++ ", " ++ str;
+    }
+  );

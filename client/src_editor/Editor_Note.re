@@ -353,6 +353,18 @@ module Editor_Note = {
                        <Fi.Link />
                      </button>
                 </UI_Balloon>
+                <i className="EditorNote__links">
+                  state.links
+                  ->(
+                      Belt.Array.mapU((. link) =>
+                        link
+                        ->Editor_Links_Utils.getNameFromLink
+                        ->String.capitalize
+                      )
+                    )
+                  ->joinWithComma
+                  ->str
+                </i>
               </div>
               (
                 state.forkFrom
