@@ -32,7 +32,7 @@ let make = _children => {
       <Router.Unload.Provider />
       <AuthStatus.Provider />
       <FontFaceObserver.Provider />
-      (
+      {
         switch (state) {
         | Home =>
           <Layout_WithTopbar>
@@ -103,12 +103,12 @@ let make = _children => {
                />
           </Layout_WithTopbar>
         | AuthCallback(token) => <Auth.AuthCallback token />
-        | AuthLogout => <Auth.AuthLogout />
+        | AuthLogout => <Logout />
         | AuthGithub => <Auth.AuthGithub />
         | AuthFailure => "auth failure"->str
         | NotFound => <NotFound />
         }
-      )
+      }
       <UI_WarningStagingServer />
     </ReasonApollo.Provider>,
 };
