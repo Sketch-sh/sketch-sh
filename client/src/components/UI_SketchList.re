@@ -15,85 +15,106 @@ module DeleteNoteComponent = ReasonApollo.CreateMutation(DeleteNote);
 let component = ReasonReact.statelessComponent("UI_SketchList");
 
 let make =
-    (~sketches, ~className=?, ~noSketches="No sketches"->str, _children) => {
+    (
+      ~sketches,
+      ~className=?,
+      ~noSketches="No sketches"->str,
+      ~fetchMore=?,
+      _children,
+    ) => {
   ...component,
   render: _self =>
     switch (sketches) {
     | [||] => <div className={Cn.unwrap(className)}> noSketches </div>
     | sketches =>
-      <ul className={Cn.make(["UI_SketchList", Cn.unwrap(className)])}>
-        ...sketches
-           ->(
-               Belt.Array.mapU((. sketch) =>
-                 <li className="UI_SketchList__sketch">
-                   <Router.Link
-                     className="UI_SketchList__sketch--link"
-                     route={Route.Note({noteId: sketch##id, data: None})}>
-                     <span className="UI_SketchList__sketch--title">
-                       {
-                         switch (sketch##title) {
-                         | None
-                         | Some("") => "untitled sketch"->str
-                         | Some(title) => title->str
+      <>
+        <ul className={Cn.make(["UI_SketchList", Cn.unwrap(className)])}>
+          ...sketches
+             ->(
+                 Belt.Array.mapU((. sketch) =>
+                   <li className="UI_SketchList__sketch">
+                     <Router.Link
+                       className="UI_SketchList__sketch--link"
+                       route={Route.Note({noteId: sketch##id, data: None})}>
+                       <span className="UI_SketchList__sketch--title">
+                         {
+                           switch (sketch##title) {
+                           | None
+                           | Some("") => "untitled sketch"->str
+                           | Some(title) => title->str
+                           }
                          }
-                       }
-                     </span>
-                   </Router.Link>
-                   <div className="UI_SketchList__sketch--lastEdited">
-                     "last edited"->str
-                     <UI_DateTime
-                       date=sketch##date
-                       className="UI_SketchList__sketch--time"
-                     />
-                   </div>
-                   <DeleteNoteComponent>
-                     ...(
-                          (mutation, _) =>
-                            <button
-                              className="btn UI_SketchList__sketch--delete"
-                              onClick={
-                                _event => {
-                                  let continue =
-                                    Webapi.Dom.(
-                                      Window.confirm(
-                                        "Are you sure you want to delete this sketch?",
-                                        window,
-                                      )
-                                    );
+                       </span>
+                     </Router.Link>
+                     <div className="UI_SketchList__sketch--lastEdited">
+                       "last edited"->str
+                       <UI_DateTime
+                         date=sketch##date
+                         className="UI_SketchList__sketch--time"
+                       />
+                     </div>
+                     <DeleteNoteComponent>
+                       ...(
+                            (mutation, _) =>
+                              <button
+                                className="btn UI_SketchList__sketch--delete"
+                                onClick={
+                                  _event => {
+                                    let continue =
+                                      Webapi.Dom.(
+                                        Window.confirm(
+                                          "Are you sure you want to delete this sketch?",
+                                          window,
+                                        )
+                                      );
 
-                                  if (continue) {
-                                    let deleteNoteQuery =
-                                      DeleteNote.make(~noteId=sketch##id, ());
+                                    if (continue) {
+                                      let deleteNoteQuery =
+                                        DeleteNote.make(
+                                          ~noteId=sketch##id,
+                                          (),
+                                        );
 
-                                    Js.Promise.(
-                                      mutation(
-                                        ~variables=deleteNoteQuery##variables,
-                                        ~refetchQueries=[|"getNotes"|],
-                                        (),
-                                      )
-                                      |> then_(_response => {
-                                           Notify.info("Note was deleted.");
-                                           resolve();
-                                         })
-                                      |> catch(err => {
-                                           Notify.error(
-                                             "Note failed to delete.",
-                                           );
-                                           logError(err)->resolve;
-                                         })
-                                      |> ignore
-                                    );
-                                  };
-                                }
-                              }>
-                              "Delete"->str
-                            </button>
-                        )
-                   </DeleteNoteComponent>
-                 </li>
+                                      Js.Promise.(
+                                        mutation(
+                                          ~variables=
+                                            deleteNoteQuery##variables,
+                                          ~refetchQueries=[|"getNotes"|],
+                                          (),
+                                        )
+                                        |> then_(_response => {
+                                             Notify.info("Note was deleted.");
+                                             resolve();
+                                           })
+                                        |> catch(err => {
+                                             Notify.error(
+                                               "Note failed to delete.",
+                                             );
+                                             logError(err)->resolve;
+                                           })
+                                        |> ignore
+                                      );
+                                    };
+                                  }
+                                }>
+                                "Delete"->str
+                              </button>
+                          )
+                     </DeleteNoteComponent>
+                   </li>
+                 )
                )
-             )
-      </ul>
+        </ul>
+        {
+          switch (fetchMore) {
+          | None => ReasonReact.null
+          | Some(fetchMore) =>
+            <button className="btn btn-primary" onClick=fetchMore>
+              "Load more sketches"->str
+            </button>
+          }
+        }
+      </>
     },
 };
 
