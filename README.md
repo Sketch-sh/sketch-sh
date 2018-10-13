@@ -8,7 +8,7 @@ A note writing application for teaching and sharing ReasonML code with inline ev
 
 ## How does it work?
 
-This project uses [rtop-eveluator](https://github.com/Sketch-sh/rtop-evaluator) for evaluating the input
+This project uses [rtop-evaluator](https://github.com/Sketch-sh/rtop-evaluator) for evaluating the input
 
 ## Contributions
 
