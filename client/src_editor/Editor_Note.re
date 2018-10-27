@@ -115,6 +115,7 @@ module Editor_Note = {
             ...state,
             isLinkMenuOpen: !state.isLinkMenuOpen,
           })
+
         | LinkUpdate(links) =>
           ReasonReact.UpdateWithSideEffects(
             {...state, links, editorContentStatus: Ec_Dirty},

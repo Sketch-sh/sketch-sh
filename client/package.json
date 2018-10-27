@@ -22,6 +22,7 @@
   "license": "MIT",
   "dependencies": {
     "@glennsl/bs-json": "^3.0.0",
+    "@reach/dialog": "^0.1.2",
     "apollo-cache-inmemory": "^1.2.6",
     "apollo-client": "^2.3.7",
     "apollo-link": "^1.2.2",

@@ -4,10 +4,10 @@
 
 .link__container {
   display: flex;
+  padding: 3px
 }
 
 .link__input {
-  width: 33%;
   font-size: var(--f5);
   font-weight: 500;
   color: var(--c-text-sub2);
@@ -34,6 +34,10 @@
   &:hover {
     color: var(--topbar-c-primary);
   }
+}
+
+.action__button {
+  margin-bottom: 20px
 }
 
 .link__button__error {
@@ -63,4 +67,10 @@
   margin-bottom: var(--space3);
   font-weight: 400;
   color: var(--c-text-sub2);
+}
+
+.links__new {
+  color: var(--mono-2);
+  display: block;
+  font-weight: 700;
 }
