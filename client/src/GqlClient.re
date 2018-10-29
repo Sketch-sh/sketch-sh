@@ -6,7 +6,7 @@ external concat:
 
 external toString: Js.Nullable.t('a) => string = "%identity";
 
-let inMemoryCache =
+let cache =
   ApolloInMemoryCache.createInMemoryCache(
     ~dataIdFromObject=
       obj =>
@@ -44,5 +44,4 @@ let authLink =
 
 let link = authLink->(concat(httpLink));
 
-let instance =
-  ReasonApollo.createApolloClient(~link, ~cache=inMemoryCache, ());
+let instance = ReasonApollo.createApolloClient(~link, ~cache, ());
