@@ -1,4 +1,4 @@
-let component = ReasonReact.reducerComponent("AuthGithub");
+let component = ReasonReact.reducerComponent("Logout");
 
 let make = _children: ReasonReact.component(unit, 'a, unit) => {
   ...component,
