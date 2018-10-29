@@ -50,7 +50,7 @@
     "react-dom": "^16.4.1",
     "react-helmet": "^5.2.0",
     "react-icons": "^3.0.4",
-    "reason-apollo": "^0.12.0",
+    "reason-apollo": "^0.14.1",
     "reason-loadable": "thangngoc89/reason-loadable#delay",
     "reason-react": "^0.5.3",
     "subscriptions-transport-ws": "^0.9.14"
@@ -59,7 +59,7 @@
     "@glennsl/bs-jest": "^0.4.3",
     "babel-jest": "^23.4.0",
     "babel-preset-env": "^1.7.0",
-    "bs-platform": "^4.0.3",
+    "bs-platform": "^4.0.5",
     "bundle-buddy": "^0.2.1",
     "css-loader": "^1.0.0",
     "cypress": "^3.1.0",
