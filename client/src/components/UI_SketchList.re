@@ -67,7 +67,7 @@ let make =
                                          resolve();
                                        })
                                     |> catch(err => {
-                                         Notify.info(
+                                         Notify.error(
                                            "Note failed to delete.",
                                          );
                                          logError(err)->resolve;
