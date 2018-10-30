@@ -113,26 +113,11 @@ module AuthCallback = {
 };
 
 module AuthGithub = {
-  let component = ReasonReact.reducerComponent("AuthGithub");
+  let component = ReasonReact.statelessComponent("AuthGithub");
 
   let make = _children: ReasonReact.component(unit, 'a, unit) => {
     ...component,
     didMount: _ => Router.redirect(Auth.githubLoginRedirect),
     render: _self => "Redirecting to Github..."->str,
-  };
-};
-
-module AuthLogout = {
-  let component = ReasonReact.reducerComponent("AuthGithub");
-
-  let make = _children: ReasonReact.component(unit, 'a, unit) => {
-    ...component,
-    didMount: _ => {
-      open Auth;
-      Token.remove();
-      UserId.remove();
-      Js.Global.setTimeout(() => Router.push(Route.Home), 0)->ignore;
-    },
-    render: _self => "Logging out..."->str,
   };
 };

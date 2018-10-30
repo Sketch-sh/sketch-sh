@@ -26,12 +26,13 @@ let make = (~userName, _children) => {
     let notesQuery = GetNotes.make(~userName, ());
     <section className="Layout__center User">
       <h1> {j|$(userName)'s sketches|j}->str </h1>
-      <GetNotesComponent variables=notesQuery##variables>
-        ...(
+      <GetNotesComponent
+        fetchPolicy="network-only" variables=notesQuery##variables>
+        ...{
              ({result}) =>
                switch (result) {
                | Loading =>
-                 <div style=(ReactDOMRe.Style.make(~width="500px", ()))>
+                 <div style={ReactDOMRe.Style.make(~width="500px", ())}>
                    <UI_SketchList.Placeholder />
                  </div>
                | Error(error) => error##message->str
@@ -41,7 +42,7 @@ let make = (~userName, _children) => {
                    noSketches={<UI_NoSketches />}
                  />
                }
-           )
+           }
       </GetNotesComponent>
     </section>;
   },
