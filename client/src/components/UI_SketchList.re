@@ -19,24 +19,24 @@ let make =
   ...component,
   render: _self =>
     switch (sketches) {
-    | [||] => <div className=(Cn.unwrap(className))> noSketches </div>
+    | [||] => <div className={Cn.unwrap(className)}> noSketches </div>
     | sketches =>
-      <ul className=(Cn.make(["UI_SketchList", Cn.unwrap(className)]))>
+      <ul className={Cn.make(["UI_SketchList", Cn.unwrap(className)])}>
         ...sketches
            ->(
                Belt.Array.mapU((. sketch) =>
                  <li className="UI_SketchList__sketch">
                    <Router.Link
                      className="UI_SketchList__sketch--link"
-                     route=(Route.Note({noteId: sketch##id, data: None}))>
+                     route={Route.Note({noteId: sketch##id, data: None})}>
                      <span className="UI_SketchList__sketch--title">
-                       (
+                       {
                          switch (sketch##title) {
                          | None
                          | Some("") => "untitled sketch"->str
                          | Some(title) => title->str
                          }
-                       )
+                       }
                      </span>
                    </Router.Link>
                    <div className="UI_SketchList__sketch--lastEdited">
@@ -50,32 +50,42 @@ let make =
                      ...(
                           (mutation, _) =>
                             <button
-                              className="UI_SketchList__sketch--delete"
-                              onClick=(
+                              className="btn UI_SketchList__sketch--delete"
+                              onClick={
                                 _event => {
-                                  let deleteNoteQuery =
-                                    DeleteNote.make(~noteId=sketch##id, ());
+                                  let continue =
+                                    Webapi.Dom.(
+                                      Window.confirm(
+                                        "Are you sure you want to delete this sketch?",
+                                        window,
+                                      )
+                                    );
 
-                                  Js.Promise.(
-                                    mutation(
-                                      ~variables=deleteNoteQuery##variables,
-                                      ~refetchQueries=[|"getNotes"|],
-                                      (),
-                                    )
-                                    |> then_(_response => {
-                                         Notify.info("Note was deleted.");
-                                         resolve();
-                                       })
-                                    |> catch(err => {
-                                         Notify.error(
-                                           "Note failed to delete.",
-                                         );
-                                         logError(err)->resolve;
-                                       })
-                                    |> ignore
-                                  );
+                                  if (continue) {
+                                    let deleteNoteQuery =
+                                      DeleteNote.make(~noteId=sketch##id, ());
+
+                                    Js.Promise.(
+                                      mutation(
+                                        ~variables=deleteNoteQuery##variables,
+                                        ~refetchQueries=[|"getNotes"|],
+                                        (),
+                                      )
+                                      |> then_(_response => {
+                                           Notify.info("Note was deleted.");
+                                           resolve();
+                                         })
+                                      |> catch(err => {
+                                           Notify.error(
+                                             "Note failed to delete.",
+                                           );
+                                           logError(err)->resolve;
+                                         })
+                                      |> ignore
+                                    );
+                                  };
                                 }
-                              )>
+                              }>
                               "Delete"->str
                             </button>
                         )
@@ -96,24 +106,24 @@ module WithUserInfo = {
     ...component,
     render: _self =>
       switch (sketches) {
-      | [||] => <div className=(Cn.unwrap(className))> noSketches </div>
+      | [||] => <div className={Cn.unwrap(className)}> noSketches </div>
       | sketches =>
-        <ul className=(Cn.make(["UI_SketchList", Cn.unwrap(className)]))>
+        <ul className={Cn.make(["UI_SketchList", Cn.unwrap(className)])}>
           ...sketches
              ->(
                  Belt.Array.mapU((. sketch) =>
                    <li className="UI_SketchList__sketch">
                      <Router.Link
                        className="UI_SketchList__sketch--link"
-                       route=(Route.Note({noteId: sketch##id, data: None}))>
+                       route={Route.Note({noteId: sketch##id, data: None})}>
                        <span className="UI_SketchList__sketch--title">
-                         (
+                         {
                            switch (sketch##title) {
                            | None
                            | Some("") => "untitled sketch"->str
                            | Some(title) => title->str
                            }
-                         )
+                         }
                        </span>
                      </Router.Link>
                      <UI_SketchOwnerInfo
