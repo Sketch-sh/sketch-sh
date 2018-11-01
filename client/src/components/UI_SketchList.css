@@ -33,3 +33,9 @@
 .UI_SketchList__sketch--time {
   margin-left: var(--space1);
 }
+
+.UI_SketchList__sketch--delete {
+  background: var(--c-danger);
+  color: var(--c-text-inverse);
+  cursor: pointer;
+}
