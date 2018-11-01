@@ -1,7 +1,14 @@
 query_templates: []
 tables:
 - array_relationships: []
-  delete_permissions: []
+  delete_permissions:
+  - comment: null
+    permission:
+      filter:
+        note:
+          user_id:
+            _eq: X-HASURA-USER-ID
+    role: user
   insert_permissions: []
   object_relationships:
   - comment: null
@@ -200,7 +207,13 @@ tables:
       foreign_key_constraint_on:
         column: note_id
         table: note_edit_token
-  delete_permissions: []
+  delete_permissions:
+  - comment: null
+    permission:
+      filter:
+        user_id:
+          _eq: X-HASURA-USER-ID
+    role: user
   insert_permissions:
   - comment: null
     permission:

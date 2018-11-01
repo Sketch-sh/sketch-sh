@@ -1,6 +1,17 @@
 Modules.require("./UI_SketchList.css");
 open Utils;
 
+module DeleteNote = [%graphql
+  {|
+    mutation ($noteId: String!) {
+      delete_note_revision(where: {note_id: {_eq: $noteId}}) { affected_rows }
+      delete_note(where: {id: {_eq: $noteId}}) { affected_rows }
+    }
+|}
+];
+
+module DeleteNoteComponent = ReasonApollo.CreateMutation(DeleteNote);
+
 let component = ReasonReact.statelessComponent("UI_SketchList");
 
 let make =
@@ -35,6 +46,40 @@ let make =
                        className="UI_SketchList__sketch--time"
                      />
                    </div>
+                   <DeleteNoteComponent>
+                     ...(
+                          (mutation, _) =>
+                            <button
+                              className="UI_SketchList__sketch--delete"
+                              onClick=(
+                                _event => {
+                                  let deleteNoteQuery =
+                                    DeleteNote.make(~noteId=sketch##id, ());
+
+                                  Js.Promise.(
+                                    mutation(
+                                      ~variables=deleteNoteQuery##variables,
+                                      ~refetchQueries=[|"getNotes"|],
+                                      (),
+                                    )
+                                    |> then_(_response => {
+                                         Notify.info("Note was deleted.");
+                                         resolve();
+                                       })
+                                    |> catch(err => {
+                                         Notify.error(
+                                           "Note failed to delete.",
+                                         );
+                                         logError(err)->resolve;
+                                       })
+                                    |> ignore
+                                  );
+                                }
+                              )>
+                              "Delete"->str
+                            </button>
+                        )
+                   </DeleteNoteComponent>
                  </li>
                )
              )
