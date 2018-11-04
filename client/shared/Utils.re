@@ -132,3 +132,11 @@ let joinWithComma =
       acc ++ ", " ++ str;
     }
   );
+
+module Object = {
+  [@bs.val]
+  external assign3: (Js.t({..}), Js.t({..}), Js.t({..})) => Js.t({..}) =
+    "Object.assign";
+  let merge = (o1: Js.t({..}), o2: Js.t({..})) =>
+    assign3(Js.Obj.empty(), o1, o2);
+};
