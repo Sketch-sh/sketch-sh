@@ -9,6 +9,7 @@
     "src/gql",
     "shared",
     "src_editor",
+    "src_editor/components",
     "src_analyzer",
     "src_worker",
     {
@@ -20,12 +21,10 @@
       "type": "dev"
     }
   ],
-  "package-specs": [
-    {
-      "module": "es6",
-      "in-source": true
-    }
-  ],
+  "package-specs": [{
+    "module": "es6",
+    "in-source": true
+  }],
   "bsc-flags": ["-bs-g"],
   "ppx-flags": ["graphql_ppx/ppx"],
   "suffix": ".bs.js",
