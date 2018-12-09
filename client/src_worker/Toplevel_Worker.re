@@ -27,9 +27,7 @@ let loadSinglePackage = name => {
   | None => ()
   | Some(name) =>
     Js.log("Loading package" ++ name);
-    importScripts(
-      "http://libraries.sketch.sh/" ++ name ++ ".loader.sketch.js",
-    );
+    importScripts("/packages/" ++ name ++ ".loader.sketch.js");
     loadedPackages := (loadedPackages^)->Belt.Set.String.add(name);
   };
 };

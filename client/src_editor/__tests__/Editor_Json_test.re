@@ -305,7 +305,7 @@ describe("encode", () => {
   test("encode with lang field - ML", () => {
     let json =
       {|{
-      "packages": ["foo"]
+      "packages": ["foo"],
       "lang": "ML",
       "links": [],
       "blocks": [
