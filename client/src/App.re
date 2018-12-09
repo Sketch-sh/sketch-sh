@@ -36,31 +36,33 @@ let make = _children => {
         switch (state) {
         | Home =>
           <Layout_WithTopbar>
-            ...<AuthStatus.IsAuthenticated>
-                 ...(
-                      user =>
-                        switch (user) {
-                        | Anonymous =>
-                          let (lang, links, blocks) = Editor_Introduction.blocks;
-                          <NoteNewLazy
-                            title="Sketch.sh - Interactive ReasonML sketchbook"
-                            blocks
-                            links
-                            lang
-                          />;
-                        | Login(userId) =>
-                          <HomeLazy
-                            fetch=(
-                              () => [%bs.raw
-                                {| import(/* webpackChunkName: "Home" */ "./Home.bs.js") |}
-                              ]
-                            )
-                            onLoading=(() => <UI_FullpageLoading />)
-                            render=(((module Home)) => <Home userId />)
-                          />
-                        }
-                    )
-               </AuthStatus.IsAuthenticated>
+            ...{
+                 let%Epitath authState = children =>
+                   <AuthStatus.IsAuthenticated>
+                     ...children
+                   </AuthStatus.IsAuthenticated>;
+
+                 switch (authState) {
+                 | Anonymous =>
+                   let (lang, links, blocks) = Editor_Introduction.blocks;
+                   <NoteNewLazy
+                     title="Sketch.sh - Interactive ReasonML sketchbook"
+                     blocks
+                     links
+                     lang
+                   />;
+                 | Login(userId) =>
+                   <HomeLazy
+                     fetch=(
+                       () => [%bs.raw
+                         {| import(/* webpackChunkName: "Home" */ "./Home.bs.js") |}
+                       ]
+                     )
+                     onLoading=(() => <UI_FullpageLoading />)
+                     render=(((module Home)) => <Home userId />)
+                   />
+                 };
+               }
           </Layout_WithTopbar>
         | Note(noteInfo) =>
           <Layout_WithTopbar>
