@@ -17,7 +17,7 @@ describe("decode", () => {
   open Expect;
   open! Expect.Operators;
   test("with fallback lang to RE", () => {
-    let (lang, links, blocks) =
+    let (packages, lang, links, blocks) =
       {|{
       "links": [],
       "blocks": [
@@ -40,8 +40,9 @@ describe("decode", () => {
       ->parse
       ->decode;
 
-    expect((lang, links, blocks))
+    expect((packages, lang, links, blocks))
     == (
+         [||],
          RE,
          [||],
          [|
@@ -61,7 +62,7 @@ describe("decode", () => {
   });
 
   test("decode lang correctly - ML", () => {
-    let (lang, links, blocks) =
+    let (packages, lang, links, blocks) =
       {|{
       "lang": "ML",
       "links": [],
@@ -85,8 +86,9 @@ describe("decode", () => {
       ->parse
       ->decode;
 
-    expect((lang, links, blocks))
+    expect((packages, lang, links, blocks))
     == (
+         [||],
          ML,
          [||],
          [|
@@ -105,7 +107,7 @@ describe("decode", () => {
        );
   });
   test("decode lang correctly - RE", () => {
-    let (lang, links, blocks) =
+    let (packages, lang, links, blocks) =
       {|{
       "lang": "RE",
       "links": [],
@@ -129,8 +131,9 @@ describe("decode", () => {
       ->parse
       ->decode;
 
-    expect((lang, links, blocks))
+    expect((packages, lang, links, blocks))
     == (
+         [||],
          RE,
          [||],
          [|
@@ -149,8 +152,9 @@ describe("decode", () => {
        );
   });
   test("decode deleted blocks", () => {
-    let (lang, links, blocks) =
+    let (packages, lang, links, blocks) =
       {|{
+
       "lang": "RE",
       "links": [],
       "blocks": [
@@ -175,8 +179,58 @@ describe("decode", () => {
       ->parse
       ->decode;
 
-    expect((lang, links, blocks))
+    expect((packages, lang, links, blocks))
     == (
+         [||],
+         RE,
+         [||],
+         [|
+           {
+             b_id: "1",
+             b_data:
+               B_Code({
+                 bc_value: "let a: string = 1;",
+                 bc_firstLineNumber: 1,
+                 bc_widgets: [||],
+               }),
+             b_deleted: true,
+           },
+           {b_id: "2", b_data: B_Text("awesome"), b_deleted: false},
+         |],
+       );
+  });
+
+  test("decode packages", () => {
+    let (packages, lang, links, blocks) =
+      {|{
+      "packages": ["foo", "bar"]
+      "lang": "RE",
+      "links": [],
+      "blocks": [
+        {
+          "id": "1",
+          "data" : {
+            "kind": "code",
+            "value": "let a: string = 1;"
+          },
+          "deleted": true
+        },
+        {
+          "id": "2",
+          "data" : {
+            "kind": "text",
+            "value": "awesome"
+          },
+          "deleted": false
+        }
+      ]
+    }|}
+      ->parse
+      ->decode;
+
+    expect((packages, lang, links, blocks))
+    == (
+         [|"foo", "bar"|],
          RE,
          [||],
          [|

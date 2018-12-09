@@ -18,15 +18,34 @@ module Refmt = Worker_Refmt.Make(Worker_BrowserEvaluator);
 /* TODO: Fix this hardcoded packages list */
 let allowedPackage = [|"owl_base", "base", "containers", "re"|];
 
+let loadedPackages = Belt.Set.String.empty;
+
+let loadPackage = name => {
+  let findPackage =
+    allowedPackage->Utils.arrayFind(package => package == name);
+  switch (findPackage) {
+  | None => ()
+  | Some(name) =>
+    Js.log("Loading package" ++ name);
+    importScripts(
+      "https://libraries.sketch.sh/" ++ name ++ ".loader.sketch.js",
+    );
+  };
+};
+
 self
 ->onMessageFromTop(event => {
     let {t_id, t_message} = event##data;
     let result =
       switch (t_message) {
-      | Execute(lang, blocks, links) =>
+      | Execute(lang, blocks, links, packages) =>
+        let packagesNeeded = Belt.Set.String.diff(packages, loadedPackages);
+        Js.log(packagesNeeded);
+        packagesNeeded->Belt.Set.String.forEach(loadPackage);
+
         ExecuteResult(
           Belt.Result.Ok(Analyze.executeMany(. lang, blocks, links)),
-        )
+        );
       | Refmt(lang, blocks) =>
         RefmtResult(Belt.Result.Ok(Refmt.refmtMany(lang, blocks)))
       | LoadPackage(name) =>

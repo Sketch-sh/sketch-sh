@@ -55,9 +55,9 @@ type state = {
 
 let createInternalLink = (~name, ~note) => {
   /* TODO handle links that also have links */
-  let (lang, _links, blocks) =
+  let (_packages, lang, _links, blocks) =
     switch (note##data) {
-    | None => (Editor_Types.RE, [||], [||])
+    | None => ([||], Editor_Types.RE, [||], [||])
     | Some(data) => Editor_Json.V1.decode(data)
     };
 

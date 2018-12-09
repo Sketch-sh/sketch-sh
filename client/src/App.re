@@ -44,7 +44,7 @@ let make = _children => {
 
                  switch (authState) {
                  | Anonymous =>
-                   let (lang, links, blocks) = Editor_Introduction.blocks;
+                   let (_packages, lang, links, blocks) = Editor_Introduction.blocks;
                    <NoteNewLazy
                      title="Sketch.sh - Interactive ReasonML sketchbook"
                      blocks

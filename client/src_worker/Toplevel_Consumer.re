@@ -85,8 +85,8 @@ let run = (payload, callback, timeoutCallback) => {
   messageId;
 };
 
-let execute = (~lang, ~blocks, ~links, callback) =>
-  run(Execute(lang, blocks, links), ExecuteCallback(callback), () =>
+let execute = (~lang, ~blocks, ~links, ~packages, callback) =>
+  run(Execute(lang, blocks, links, packages), ExecuteCallback(callback), () =>
     callback(Belt.Result.Error("Evaluation timeout."))
   );
 

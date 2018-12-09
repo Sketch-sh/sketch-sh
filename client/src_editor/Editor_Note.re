@@ -5,6 +5,7 @@ open Editor_Types;
 
 module Editor_Note = {
   type state = {
+    packages: Belt.Set.String.t,
     hasSavePermission: bool,
     noteId: id,
     forkFrom: option(id),
@@ -32,12 +33,14 @@ module Editor_Note = {
     | UpdateForkStatus(forkStatus)
     | Execute
     | ChangeLang(lang)
+    | UpdatePackages(bool, string)
     | IsExecuting(bool);
 
   let component = ReasonReact.reducerComponent("Editor_Page");
 
   let make =
       (
+        ~initialPackages: array(string),
         ~initialHasSavePermission,
         ~initialNoteId,
         ~initialForkFrom=?,
@@ -52,6 +55,7 @@ module Editor_Note = {
         _children,
       ) => {
     let makeInitialState = () => {
+      packages: initialPackages->Belt.Set.String.fromArray,
       hasSavePermission: initialHasSavePermission,
       noteId: initialNoteId,
       forkFrom: initialForkFrom,
@@ -196,12 +200,21 @@ module Editor_Note = {
           }
         | IsExecuting(isExecuting) =>
           ReasonReact.Update({...state, isExecuting})
+        | UpdatePackages(checked, name) =>
+          let packages = state.packages;
+
+          let packages =
+            checked ?
+              packages->Belt.Set.String.add(name) :
+              packages->Belt.Set.String.remove(name);
+
+          ReasonReact.Update({...state, packages});
         },
       render: ({state, send}) => {
         let {editorContentStatus, lang} = state;
         <>
           <UI_Topbar.Actions>
-            ...(
+            ...{
                  (~buttonClassName) =>
                    <>
                      <UI_Balloon
@@ -209,38 +222,38 @@ module Editor_Note = {
                        length=Fit
                        message="Execute code (Ctrl+Enter)">
                        ...<button
-                            disabled=state.isExecuting
+                            disabled={state.isExecuting}
                             className=buttonClassName
-                            onClick=(
+                            onClick={
                               _ =>
                                 switch (state.executeCallback) {
                                 | None => ()
                                 | Some(callback) => callback()
                                 }
-                            )>
+                            }>
                             <UI_LoadingWrapper
-                              loading=state.isExecuting delayMs=500>
-                              ...(
+                              loading={state.isExecuting} delayMs=500>
+                              ...{
                                    loading =>
                                      loading ?
                                        <Fi.Loader
                                          className="EditorNav__button--spin"
                                        /> :
                                        <Fi.Play />
-                                 )
+                                 }
                             </UI_LoadingWrapper>
                             <span> "Run"->str </span>
                           </button>
                      </UI_Balloon>
                      <Editor_Note_SaveButton
-                       hasSavePermission=state.hasSavePermission
-                       noteId=state.noteId
-                       noteState=state.noteState
+                       hasSavePermission={state.hasSavePermission}
+                       noteId={state.noteId}
+                       noteState={state.noteState}
                        editorContentStatus
-                       updateSaveStatus=(
+                       updateSaveStatus={
                          saveStatus => saveStatus->UpdateNoteSaveStatus->send
-                       )
-                       getCurrentData=(
+                       }
+                       getCurrentData={
                          () => (
                            state.title,
                            Editor_Json.V1.encode(
@@ -251,18 +264,18 @@ module Editor_Note = {
                              ),
                            ),
                          )
-                       )
+                       }
                        registerShortcut
                        className=buttonClassName
                      />
                      <Editor_Note_ForkButton
-                       hasSavePermission=state.hasSavePermission
-                       noteId=state.noteId
-                       noteState=state.noteState
-                       updateForkStatus=(
+                       hasSavePermission={state.hasSavePermission}
+                       noteId={state.noteId}
+                       noteState={state.noteState}
+                       updateForkStatus={
                          forkStatus => forkStatus->UpdateForkStatus->send
-                       )
-                       getCurrentData=(
+                       }
+                       getCurrentData={
                          () => (
                            state.title,
                            Editor_Json.V1.encode(
@@ -273,9 +286,9 @@ module Editor_Note = {
                              ),
                            ),
                          )
-                       )
+                       }
                        className=buttonClassName
-                       forkStatus=state.forkStatus
+                       forkStatus={state.forkStatus}
                      />
                      <UI_Balloon message="Sketch language" position=Down>
                        ...<fieldset
@@ -286,8 +299,8 @@ module Editor_Note = {
                                 type_="radio"
                                 id="RE"
                                 name="language"
-                                checked=(lang == RE)
-                                onChange=(_ => send(ChangeLang(RE)))
+                                checked={lang == RE}
+                                onChange={_ => send(ChangeLang(RE))}
                               />
                               <label
                                 htmlFor="RE" className="EditorNote__lang--RE">
@@ -299,8 +312,8 @@ module Editor_Note = {
                                 type_="radio"
                                 id="ML"
                                 name="language"
-                                checked=(lang == ML)
-                                onChange=(_ => send(ChangeLang(ML)))
+                                checked={lang == ML}
+                                onChange={_ => send(ChangeLang(ML))}
                               />
                               <label
                                 htmlFor="ML" className="EditorNote__lang--ML">
@@ -310,7 +323,7 @@ module Editor_Note = {
                           </fieldset>
                      </UI_Balloon>
                    </>
-               )
+               }
           </UI_Topbar.Actions>
           <Helmet>
             <title>
@@ -325,32 +338,32 @@ module Editor_Note = {
               <input
                 className="EditorNote__metadata--title"
                 placeholder="untitled sketch"
-                value=state.title
-                onChange=(event => valueFromEvent(event)->TitleUpdate->send)
+                value={state.title}
+                onChange={event => valueFromEvent(event)->TitleUpdate->send}
               />
               <div className="EditorNote__metadata--info">
-                <Editor_Note_GetUserInfo userId=state.noteOwnerId>
-                  ...(
+                <Editor_Note_GetUserInfo userId={state.noteOwnerId}>
+                  ...{
                        fun
                        | None => React.null
                        | Some(user) =>
                          <UI_SketchOwnerInfo
                            owner=user
-                           noteLastEdited=?state.noteLastEdited
+                           noteLastEdited=?{state.noteLastEdited}
                            className="EditorNote__owner"
                          />
-                     )
+                     }
                 </Editor_Note_GetUserInfo>
                 <UI_Balloon position=Down message="Link sketches">
                   ...<button
-                       className=(
+                       className={
                          ClassNames.make([
                            "EditorNote__linkMenu",
                            state.isLinkMenuOpen
                            ->ClassNames.ifTrue("EditorNote__linkMenu--open"),
                          ])
-                       )
-                       onClick=(_ => send(ToggleLinkMenu))>
+                       }
+                       onClick={_ => send(ToggleLinkMenu)}>
                        <Fi.Link />
                      </button>
                 </UI_Balloon>
@@ -367,7 +380,7 @@ module Editor_Note = {
                   ->str
                 </i>
               </div>
-              (
+              {
                 state.forkFrom
                 =>> (
                   forkFrom =>
@@ -375,37 +388,58 @@ module Editor_Note = {
                       <p>
                         "Forked from"->str
                         <Router.Link
-                          route=(Route.Note({noteId: forkFrom, data: None}))>
+                          route={Route.Note({noteId: forkFrom, data: None})}>
                           {j|/s/$(forkFrom)|j}->str
                         </Router.Link>
                       </p>
                     </div>
                 )
-              )
+              }
             </div>
-            (
+            {
               state.isLinkMenuOpen ?
                 <Editor_Links
-                  key=(
+                  key={
                     state.noteId ++ string_of_int(Array.length(state.links))
-                  )
-                  currentSketchId=state.noteId
-                  links=state.links
-                  onUpdate=(links => send(LinkUpdate(links)))
+                  }
+                  currentSketchId={state.noteId}
+                  links={state.links}
+                  onUpdate={links => send(LinkUpdate(links))}
                 /> :
                 ReasonReact.null
-            )
+            }
+            [|"owl_base", "base", "containers", "re"|]
+            ->(
+                Belt.Array.map(package =>
+                  <label>
+                    <input
+                      type_="checkbox"
+                      value=package
+                      checked=state.packages->Belt.Set.String.has(package)
+                      onChange={
+                        event => {
+                          let target = event->ReactEvent.Form.target;
+                          send(UpdatePackages(target##checked, package));
+                        }
+                      }
+                    />
+                    package->str
+                  </label>
+                )
+              )
+            ->ReasonReact.array
             <Editor_Blocks
-              key=state.noteId
+              key={state.noteId}
               lang
               blocks=state.blocks^
-              links=state.links
-              registerExecuteCallback=(
+              links={state.links}
+              packages={state.packages}
+              registerExecuteCallback={
                 callback => send(RegisterExecuteCallback(callback))
-              )
+              }
               registerShortcut
-              onUpdate=(blocks => send(BlockUpdate(blocks)))
-              onExecute=(isExecuting => send(IsExecuting(isExecuting)))
+              onUpdate={blocks => send(BlockUpdate(blocks))}
+              onExecute={isExecuting => send(IsExecuting(isExecuting))}
             />
           </main>
         </>;
@@ -419,6 +453,7 @@ module WithShortcut = {
 
   let make =
       (
+        ~packages,
         ~hasSavePermission,
         ~noteId,
         ~noteState,
@@ -434,9 +469,10 @@ module WithShortcut = {
     ...component,
     render: _self =>
       <Shortcut.Consumer>
-        ...(
+        ...{
              registerShortcut =>
                <Editor_Note
+                 initialPackages=packages
                  initialHasSavePermission=hasSavePermission
                  initialNoteId=noteId
                  initialNoteState=noteState
@@ -449,7 +485,7 @@ module WithShortcut = {
                  initialForkFrom=?forkFrom
                  registerShortcut
                />
-           )
+           }
       </Shortcut.Consumer>,
   };
 };

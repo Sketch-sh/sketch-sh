@@ -32,6 +32,7 @@ type state = {
 let make:
   (
     ~lang: lang=?,
+    ~packages: Belt.Set.String.t,
     ~links: array(Link.link),
     ~blocks: array(Block.block),
     ~readOnly: bool=?,

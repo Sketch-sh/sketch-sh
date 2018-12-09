@@ -52,22 +52,16 @@ module V1 = {
         };
       };
 
-    let decode: Js.Json.t => (lang, array(Link.link), array(Block.block)) =
+    let decode:
+      Js.Json.t =>
+      (array(string), lang, array(Link.link), array(Block.block)) =
       json => (
-        json
-        |> optional(field("lang", langDecoder))
-        |> (
-          fun
-          | None => RE
-          | Some(lang) => lang
-        ),
-        json
-        |> optional(field("links", array(linkDecoder)))
-        |> (
-          fun
-          | None => [||]
-          | Some(links) => links
-        ),
+        (json |> optional(field("packages", array(string))))
+        ->Belt.Option.getWithDefault([||]),
+        (json |> optional(field("lang", langDecoder)))
+        ->Belt.Option.getWithDefault(RE),
+        (json |> optional(field("links", array(linkDecoder))))
+        ->Belt.Option.getWithDefault([||]),
         json |> field("blocks", array(blockDecoder)),
       );
   };

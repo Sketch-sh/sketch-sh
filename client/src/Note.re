@@ -42,9 +42,9 @@ let make = (~noteInfo: Route.noteRouteConfig, _children: React.childless) => {
           arrayFirst(
             ~empty=<NotFound entity="note" />,
             ~render=note => {
-              let (lang, links, blocks) =
+              let (packages, lang, links, blocks) =
                 switch (note##data) {
-                | None => (Editor_Types.RE, [||], [||])
+                | None => ([||], Editor_Types.RE, [||], [||])
                 | Some(data) => data->Editor_Json.V1.decode
                 };
               let hasSavePermission =
@@ -57,6 +57,7 @@ let make = (~noteInfo: Route.noteRouteConfig, _children: React.childless) => {
 
               <RedirectSketchURL noteId>
                 ...<Editor_Note
+                     packages
                      key=noteId
                      noteOwnerId=note##user_id
                      noteLastEdited={Some(note##updated_at)}

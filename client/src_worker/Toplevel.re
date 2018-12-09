@@ -33,6 +33,7 @@ module Types = {
         Editor_Types.lang,
         list(blockInput),
         list(Editor_Types.Link.link),
+        Belt.Set.String.t,
       )
     | Refmt(refmtTypes, list(blockInput))
     | LoadPackage(string);

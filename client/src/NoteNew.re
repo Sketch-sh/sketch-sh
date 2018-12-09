@@ -10,7 +10,15 @@ let defaultBlocks = [|
 
 let component = ReasonReact.statelessComponent("Note_New");
 
-let make = (~blocks=defaultBlocks, ~title=?, ~lang, ~links=[||], _children) => {
+let make =
+    (
+      ~blocks=defaultBlocks,
+      ~title=?,
+      ~lang,
+      ~links=[||],
+      ~packages=[||],
+      _children,
+    ) => {
   ...component,
   render: _self => {
     let%Epitath authStatus = children =>
@@ -23,6 +31,7 @@ let make = (~blocks=defaultBlocks, ~title=?, ~lang, ~links=[||], _children) => {
       };
     let noteId = Utils.generateId();
     <Editor_Note
+      packages
       key=noteId
       hasSavePermission=true
       noteOwnerId=userId
