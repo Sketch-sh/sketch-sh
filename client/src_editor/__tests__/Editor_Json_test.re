@@ -203,7 +203,7 @@ describe("decode", () => {
   test("decode packages", () => {
     let (packages, lang, links, blocks) =
       {|{
-      "packages": ["foo", "bar"]
+      "packages": ["foo", "bar"],
       "lang": "RE",
       "links": [],
       "blocks": [
