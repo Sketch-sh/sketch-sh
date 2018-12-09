@@ -106,7 +106,7 @@ const base = {
         ],
       },
       {
-        test: /\.(png|jpg|gif)$|toplevel.js$/,
+        test: /\.(png|jpg|gif)$|evaluator/,
         loader: "file-loader?name=[name].[hash].[ext]",
       },
     ],
