@@ -20,5 +20,6 @@ module V1: {
   let decode:
     Js.Json.t =>
     (array(string), lang, array(Link.link), array(Block.block));
-  let encode: (lang, array(Link.link), array(Block.block)) => Js.Json.t;
+  let encode:
+    (array(string), lang, array(Link.link), array(Block.block)) => Js.Json.t;
 };

@@ -18,9 +18,9 @@ module Refmt = Worker_Refmt.Make(Worker_BrowserEvaluator);
 /* TODO: Fix this hardcoded packages list */
 let allowedPackage = [|"owl_base", "base", "containers", "re"|];
 
-let loadedPackages = Belt.Set.String.empty;
+let loadedPackages = ref(Belt.Set.String.empty);
 
-let loadPackage = name => {
+let loadSinglePackage = name => {
   let findPackage =
     allowedPackage->Utils.arrayFind(package => package == name);
   switch (findPackage) {
@@ -28,10 +28,15 @@ let loadPackage = name => {
   | Some(name) =>
     Js.log("Loading package" ++ name);
     importScripts(
-      "https://libraries.sketch.sh/" ++ name ++ ".loader.sketch.js",
+      "http://libraries.sketch.sh/" ++ name ++ ".loader.sketch.js",
     );
+    loadedPackages := (loadedPackages^)->Belt.Set.String.add(name);
   };
 };
+
+let loadPackages = packages =>
+  Belt.Set.String.diff(packages, loadedPackages^)
+  ->Belt.Set.String.forEach(loadSinglePackage);
 
 self
 ->onMessageFromTop(event => {
@@ -39,26 +44,15 @@ self
     let result =
       switch (t_message) {
       | Execute(lang, blocks, links, packages) =>
-        let packagesNeeded = Belt.Set.String.diff(packages, loadedPackages);
-        Js.log(packagesNeeded);
-        packagesNeeded->Belt.Set.String.forEach(loadPackage);
-
+        loadPackages(packages);
         ExecuteResult(
           Belt.Result.Ok(Analyze.executeMany(. lang, blocks, links)),
         );
       | Refmt(lang, blocks) =>
         RefmtResult(Belt.Result.Ok(Refmt.refmtMany(lang, blocks)))
-      | LoadPackage(name) =>
-        let findPackage =
-          allowedPackage->Utils.arrayFind(package => package == name);
-        switch (findPackage) {
-        | None => LoadPackageResult(Belt.Result.Error(`PackageNotAvailable))
-        | Some(name) =>
-          importScripts(
-            "https://libraries.sketch.sh/" ++ name ++ ".loader.sketch.js",
-          );
-          LoadPackageResult(Belt.Result.Ok());
-        };
+      | LoadPackage(packages) =>
+        loadPackages(packages);
+        LoadPackageResult(Belt.Result.Ok());
       };
     postMessageFromWorker({w_id: t_id, w_message: result});
   });

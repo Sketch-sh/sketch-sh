@@ -110,9 +110,12 @@ module V1 = {
         | _ => failwith("There are no external links yet.")
         };
 
-    let encode: (lang, array(Link.link), array(Block.block)) => Js.Json.t =
-      (lang, links, blocks) =>
+    let encode:
+      (array(string), lang, array(Link.link), array(Block.block)) =>
+      Js.Json.t =
+      (packages, lang, links, blocks) =>
         object_([
+          ("packages", packages->mapToJsonArray(string)),
           ("lang", lang |> langToString |> string),
           ("links", links->mapToJsonArray(linkEncoder)),
           ("blocks", blocks->mapToJsonArray(blockEncoder)),

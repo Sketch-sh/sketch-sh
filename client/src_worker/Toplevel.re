@@ -36,7 +36,7 @@ module Types = {
         Belt.Set.String.t,
       )
     | Refmt(refmtTypes, list(blockInput))
-    | LoadPackage(string);
+    | LoadPackage(Belt.Set.String.t);
 
   type topToWorkerData = {
     t_id: string,
@@ -49,7 +49,9 @@ module Types = {
         Belt.Result.t((list(linkResult), list(blockResult)), string),
       )
     | RefmtResult(Belt.Result.t(refmtOk, string))
-    | LoadPackageResult(Belt.Result.t(unit, [ | `PackageNotAvailable]));
+    | LoadPackageResult(
+        Belt.Result.t(unit, [ | `PackageNotAvailable | `EvaluationTimeout]),
+      );
 
   type workerToTopData = {
     w_id: string,

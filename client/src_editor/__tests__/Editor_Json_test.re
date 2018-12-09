@@ -256,6 +256,7 @@ describe("encode", () => {
   test("encode with lang field - RE", () => {
     let json =
       {|{
+      "packages": ["foo"],
       "lang": "RE",
       "links": [],
       "blocks": [
@@ -281,6 +282,7 @@ describe("encode", () => {
 
     expect(
       encode(
+        [|"foo"|],
         RE,
         [||],
         [|
@@ -303,6 +305,7 @@ describe("encode", () => {
   test("encode with lang field - ML", () => {
     let json =
       {|{
+      "packages": ["foo"]
       "lang": "ML",
       "links": [],
       "blocks": [
@@ -328,6 +331,7 @@ describe("encode", () => {
 
     expect(
       encode(
+        [|"foo"|],
         ML,
         [||],
         [|

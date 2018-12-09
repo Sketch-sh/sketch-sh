@@ -11,7 +11,8 @@ type callback =
     )
   | RefmtCallback(Belt.Result.t(refmtOk, string) => unit)
   | LoadPackageCallback(
-      Belt.Result.t(unit, [ | `PackageNotAvailable]) => unit,
+      Belt.Result.t(unit, [ | `PackageNotAvailable | `EvaluationTimeout]) =>
+      unit,
     );
 
 let ongoingCallbacks: MapStr.t((Js.Global.timeoutId, callback)) =
@@ -93,4 +94,9 @@ let execute = (~lang, ~blocks, ~links, ~packages, callback) =>
 let refmt = (refmtTypes, blocks, callback) =>
   run(Refmt(refmtTypes, blocks), RefmtCallback(callback), () =>
     callback(Belt.Result.Error("Evaluation timeout."))
+  );
+
+let loadPackages = (packages: Belt.Set.String.t, callback) =>
+  run(LoadPackage(packages), LoadPackageCallback(callback), () =>
+    callback(Belt.Result.Error(`EvaluationTimeout))
   );

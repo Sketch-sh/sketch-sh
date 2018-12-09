@@ -208,7 +208,23 @@ module Editor_Note = {
               packages->Belt.Set.String.add(name) :
               packages->Belt.Set.String.remove(name);
 
-          ReasonReact.Update({...state, packages});
+          ReasonReact.UpdateWithSideEffects(
+            {...state, packages},
+            (
+              ({state, onUnmount}) => {
+                let cancelToken =
+                  Toplevel_Consumer.loadPackages(
+                    state.packages,
+                    fun
+                    | Belt.Result.Ok(_) =>
+                      Notify.info("External packages updated")
+                    | Belt.Result.Error(_) =>
+                      Notify.error("Unable to load external packages"),
+                  );
+                onUnmount(() => Toplevel_Consumer.cancel(cancelToken));
+              }
+            ),
+          );
         },
       render: ({state, send}) => {
         let {editorContentStatus, lang} = state;
@@ -257,6 +273,7 @@ module Editor_Note = {
                          () => (
                            state.title,
                            Editor_Json.V1.encode(
+                             state.packages->Belt.Set.String.toArray,
                              state.lang,
                              state.links,
                              Editor_Blocks_Utils.filterDeletedBlocks(
@@ -279,6 +296,7 @@ module Editor_Note = {
                          () => (
                            state.title,
                            Editor_Json.V1.encode(
+                             state.packages->Belt.Set.String.toArray,
                              state.lang,
                              state.links,
                              Editor_Blocks_Utils.filterDeletedBlocks(
