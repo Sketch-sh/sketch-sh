@@ -9,7 +9,10 @@ type callback =
   | ExecuteCallback(
       Belt.Result.t((list(linkResult), list(blockResult)), string) => unit,
     )
-  | RefmtCallback(Belt.Result.t(refmtOk, string) => unit);
+  | RefmtCallback(Belt.Result.t(refmtOk, string) => unit)
+  | LoadPackageCallback(
+      Belt.Result.t(unit, [ | `PackageNotAvailable]) => unit,
+    );
 
 let ongoingCallbacks: MapStr.t((Js.Global.timeoutId, callback)) =
   MapStr.make();
@@ -31,6 +34,11 @@ let workerListener = event => {
     | RefmtResult(result) =>
       switch (callback) {
       | RefmtCallback(callback) => callback(result)
+      | _ => ()
+      }
+    | LoadPackageResult(result) =>
+      switch (callback) {
+      | LoadPackageCallback(callback) => callback(result)
       | _ => ()
       }
     };

@@ -15,6 +15,9 @@ postMessageFromWorker({w_id: "ready", w_message: Ready});
 module Analyze = Worker_Analyze.Make(Worker_BrowserEvaluator);
 module Refmt = Worker_Refmt.Make(Worker_BrowserEvaluator);
 
+/* TODO: Fix this hardcoded packages list */
+let allowedPackage = [|"owl_base", "base", "containers", "re"|];
+
 self
 ->onMessageFromTop(event => {
     let {t_id, t_message} = event##data;
@@ -26,6 +29,17 @@ self
         )
       | Refmt(lang, blocks) =>
         RefmtResult(Belt.Result.Ok(Refmt.refmtMany(lang, blocks)))
+      | LoadPackage(name) =>
+        let findPackage =
+          allowedPackage->Utils.arrayFind(package => package == name);
+        switch (findPackage) {
+        | None => LoadPackageResult(Belt.Result.Error(`PackageNotAvailable))
+        | Some(name) =>
+          importScripts(
+            "https://libraries.sketch.sh/" ++ name ++ ".loader.sketch.js",
+          );
+          LoadPackageResult(Belt.Result.Ok());
+        };
       };
     postMessageFromWorker({w_id: t_id, w_message: result});
   });
