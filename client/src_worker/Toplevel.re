@@ -34,6 +34,7 @@ module Types = {
         list(blockInput),
         list(Editor_Types.Link.link),
       )
+    | ExecuteEmbed(Editor_Types.lang, string)
     | Refmt(refmtTypes, list(blockInput));
 
   type topToWorkerData = {
@@ -45,6 +46,9 @@ module Types = {
     | Ready
     | ExecuteResult(
         Belt.Result.t((list(linkResult), list(blockResult)), string),
+      )
+    | ExecuteEmbedResult(
+        Belt.Result.t(list(Worker_Types.blockData), string),
       )
     | RefmtResult(Belt.Result.t(refmtOk, string));
 

@@ -15,7 +15,10 @@ const isProd = process.env.NODE_ENV === "production";
 
 /** @type webpack.Configuration */
 const base = {
-  entry: ["react-hot-loader/patch", "./entry.js"],
+  entry: {
+    app: ["react-hot-loader/patch", "./entry.js"],
+    embed: ["react-hot-loader/patch", "./embed.js"],
+  },
   mode: isProd ? "production" : "development",
   devServer: {
     hot: true,
@@ -42,6 +45,13 @@ const base = {
   plugins: [
     new HtmlWebpackPlugin({
       template: path.join(__dirname, "src", "index.html"),
+      chunks: ["app"],
+      filename: "index.html"
+    }),
+    new HtmlWebpackPlugin({
+      template: path.join(__dirname, "src", "embed.html"),
+      chunks: ["embed"],
+      filename: "embed.html"
     }),
     new MiniCssExtractPlugin({
       filename: isProd ? "[name].[contenthash].css" : "[name].css",

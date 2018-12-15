@@ -9,6 +9,9 @@ type callback =
   | ExecuteCallback(
       Belt.Result.t((list(linkResult), list(blockResult)), string) => unit,
     )
+  | ExecuteEmbedCallback(
+      Belt.Result.t(list(Worker_Types.blockData), string) => unit,
+    )
   | RefmtCallback(Belt.Result.t(refmtOk, string) => unit);
 
 let ongoingCallbacks: MapStr.t((Js.Global.timeoutId, callback)) =
@@ -31,6 +34,11 @@ let workerListener = event => {
     | RefmtResult(result) =>
       switch (callback) {
       | RefmtCallback(callback) => callback(result)
+      | _ => ()
+      }
+    | ExecuteEmbedResult(result) =>
+      switch (callback) {
+      | ExecuteEmbedCallback(callback) => callback(result)
       | _ => ()
       }
     };

@@ -160,4 +160,16 @@ module Make = (ESig: Worker_Evaluator.EvaluatorSig) => {
 
       (linkResults, executeResults);
     };
+  let executeEmbed:
+    (. Editor_Types.lang, string) => list(Worker_Types.blockData) =
+    (. lang, code) => {
+      Evaluator.reset();
+      switch (lang) {
+      | ML => Evaluator.mlSyntax()
+      | RE => Evaluator.reSyntax()
+      };
+
+      let (result, _hasError) = execute(. code);
+      result;
+    };
 };

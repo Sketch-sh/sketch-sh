@@ -11,18 +11,19 @@ module Analyze = Worker_Analyze.Make(Worker_BrowserEvaluator);
 module Refmt = Worker_Refmt.Make(Worker_BrowserEvaluator);
 
 self
-->onMessageFromTop(
-    event => {
-      let {t_id, t_message} = event##data;
-      let result =
-        switch (t_message) {
-        | Execute(lang, blocks, links) =>
-          ExecuteResult(
-            Belt.Result.Ok(Analyze.executeMany(. lang, blocks, links)),
-          )
-        | Refmt(lang, blocks) =>
-          RefmtResult(Belt.Result.Ok(Refmt.refmtMany(lang, blocks)))
-        };
-      postMessageFromWorker({w_id: t_id, w_message: result});
-    },
-  );
+->onMessageFromTop(event => {
+    let {t_id, t_message} = event##data;
+    let result =
+      switch (t_message) {
+      | Execute(lang, blocks, links) =>
+        ExecuteResult(
+          Belt.Result.Ok(Analyze.executeMany(. lang, blocks, links)),
+        )
+      | Refmt(lang, blocks) =>
+        RefmtResult(Belt.Result.Ok(Refmt.refmtMany(lang, blocks)))
+      | ExecuteEmbed(lang, code) =>
+        let result = Analyze.executeEmbed(. lang, code);
+        ExecuteEmbedResult(Belt.Result.Ok(result));
+      };
+    postMessageFromWorker({w_id: t_id, w_message: result});
+  });

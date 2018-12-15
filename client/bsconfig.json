@@ -11,6 +11,7 @@
     "src_editor",
     "src_editor/components",
     "src_analyzer",
+    "src_embed",
     "src_worker",
     {
       "dir": "src_analyzer/__tests__",
