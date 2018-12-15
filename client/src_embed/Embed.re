@@ -4,11 +4,6 @@ Modules.require("./Embed.css");
 [@bs.val] external atob: string => string = "";
 [@bs.val] external btoa: string => string = "";
 
-type handler('a) = Js.t('a) => unit;
-[@bs.val] external window: Dom.window = "";
-[@bs.send]
-external addEventListener: (Dom.window, string, handler('a)) => unit = "";
-
 type state = {
   value: string,
   widgets: array(Editor_Types.Widget.t),
@@ -23,14 +18,7 @@ let component = ReasonReact.reducerComponent("Embed");
 
 let make = _children => {
   ...component,
-  didMount: ({state: _, send}) => {
-    let resizeHandler = event => Js.log(event);
-
-    window->addEventListener("resize", resizeHandler);
-
-    send(Run);
-    ();
-  },
+  didMount: ({state: _, send}) => send(Run),
   initialState: () => {
     let search = [%bs.raw "window.location.search"];
     let params = URLSearchParams.make(search);

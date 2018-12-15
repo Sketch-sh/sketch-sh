@@ -15,6 +15,20 @@ var onReady = function(cb) {
 };
 
 var Sketch = {
+  defaultHeight: "200px",
+  onLoad: function() {
+    var elements = document.querySelectorAll("[data-sketch]");
+    var length = elements.length;
+    var i = 0;
+    for (; i < length; i++) {
+      var ele = elements[i];
+      this.createEmbed({
+        element: ele,
+        height: ele.dataset.height || this.defaultHeight,
+        source: ele.innerText,
+      });
+    }
+  },
   createEmbed: function(options) {
     var options = options || {};
     if (!options.element) {
@@ -27,7 +41,7 @@ var Sketch = {
     } else {
       var source = options.source;
     }
-    var height = options.height || "200px";
+    var height = options.height || this.defaultHeight;
 
     var iframe = document.createElement("iframe");
     iframe.setAttribute(
@@ -41,3 +55,5 @@ var Sketch = {
     element.parentNode.replaceChild(iframe, element);
   },
 };
+
+onReady(Sketch.onLoad.bind(Sketch));
