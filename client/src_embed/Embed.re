@@ -55,9 +55,9 @@ let make = _children => {
       | exception _ => RE
       };
     let heightTyp =
-      switch (params->URLSearchParams.get("disableAutoHeight")) {
-      | Some(_) => Fixed
-      | None => Auto
+      switch (params->URLSearchParams.get("autoHeight")) {
+      | Some("false") => Fixed
+      | _ => Auto
       };
 
     {

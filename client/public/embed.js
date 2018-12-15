@@ -62,7 +62,8 @@ var Sketch = {
         btoa(source) +
         "&lang=" +
         lang +
-        (autoHeight ? "" : "&disableAutoHeight=true")
+        "&autoHeight=" +
+        autoHeight
     );
     iframe.width = "100%";
     iframe.height = height;
