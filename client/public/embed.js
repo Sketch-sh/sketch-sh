@@ -18,9 +18,11 @@ var url =
   document.location.hostname == "localhost"
     ? "http://localhost:3000"
     : "https://sketch.sh";
+
 var Sketch = {
   defaultHeight: "200px",
   defaultLang: "RE",
+  defaultAutoHeight: true,
   onLoad: function() {
     var elements = document.querySelectorAll("[data-sketch]");
     var length = elements.length;
@@ -31,6 +33,7 @@ var Sketch = {
         element: ele,
         height: ele.dataset.height || this.defaultHeight,
         lang: ele.dataset.lang || this.defaultLang,
+        autoHeight: ele.dataset.autoHeight || this.defaultAutoHeight,
         source: ele.innerText,
       });
     }
@@ -49,11 +52,17 @@ var Sketch = {
     }
     var height = options.height || this.defaultHeight;
     var lang = options.lang || this.defaultLang;
+    var autoHeight = options.autoHeight || this.defaultAutoHeight;
 
     var iframe = document.createElement("iframe");
     iframe.setAttribute(
       "src",
-      url + "/embed.html?value=" + btoa(source) + "&lang=" + lang
+      url +
+        "/embed.html?value=" +
+        btoa(source) +
+        "&lang=" +
+        lang +
+        (autoHeight ? "" : "&disableAutoHeight=true")
     );
     iframe.width = "100%";
     iframe.height = height;

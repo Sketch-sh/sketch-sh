@@ -1,3 +1,4 @@
+open Utils;
 Modules.require("../src/App.css");
 Modules.require("./Embed.css");
 
@@ -12,11 +13,17 @@ let postMessage: Js.t('a) => unit = [%raw
      window.parent && window.parent.postMessage(message, "*")
   } |}
 ];
+
+type heightTyp =
+  | Fixed
+  | Auto;
+
 type state = {
   value: string,
   lang: Editor_Types.lang,
   widgets: array(Editor_Types.Widget.t),
   scrollHeight: ref(float),
+  heightTyp,
 };
 
 type action =
@@ -47,7 +54,19 @@ let make = _children => {
       | value => value
       | exception _ => RE
       };
-    {value, lang, widgets: [||], scrollHeight: ref(getScrollHeight())};
+    let heightTyp =
+      switch (params->URLSearchParams.get("disableAutoHeight")) {
+      | Some(_) => Fixed
+      | None => Auto
+      };
+
+    {
+      value,
+      lang,
+      widgets: [||],
+      scrollHeight: ref(getScrollHeight()),
+      heightTyp,
+    };
   },
   reducer: (action, state) =>
     switch (action) {
@@ -93,14 +112,47 @@ let make = _children => {
       )
     },
   render: ({state, send}) => {
-    let {value, widgets} = state;
-    <Embed_Editor
-      value
-      handleValueChange={value => send(UpdateValue(value))}
-      handleEditorUpdate={() => send(EditorUpdate)}
-      handleRun={() => send(Run)}
-      widgets
-    />;
+    let {value, widgets, heightTyp} = state;
+    <>
+      <section
+        id="editor"
+        className={
+          switch (heightTyp) {
+          | Fixed => "fixedHeight"
+          | Auto => "autoHeight"
+          }
+        }>
+        <Editor_CodeBlock
+          value
+          firstLineNumber=1
+          focused={Some(FcTyp_EditorFocus)}
+          widgets
+          /* viewportMargin=10. */
+          onChange={(value, _) => send(UpdateValue(value))}
+          onUpdate=?{
+            switch (heightTyp) {
+            | Fixed => None
+            | Auto => Some((() => send(EditorUpdate)))
+            }
+          }
+        />
+      </section>
+      <footer id="footer">
+        <a
+          href="https://sketch.sh"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="footer-cell footer-powered-by">
+          <span> "Powered by "->str </span>
+          <strong> "Sketch"->str </strong>
+        </a>
+        <span className="footer_spacing" />
+        <button className="footer_run" onClick={_ => send(Run)}>
+          <Fi.Play className="footer_run_icon" />
+          "Run"->str
+        </button>
+      </footer>
+    </>;
   },
 };
 
