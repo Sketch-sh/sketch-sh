@@ -61,5 +61,5 @@
 }
 
 #editor .CodeMirror {
-  height: 100%;
+  height: calc(100vh - 34px);
 }
