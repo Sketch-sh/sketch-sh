@@ -31,6 +31,7 @@ let make =
       ~onBlur=?,
       ~onBlockUp=?,
       ~onBlockDown=?,
+      ~onUpdate=?,
       ~readOnly=?,
       ~viewportMargin=infinity,
       ~lang=RE,
@@ -180,12 +181,8 @@ let make =
       ?onBlur
       ?onBlockUp
       ?onBlockDown
-      setEditor={
-        editor => {
-          state.editor := Some(editor);
-          ();
-        }
-      }
+      ?onUpdate
+      setEditor={editor => state.editor := Some(editor)}
       options={
         CodeMirror.EditorConfiguration.make(
           ~mode=lang->langToMode,

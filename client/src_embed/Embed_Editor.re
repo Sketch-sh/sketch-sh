@@ -2,7 +2,15 @@ open Utils;
 
 let component = ReasonReact.statelessComponent("Embed_Editor");
 
-let make = (~value, ~handleValueChange, ~handleRun, ~widgets, _children) => {
+let make =
+    (
+      ~value,
+      ~widgets,
+      ~handleValueChange,
+      ~handleRun,
+      ~handleEditorUpdate,
+      _children,
+    ) => {
   ...component,
   render: _self =>
     <>
@@ -12,8 +20,9 @@ let make = (~value, ~handleValueChange, ~handleRun, ~widgets, _children) => {
           firstLineNumber=1
           focused={Some(FcTyp_EditorFocus)}
           widgets
-          viewportMargin=10.
+          /* viewportMargin=10. */
           onChange={(value, _) => handleValueChange(value)}
+          onUpdate=handleEditorUpdate
         />
       </section>
       <footer id="footer">

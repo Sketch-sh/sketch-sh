@@ -55,8 +55,8 @@ var Sketch = {
       "src",
       url + "/embed.html?value=" + btoa(source) + "&lang=" + lang
     );
-    iframe.style.width = "100%";
-    iframe.style.height = height;
+    iframe.width = "100%";
+    iframe.height = height;
     iframe.style.border = "none";
 
     element.parentNode.replaceChild(iframe, element);
@@ -64,3 +64,22 @@ var Sketch = {
 };
 
 onReady(Sketch.onLoad.bind(Sketch));
+
+window.addEventListener("message", function(e) {
+  if (e.origin !== url) return;
+
+  var data = e.data;
+
+  if (data.type !== "iframe.resize") {
+    return false;
+  }
+
+  var iframe = document.querySelector('iframe[src="' + data.src + '"]');
+  if (!iframe) {
+    return false;
+  }
+
+  if (data.height) {
+    iframe.height = data.height;
+  }
+});

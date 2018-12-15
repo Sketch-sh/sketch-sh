@@ -67,6 +67,9 @@
   height: 100%;
 }
 
-#editor .CodeMirror {
+/* #editor .CodeMirror {
   height: calc(100vh - 34px);
+} */
+#editor .CodeMirror {
+  height: 100%;
 }

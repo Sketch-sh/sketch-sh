@@ -41,6 +41,7 @@ let make =
       ~onChange=?,
       ~onFocus: option(unit => unit)=?,
       ~onBlur: option(unit => unit)=?,
+      ~onUpdate: option(unit => unit)=?,
       _children,
     )
     : ReasonReact.component(state, _, unit) => {
@@ -129,6 +130,11 @@ let make =
       | Some(onFocus) =>
         editor->(CodeMirror.Editor.onFocus((_editor, _event) => onFocus()))
       };
+      switch (onUpdate) {
+      | None => ()
+      | Some(onUpdate) =>
+        editor->CodeMirror.Editor.onUpdate(_editor => onUpdate())
+      };
       open Webapi.Dom;
       switch (onBlockUp, onBlockDown) {
       | (Some(onBlockUp), Some(onBlockDown)) =>
@@ -167,5 +173,5 @@ let make =
       };
     },
   render: ({handle, state: _}) =>
-    <div ?className ref=(handle(setDivRef)) />,
+    <div ?className ref={handle(setDivRef)} />,
 };
