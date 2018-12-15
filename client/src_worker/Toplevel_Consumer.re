@@ -90,6 +90,11 @@ let execute = (~lang, ~blocks, ~links, callback) =>
     callback(Belt.Result.Error("Evaluation timeout."))
   );
 
+let executeEmbed = (~lang, ~code, callback) =>
+  run(ExecuteEmbed(lang, code), ExecuteEmbedCallback(callback), () =>
+    callback(Belt.Result.Error("Evaluation timeout."))
+  );
+
 let refmt = (refmtTypes, blocks, callback) =>
   run(Refmt(refmtTypes, blocks), RefmtCallback(callback), () =>
     callback(Belt.Result.Error("Evaluation timeout."))

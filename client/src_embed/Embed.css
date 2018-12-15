@@ -1,0 +1,49 @@
+#main {
+  display: flex;
+  height: 100vh;
+  width: 100vw;
+  flex-direction: column;
+  border-radius: 5px;
+  border: solid 1px #ddd;
+}
+
+#footer {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  background: #eee;
+  border-top: solid 1px #ddd;
+}
+
+.footer-cell {
+  border-right: solid 1px #ddd;
+  padding: 0.5rem;
+  color: #666;
+}
+.footer-cell:hover {
+  background: #ccc;
+}
+
+.footer_spacing {
+  flex: 1;
+}
+
+.footer_run {
+  padding: 0.5rem;
+  border: none;
+  background: #1874d5;
+  color: #fff;
+  font-weight: 900;
+}
+
+#editor {
+  flex: 1;
+}
+
+#editor > div {
+  height: 100%;
+}
+
+#editor .CodeMirror {
+  height: 100%;
+}
