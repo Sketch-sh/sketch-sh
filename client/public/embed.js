@@ -44,10 +44,7 @@ var Sketch = {
     var height = options.height || this.defaultHeight;
 
     var iframe = document.createElement("iframe");
-    iframe.setAttribute(
-      "src",
-      "http://localhost:3000/embed.html?value=" + btoa(source)
-    );
+    iframe.setAttribute("src", "/embed.html?value=" + btoa(source));
     iframe.style.width = "100%";
     iframe.style.height = height;
     iframe.style.border = "none";
