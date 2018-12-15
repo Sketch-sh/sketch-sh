@@ -17,10 +17,14 @@ let make = (~value, ~handleValueChange, ~handleRun, ~widgets, _children) => {
         />
       </section>
       <footer id="footer">
-        <span className="footer-cell">
+        <a
+          href="https://sketch.sh"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="footer-cell footer-powered-by">
           <span> "Powered by "->str </span>
           <strong> "Sketch"->str </strong>
-        </span>
+        </a>
         <span className="footer_spacing" />
         <button className="footer_run" onClick={_ => handleRun()}>
           <Fi.Play className="footer_run_icon" />

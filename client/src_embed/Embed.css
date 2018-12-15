@@ -29,6 +29,13 @@
   flex: 1;
 }
 
+.footer-powered-by {
+  text-decoration: none;
+}
+.footer-powered-by:hover {
+  color: inherit;
+}
+
 .footer_run {
   padding: 0.5rem;
   border: none;

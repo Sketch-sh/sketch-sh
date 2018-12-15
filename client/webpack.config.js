@@ -17,7 +17,7 @@ const isProd = process.env.NODE_ENV === "production";
 const base = {
   entry: {
     app: ["react-hot-loader/patch", "./entry.js"],
-    embed: ["react-hot-loader/patch", "./embed.js"],
+    embedApp: ["react-hot-loader/patch", "./embedApp.js"],
   },
   mode: isProd ? "production" : "development",
   devServer: {
@@ -46,12 +46,12 @@ const base = {
     new HtmlWebpackPlugin({
       template: path.join(__dirname, "src", "index.html"),
       chunks: ["app"],
-      filename: "index.html"
+      filename: "index.html",
     }),
     new HtmlWebpackPlugin({
       template: path.join(__dirname, "src", "embed.html"),
-      chunks: ["embed"],
-      filename: "embed.html"
+      chunks: ["embedApp"],
+      filename: "embed.html",
     }),
     new MiniCssExtractPlugin({
       filename: isProd ? "[name].[contenthash].css" : "[name].css",
@@ -130,5 +130,22 @@ if (!isProd) {
 if (process.env.ANALYZE) {
   base.devtool = "source-map";
 }
+
+// const embed = {
+//   entry: "./embed.js",
+//   output: {
+//     path: path.join(__dirname, "public/"),
+//     library: "Sketch",
+//     libraryTarget: "umd",
+//   },
+//   mode: isProd ? "production" : "development",
+//   plugins: [
+//     new webpack.DefinePlugin({
+//       SERVICE_URL: JSON.stringify(
+//         isProd ? "https://sketch.sh" : "http://localhost:3000"
+//       ),
+//     }),
+//   ],
+// };
 
 module.exports = base;

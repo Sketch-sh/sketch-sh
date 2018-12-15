@@ -6,6 +6,7 @@ Modules.require("./Embed.css");
 
 type state = {
   value: string,
+  lang: Editor_Types.lang,
   widgets: array(Editor_Types.Widget.t),
 };
 
@@ -28,7 +29,15 @@ let make = _children => {
       | None => ""
       | Some(value) => atob(value)
       };
-    {value, widgets: [||]};
+
+    let lang =
+      params->URLSearchParams.get("lang")->Belt.Option.getWithDefault("RE");
+    let lang =
+      switch (lang->Editor_Types.stringToLang) {
+      | value => value
+      | exception _ => RE
+      };
+    {value, lang, widgets: [||]};
   },
   reducer: (action, state) =>
     switch (action) {
@@ -44,7 +53,7 @@ let make = _children => {
           ({state, send, onUnmount}) => {
             let cancelToken =
               Toplevel_Consumer.executeEmbed(
-                ~lang=RE,
+                ~lang=state.lang,
                 ~code=state.value,
                 fun
                 | Belt.Result.Ok(result) => {
