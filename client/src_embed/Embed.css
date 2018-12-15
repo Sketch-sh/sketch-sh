@@ -13,6 +13,7 @@
   width: 100%;
   background: #eee;
   border-top: solid 1px #ddd;
+  font-size: 0.8rem;
 }
 
 .footer-cell {
@@ -33,7 +34,22 @@
   border: none;
   background: #1874d5;
   color: #fff;
-  font-weight: 900;
+  font-weight: 700;
+  font-size: 0.8rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.footer_run:hover {
+  background: #135ba7;
+}
+
+.footer_run_icon {
+  fill: #fff;
+  height: 12px;
+  width: 12px;
 }
 
 #editor {

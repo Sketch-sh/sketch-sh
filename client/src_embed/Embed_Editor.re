@@ -33,7 +33,7 @@ let make = (~initialValue="", _children) => {
                       Editor_Blocks_Utils.executeResultToWidget(result);
                     send(UpdateWidgets(widgets));
                   }
-                | Belt.Result.Error(message) => (),
+                | Belt.Result.Error(message) => Js.log(message),
               );
             onUnmount(() => Toplevel_Consumer.cancel(cancelToken));
           }
@@ -58,6 +58,7 @@ let make = (~initialValue="", _children) => {
         </span>
         <span className="footer_spacing" />
         <button className="footer_run" onClick={_ => send(Run)}>
+          <Fi.Play className="footer_run_icon" />
           "Run"->str
         </button>
       </footer>
