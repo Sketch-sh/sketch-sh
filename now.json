@@ -11,7 +11,7 @@
       { "source": "u/*", "destination": "/index.html" },
       { "source": "auth/*", "destination": "/index.html" },
       { "source": "s/**", "destination": "/index.html" },
-      { "source": "*", "destination": "/index.html"}
+      { "source": "*", "destination": "/index.html" }
     ],
     "headers": [
       {
@@ -33,7 +33,7 @@
         ]
       },
       {
-        "source": "index.html",
+        "source": "*.html",
         "headers": [
           {
             "key": "Cache-Control",
