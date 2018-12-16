@@ -5,11 +5,6 @@ open Toplevel.Worker;
 [@bs.module] external toplevelPath: string = "../public/toplevel.js";
 importScripts(toplevelPath);
 
-%raw
-{|
-importScripts("/jsootop.cmis.js");
-|};
-
 postMessageFromWorker({w_id: "ready", w_message: Ready});
 
 module Analyze = Worker_Analyze.Make(Worker_BrowserEvaluator);

@@ -18,25 +18,52 @@ type heightTyp =
   | Fixed
   | Auto;
 
+type workerState = {
+  ready: bool,
+  packageLoaded: bool,
+};
+
+let isReady = s => s.ready && s.packageLoaded;
+
 type state = {
   value: string,
   lang: Editor_Types.lang,
   widgets: array(Editor_Types.Widget.t),
   scrollHeight: ref(float),
   heightTyp,
+  loadPackage: option(string),
+  workerState,
 };
 
 type action =
   | UpdateValue(string)
   | UpdateWidgets(array(Editor_Types.Widget.t))
   | EditorUpdate
+  | WorkerPackageLoaded
+  | WorkerReady
   | Run;
 
 let component = ReasonReact.reducerComponent("Embed");
 
 let make = _children => {
   ...component,
-  didMount: ({state: _, send}) => send(Run),
+  didMount: ({state, send, onUnmount}) => {
+    Toplevel_Consumer.getWorker() |> ignore;
+    Toplevel_Consumer.registerReadyCb(() => send(WorkerReady));
+    switch (state.loadPackage) {
+    | None => ()
+    | Some(package) =>
+      let cancelToken =
+        Toplevel_Consumer.loadScript(
+          package,
+          () => {
+            Js.log("package loaded");
+            send(WorkerPackageLoaded);
+          },
+        );
+      onUnmount(() => Toplevel_Consumer.cancel(cancelToken));
+    };
+  },
   initialState: () => {
     let search = [%bs.raw "window.location.search"];
     let params = URLSearchParams.make(search);
@@ -60,12 +87,23 @@ let make = _children => {
       | _ => Auto
       };
 
+    let loadPackage = params->URLSearchParams.get("package");
+
     {
       value,
       lang,
       widgets: [||],
       scrollHeight: ref(getScrollHeight()),
       heightTyp,
+      workerState: {
+        ready: false,
+        packageLoaded:
+          switch (loadPackage) {
+          | Some(_) => false
+          | None => true
+          },
+      },
+      loadPackage,
     };
   },
   reducer: (action, state) =>
@@ -110,6 +148,38 @@ let make = _children => {
           }
         ),
       )
+    | WorkerPackageLoaded =>
+      ReasonReact.UpdateWithSideEffects(
+        {
+          ...state,
+          workerState: {
+            ...state.workerState,
+            packageLoaded: true,
+          },
+        },
+        (
+          ({state, send}) =>
+            if (state.workerState->isReady) {
+              send(Run);
+            }
+        ),
+      )
+    | WorkerReady =>
+      ReasonReact.UpdateWithSideEffects(
+        {
+          ...state,
+          workerState: {
+            ...state.workerState,
+            ready: true,
+          },
+        },
+        (
+          ({state, send}) =>
+            if (state.workerState->isReady) {
+              send(Run);
+            }
+        ),
+      )
     },
   render: ({state, send}) => {
     let {value, widgets, heightTyp} = state;
@@ -147,6 +217,14 @@ let make = _children => {
           <strong> "Sketch"->str </strong>
         </a>
         <span className="footer_spacing" />
+        <span className="footer-cell">
+          {
+            switch (state.workerState->isReady) {
+            | false => "Initialize"->str
+            | true => ReasonReact.null
+            }
+          }
+        </span>
         <button className="footer_run" onClick={_ => send(Run)}>
           <Fi.Play className="footer_run_icon" />
           "Run"->str

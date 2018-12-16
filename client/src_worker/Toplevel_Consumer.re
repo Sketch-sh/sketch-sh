@@ -25,16 +25,21 @@ let workerListener = event => {
   let {w_id, w_message: message} = event##data;
 
   switch (ongoingCallbacks->MapStr.get(w_id)) {
-  | None => ()
-  | Some((timeoutId, callback)) =>
-    Js.Global.clearTimeout(timeoutId);
-    switch (message) {
-    | Ready =>
+  | None =>
+    switch (w_id, message) {
+    | ("ready", Ready) =>
       isReady := true;
       switch (readyCb^) {
       | None => ()
       | Some(cb) => cb()
       };
+    | _ => ()
+    }
+  | Some((timeoutId, callback)) =>
+    Js.Global.clearTimeout(timeoutId);
+    switch (message) {
+    | Ready => ()
+
     | ExecuteResult(result) =>
       switch (callback) {
       | ExecuteCallback(callback) => callback(result)
