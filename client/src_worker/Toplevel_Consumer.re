@@ -12,10 +12,14 @@ type callback =
   | ExecuteEmbedCallback(
       Belt.Result.t(list(Worker_Types.blockData), string) => unit,
     )
-  | RefmtCallback(Belt.Result.t(refmtOk, string) => unit);
+  | RefmtCallback(Belt.Result.t(refmtOk, string) => unit)
+  | LoadScriptCallback(unit => unit);
 
 let ongoingCallbacks: MapStr.t((Js.Global.timeoutId, callback)) =
   MapStr.make();
+
+let isReady = ref(false);
+let readyCb = ref(None);
 
 let workerListener = event => {
   let {w_id, w_message: message} = event##data;
@@ -25,7 +29,12 @@ let workerListener = event => {
   | Some((timeoutId, callback)) =>
     Js.Global.clearTimeout(timeoutId);
     switch (message) {
-    | Ready => () /* Ignore this for now */
+    | Ready =>
+      isReady := true;
+      switch (readyCb^) {
+      | None => ()
+      | Some(cb) => cb()
+      };
     | ExecuteResult(result) =>
       switch (callback) {
       | ExecuteCallback(callback) => callback(result)
@@ -39,6 +48,11 @@ let workerListener = event => {
     | ExecuteEmbedResult(result) =>
       switch (callback) {
       | ExecuteEmbedCallback(callback) => callback(result)
+      | _ => ()
+      }
+    | LoadScriptResult =>
+      switch (callback) {
+      | LoadScriptCallback(callback) => callback()
       | _ => ()
       }
     };
@@ -85,6 +99,13 @@ let run = (payload, callback, timeoutCallback) => {
   messageId;
 };
 
+let registerReadyCb = cb =>
+  if (isReady^) {
+    cb();
+  } else {
+    readyCb := Some(cb);
+  };
+
 let execute = (~lang, ~blocks, ~links, callback) =>
   run(Execute(lang, blocks, links), ExecuteCallback(callback), () =>
     callback(Belt.Result.Error("Evaluation timeout."))
@@ -99,3 +120,6 @@ let refmt = (refmtTypes, blocks, callback) =>
   run(Refmt(refmtTypes, blocks), RefmtCallback(callback), () =>
     callback(Belt.Result.Error("Evaluation timeout."))
   );
+
+let loadScript = (url, callback) =>
+  run(LoadScript(url), LoadScriptCallback(callback), callback);
