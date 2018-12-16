@@ -34,6 +34,7 @@ var Sketch = {
         height: ele.dataset.height || this.defaultHeight,
         lang: ele.dataset.lang || this.defaultLang,
         autoHeight: ele.dataset.autoHeight || this.defaultAutoHeight,
+        package: ele.dataset.package,
         source: ele.innerText,
       });
     }
@@ -53,6 +54,7 @@ var Sketch = {
     var height = options.height || this.defaultHeight;
     var lang = options.lang || this.defaultLang;
     var autoHeight = options.autoHeight || this.defaultAutoHeight;
+    var package = options.package || null;
 
     var iframe = document.createElement("iframe");
     iframe.setAttribute(
@@ -60,10 +62,9 @@ var Sketch = {
       url +
         "/embed.html?value=" +
         btoa(source) +
-        "&lang=" +
-        lang +
-        "&autoHeight=" +
-        autoHeight
+        ("&lang=" + lang) +
+        ("&autoHeight=" + autoHeight) +
+        (package ? "&package" + package : "")
     );
     iframe.width = "100%";
     iframe.height = height;
