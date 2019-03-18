@@ -9,7 +9,7 @@ It can print runtime values without print function|};
 
 let code2 = {|print_endline("Hello ReasonML folks");
 
-let noPrintFuntionNeeded = [
+let noPrintFunctionNeeded = [
   Random.int(10) > 4 ? Some("Hello") : None,
   None,
   Some("good bye")
@@ -17,7 +17,7 @@ let noPrintFuntionNeeded = [
 
 let text3 = "## All code blocks are connected";
 
-let code4 = "noPrintFuntionNeeded; /* This is from the first previous block */";
+let code4 = "noPrintFunctionNeeded; /* This is from the first previous block */";
 
 let text5 = {|## Inline errors and warnings|};
 
