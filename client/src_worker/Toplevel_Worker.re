@@ -25,7 +25,9 @@ self
         let result = Analyze.executeEmbed(. lang, code);
         ExecuteEmbedResult(Belt.Result.Ok(result));
       | LoadScript(string) =>
-        importScripts(string);
+        try (importScripts(string)) {
+        | Js.Exn.Error(exn) => Js.log(exn)
+        };
         LoadScriptResult;
       };
     postMessageFromWorker({w_id: t_id, w_message: result});

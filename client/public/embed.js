@@ -29,12 +29,13 @@ var Sketch = {
     var i = 0;
     for (; i < length; i++) {
       var ele = elements[i];
+      console.log(ele.dataset);
       this.createEmbed({
         element: ele,
         height: ele.dataset.height || this.defaultHeight,
         lang: ele.dataset.lang || this.defaultLang,
         autoHeight: ele.dataset.autoHeight || this.defaultAutoHeight,
-        externalPackage: ele.dataset.package,
+        package: ele.dataset.package,
         source: ele.innerText,
       });
     }
@@ -55,7 +56,7 @@ var Sketch = {
     var lang = options.lang || this.defaultLang;
     var autoHeight = options.autoHeight || this.defaultAutoHeight;
     var externalPackage = options.package || null;
-
+    console.log(externalPackage);
     var iframe = document.createElement("iframe");
     iframe.setAttribute(
       "src",

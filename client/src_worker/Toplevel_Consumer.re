@@ -71,6 +71,7 @@ let getWorker = () =>
     let newWorker = Toplevel.make();
     toplevelWorker := Some(newWorker);
     newWorker->Toplevel.Top.onMessageFromWorker(workerListener);
+    newWorker->Toplevel.Top.onErrorFromWorker(Js.log);
     newWorker;
   | Some(worker) => worker
   };
