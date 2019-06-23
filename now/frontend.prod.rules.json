@@ -2,7 +2,7 @@
   "rules": [
     {
       "pathname": "/api/auth/**",
-      "dest": "auth.sketch.sh"
+      "dest": "sleepy-ridge-67082.herokuapp.com"
     },
     {
       "dest": "sketch.now.sh"
