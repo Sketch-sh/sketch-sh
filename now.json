@@ -3,17 +3,17 @@
   "type": "static",
   "public": true,
   "static": {
-    "rewrites": [{ "source": "**", "destination": "/index.html" }],
+    "cleanUrls": false,
+    "rewrites": [
+      { "source": "re", "destination": "/index.html" },
+      { "source": "ml", "destination": "/index.html" },
+      { "source": "new/*", "destination": "/index.html" },
+      { "source": "u/*", "destination": "/index.html" },
+      { "source": "auth/*", "destination": "/index.html" },
+      { "source": "s/**", "destination": "/index.html" },
+      { "source": "*", "destination": "/index.html" }
+    ],
     "headers": [
-      {
-        "source": "index.html",
-        "headers": [
-          {
-            "key": "Cache-Control",
-            "value": "no-cache"
-          }
-        ]
-      },
       {
         "source": "**/*.@(jpg|jpeg|gif|png|js|css)",
         "headers": [
@@ -29,6 +29,24 @@
           {
             "key": "Cache-Control",
             "value": "max-age=311536000,public"
+          }
+        ]
+      },
+      {
+        "source": "*.html",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "no-cache"
+          }
+        ]
+      },
+      {
+        "source": "embed.js",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "no-cache"
           }
         ]
       }

@@ -20,6 +20,9 @@ module Make = (Config: Config) => {
     external onMessageFromWorker:
       (worker, {. "data": Config.workerToTopData} => unit) => unit =
       "onmessage";
+    [@bs.set]
+    external onErrorFromWorker: (worker, Js.t('a) => unit) => unit =
+      "onerror";
     [@bs.send] external terminate: worker => unit = "terminate";
   };
 
