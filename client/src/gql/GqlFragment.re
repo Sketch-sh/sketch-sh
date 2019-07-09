@@ -13,7 +13,7 @@ module Editor = [%graphql
 ];
 module User = [%graphql
   {|
-    fragment userInfo on user_public {
+    fragment userInfo on user {
       __typename
       id
       name

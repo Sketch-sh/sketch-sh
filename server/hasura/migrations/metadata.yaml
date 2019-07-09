@@ -1,4 +1,6 @@
+functions: []
 query_templates: []
+remote_schemas: []
 tables:
 - array_relationships: []
   delete_permissions:
@@ -9,6 +11,7 @@ tables:
           user_id:
             _eq: X-HASURA-USER-ID
     role: user
+  event_triggers: []
   insert_permissions: []
   object_relationships:
   - comment: null
@@ -38,6 +41,7 @@ tables:
   update_permissions: []
 - array_relationships: []
   delete_permissions: []
+  event_triggers: []
   insert_permissions: []
   object_relationships: []
   select_permissions:
@@ -51,10 +55,10 @@ tables:
   update_permissions: []
 - array_relationships: []
   delete_permissions: []
+  event_triggers: []
   insert_permissions:
   - comment: null
     permission:
-      allow_upsert: false
       check: {}
     role: public
   object_relationships:
@@ -85,6 +89,7 @@ tables:
   update_permissions: []
 - array_relationships: []
   delete_permissions: []
+  event_triggers: []
   insert_permissions: []
   object_relationships: []
   select_permissions:
@@ -114,10 +119,10 @@ tables:
   update_permissions: []
 - array_relationships: []
   delete_permissions: []
+  event_triggers: []
   insert_permissions:
   - comment: null
     permission:
-      allow_upsert: true
       check: {}
     role: auth_service
   object_relationships:
@@ -146,6 +151,31 @@ tables:
       - identity_id
       filter: {}
     role: auth_service
+- array_relationships: []
+  delete_permissions: []
+  event_triggers: []
+  insert_permissions: []
+  object_relationships:
+  - comment: null
+    name: private
+    using:
+      manual_configuration:
+        column_mapping:
+          id: id
+        remote_table: user
+  select_permissions:
+  - comment: null
+    permission:
+      allow_aggregations: false
+      columns:
+      - email
+      - id
+      filter:
+        id:
+          _eq: X-Hasura-User-Id
+    role: user
+  table: user_private
+  update_permissions: []
 - array_relationships:
   - comment: null
     name: notes
@@ -160,10 +190,10 @@ tables:
         column: user_id
         table: user_identity
   delete_permissions: []
+  event_triggers: []
   insert_permissions:
   - comment: null
     permission:
-      allow_upsert: false
       check: {}
     role: auth_service
   object_relationships: []
@@ -180,6 +210,26 @@ tables:
       - updated_at
       filter: {}
     role: auth_service
+  - comment: null
+    permission:
+      allow_aggregations: false
+      columns:
+      - avatar
+      - id
+      - name
+      - username
+      filter: {}
+    role: public
+  - comment: null
+    permission:
+      allow_aggregations: false
+      columns:
+      - avatar
+      - id
+      - name
+      - username
+      filter: {}
+    role: user
   table: user
   update_permissions:
   - comment: null
@@ -214,33 +264,25 @@ tables:
         user_id:
           _eq: X-HASURA-USER-ID
     role: user
+  event_triggers: []
   insert_permissions:
   - comment: null
     permission:
-      allow_upsert: false
       check:
         user_id:
           _eq: X-HASURA-USER-ID
     role: user
   - comment: null
     permission:
-      allow_upsert: false
       check:
         user_id:
           _eq: anonymous
     role: public
   object_relationships:
   - comment: null
-    name: user
-    using:
-      foreign_key_constraint_on: user_id
-  - comment: null
     name: owner
     using:
-      manual_configuration:
-        column_mapping:
-          user_id: id
-        remote_table: user_public
+      foreign_key_constraint_on: user_id
   select_permissions:
   - comment: null
     permission:

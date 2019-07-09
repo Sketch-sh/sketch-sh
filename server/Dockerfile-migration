@@ -2,6 +2,7 @@ FROM node:10-alpine
 
 # Install curl 
 RUN apk add --no-cache curl postgresql
+RUN echo "Install hasura for alpha 45"
 # Install hasura cli
 RUN curl -L https://hasura.io/install/linux-amd64 -o hasura && \
   chmod +x hasura && \

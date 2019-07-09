@@ -6,7 +6,9 @@ module GetNotes = [%graphql
   query getNotes($userName: String!, $limit: Int, $offset: Int) {
     note(
       where: {owner: {username: {_eq: $userName}}}
-      order_by: updated_at_desc
+      order_by: {
+        updated_at: desc
+      },
       limit: $limit,
       offset: $offset
       ) {

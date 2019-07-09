@@ -123,7 +123,24 @@ module WithUserInfo = {
     ReasonReact.statelessComponent("UI_SketchList.WithUserInfo");
 
   let make =
-      (~sketches, ~className=?, ~noSketches="No sketches"->str, _children) => {
+      (
+        ~sketches:
+           array({
+             .
+             "id": string,
+             "title": option(string),
+             "date": Js.Json.t,
+             "owner": {
+               .
+               "id": string,
+               "avatar": option(string),
+               "username": string,
+             },
+           }),
+        ~className=?,
+        ~noSketches="No sketches"->str,
+        _children,
+      ) => {
     ...component,
     render: _self =>
       switch (sketches) {

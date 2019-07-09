@@ -119,7 +119,7 @@ module UserInfo = {
         | Loading => children(None)
         | Error(_) => children(None)
         | Data(response) =>
-          response##user_public
+          response##user
           ->(
               arrayFirst(~empty=children(None), ~render=user =>
                 children(Some((user, userId)))
