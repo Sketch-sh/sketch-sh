@@ -1,0 +1,10 @@
+(library
+  (name core)
+  (flags (:standard))
+  (modes byte)
+  (public_name sketch.core)
+  (libraries compiler-libs.common sketch.util)
+  (preprocess 
+    (pps ppx_deriving.show)
+  )
+)

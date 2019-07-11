@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width" />
+    <title>@ViewBag.Title</title>
+    <link
+      href="/monaco-editor/min/vs/editor/editor.main.css"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        margin: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="editor"></div>
+
+    <script src="./exported.cmis.js"></script>
+    <script src="./SketchJsoo.bc.js"></script>
+    <script>
+      var require = { paths: { vs: "/monaco-editor/min/vs" } };
+    </script>
+    <script src="/monaco-editor/min/vs/loader.js"></script>
+    <script src="/monaco-editor/min/vs/editor/editor.main.nls.js"></script>
+    <script src="/monaco-editor/min/vs/editor/editor.main.js"></script>
+    <script>
+      "use strict";
+      var el = document.getElementById("editor");
+      el.style.height = "100vh";
+      el.style.width = "100vw";
+
+      var editor = null;
+      var init = function() {
+        require(["vs/editor/editor.main"], function() {
+          // monaco.languages.register({ id: "reason" });
+
+          monaco.languages.registerCompletionItemProvider("rust", {
+            provideCompletionItems: function(model, position) {
+              // find out if we are completing a property in the 'dependencies' object.
+              var textUntilPosition = model.getValueInRange({
+                startLineNumber: 1,
+                startColumn: 1,
+                endLineNumber: position.lineNumber,
+                endColumn: position.column,
+              });
+
+              let { completions } = completion(textUntilPosition);
+
+              let result = completions.map(result => ({
+                label: result,
+                documentation: "",
+                kind: monaco.languages.CompletionItemKind.Function,
+                insertText: result,
+              }));
+              return { suggestions: result };
+            },
+          });
+
+          editor = monaco.editor.create(el, {
+            value: `let a = `,
+            language: "rust",
+            theme: "vs-dark",
+          });
+
+          editor.layout();
+        });
+
+        // no point in keeping this around.
+        window.removeEventListener("load", init);
+      };
+
+      window.addEventListener("load", init);
+    </script>
+  </body>
+</html>

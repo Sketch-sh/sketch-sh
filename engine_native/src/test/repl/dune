@@ -1,0 +1,36 @@
+(library
+   (name ReplTest)
+   (public_name sketch.test_repl)
+   (flags :standard -w -33 -safe-string -rectypes)
+   ; the linkall flag ensures that all of our tests are compiled and the
+   ; -g flag emits debugging information
+   (ocamlopt_flags -linkall -g)
+   ; you will want to depend on the library you are testing as well, however for
+   ; the purposes of this example we are only depending on the test runner itself
+   (libraries 
+    rely.lib 
+    console.lib 
+    sketch.repl 
+    sketch.util
+    sketch.read_stdout
+    sketch.read_stdout_unix
+   )
+   (modules (:standard \ RunTests))
+)
+
+(executable
+  ; the for the library is automatically detected because of the name, but we
+  ; need to explicitly specify the package here
+  (name RunTests)
+  (modes byte)
+  (link_flags (:standard -linkall))
+  (flags :standard -w -33 -safe-string -rectypes)
+  (public_name RunTests.exe)
+  (package sketch)
+  (libraries
+    sketch.test_repl
+    rely.lib
+    console.lib
+  )
+  (modules RunTests)
+)

@@ -6,8 +6,10 @@ const path = require("path");
 const UglifyJsPlugin = require("uglifyjs-webpack-plugin");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const OptimizeCSSAssetsPlugin = require("optimize-css-assets-webpack-plugin");
+const MonacoWebpackPlugin = require("monaco-editor-webpack-plugin");
 
 const postcssPresetEnv = require("postcss-preset-env");
+const postcssNormalize = require("postcss-normalize");
 
 const outputDir = path.join(__dirname, "build/");
 
@@ -17,7 +19,6 @@ const isProd = process.env.NODE_ENV === "production";
 const base = {
   entry: {
     app: ["react-hot-loader/patch", "./entry.js"],
-    embedApp: ["react-hot-loader/patch", "./embedApp.js"],
   },
   mode: isProd ? "production" : "development",
   devServer: {
@@ -48,15 +49,11 @@ const base = {
       chunks: ["app"],
       filename: "index.html",
     }),
-    new HtmlWebpackPlugin({
-      template: path.join(__dirname, "src", "embed.html"),
-      chunks: ["embedApp"],
-      filename: "embed.html",
-    }),
     new MiniCssExtractPlugin({
       filename: isProd ? "[name].[contenthash].css" : "[name].css",
       chunkFilename: isProd ? "[id].[contenthash].css" : "[id].css",
     }),
+    new MonacoWebpackPlugin(),
   ],
   optimization: {
     minimizer: [
@@ -72,12 +69,18 @@ const base = {
     rules: [
       {
         test: file =>
-          file.endsWith(".worker.js") ||
-          file.endsWith("Worker_Index.bs.js") ||
-          file.endsWith("Toplevel_Worker.bs.js"),
-        exclude: ["public"],
-        use: { loader: "worker-loader" },
+          file.endsWith(".js") &&
+          !file.endsWith(".bs.js") &&
+          !file.endsWith(".gen.js") &&
+          !file.endsWith(".worker.js"),
+        include: path.join(__dirname, "src"),
+        use: { loader: "babel-loader" },
       },
+      // {
+      //   test: file => file.endsWith(".worker.js"),
+      //   exclude: /public/,
+      //   use: { loader: "worker-loader" },
+      // },
       {
         test: /\.css$/,
         use: [
@@ -93,21 +96,11 @@ const base = {
             options: {
               ident: "postcss",
               plugins: () => [
+                postcssNormalize(),
                 postcssPresetEnv({
                   stage: 3,
                   features: {
                     autoprefixer: isProd,
-                    "custom-properties": false,
-                    "color-mod-function": true,
-                    "nesting-rules": true,
-                    "custom-media-queries": {
-                      extensions: {
-                        "--sm": "screen and (min-width: 35.5rem)",
-                        "--md": "screen and (min-width: 48rem)",
-                        "--lg": "screen and (min-width: 64rem)",
-                        "--xl": "screen and (min-width: 80rem)",
-                      },
-                    },
                   },
                 }),
               ],
@@ -130,22 +123,5 @@ if (!isProd) {
 if (process.env.ANALYZE) {
   base.devtool = "source-map";
 }
-
-// const embed = {
-//   entry: "./embed.js",
-//   output: {
-//     path: path.join(__dirname, "public/"),
-//     library: "Sketch",
-//     libraryTarget: "umd",
-//   },
-//   mode: isProd ? "production" : "development",
-//   plugins: [
-//     new webpack.DefinePlugin({
-//       SERVICE_URL: JSON.stringify(
-//         isProd ? "https://sketch.sh" : "http://localhost:3000"
-//       ),
-//     }),
-//   ],
-// };
 
 module.exports = base;

@@ -1,25 +1,12 @@
 {
   "name": "sketch",
   "reason": {
-    "react-jsx": 2
+    "react-jsx": 3
   },
   "sources": [
-    "src",
-    "src/components",
-    "src/gql",
-    "shared",
-    "src_editor",
-    "src_editor/components",
-    "src_analyzer",
-    "src_embed",
-    "src_worker",
     {
-      "dir": "src_analyzer/__tests__",
-      "type": "dev"
-    },
-    {
-      "dir": "src_editor/__tests__",
-      "type": "dev"
+      "dir": "src",
+      "subdirs": true
     }
   ],
   "package-specs": [
@@ -29,10 +16,7 @@
     }
   ],
   "bsc-flags": ["-bs-g"],
-  "ppx-flags": [
-    "graphql_ppx/ppx",
-    "let-anything/lib/bs/native/let_anything.native"
-  ],
+  "ppx-flags": ["graphql_ppx/ppx"],
   "suffix": ".bs.js",
   "namespace": true,
   "bs-dependencies": [
@@ -40,15 +24,23 @@
     "@glennsl/bs-json",
     "bs-webapi",
     "reason-apollo",
-    "bs-dynamic-import",
-    "reason-loadable",
     "bs-date-fns",
     "re-classnames",
-    "bs-epitath"
+    "bs-css",
+    "reason-react-update",
+    "re-debouncer"
   ],
   "bs-dev-dependencies": ["@glennsl/bs-jest"],
   "refmt": 3,
   "warnings": {
     "error": "+5+8"
+  },
+  "gentypeconfig": {
+    "language": "untyped",
+    "ReasonReact": "ReactShim",
+    "debug": {
+      "all": false,
+      "basic": false
+    }
   }
 }

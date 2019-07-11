@@ -212,26 +212,6 @@ tables:
       - updated_at
       filter: {}
     role: auth_service
-  - comment: null
-    permission:
-      allow_aggregations: false
-      columns:
-      - avatar
-      - id
-      - name
-      - username
-      filter: {}
-    role: public
-  - comment: null
-    permission:
-      allow_aggregations: false
-      columns:
-      - avatar
-      - id
-      - name
-      - username
-      filter: {}
-    role: user
   table: user
   update_permissions:
   - comment: null
