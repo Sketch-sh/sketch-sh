@@ -1,4 +1,6 @@
+allowlist: []
 functions: []
+query_collections: []
 query_templates: []
 remote_schemas: []
 tables:
@@ -151,31 +153,6 @@ tables:
       - identity_id
       filter: {}
     role: auth_service
-- array_relationships: []
-  delete_permissions: []
-  event_triggers: []
-  insert_permissions: []
-  object_relationships:
-  - comment: null
-    name: private
-    using:
-      manual_configuration:
-        column_mapping:
-          id: id
-        remote_table: user
-  select_permissions:
-  - comment: null
-    permission:
-      allow_aggregations: false
-      columns:
-      - email
-      - id
-      filter:
-        id:
-          _eq: X-Hasura-User-Id
-    role: user
-  table: user_private
-  update_permissions: []
 - array_relationships:
   - comment: null
     name: notes
@@ -280,9 +257,16 @@ tables:
     role: public
   object_relationships:
   - comment: null
-    name: owner
+    name: user
     using:
       foreign_key_constraint_on: user_id
+  - comment: null
+    name: owner
+    using:
+      manual_configuration:
+        column_mapping:
+          user_id: id
+        remote_table: user_public
   select_permissions:
   - comment: null
     permission:

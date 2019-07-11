@@ -26,7 +26,7 @@ services:
     command: ["sh", "./wait-for-pg.sh", "postgres", "npm run migrate"]
 
   graphql-engine:
-    image: hasura/graphql-engine:v1.0.0-alpha45
+    image: hasura/graphql-engine:v1.0.0-beta.2
     depends_on:
       - postgres
     restart: always
