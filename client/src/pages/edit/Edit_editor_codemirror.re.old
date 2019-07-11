@@ -1,0 +1,109 @@
+%raw
+{|
+  require("./reason-mode.js");
+  require("codemirror/addon/selection/active-line");
+  require("codemirror/lib/codemirror.css");
+|};
+
+module S = {
+  open Css;
+  open Ds_unit;
+
+  global(".CodeMirror", [width(`percent(100.)), height(`percent(100.))]);
+  global(
+    ".CodeMirror-activeline-background",
+    [backgroundColor(Color.light_3)],
+  );
+  global(".CodeMirror-activeline-gutter", [backgroundColor(Color.light_4)]);
+  global(".CodeMirror-linenumber", [color(Color.light)]);
+  global(
+    ".CodeMirror-gutters",
+    [
+      backgroundColor(Color.brand_invert),
+      paddingRight(Space.s1),
+      borderRightWidth(`zero),
+    ],
+  );
+
+  let wrap =
+    [
+      display(`flex),
+      flexDirection(`row),
+      flex(`num(1.)),
+      width(`percent(100.)),
+      height(`percent(100.)),
+    ]
+    ->style;
+  let editor =
+    [width(`percent(100.)), height(`percent(100.)), fontSize(`px(14))]
+    ->style;
+  let view =
+    [
+      flex3(~grow=0., ~shrink=0., ~basis=`px(350)),
+      paddingLeft(Space.s2),
+      paddingRight(Space.s2),
+      backgroundColor(Color.light_4),
+    ]
+    ->style;
+};
+
+open Edit_state_native;
+open Utils;
+
+let parse = Debouncer.make(((code, send)) => send(Out_parse(code)));
+
+[@react.component]
+let make = (~value, ~onChange) => {
+  // let editorDomRef = React.useRef(Js.Nullable.null);
+  // let (editor, setEditor) = React.useState(() => None);
+
+  let (ntv_state, ntv_send) =
+    ReactUpdate.useReducer({parse_info: Belt.Result.Ok([||])}, reducer);
+
+  let editorConfig =
+    CodeMirror.EditorConfiguration.make(
+      ~mode="reason",
+      ~lineNumbers=true,
+      ~viewportMargin=infinity,
+      ~firstLineNumber=0,
+      ~lineWrapping=true,
+      ~styleActiveLine=true,
+      ~gutters=[|"CodeMirror-lint-markers CodeMirror-linenumbers"|],
+      ~lintOptions=
+        CodeMirror.LintOptions.make(
+          ~getAnnotations=
+            (. _code, cb) =>
+              // TODO: Fix me
+              // Editor_config is created on each keystroke for getting the latest ntv_state
+              switch (ntv_state.parse_info) {
+              | Belt.Result.Ok(_) => cb([||])
+              | Belt.Result.Error(err) =>
+                Js.log(cb);
+                let loc = err##loc;
+                let res =
+                  CodeMirror.LintOptions.annotation(
+                    ~message=err##message,
+                    ~from=Edit_state_native.to_cm(loc##loc_start),
+                    ~to_=Edit_state_native.to_cm(loc##loc_end),
+                    ~severity="error",
+                  );
+                cb([|res|]);
+              },
+          ~async=false,
+        ),
+      (),
+    );
+
+  <div className=S.wrap>
+    <ReactCodeMirror.Controlled
+      value
+      options=editorConfig
+      onBeforeChange={(_editor, _changes, value) => {
+        onChange(value);
+        parse((value, ntv_send));
+      }}
+      className=S.editor
+    />
+    <div className=S.view> "data"->str </div>
+  </div>;
+};

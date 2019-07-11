@@ -1,0 +1,43 @@
+---
+name: Button
+---
+
+import { Playground, Props } from "docz";
+import { make as Button } from "./Ds_button.gen.js";
+
+# Button
+
+<Props of={Button} />
+
+## Color variants
+
+Brand
+
+<Button color="Brand">Click me</Button>
+
+Text
+
+<Button color="Text">Click me</Button>
+
+Secondary
+
+<Button color="Secondary">Click me</Button>
+
+## Primary
+
+Note that `Normal` variant doesn't have a primary state
+
+<Button color="Brand" primary>
+  Click me
+</Button>
+
+## Playground
+
+<Playground>
+  <Button color="Brand">Click me</Button>
+  <Button color="Text">Click me</Button>
+  <Button color="Secondary">Click me</Button>
+  <Button color="Brand" primary>
+    Click me
+  </Button>
+</Playground>

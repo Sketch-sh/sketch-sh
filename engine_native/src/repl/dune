@@ -1,0 +1,19 @@
+(library
+  (name Repl)
+  (flags (:standard -w -27-26))
+  (modes byte)
+  (public_name sketch.repl)
+  (libraries 
+    console.lib
+    compiler-libs.common 
+    compiler-libs.toplevel 
+    reason
+    unix
+    sketch.core
+    sketch.util
+    sketch.read_stdout
+  )
+  (preprocess 
+    (pps ppx_deriving.show)
+  )
+)
