@@ -9,11 +9,11 @@
     compiler-libs.toplevel 
     reason
     unix
-    sketch.core
     sketch.util
     sketch.read_stdout
   )
   (preprocess 
     (pps ppx_deriving.show)
   )
+  (modules Location_util Reason_util Report State SyntaxControl Types Execute)
 )

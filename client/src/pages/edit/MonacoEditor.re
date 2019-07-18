@@ -1,7 +1,7 @@
 // Reference: https://github.com/Microsoft/monaco-editor/blob/master/monaco.d.ts
 
 module MarkerSeverity = {
-  [@bs.deriving jsConverter]
+  [@bs.deriving {jsConverter: newType}]
   type t =
     | [@bs.as 1] Hint
     | [@bs.as 2] Info
@@ -67,7 +67,7 @@ module IMarkerData = {
   type t = {
     [@bs.optional]
     code: string,
-    severity: MarkerSeverity.t,
+    severity: MarkerSeverity.abs_t,
     message: string,
     [@bs.optional]
     source: string,
@@ -119,6 +119,45 @@ module IModelDeltaDecoration = {
   let make = t;
 };
 
+module IViewZone = {
+  type id;
+
+  [@bs.deriving abstract]
+  type t = {
+    [@bs.optional]
+    afterColumn: int,
+    afterLineNumber: int,
+    domNode: Dom.element,
+    [@bs.optional]
+    heightInLines: int,
+    [@bs.optional]
+    marginDomNode: Dom.element,
+    [@bs.optional]
+    minWidthInPx: string,
+    [@bs.optional]
+    onComputedHeight: int => unit,
+    [@bs.optional]
+    onDomNodeTop: int => unit,
+    [@bs.optional]
+    suppressMouseDown: bool,
+  };
+
+  let make = t;
+};
+
+module IViewZoneChangeAccessor = {
+  type t = {
+    .
+    // Create a new view zone
+    [@bs.meth] "addZone": IViewZone.t => IViewZone.id,
+    // Remove a zone
+    [@bs.meth] "removeZone": IViewZone.id => unit,
+    // Change a zone's position.
+    // The editor will rescan the `afterLineNumber` and `afterColumn` properties of a view zone.
+    [@bs.meth] "layoutZone": IViewZone.id => unit,
+  };
+};
+
 module IStandaloneCodeEditor = {
   type t = {
     .
@@ -126,6 +165,7 @@ module IStandaloneCodeEditor = {
     [@bs.meth]
     "deltaDecorations":
       (array(string), array(IModelDeltaDecoration.t)) => array(string),
+    [@bs.meth] "changeViewZones": (IViewZoneChangeAccessor.t => unit) => unit,
   };
 };
 

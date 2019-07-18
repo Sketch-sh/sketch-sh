@@ -76,7 +76,8 @@ type foo = | Bar | Baz;
 
 fun
 | Bar => ()
-| Baz => ();
+| Baz => ()
+| _ => ();
 |};
 
 let initial_files = {

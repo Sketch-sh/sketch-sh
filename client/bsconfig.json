@@ -16,7 +16,7 @@
     }
   ],
   "bsc-flags": ["-bs-g"],
-  "ppx-flags": ["graphql_ppx/ppx"],
+  "ppx-flags": ["@ryb73/decco/ppx/ppx_decco.sh"],
   "suffix": ".bs.js",
   "namespace": true,
   "bs-dependencies": [
@@ -28,7 +28,8 @@
     "re-classnames",
     "bs-css",
     "reason-react-update",
-    "re-debouncer"
+    "re-debouncer",
+    "@ryb73/decco"
   ],
   "bs-dev-dependencies": ["@glennsl/bs-jest"],
   "refmt": 3,

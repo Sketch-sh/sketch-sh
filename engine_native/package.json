@@ -8,7 +8,7 @@
   },
   "devDependencies": {},
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "watch": "nodemon --watch src -e \"re rei ml mli dune\" --exec \"esy build\""
   },
   "repository": {
     "type": "git",

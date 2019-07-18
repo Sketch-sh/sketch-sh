@@ -1,4 +1,4 @@
-open Core.Syntax;
+open Types.Syntax;
 
 let _activeSyntax = ref(RE);
 let current = () => _activeSyntax^;
