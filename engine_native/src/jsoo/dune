@@ -4,7 +4,7 @@
   (package sketch)
   (flags :standard -safe-string)
   (js_of_ocaml 
-   (flags :standard --toplevel --linkall +toplevel.js +dynlink.js)
+   (flags :standard --no-cmis --toplevel --linkall +toplevel.js +dynlink.js)
   )
   (modes byte)
   (preprocess (pps js_of_ocaml-ppx ppx_jsobject_conv))
@@ -17,7 +17,6 @@
     sketch.utop
     sketch.util
     sketch.repl
-    sketch.core
     sketch.read_stdout_js
   )
 )

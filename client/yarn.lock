@@ -1327,6 +1327,11 @@
   resolved "https://registry.npmjs.org/@reach/utils/-/utils-0.2.3.tgz#820f6a6af4301b4c5065cfc04bb89e6a3d1d723f"
   integrity sha512-zM9rA8jDchr05giMhL95dPeYkK67cBQnIhCVrOKKqgWGsv+2GE/HZqeptvU4zqs0BvIqsThwov+YxVNVh5csTQ==
 
+"@ryb73/decco@^0.0.14":
+  version "0.0.14"
+  resolved "https://registry.yarnpkg.com/@ryb73/decco/-/decco-0.0.14.tgz#68814f6eaff42edac993306a60b9142446930acc"
+  integrity sha512-RPxV0rlGa3gK6yoXVnsRW9A5xjN2ng7VuI1DHc79sMGJP4foWAuuyDxb1gSAa2iJLos85vpgDP7gV8CmCC8nQQ==
+
 "@samverschueren/stream-to-observable@^0.3.0":
   version "0.3.0"
   resolved "https://registry.npmjs.org/@samverschueren/stream-to-observable/-/stream-to-observable-0.3.0.tgz#ecdf48d532c58ea477acfcab80348424f8d0662f"

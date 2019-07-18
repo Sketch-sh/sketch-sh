@@ -1,22 +1,11 @@
-/* open Core; */
+open Types;
 
-type parse_id = int;
-
-type parse_result = {
-  id: parse_id,
-  loc: option(Core.Loc.t),
+type state_phr = {
+  sphr_id: Parse.id,
+  sphr_loc: option(Loc.t),
+  sphr_phrase: Parsetree.toplevel_phrase,
 };
 
-type parse_error = {
-  loc: option(Core.Loc.t),
-  message: string,
-};
-
-type state;
-
-let initial_state: state;
 let reset_state: unit => unit;
-
-let parse: string => result(list(parse_result), parse_error);
-
-let execute: parse_id => unit;
+let parse: string => Parse.message;
+let get_phrs_to_execute: Parse.id => list(state_phr);
