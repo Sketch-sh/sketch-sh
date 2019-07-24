@@ -1,0 +1,38 @@
+defaultEntryPoints = ["https","http"]
+
+[api]
+entryPoint = "traefik"
+dashboard = true
+  [api.statistics]
+  recentErrors = 20
+
+[entryPoints]
+  [entryPoints.http]
+  address = ":80"
+
+  [entryPoints.traefik]
+  address = ":8080"
+  [entryPoints.traefik.auth.basic]
+  users = ["khoa:$apr1$DBWYRFHK$0dWM8Kuach/HlUrFAkzIh0"]
+    
+  [entryPoints.https]
+  address = ":443"
+  [entryPoints.https.tls]
+    [[entryPoints.https.tls.certificates]]
+    certFile = "/run/secrets/cloudflare.cert"
+    keyfile = "/run/secrets/cloudflare.key"
+
+[docker]
+endpoint = "unix:///var/run/docker.sock"
+domain = "docker.localhost"
+watch = true
+exposedbydefault = false
+swarmMode = true
+
+[retry]
+
+# [tls]
+#   entryPoints = ["https"]
+#   [tls.certificate]
+#     certFile = "/run/secrets/cloudflare.cert"
+#     keyfile = "/run/secrets/cloudflare.key"

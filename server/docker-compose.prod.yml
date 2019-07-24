@@ -1,46 +1,113 @@
 version: '3.6'
-services:
-  postgres:
-    networks:
-      - rtop
-    volumes:
-      - ~/rtop/pgdata:/var/lib/postgresql/data
+services: 
   migration:
+    image: thangngoc89/sketch-migration:latest
     networks:
-      - rtop
-  graphql-engine:
-    expose:
-      - "8080"
-    networks:
-      - rtop
-    labels:
-      - "traefik.enable=true"
-      - "traefik.backend=rtop_graphql"
-      - "traefik.frontend.rule=Host:api.sketch.sh;Path:/graphql;AddPrefix:/v1alpha1/graphql;"
+      - web
+    depends_on:
+      - graphql-engine
+    build:
+      context: .
+      dockerfile: Dockerfile-migration
+    environment:
+      - HASURA_ENDPOINT=http://graphql-engine:8080
+      - DATABASE_URL=${DATABASE_URL}
+      - HASURA_ACCESS_KEY=${HASURA_ACCESS_KEY}
+    command: ["sh", "./wait-for-pg.sh", "postgres", "npm run migrate"]
+    deploy:
+      restart_policy:
+        condition: on-failure
+  
   auth:
+    image: thangngoc89/sketch-auth:latest
     build:
       context: auth
       args:
         - NODE_ENV=production
-    expose:
-      - "3001"
+    restart: unless-stopped
+    networks:
+      - web
     environment:
       - NODE_ENV=production
       - JWT_TOKEN=${JWT_TOKEN}
-      - HASURA_ENDPOINT=http://graphql-engine:8080/v1alpha1/graphql
+      - HASURA_ENDPOINT=http://graphql-engine:8080/v1/graphql
       - GITHUB_CLIENT_ID=${GITHUB_CLIENT_ID}
       - GITHUB_CLIENT_SECRET=${GITHUB_CLIENT_SECRET}
       - AUTH_URL=${AUTH_URL}
       - FRONTEND_URL=${FRONTEND_URL}
-    labels:
-      - "traefik.enable=true"
-      - "traefik.backend=rtop_auth"
-      - "traefik.frontend.rule=Host:api.sketch.sh;Path:/auth"
-
+      - DATABASE_URL=${DATABASE_URL}
     depends_on:
       - graphql-engine
+      - proxy
+    deploy:
+      labels:
+        - traefik.enable=true
+        - traefik.port=80
+        - traefik.backend=auth
+        - traefik.frontend.rule=Host:api.sketch.sh;PathPrefix:/auth;AddPrefix:/api;
+
+  graphql-engine:
+    image: hasura/graphql-engine:v1.0.0-beta.3
+    restart: always
+    networks:
+      - web
+    depends_on:
+      - proxy
+    environment:
+      - HASURA_GRAPHQL_DATABASE_URL=${DATABASE_URL}
+      - HASURA_GRAPHQL_ACCESS_KEY=${HASURA_ACCESS_KEY}
+      - HASURA_GRAPHQL_AUTH_HOOK=http://auth/api/auth/webhook
+    command: >
+      /bin/sh -c "graphql-engine serve --enable-console;"
+    deploy:
+      labels:
+        - traefik.enable=true
+        - traefik.port=8080
+        - traefik.backend=hasura
+        - traefil.backend.healthcheck.path=/healthz
+        - traefik.graphql.frontend.rule=Host:api.sketch.sh;Path:/graphql;AddPrefix:/v1
+        - traefik.console.frontend.rule=Host:console.api.sketch.sh;
+
+  proxy:
+    image: traefik:latest
+    networks:
+      - web
+    restart: "always"
+    ports:
+      - "80:80"
+      - "443:443"
+      - "8080:8080"
+    configs:
+      - source: traefik.toml_12
+        target: /etc/traefik/traefik.toml
+    secrets:
+      - cloudflare.cert
+      - cloudflare.key
+
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      #- ./traefik.toml:/etc/traefik/traefik.toml
+    deploy:
+      # labels:
+      #   - traefik.logLevel=DEBUG
+      placement:
+        constraints:
+          - node.role == manager
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+
+configs:
+  traefik.toml_12:
+    file: ./traefik.toml
+secrets:
+  cloudflare.cert:
+    external: true
+  cloudflare.key:
+    external: true
 
 networks:
-  rtop:
-    external:
-      name: traefik_webgateway
+  web:
+    name: traefik

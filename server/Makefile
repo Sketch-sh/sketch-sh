@@ -39,4 +39,17 @@ dev:
 dev-build:
 	docker-compose -f docker-compose.yml -f docker-compose.dev.yml build
 
-.PHONY: migrate save update-schema clear reset prod-migrate staging-migrate dev
+do-build:
+	docker-compose -f docker-compose.prod.yml build && docker-compose -f docker-compose.prod.yml push
+do-ps:
+	docker stack ps sketch
+do-deploy:
+	export $(cat .env.production) && docker stack deploy --with-registry-auth --compose-file=docker-compose.prod.yml sketch
+do-logs:
+	docker services 
+
+.PHONY: migrate \
+				save \
+				update-schema \
+				clear reset prod-migrate staging-migrate dev \
+				do-build do-ps do-deploy do-logs

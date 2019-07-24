@@ -16,8 +16,7 @@ let generateId = () =>
     22
   );
 
-const GITHUB_CALLBACK_URL =
-  process.env.FRONTEND_URL + "/api/auth/github/callback";
+const GITHUB_CALLBACK_URL = process.env.AUTH_URL + "/github/callback";
 const FRONTEND_AUTH_FAILURE = process.env.FRONTEND_URL + "/auth/failure";
 const FRONTEND_AUTH_CALLBACK = process.env.FRONTEND_URL + "/auth/callback";
 

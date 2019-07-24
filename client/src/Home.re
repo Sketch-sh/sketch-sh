@@ -39,7 +39,7 @@ module GetCommunitySketches = [%graphql
         id
         title
         date: created_at
-        owner {
+        user {
           id
           avatar
           username

@@ -1,6 +1,6 @@
 open Utils;
 
-let authDomain = "/api";
+let authDomain = "https://api.skech.sh/auth";
 
 let stagingHost = "staging.sketch.sh";
 let productionHost = "sketch.sh";
@@ -13,7 +13,7 @@ let graphqlEndpoint =
       if (host == stagingHost) {
         "https://rtop-server.herokuapp.com/v1alpha1/graphql";
       } else if (host == productionHost) {
-        "https://sketch-graphql.herokuapp.com/v1alpha1/graphql";
+        "https://api.sketch.sh/graphql";
       } else {
         "/graphql";
       };

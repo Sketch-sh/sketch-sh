@@ -130,7 +130,7 @@ module WithUserInfo = {
              "id": string,
              "title": option(string),
              "date": Js.Json.t,
-             "owner": {
+             "user": {
                .
                "id": string,
                "avatar": option(string),
@@ -165,7 +165,7 @@ module WithUserInfo = {
                        </span>
                      </Router.Link>
                      <UI_SketchOwnerInfo
-                       owner=sketch##owner
+                       owner=sketch##user
                        noteLastEdited=sketch##date
                      />
                    </li>

@@ -3,6 +3,7 @@ const app = require("./server");
 const port = process.env.PORT || 3001;
 
 const server = app.listen(port, function() {
+  console.log(process.env.DATABASE_URL);
   console.log("Webserver is ready on http://localhost:" + port);
 });
 
