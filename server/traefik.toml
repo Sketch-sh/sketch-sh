@@ -30,9 +30,3 @@ exposedbydefault = false
 swarmMode = true
 
 [retry]
-
-# [tls]
-#   entryPoints = ["https"]
-#   [tls.certificate]
-#     certFile = "/run/secrets/cloudflare.cert"
-#     keyfile = "/run/secrets/cloudflare.key"

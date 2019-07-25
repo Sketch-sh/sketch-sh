@@ -45,13 +45,16 @@ docker-compose -f docker-compose.prod.yml push
 ```
 
 - Make sure you have setup `.env.production` correctly
-- The `export $(cat .env.production)` hack is because `docker stack` doesn't read `.env` by design, unline `docker-compose` and we need to append everything into environment variables.
-
 - Deploy the stack
 
 ```sh
-export $(cat .env.production) && \
-docker stack deploy --prune --with-registry-auth --compose-file=docker-compose.prod.yml sketch
+./deploy.sh
+```
+
+If you see `permission denied error`, you need to make `deploy.sh` executable:
+
+```sh
+chmox +x ./deploy.sh
 ```
 
 ## Postgres management
