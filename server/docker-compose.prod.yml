@@ -78,7 +78,7 @@ services:
       - "443:443"
       - "8080:8080"
     configs:
-      - source: traefik.toml_12
+      - source: traefik.toml
         target: /etc/traefik/traefik.toml
     secrets:
       - cloudflare.cert
@@ -100,8 +100,9 @@ services:
         condition: on-failure
 
 configs:
-  traefik.toml_12:
+  traefik.toml:
     file: ./traefik.toml
+    name: traefik-${TRAEFIK_CONF}
 secrets:
   cloudflare.cert:
     external: true
