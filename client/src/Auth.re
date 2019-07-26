@@ -32,7 +32,7 @@ module Auth = {
     | Some(editToken) => editToken
     };
 
-  let githubLoginRedirect = Config.authDomain ++ "/auth/github";
+  let githubLoginRedirect = Config.authDomain ++ "/github";
 
   let decodeUserId = json => Json.Decode.(json |> field("userId", string));
 
