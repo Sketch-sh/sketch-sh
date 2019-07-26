@@ -1,55 +1,15 @@
 {
-  "name": "rtop",
-  "type": "static",
-  "public": true,
-  "static": {
-    "cleanUrls": false,
-    "rewrites": [
-      { "source": "re", "destination": "/index.html" },
-      { "source": "ml", "destination": "/index.html" },
-      { "source": "new/*", "destination": "/index.html" },
-      { "source": "u/*", "destination": "/index.html" },
-      { "source": "auth/*", "destination": "/index.html" },
-      { "source": "s/**", "destination": "/index.html" },
-      { "source": "*", "destination": "/index.html" }
-    ],
-    "headers": [
-      {
-        "source": "**/*.@(jpg|jpeg|gif|png|js|css)",
-        "headers": [
-          {
-            "key": "Cache-Control",
-            "value": "max-age=311536000,public"
-          }
-        ]
-      },
-      {
-        "source": "**.@(js|css)",
-        "headers": [
-          {
-            "key": "Cache-Control",
-            "value": "max-age=311536000,public"
-          }
-        ]
-      },
-      {
-        "source": "*.html",
-        "headers": [
-          {
-            "key": "Cache-Control",
-            "value": "no-cache"
-          }
-        ]
-      },
-      {
-        "source": "embed.js",
-        "headers": [
-          {
-            "key": "Cache-Control",
-            "value": "no-cache"
-          }
-        ]
-      }
-    ]
-  }
+  "version": 2,
+  "name": "sketch",
+  "builds": [
+    {
+      "src": "client/package.json",
+      "use": "@now/static-build",
+      "config": { "distDir": "build" }
+    }
+  ],
+  "routes": [
+    { "src": "/(.+)\\.(.+)", "dest": "/client/$1.$2" },
+    { "src": "/(.*)", "dest": "/client/$1" }
+  ]
 }

@@ -12,6 +12,7 @@
     "staging": "npm run build && now build && now alias staging.rtop.khoanguyen.me",
     "start": "webpack-dev-server",
     "ci:build": "rm -rf build && node ./set-bsconfig-production.js && bsb -clean-world && npm run build",
+    "now-build": "npm run ci:build && ls",
     "ci:cypress": "start-server-and-test start http-get://localhost:3000 cy:run:record",
     "ci:cypress:staging": "CYPRESS_GRAPHQL_ENDPOINT=https://rtop-server.herokuapp.com/v1alpha1/graphql cypress run --record --browser chrome -c baseUrl=\"https://staging.sketch.sh\",defaultCommandTimeout=20000",
     "cy:open": "cypress open",
