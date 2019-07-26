@@ -14,6 +14,8 @@
     }
   ],
   "routes": [
+    { "src": "/docs/static/(.*)", "dest": "/docs/static/$1" },
+    { "src": "/docs/assets.json", "dest": "/docs/assets.json" },
     { "src": "/docs/(.*)", "dest": "/docs/index.html" },
     { "src": "/(.+)\\.(.+)", "dest": "/client/$1.$2" },
     { "src": "/(.*)", "dest": "/client/index.html" }
