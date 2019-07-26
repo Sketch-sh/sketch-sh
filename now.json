@@ -6,9 +6,15 @@
       "src": "client/package.json",
       "use": "@now/static-build",
       "config": { "distDir": "build" }
+    },
+    {
+      "src": "docs/package.json",
+      "use": "@now/static-build",
+      "config": { "distDir": ".docz/dist" }
     }
   ],
   "routes": [
+    { "handle": "filesystem" },
     { "src": "/(.+)\\.(.+)", "dest": "/client/$1.$2" },
     { "src": "/(.*)", "dest": "/client/index.html" }
   ]

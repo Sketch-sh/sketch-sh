@@ -1,0 +1,72 @@
+---
+name: A new home
+menu: Blog
+---
+
+import heroku_email from "./heroku_email.png";
+
+# A new home
+
+In the last year, [Sketch.sh](https://sketch.sh) has been operating within 
+the generous free plans of several hosting services like [now.sh](https://now.sh) and
+[Heroku](https://heroku.com). 
+
+As Sketch grown, there are several incidents that leads to service interruptions 
+because of the limitation of the free plans. Like:
+
+- [That time when you couldn't save any new Sketches](https://discuss.ocaml.org/t/status-of-sketch-sh/3925)
+- [Or HackerNews's hug of death](https://news.ycombinator.com/item?id=20217979) that rendered 
+Sketch unusable for everyone
+
+These incidents happened because I've been trying to keep the infrastructure cost of Sketch 
+as low as possible. This could have been going for a while longer if I didn't receive this email
+from Heroku:
+
+<img src={heroku_email} />
+
+Well this is a deal breaker for me. I can't start a new dyno until next month and I decided 
+it's time to move on.
+
+## Moving to DigitalOcean
+
+With the financial support from Sketch's generous [Open Collective's backers](https://opencollective.com/sketch-sh), 
+I'm pleased to announce that Sketch has a new home. The whole website is currently running on a VPS hosted by DigitalOcean.
+
+Technical details and costs:
+
+### Database
+
+I'm created a new managed PostgreSQL cluster which costs $15/ month. 
+
+This includes a daily backup and 7 days rentention of point-in-time backup 
+so I would say this is the cheapest managed PostgreSQL cluster on the market with a relatively reliable hosting service.
+
+### Backend
+
+I created a Docker Swarm cluster on the cheapest VPS plans which costs $5/ month. 
+This includes a Traefik reverse proxy, Hasura GraphQL Engine, and the custom authentication server. 
+
+By setting up a Swarm cluster, I can easily add new node in case of a traffic spikes as well as 
+reproducible deployments with a single command.
+
+For more details, please refer to [/server folder on Github](https://github.com/Sketch-sh/sketch-sh/tree/master/server).
+
+## Results
+
+Moving to a new host has decreased the average response time of backend by 40% (50ms). This is due to the fact that 
+**auth** server and **GraphQL Engine** stays in the same machine.
+
+Here is CPU usage chart over the last few days:
+
+import cpu_chart from "./cpu load.png"
+
+<img src={cpu_chart} />
+
+Under the normal loads, CPU usage never exceeds 10 percent which is an amazing result given the cheap $5/ month plan.
+
+## Supporting Sketch on OpenCollective
+
+If you like Sketch and want to ensure its longevity of a service, 
+please consider [supporting Sketch on OpenCollective at https://opencollective.com/sketch-sh](https://opencollective.com/sketch-sh).
+
+Thank you!
