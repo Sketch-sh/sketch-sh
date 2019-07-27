@@ -77,8 +77,7 @@ type foo = | Bar | Baz;
 fun
 | Bar => ()
 | Baz => ()
-| _ => ();
-|};
+| _ => (|};
 
 let initial_files = {
   Belt.Map.String.empty

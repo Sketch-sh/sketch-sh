@@ -2,7 +2,9 @@
 {|
   require("./reason-mode.js");
   require("codemirror/addon/selection/active-line");
+  require("./lint.js");
   require("codemirror/lib/codemirror.css");
+  require("codemirror/addon/lint/lint.css");
 |};
 
 module S = {
@@ -48,62 +50,81 @@ module S = {
 };
 
 open Edit_state_native;
-open Utils;
 
 let parse = Debouncer.make(((code, send)) => send(Out_parse(code)));
 
+let editor_config =
+  CodeMirror.EditorConfiguration.make(
+    ~mode="reason",
+    ~lineNumbers=true,
+    ~viewportMargin=infinity,
+    ~firstLineNumber=0,
+    ~lineWrapping=true,
+    ~styleActiveLine=true,
+    ~gutters=[|"CodeMirror-lint-markers", "CodeMirror-linenumbers"|],
+    ~lint=true,
+    (),
+  );
+
 [@react.component]
 let make = (~value, ~onChange) => {
-  // let editorDomRef = React.useRef(Js.Nullable.null);
-  // let (editor, setEditor) = React.useState(() => None);
+  let editor_ref = React.useRef(None);
 
   let (ntv_state, ntv_send) =
-    ReactUpdate.useReducer({parse_info: Belt.Result.Ok([||])}, reducer);
-
-  let editorConfig =
-    CodeMirror.EditorConfiguration.make(
-      ~mode="reason",
-      ~lineNumbers=true,
-      ~viewportMargin=infinity,
-      ~firstLineNumber=0,
-      ~lineWrapping=true,
-      ~styleActiveLine=true,
-      ~gutters=[|"CodeMirror-lint-markers CodeMirror-linenumbers"|],
-      ~lintOptions=
-        CodeMirror.LintOptions.make(
-          ~getAnnotations=
-            (. _code, cb) =>
-              // TODO: Fix me
-              // Editor_config is created on each keystroke for getting the latest ntv_state
-              switch (ntv_state.parse_info) {
-              | Belt.Result.Ok(_) => cb([||])
-              | Belt.Result.Error(err) =>
-                Js.log(cb);
-                let loc = err##loc;
-                let res =
-                  CodeMirror.LintOptions.annotation(
-                    ~message=err##message,
-                    ~from=Edit_state_native.to_cm(loc##loc_start),
-                    ~to_=Edit_state_native.to_cm(loc##loc_end),
-                    ~severity="error",
-                  );
-                cb([|res|]);
-              },
-          ~async=false,
-        ),
-      (),
+    ReactUpdate.useReducer(
+      {
+        parse_error: None,
+        parse_success: [],
+        last_executed_line: Some(1),
+        exec_msg: Belt.Map.Int.empty,
+      },
+      reducer,
     );
 
+  /* Parsing the statements on value changes */
+  React.useEffect1(
+    () => {
+      parse((value, ntv_send));
+      None;
+    },
+    [|value|],
+  );
+
+  /* Handling display of execution result */
+  Edit_editor_codemirror_hooks.use_exec_result(
+    ~exec_msg=ntv_state.exec_msg,
+    ~editor_ref,
+  );
+  /* Handling parsing error markers */
+  // Edit_editor_codemirror_hooks.use_parse_error(
+  //   ~parse_error=ntv_state.parse_error,
+  //   ~editor_ref,
+  // );
+
   <div className=S.wrap>
+    <Ds.Button
+      onClick={_ =>
+        switch (ntv_state.parse_success) {
+        | [] => ()
+        | [hd, ..._xs] => ntv_send(Execute(hd.id))
+        }
+      }>
+      "Execute all"->React.string
+    </Ds.Button>
     <ReactCodeMirror.Controlled
       value
-      options=editorConfig
+      options=editor_config
       onBeforeChange={(_editor, _changes, value) => {
         onChange(value);
         parse((value, ntv_send));
       }}
+      editorDidMount={editor => {
+        %raw
+        {|window.editor = editor|};
+        editor_ref->React.Ref.setCurrent(Some(editor));
+      }}
       className=S.editor
     />
-    <div className=S.view> "data"->str </div>
   </div>;
+  // <div className=S.view> "data"->React.string </div>
 };

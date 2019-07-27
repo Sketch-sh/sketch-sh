@@ -8,6 +8,7 @@ module Controlled = {
       ~options: EditorConfiguration.t,
       ~onChange: (editor, EditorChange.t, string) => unit=?,
       ~onBeforeChange: (editor, EditorChange.t, string) => unit=?,
+      ~editorDidMount: editor => unit=?,
       ~className: string=?
     ) =>
     React.element =

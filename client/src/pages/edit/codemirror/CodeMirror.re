@@ -205,6 +205,10 @@ module EditorConfiguration = {
 [@bs.module]
 external make: (Dom.element, EditorConfiguration.t) => editor = "codemirror";
 
+[@bs.module "codemirror"]
+external updateLinting: (editor, array(LintOptions.annotation)) => unit =
+  "updateLinting";
+
 module LineHandle = {
   type t;
 };
@@ -278,11 +282,11 @@ module Doc = {
   external getCursor:
     (t, [@bs.string] [ | `start | [@bs.as "end"] `end_ | `head | `anchor]) =>
     Position.t =
-    "";
+    "getCursor";
 
   [@bs.send] external setCursor: (t, Position.t) => unit = "";
 
-  [@bs.send] external clearHistory: t => unit = "";
+  [@bs.send] external clearHistory: t => unit = "clearHistory";
 
   [@bs.deriving abstract]
   type markTextOption = {
@@ -323,7 +327,7 @@ module Doc = {
   external markText:
     (t, ~from: Position.t, ~to_: Position.t, ~option: markTextOption) =>
     TextMarker.t =
-    "";
+    "markText";
 
   [@bs.send]
   external addLineClass:
@@ -371,7 +375,7 @@ module Doc = {
   [@bs.send]
   external setGutterMarker:
     (t, ~line: int, ~gutterId: string, ~value: Dom.element) => LineHandle.t =
-    "";
+    "setGutterMarker";
 };
 
 module Token = {
@@ -388,25 +392,28 @@ module Token = {
 };
 
 module Editor = {
-  [@bs.send] external getValue: editor => string = "";
-  [@bs.send] external setValue: (editor, string) => unit = "";
-  [@bs.send] external setOption: (editor, string, 'a) => unit = "";
-  [@bs.send] external getOption: (editor, string) => 'a = "";
-  [@bs.send] external getWrapperElement: editor => Dom.element = "";
-  [@bs.send] external operation: (editor, (. unit) => 'a) => 'a = "";
+  [@bs.send] external getValue: editor => string = "getValue";
+  [@bs.send] external setValue: (editor, string) => unit = "setValue";
+  [@bs.send] external setOption: (editor, string, 'a) => unit = "setOption";
+  [@bs.send] external getOption: (editor, string) => 'a = "getOption";
+  [@bs.send]
+  external getWrapperElement: editor => Dom.element = "getWrapperElement";
+  [@bs.send] external operation: (editor, (. unit) => 'a) => 'a = "operation";
   [@bs.send]
   external getLineTokens:
     (editor, ~line: int, ~precise: bool) => array(Token.t) =
-    "";
+    "getLineTokens";
 
-  [@bs.send] external heightAtLine: (editor, ~line: int) => int = "";
+  [@bs.send]
+  external heightAtLine: (editor, ~line: int) => int = "heightAtLine";
   module GetOption = {
     [@bs.send]
     external indentUnit: (editor, [@bs.as "indentUnit"] _) => int =
       "getOption";
   };
 
-  [@bs.send] external replaceSelection: (editor, string) => unit = "";
+  [@bs.send]
+  external replaceSelection: (editor, string) => unit = "replaceSelection";
   [@bs.send]
   external addLineWidget:
     (
@@ -416,14 +423,14 @@ module Editor = {
       ~options: LineWidget.options
     ) =>
     LineWidget.t =
-    "";
+    "addLineWidget";
 
-  [@bs.send] external getDoc: editor => Doc.t = "";
-  [@bs.send] external hasFocus: editor => bool = "";
-  [@bs.send] external focus: editor => unit = "";
+  [@bs.send] external getDoc: editor => Doc.t = "getDoc";
+  [@bs.send] external hasFocus: editor => bool = "hasFocus";
+  [@bs.send] external focus: editor => unit = "focus";
 
-  [@bs.send] external getLine: (editor, int) => string = "";
-  [@bs.send] external lineCount: editor => int = "";
+  [@bs.send] external getLine: (editor, int) => string = "getLine";
+  [@bs.send] external lineCount: editor => int = "lineCount";
 
   [@bs.send]
   external onChange:
@@ -460,6 +467,9 @@ module Editor = {
     (editor, [@bs.as "cursorActivity"] _, Doc.t => unit) => unit =
     "on";
 
+  [@bs.send]
+  external updateLinting: (editor, array(LintOptions.annotation)) => unit =
+    "updateLinting";
   /* comment addon */
   [@bs.deriving abstract]
   type commentOptions = {
@@ -487,6 +497,6 @@ module Editor = {
       unit
     ) =>
     unit =
-    "";
+    "toggleComment";
   /* Set the lines in the given range to be line comments. Will fall back to blockComment when no line comment style is defined for the mode. */
 };
