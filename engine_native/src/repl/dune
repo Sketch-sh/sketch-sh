@@ -16,4 +16,5 @@
     (pps ppx_deriving.show)
   )
   (modules Location_util Reason_util Report State SyntaxControl Types Execute)
+  (private_modules Location_util Reason_util Report)
 )
