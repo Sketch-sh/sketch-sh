@@ -1,12 +1,12 @@
 open Utils;
 
-let authDomain = "https://api.skech.sh/auth";
+let authDomain = "https://api.sketch.sh/auth";
 
 let stagingHost = "staging.sketch.sh";
 let productionHost = "sketch.sh";
 let graphqlEndpoint =
-  env == "production" ?
-    {
+  env == "production"
+    ? {
       open Webapi.Dom;
       let host = location->Location.host;
 
@@ -17,8 +17,8 @@ let graphqlEndpoint =
       } else {
         "/graphql";
       };
-    } :
-    "/graphql";
+    }
+    : "/graphql";
 
 let anonymousUserId = "anonymous";
 
