@@ -1,7 +1,6 @@
 open Edit_state_native;
 module Execute = Engine_native.Types.Execute;
 module Parse = Engine_native.Types.Parse;
-module Error = Engine_native.Types.Error;
 
 let get_monaco = (monaco_ref, cb) => {
   switch (monaco_ref->React.Ref.current->Js.Nullable.toOption) {

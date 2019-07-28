@@ -1,5 +1,3 @@
-module Error = Engine_native.Types.Error;
-
 open MonacoEditor;
 
 let make_marker = err => {

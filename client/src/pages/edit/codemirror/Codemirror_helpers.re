@@ -1,5 +1,3 @@
-module Error = Engine_native.Types.Error;
-
 open! CodeMirror;
 
 let make_loc = err => {
@@ -23,9 +21,13 @@ let clean_error_message = msg => {
 
 let make_error_marker = err => {
   let (from, to_) = make_loc(err);
-  let message = err.Error.message->clean_error_message;
 
-  LintOptions.annotation(~from, ~to_, ~message, ~severity="error");
+  LintOptions.annotation(
+    ~from,
+    ~to_,
+    ~message=err.Error.message,
+    ~severity="error",
+  );
 };
 
 let make_warning_marker = err => {

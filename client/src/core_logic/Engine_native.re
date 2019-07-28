@@ -56,23 +56,6 @@ and result_decode = (decoder_a, decoder_b, v) =>
   );
 
 module Types = {
-  module Error = {
-    [@decco]
-    type t = {
-      loc: option(Loc.t),
-      message: string,
-    };
-  };
-
-  module Warning = {
-    [@decco]
-    type t =
-      Error.t = {
-        loc: option(Loc.t),
-        message: string,
-      };
-  };
-
   module Parse = {
     [@decco]
     type id = int;

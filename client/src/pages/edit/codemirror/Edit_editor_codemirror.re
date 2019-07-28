@@ -1,6 +1,7 @@
 %raw
 {|
   require("./reason-mode.js");
+  require("codemirror/mode/javascript/javascript");
   require("codemirror/addon/selection/active-line");
   require("./lint.js");
   require("codemirror/lib/codemirror.css");
@@ -30,10 +31,11 @@ module S = {
   let wrap =
     [
       display(`flex),
-      flexDirection(`row),
+      flexDirection(`column),
       flex(`num(1.)),
       width(`percent(100.)),
       height(`percent(100.)),
+      maxHeight(`percent(100.)),
     ]
     ->style;
   let editor =
@@ -49,13 +51,8 @@ module S = {
     ->style;
 };
 
-open Edit_state_native;
-
-let parse = Debouncer.make(((code, send)) => send(Out_parse(code)));
-
-let editor_config =
+let base_config =
   CodeMirror.EditorConfiguration.make(
-    ~mode="reason",
     ~lineNumbers=true,
     ~viewportMargin=infinity,
     ~firstLineNumber=0,
@@ -63,61 +60,31 @@ let editor_config =
     ~styleActiveLine=true,
     ~gutters=[|"CodeMirror-lint-markers", "CodeMirror-linenumbers"|],
     ~lint=true,
-    (),
   );
+
+let reason_config = base_config(~mode="reason", ());
+let compile_config = base_config(~mode="javascript", ~readOnly=true, ());
+
+// open Utils;
 
 [@react.component]
-let make = (~value, ~onChange) => {
+let make = (~value, ~onChange, ~errors, ~warnings, ~compiled=?) => {
+  // let (show_compiled, set_show_compiled) = React.useState(() => false);
   let editor_ref = React.useRef(None);
 
-  let (ntv_state, ntv_send) =
-    ReactUpdate.useReducer(
-      {
-        parse_error: None,
-        parse_success: [],
-        last_executed_line: Some(1),
-        exec_msg: Belt.Map.Int.empty,
-      },
-      reducer,
-    );
+  Js.log(errors);
 
-  /* Parsing the statements on value changes */
-  React.useEffect1(
-    () => {
-      parse((value, ntv_send));
-      None;
-    },
-    [|value|],
-  );
-
-  /* Handling display of execution result */
-  Edit_editor_codemirror_hooks.use_exec_result(
-    ~exec_msg=ntv_state.exec_msg,
+  Edit_editor_codemirror_hooks.update_markers(
+    ~errors,
+    ~warnings,
     ~editor_ref,
   );
-  /* Handling parsing error markers */
-  // Edit_editor_codemirror_hooks.use_parse_error(
-  //   ~parse_error=ntv_state.parse_error,
-  //   ~editor_ref,
-  // );
 
   <div className=S.wrap>
-    <Ds.Button
-      onClick={_ =>
-        switch (ntv_state.parse_success) {
-        | [] => ()
-        | [hd, ..._xs] => ntv_send(Execute(hd.id))
-        }
-      }>
-      "Execute all"->React.string
-    </Ds.Button>
     <ReactCodeMirror.Controlled
       value
-      options=editor_config
-      onBeforeChange={(_editor, _changes, value) => {
-        onChange(value);
-        parse((value, ntv_send));
-      }}
+      options=reason_config
+      onBeforeChange={(_editor, _changes, value) => onChange(value)}
       editorDidMount={editor => {
         %raw
         {|window.editor = editor|};
@@ -125,6 +92,10 @@ let make = (~value, ~onChange) => {
       }}
       className=S.editor
     />
+    <ReactCodeMirror.Controlled
+      value={compiled->Belt.Option.getWithDefault("")}
+      options=compile_config
+      className=S.editor
+    />
   </div>;
-  // <div className=S.view> "data"->React.string </div>
 };

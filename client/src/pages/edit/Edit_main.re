@@ -67,29 +67,51 @@ module S = {
       unsafe("WebkitOverflowScrolling", "touch"),
     ]
     ->style;
+
+  let frame =
+    [
+      position(`absolute),
+      top(`zero),
+      right(`zero),
+      bottom(`zero),
+      left(`zero),
+      borderStyle(`none),
+      width(`percent(100.)),
+      height(`percent(100.)),
+    ]
+    ->style;
 };
 
-let default_value = {|let a = 1;
-let b = 2;
+let default_value = {|[@bs.deriving jsConverter]
+type t =
+  | [@bs.as 1] Hint
+  | [@bs.as 2] Info
+  | [@bs.as 4] Warning
+  | [@bs.as 8] Error;
 
-type foo = | Bar | Baz;
+let a = tToJs(Hint);
 
-fun
-| Bar => ()
-| Baz => ()
-| _ => ();
+Js.log(a);
 
-1 + "1";|};
+[@bs.deriving jsConverter]
+type t =
+  | [@bs.as 1] Hint
+  | [@bs.as 2] Info
+  | [@bs.as 4] Warning
+  | [@bs.as 8] Error;
+
+let a = tToJs(Hint);
+
+Js.log(a);|};
 
 let initial_files = {
   Belt.Map.String.empty
-  ->Belt.Map.String.set("entry.re", {code: default_value, file_type: RE})
+  ->Belt.Map.String.set("index.re", Edit_state.make_file(default_value))
   ->Belt.Map.String.set(
       "second_file.re",
-      {
-        code: "// Sketch doesn't support multiple files yet.\n// This is just for design mockup\n",
-        file_type: RE,
-      },
+      Edit_state.make_file(
+        "// Sketch doesn't support multiple files yet.\n// This is just for design mockup\n",
+      ),
     );
 };
 
@@ -97,7 +119,7 @@ let initial_files = {
 let make = () => {
   let (state, send) =
     ReactUpdate.useReducer(
-      {files: initial_files, active_file: "entry.re"},
+      {files: initial_files, active_file: "index.re"},
       reducer,
     );
 
@@ -115,10 +137,12 @@ let make = () => {
         <section className=S.editor_wrap>
           {switch (state.files->Belt.Map.String.get(state.active_file)) {
            | None => "Nothing to show here"->str
-           | Some({code}) =>
+           | Some({code, errors, warnings, compiled}) =>
              <Edit_editor
-               key={state.active_file}
                value=code
+               errors
+               warnings
+               ?compiled
                onChange={new_value =>
                  send(File_update(state.active_file, new_value))
                }
@@ -126,7 +150,14 @@ let make = () => {
            }}
         </section>
       </div>
+      <div className=S.preview_container>
+        <iframe
+          id="frame"
+          className=S.frame
+          src="/container.html"
+          sandbox="allow-modals allow-scripts allow-popups allow-forms allow-same-origin"
+        />
+      </div>
     </main>
-    // <div className=S.preview_container />
   </>;
 };

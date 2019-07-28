@@ -1,6 +1,5 @@
 open Belt.Result;
 module Parse = Engine_native.Types.Parse;
-module Error = Engine_native.Types.Error;
 module Execute = Engine_native.Types.Execute;
 /*
  * |--- executed ---|--- parsed_and_executable ---|--- unparsable/new code ---|

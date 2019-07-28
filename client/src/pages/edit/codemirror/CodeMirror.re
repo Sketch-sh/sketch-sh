@@ -284,7 +284,7 @@ module Doc = {
     Position.t =
     "getCursor";
 
-  [@bs.send] external setCursor: (t, Position.t) => unit = "";
+  [@bs.send] external setCursor: (t, Position.t) => unit = "setCursor";
 
   [@bs.send] external clearHistory: t => unit = "clearHistory";
 

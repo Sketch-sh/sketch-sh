@@ -1581,6 +1581,11 @@
     "@types/prop-types" "*"
     csstype "^2.2.0"
 
+"@types/semver@^5.5.0":
+  version "5.5.0"
+  resolved "https://registry.yarnpkg.com/@types/semver/-/semver-5.5.0.tgz#146c2a29ee7d3bae4bf2fcb274636e264c813c45"
+  integrity sha512-41qEJgBH/TWgo5NFSvBCJ1qkoi3Q6ONSF2avrHq1LVEZfYpdHmj0y9SuTK+u9ZhG1sYQKBL1AWXKyLWP4RaUoQ==
+
 "@types/shelljs@^0.8.0":
   version "0.8.5"
   resolved "https://registry.npmjs.org/@types/shelljs/-/shelljs-0.8.5.tgz#1e507b2f6d1f893269bd3e851ec24419ef9beeea"
@@ -2709,7 +2714,7 @@ babel-template@^6.16.0:
     babylon "^6.18.0"
     lodash "^4.17.4"
 
-babel-traverse@^6.18.0, babel-traverse@^6.26.0:
+babel-traverse@^6.18.0, babel-traverse@^6.23.1, babel-traverse@^6.26.0:
   version "6.26.0"
   resolved "https://registry.npmjs.org/babel-traverse/-/babel-traverse-6.26.0.tgz#46a9cbd7edcc62c8e5c064e2d2d8d0f4035766ee"
   integrity sha1-RqnL1+3MYsjlwGTi0tjQ9ANXZu4=
@@ -2734,7 +2739,7 @@ babel-types@^6.18.0, babel-types@^6.26.0:
     lodash "^4.17.4"
     to-fast-properties "^1.0.3"
 
-babylon@^6.18.0:
+babylon@^6.15.0, babylon@^6.18.0:
   version "6.18.0"
   resolved "https://registry.npmjs.org/babylon/-/babylon-6.18.0.tgz#af2f3b88fa6f5c1e4c634d1a0f8eac4f55b395e3"
   integrity sha512-q/UEjfGJ2Cm3oKV71DJz9d25TPnq5rhBVL2Q4fA5wcC3jcrdn7+SssEybFIxwAvvP+YCsCYNKughoF33GxgycQ==
@@ -3067,10 +3072,10 @@ bs-platform@^5.0.6:
   resolved "https://registry.npmjs.org/bs-platform/-/bs-platform-5.0.6.tgz#88c13041fb020479800de3d82c680bf971091425"
   integrity sha512-6Boa2VEcWJp2WJr38L7bp3J929nYha7gDarjxb070jWzgfPJ/WbzjipmSfnu2eqqk1MfjEIpBipbPz6n1NISwA==
 
-bs-webapi@^0.10.0:
-  version "0.10.0"
-  resolved "https://registry.npmjs.org/bs-webapi/-/bs-webapi-0.10.0.tgz#2fd08783c1bf184817a7dd37f457ddd5449eb6fc"
-  integrity sha512-CnEwtcN89JjsJQcaTRqkuHFGFrWka21miEvZPgbnmmDox1XYcrtXgsRD5S1EM3002F88BgX4Ek0kGHPOq6COQA==
+bs-webapi@^0.15.2:
+  version "0.15.2"
+  resolved "https://registry.yarnpkg.com/bs-webapi/-/bs-webapi-0.15.2.tgz#0bf4174cffafde748df19c4ae42f6e8e6c6a22b1"
+  integrity sha512-P3YNG9i29FjGxBLN4UkhiQpBwB4ok+xiGK6kCiUixBB/mb/hwnFGPbxAY/Q2owx0/8ehM+BwRT6vFd01T0GRRQ==
 
 bser@^2.0.0:
   version "2.1.0"
@@ -3618,10 +3623,15 @@ code-point-at@^1.0.0:
   resolved "https://registry.npmjs.org/code-point-at/-/code-point-at-1.1.0.tgz#0d070b4d043a5bea33a2f1a40e2edb3d9a4ccf77"
   integrity sha1-DQcLTQQ6W+ozovGkDi7bPZpMz3c=
 
-codemirror@^5.35.0, codemirror@^5.39.2, codemirror@^5.46.0:
+codemirror@^5.35.0, codemirror@^5.46.0:
   version "5.48.0"
   resolved "https://registry.npmjs.org/codemirror/-/codemirror-5.48.0.tgz#66e6dae6ca79b955e34b322881ebb7b5512f3cc5"
   integrity sha512-3Ter+tYtRlTNtxtYdYNPxGxBL/b3cMcvPdPm70gvmcOO2Rauv/fUEewWa0tT596Hosv6ea2mtpx28OXBy1mQCg==
+
+codemirror@^5.39.2:
+  version "5.48.2"
+  resolved "https://registry.yarnpkg.com/codemirror/-/codemirror-5.48.2.tgz#a9dd3d426dea4cd59efd59cd98e20a9152a30922"
+  integrity sha512-i9VsmC8AfA5ji6EDIZ+aoSe4vt9FcwPLdHB1k1ItFbVyuOFRrcfvnoKqwZlC7EVA2UmTRiNEypE4Uo7YvzVY8Q==
 
 codesandbox-api@^0.0.19:
   version "0.0.19"
@@ -7988,6 +7998,14 @@ kleur@^3.0.2:
   resolved "https://registry.npmjs.org/kleur/-/kleur-3.0.3.tgz#a79c9ecc86ee1ce3fa6206d1216c501f147fc07e"
   integrity sha512-eTIzlVOSUR+JxdDFepEYcBMtZ9Qqdef+rnzWdRZuMbOywu5tO2w2N7rqjoANZ5k9vywhL6Br1VRjUIgTQx4E8w==
 
+konan@^1.2.1:
+  version "1.2.1"
+  resolved "https://registry.yarnpkg.com/konan/-/konan-1.2.1.tgz#51cdc2e7c6f500d8217cc8976303521733a43b57"
+  integrity sha512-aLJDxX96Cqq1rC39AP3H7bTh8GV5ByU0KPsPKKagME8ElixRIrGd+LFxKBiCbSmHDTb+c6lkjDZhYXzm5fDtHQ==
+  dependencies:
+    babel-traverse "^6.23.1"
+    babylon "^6.15.0"
+
 last-call-webpack-plugin@^3.0.0:
   version "3.0.0"
   resolved "https://registry.npmjs.org/last-call-webpack-plugin/-/last-call-webpack-plugin-3.0.0.tgz#9742df0e10e3cf46e5c0381c2de90d3a7a2d7555"
@@ -9916,6 +9934,14 @@ pn@^1.1.0:
   resolved "https://registry.npmjs.org/pn/-/pn-1.1.0.tgz#e2f4cef0e219f463c179ab37463e4e1ecdccbafb"
   integrity sha512-2qHaIQr2VLRFoxe2nASzsV6ef4yOOH+Fi9FBOVH6cqeSgUnoyySPZkxzLuzd+RYOQTRpROA0ztTMqxROKSb/nA==
 
+polestar@^0.1.2:
+  version "0.1.2"
+  resolved "https://registry.yarnpkg.com/polestar/-/polestar-0.1.2.tgz#dde837d4d14ace9faa6d136e18e42d8fd9b6a421"
+  integrity sha512-wb1P6VSkp9653OCEHvtxN+r3ulooptC7cJCaNyzbJi5h6UJOnbXgxbLywBQPL+3yxH7yP3cwWNJIKJRGX41+2A==
+  dependencies:
+    "@types/semver" "^5.5.0"
+    semver "^5.6.0"
+
 polished@^3.3.0:
   version "3.4.1"
   resolved "https://registry.npmjs.org/polished/-/polished-3.4.1.tgz#1eb5597ec1792206365635811d465751f5cbf71c"
@@ -10908,7 +10934,7 @@ react-codemirror2@^4.0.1:
 
 react-codemirror2@^6.0.0:
   version "6.0.0"
-  resolved "https://registry.npmjs.org/react-codemirror2/-/react-codemirror2-6.0.0.tgz#180065df57a64026026cde569a9708fdf7656525"
+  resolved "https://registry.yarnpkg.com/react-codemirror2/-/react-codemirror2-6.0.0.tgz#180065df57a64026026cde569a9708fdf7656525"
   integrity sha512-D7y9qZ05FbUh9blqECaJMdDwKluQiO3A9xB+fssd5jKM7YAXucRuEOlX32mJQumUvHUkHRHqXIPBjm6g0FW0Ag==
 
 react-content-loader@^3.1.2:

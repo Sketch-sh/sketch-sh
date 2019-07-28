@@ -84,9 +84,10 @@ let make =
       ~state=Normal,
       ~primary=false,
       ~onClick=?,
+      ~disabled=?,
       ~children,
     ) => {
-  <button ?onClick className={Styles.button(primary, color, size)}>
+  <button ?onClick ?disabled className={Styles.button(primary, color, size)}>
     children
   </button>;
 };
