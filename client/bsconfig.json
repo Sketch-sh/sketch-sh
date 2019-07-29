@@ -16,12 +16,14 @@
     }
   ],
   "bsc-flags": ["-bs-g"],
-  "ppx-flags": ["@ryb73/decco/ppx/ppx_decco.sh"],
+  "ppx-flags": [
+    "@ryb73/decco/ppx/ppx_decco.sh",
+    "let-anything/lib/bs/native/let_anything.native"
+  ],
   "suffix": ".bs.js",
   "namespace": true,
   "bs-dependencies": [
     "reason-react",
-    "@glennsl/bs-json",
     "bs-webapi",
     "reason-apollo",
     "bs-date-fns",
@@ -30,7 +32,9 @@
     "reason-react-update",
     "re-debouncer",
     "@ryb73/decco",
-    "bs-fetch"
+    "bs-fetch",
+    "bs-decode",
+    "reason-future"
   ],
   "bs-dev-dependencies": ["@glennsl/bs-jest"],
   "refmt": 3,

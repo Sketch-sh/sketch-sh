@@ -39,7 +39,7 @@ module Sketch_polestar = {
     },
   };
 
-  let handle_filesystem = (~url, ~meta: _, ~pathname as filename) => {
+  let handle_filesystem = (~url, ~meta as _, ~pathname as filename) => {
     let file_content = Container_fs.get(~filename);
 
     Js.Promise.make((~resolve, ~reject: _) =>
@@ -65,7 +65,7 @@ module Sketch_polestar = {
     );
   };
 
-  let handle_bs_stdlib = (~url, ~meta, ~pathname) => {
+  let handle_bs_stdlib = (~url, ~meta as _, ~pathname) => {
     Fetch.fetch(Config.bs_stdlib_url ++ "/" ++ pathname)
     |> then_(Fetch.Response.text)
     |> then_(code =>
@@ -99,9 +99,11 @@ module Sketch_polestar = {
         } else {
           handle_filesystem(~url, ~meta, ~pathname);
         }
+      | Npm => Container_fetcher_npm.handle_npm(~url, ~meta, ~pathname)
       | _ =>
-        Js.log(url);
-        Js.Promise.make((~resolve, ~reject) => failwith("Unhandle case"));
+        Js.Promise.make((~resolve as _, ~reject as _) =>
+          failwith("Unhandle polestar url: " ++ url)
+        )
       };
     };
 
@@ -118,7 +120,7 @@ module Sketch_polestar = {
         },
       "onError":
         (. error) => {
-          Js.log(error);
+          Js.log2("onError", error);
         },
     });
 };

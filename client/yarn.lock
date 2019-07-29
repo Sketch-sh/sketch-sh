@@ -3053,6 +3053,11 @@ browserslist@^4.0.0, browserslist@^4.5.2, browserslist@^4.6.0, browserslist@^4.6
     electron-to-chromium "^1.3.188"
     node-releases "^1.1.25"
 
+bs-abstract@^0.17.0:
+  version "0.17.0"
+  resolved "https://registry.yarnpkg.com/bs-abstract/-/bs-abstract-0.17.0.tgz#543272bc8c58c01756e113540557b62b510f1664"
+  integrity sha512-J1sPz2EZS29Ga0YdOVV8wD7PPKpCxrpEgMKLcehXNseSNxiWgmg4mxmJEhRva/d/d0LpjM4HysBiuCDwZ1FTNQ==
+
 bs-css@^9.0.1:
   version "9.0.1"
   resolved "https://registry.npmjs.org/bs-css/-/bs-css-9.0.1.tgz#105733f880bfb2dc1d1dfd3174b60b35c381ee6f"
@@ -3066,6 +3071,11 @@ bs-date-fns@^0.1.6:
   integrity sha512-pZ5QuWKV6OK+8a8VYHmyqDJaWNqIp7MRQwokR9tTorpbcOary/jcjv/+RXgXd+IZwief64NaY4KJjABihzdBeg==
   dependencies:
     date-fns "^1.29.0"
+
+bs-decode@^0.8.1:
+  version "0.8.1"
+  resolved "https://registry.yarnpkg.com/bs-decode/-/bs-decode-0.8.1.tgz#581cb9c6a879445cf001224b8cf2458480eb8056"
+  integrity sha512-Yda3fY0tD6vf7IaOpMUHuXiBmBe2qe2ipUvHVcgSxXHNePoZ0RbZ0HyP1jEGdvIiLcXgt1rSCieytqP+qztpWg==
 
 bs-fetch@^0.5.0:
   version "0.5.0"
@@ -3081,6 +3091,13 @@ bs-webapi@^0.15.2:
   version "0.15.2"
   resolved "https://registry.yarnpkg.com/bs-webapi/-/bs-webapi-0.15.2.tgz#0bf4174cffafde748df19c4ae42f6e8e6c6a22b1"
   integrity sha512-P3YNG9i29FjGxBLN4UkhiQpBwB4ok+xiGK6kCiUixBB/mb/hwnFGPbxAY/Q2owx0/8ehM+BwRT6vFd01T0GRRQ==
+
+bsb-native@4.0.6:
+  version "4.0.6"
+  resolved "https://registry.yarnpkg.com/bsb-native/-/bsb-native-4.0.6.tgz#5c0289e24e0a3375ebf8f69a17510b884cace1ca"
+  integrity sha512-T1MkndnmA4StiKK2UvEftrqANN+h9StlLghBbwmKa833d97D86np+2wmIOw5Rqy6rNW3D076A2G51mooWTUwfQ==
+  dependencies:
+    yauzl "^2.9.1"
 
 bser@^2.0.0:
   version "2.1.0"
@@ -8053,6 +8070,13 @@ left-pad@^1.3.0:
   resolved "https://registry.npmjs.org/left-pad/-/left-pad-1.3.0.tgz#5b8a3a7765dfe001261dde915589e782f8c94d1e"
   integrity sha512-XI5MPzVNApjAyhQzphX8BkmKsKUxD4LdyK24iZeQGinBN9yTQT3bFlCBy/aVx2HrNcqQGsdot8ghrjyrvMCoEA==
 
+let-anything@^1.0.3:
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/let-anything/-/let-anything-1.0.3.tgz#0e870607e37ee9ec3793a973e8cd48a59817edf4"
+  integrity sha512-cq3cWtklrAy2B+Fcl/PodvaCRGl2RDP2NjwFogsqRXE7Q1nsEtHpFlL1PmgNRj0+7bSYtt5fEyQmPmHlVTzvNQ==
+  dependencies:
+    bsb-native "4.0.6"
+
 leven@^2.1.0:
   version "2.1.0"
   resolved "https://registry.npmjs.org/leven/-/leven-2.1.0.tgz#c2e7a9f772094dee9d34202ae8acce4687875580"
@@ -11261,6 +11285,10 @@ reason-apollo@^0.16.4:
     react-apollo "2.3.2"
     subscriptions-transport-ws "^0.9.16"
 
+"reason-future@github:RationalJS/future":
+  version "2.5.0"
+  resolved "https://codeload.github.com/RationalJS/future/tar.gz/755d2e3a7a375ee001077e3fa10a1d2212a716f3"
+
 reason-react-compat@^0.4.0:
   version "0.4.0"
   resolved "https://registry.npmjs.org/reason-react-compat/-/reason-react-compat-0.4.0.tgz#9c6705f9bd67e7ff7219355f3a95fd67442b578d"
@@ -11455,6 +11483,11 @@ relateurl@0.2.x, relateurl@^0.2.7:
   version "0.2.7"
   resolved "https://registry.npmjs.org/relateurl/-/relateurl-0.2.7.tgz#54dbf377e51440aca90a4cd274600d3ff2d888a9"
   integrity sha1-VNvzd+UUQKypCkzSdGANP/LYiKk=
+
+relude@^0.19.0:
+  version "0.19.0"
+  resolved "https://registry.yarnpkg.com/relude/-/relude-0.19.0.tgz#30f7cef3c9469f4ec3520fb68bd1c31584f75462"
+  integrity sha512-yXTsjuOKBQkJhHmXBWCfWTe9B1sZKjHhhg8GAml69cBuQVYJoHnYjCdFiSoOEWk9gtRBio98aBgf5KhKgCpnMg==
 
 remark-docz@^1.2.0:
   version "1.2.0"
@@ -14209,7 +14242,7 @@ yargs@^7.0.0:
     y18n "^3.2.1"
     yargs-parser "^5.0.0"
 
-yauzl@2.10.0:
+yauzl@2.10.0, yauzl@^2.9.1:
   version "2.10.0"
   resolved "https://registry.npmjs.org/yauzl/-/yauzl-2.10.0.tgz#c7eb17c93e112cb1086fa6d8e51fb0667b79a5f9"
   integrity sha1-x+sXyT4RLLEIb6bY5R+wZnt5pfk=

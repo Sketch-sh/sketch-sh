@@ -101,6 +101,12 @@ let initial_files = {
       Edit_state.make_file(
         "// Sketch doesn't support multiple files yet.\n// This is just for design mockup\n",
       ),
+    )
+  ->Belt.Map.String.set(
+      "npm.re",
+      Edit_state.make_file(
+        {|[@bs.module] external thangngoc89: Js.t('a) = "thangngoc89";\nJs.log(thangngoc89);|},
+      ),
     );
 };
 

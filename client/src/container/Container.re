@@ -39,5 +39,3 @@ window->addMessageListener(
   },
   false,
 );
-
-// Container_bundler.main();
