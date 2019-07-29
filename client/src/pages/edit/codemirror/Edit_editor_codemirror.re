@@ -72,8 +72,6 @@ let make = (~value, ~onChange, ~errors, ~warnings, ~compiled=?) => {
   // let (show_compiled, set_show_compiled) = React.useState(() => false);
   let editor_ref = React.useRef(None);
 
-  Js.log(errors);
-
   Edit_editor_codemirror_hooks.update_markers(
     ~errors,
     ~warnings,

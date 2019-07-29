@@ -35,6 +35,7 @@
     "bloodyowl-upgrade-reason-react": "^0.3.0",
     "bs-css": "^9.0.1",
     "bs-date-fns": "^0.1.6",
+    "bs-fetch": "^0.5.0",
     "bs-webapi": "^0.15.2",
     "butter-toast": "^2.1.2",
     "codemirror": "^5.39.2",

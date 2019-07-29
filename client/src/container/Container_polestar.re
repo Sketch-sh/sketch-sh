@@ -23,6 +23,7 @@ module Fetcher = {
         ~dependencies: dependencies=?,
         ~dependencyVersionRanges: versionRanges=?,
         ~css: string=?,
+        ~code: string=?,
         unit
       ) =>
       t;
@@ -36,13 +37,23 @@ module Fetcher = {
       [@bs.optional]
       dependencies: js_dependencies,
       [@bs.optional]
+      code: string,
+      [@bs.optional]
       dependencyVersionRanges: versionRanges,
       [@bs.optional]
       css: string,
     };
     external unsafe_make_js_deps: 'a => js_dependencies = "%identity";
     let make =
-        (~id, ~url, ~dependencies=?, ~dependencyVersionRanges=?, ~css=?, ()) => {
+        (
+          ~id,
+          ~url,
+          ~dependencies=?,
+          ~dependencyVersionRanges=?,
+          ~css=?,
+          ~code=?,
+          (),
+        ) => {
       t(
         ~id,
         ~url,
@@ -54,6 +65,7 @@ module Fetcher = {
           ),
         ~dependencyVersionRanges?,
         ~css?,
+        ~code?,
         (),
       );
     };
@@ -78,3 +90,14 @@ external make: polestar_opts('a, 'b) => polestar = "Polestar";
 
 [@bs.module "polestar"] [@bs.new]
 external defaultResolver: resolver = "DefaultResolver";
+
+type polestar_module;
+
+[@bs.send]
+external require: (polestar, string) => Js.Promise.t(polestar_module) =
+  "require";
+
+[@bs.send]
+external evaluate:
+  (polestar, array(string), string) => Js.Promise.t(polestar_module) =
+  "evaluate";

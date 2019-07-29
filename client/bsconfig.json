@@ -29,7 +29,8 @@
     "bs-css",
     "reason-react-update",
     "re-debouncer",
-    "@ryb73/decco"
+    "@ryb73/decco",
+    "bs-fetch"
   ],
   "bs-dev-dependencies": ["@glennsl/bs-jest"],
   "refmt": 3,

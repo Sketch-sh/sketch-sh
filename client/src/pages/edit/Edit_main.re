@@ -82,27 +82,16 @@ module S = {
     ->style;
 };
 
-let default_value = {|[@bs.deriving jsConverter]
-type t =
-  | [@bs.as 1] Hint
-  | [@bs.as 2] Info
-  | [@bs.as 4] Warning
-  | [@bs.as 8] Error;
+let default_value = {code|// Hey, welcome to Sketch's Bucklescript engine
+// Try to make a mess and break it
+// Report issues/feature requests here: https://github.com/Sketch-sh/sketch-sh/issues
 
-let a = tToJs(Hint);
+[%% bs.raw {|
+  document.body.innerHTML = "Sketch <3 Bucklescript";
+  document.body.style.backgroundColor = "yellow";
+|}];
 
-Js.log(a);
-
-[@bs.deriving jsConverter]
-type t =
-  | [@bs.as 1] Hint
-  | [@bs.as 2] Info
-  | [@bs.as 4] Warning
-  | [@bs.as 8] Error;
-
-let a = tToJs(Hint);
-
-Js.log(a);|};
+|code};
 
 let initial_files = {
   Belt.Map.String.empty
@@ -119,9 +108,25 @@ let initial_files = {
 let make = () => {
   let (state, send) =
     ReactUpdate.useReducer(
-      {files: initial_files, active_file: "index.re"},
+      {
+        files: initial_files,
+        active_file: "index.re",
+        iframe_ref: ref(Js.Nullable.null),
+      },
       reducer,
     );
+
+  React.useEffect1(
+    () => {
+      send(Compile_active_file);
+      None;
+    },
+    [|
+      state.files
+      ->Belt.Map.String.get(state.active_file)
+      ->Belt.Option.map(file => file.code),
+    |],
+  );
 
   <>
     <header className=S.header> "Sketch.sh"->str </header>
@@ -155,6 +160,7 @@ let make = () => {
           id="frame"
           className=S.frame
           src="/container.html"
+          ref={ReactDOMRe.Ref.callbackDomRef(r => state.iframe_ref := r)}
           sandbox="allow-modals allow-scripts allow-popups allow-forms allow-same-origin"
         />
       </div>
