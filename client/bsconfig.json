@@ -19,7 +19,8 @@
   "ppx-flags": [
     "@ryb73/decco/ppx/ppx_decco.sh",
     "let-anything/lib/bs/native/let_anything.native",
-    "bs-log/ppx"
+    "bs-log/ppx",
+    "./ppx_let"
   ],
   "suffix": ".bs.js",
   "namespace": true,
