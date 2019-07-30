@@ -8,12 +8,12 @@ jobs:
       - checkout:
           path: ~/app
       - restore_cache:
-          key: dependency-cache-{{ checksum "client/package.json" }}-{{ checksum "client/yarn.lock" }}
+          key: dependency-cache-{{ checksum "package.json" }}-{{ checksum "yarn.lock" }}
       - run:
           name: install depdencies
           command: yarn
       - save_cache:
-          key: dependency-cache-{{ checksum "client/package.json" }}-{{ checksum "client/yarn.lock" }}
+          key: dependency-cache-{{ checksum "package.json" }}-{{ checksum "yarn.lock" }}
           paths:
             - ./node_modules
       - run:
