@@ -1,3 +1,5 @@
+open SStdlib;
+
 type filename = string;
 
 type file = {
@@ -40,6 +42,7 @@ type state = {
   files: Map.t(file),
   active_file: filename,
   iframe_ref: ref(Js.nullable(Dom.element)),
+  log: array(ConsoleFeed.log),
 };
 
 type action =
@@ -160,6 +163,9 @@ let reducer = (action, state) => {
             None;
           },
         )
+      | Comm_send_log(log) =>
+        let decoded = ConsoleFeed.decode(log);
+        Update({...state, log: ImmutableArray.unshift(state.log, decoded)});
       }
     }
   );

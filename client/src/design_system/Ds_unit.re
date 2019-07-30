@@ -38,6 +38,10 @@ module Color = {
   let light_3 = `hex("E9ECEE");
   let light_4 = `hex("F1F3F5");
   let light_5 = `hex("F8F9FA");
+
+  let to_string =
+    fun
+    | `hex(a) => "#" ++ a;
 };
 
 module BorderWidth = {

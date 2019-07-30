@@ -5,4 +5,5 @@ type from_host =
   | Comm_set_entry(filename);
 
 type to_host =
-  | Comm_ready;
+  | Comm_ready
+  | Comm_send_log(ConsoleFeed.log_encoded);

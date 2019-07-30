@@ -41,10 +41,8 @@ let default_value = {code|// Hey, welcome to Sketch's Bucklescript engine
 // Try to make a mess and break it
 // Report issues/feature requests here: https://github.com/Sketch-sh/sketch-sh/issues
 
-[%% bs.raw {|
-  document.body.innerHTML = "Sketch <3 Bucklescript";
-  document.body.style.backgroundColor = "yellow";
-|}];|code};
+[@bs.module] external uuid: unit => string = "uuid";
+Js.log(uuid());|code};
 
 let initial_files = {
   Belt.Map.String.empty
@@ -67,6 +65,7 @@ let make = () => {
         files: initial_files,
         active_file: "index.re",
         iframe_ref: ref(Js.Nullable.null),
+        log: [||],
       },
       reducer,
     );
@@ -131,15 +130,29 @@ let make = () => {
         </Reflex.Element>
         <Reflex.Splitter className=Ds.splitter_className />
         <Reflex.Element>
-          <section className=S.preview_container>
-            <iframe
-              id="frame"
-              className=S.frame
-              src="/container.html"
-              ref={ReactDOMRe.Ref.callbackDomRef(r => state.iframe_ref := r)}
-              sandbox="allow-modals allow-scripts allow-popups allow-forms allow-same-origin"
-            />
-          </section>
+          <Reflex.Container orientation="horizontal">
+            <Reflex.Element>
+              <section className=S.preview_container>
+                <iframe
+                  id="frame"
+                  className=S.frame
+                  src="/container.html"
+                  ref={ReactDOMRe.Ref.callbackDomRef(r =>
+                    state.iframe_ref := r
+                  )}
+                  sandbox="allow-modals allow-scripts allow-popups allow-forms allow-same-origin"
+                />
+              </section>
+            </Reflex.Element>
+            <Reflex.Splitter className=Ds.splitter_className />
+            <Reflex.Element>
+              <ConsoleFeed.Display
+                logs={state.log}
+                variant="dark"
+                styles=Ds.console_style
+              />
+            </Reflex.Element>
+          </Reflex.Container>
         </Reflex.Element>
       </Reflex.Container>
     </Reflex.Element>
