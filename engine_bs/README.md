@@ -15,17 +15,53 @@ sh <(curl -sL https://raw.githubusercontent.com/ocaml/opam/master/shell/install.
 opam init
 ```
 
-2. Cloning repositories
+2. BuckleScript
+
+Clone the BuckleScript fork that works with Sketch.sh. `bucklescript` root project folder
+should be next to `sketch-sh` root project folder in the directory structure.
 
 ```sh
-git clone https://github.com/BuckleScript/bucklescript
-git clone https://github.com/BuckleScript/bucklescript-playground
-git clone https://github.com/facebook/reason/
+git clone https://github.com/thangngoc89/bucklescript/
+git checkout sketch
 ```
 
-3. Bootstraping
+js_of_ocaml is also needed to build the browser version of the BuckleScript compiler:
 
-- reason
+```sh
+opam install js_of_ocaml
+```
+
+_Note: js_of_ocaml can be installed in any opam switch, even different than 4.02.3._
+
+```sh
+git submodule update --init && node scripts/buildocaml.js # Build BuckleScript fork of OCaml
+cd scripts
+./ninja.js config && ./ninja.js build # Build BuckleScript
+BS_PLAYGROUND=../../sketch-sh/client/public ./repl.js # Generate browser version of BuckleScript
+```
+
+If there are errors while building BuckleScript, try running `./scripts/ninja.js clean` and calling
+`./ninja.js config && ./ninja.js build` again.
+
+For convenience, the last two commands (`./ninja.js build` and `./repl.js`) are included in a script file, so when
+new changes are done in BuckleScript code, one can just run `./repl.sh` from the `scripts` folder:
+
+```sh
+cd scripts && ./repl.sh
+```
+
+These steps should be enough to build BuckleScript for Sketch.sh. For more information
+about how to work with BuckleScript, refer to [`bucklescript/CONTRIBUTING.md`](https://github.com/BuckleScript/bucklescript/blob/2e4c0558a8b417983a4c8ce8d6016ea3a4fa1fc5/CONTRIBUTING.md).
+
+3. Reason (optional)
+
+This step is optional, as a pre-packed version of `refmt.ml` is already included with Sketch.sh fork of BuckleScript.
+
+Clone Reason (also next to `sketch-sh` and `bucklescript` folders in the directory structure):
+
+```sh
+git clone https://github.com/facebook/reason/
+```
 
 ```sh
 opam switch create 4.02.3
@@ -48,14 +84,4 @@ The script will failed because we don't have JVM installed but that isn't import
 ```sh
 # inside bspacks
 cp ./build/refmt_api.ml ../../bucklescript/jscomp/main
-```
-
-- bucklescript
-
-Refer to `bucklescript/CONTRIBUTING.md`
-
-```
-git submodule update --init && node scripts/buildocaml.js
-./scripts/ninja.js config && ./scripts/ninja.js build
-./scripts/repl.js
 ```
