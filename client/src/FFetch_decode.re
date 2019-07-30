@@ -2,13 +2,6 @@ module D = Decode.AsResult.OfParseError;
 
 type error = [ FFetch.error | `DecodeError(D.ParseError.failure)];
 
-let error_to_string =
-  fun
-  | `ApiErrorJson(json) => {j|ApiErrorJson $json|j}
-  | `ApiErrorText(string) => {j|ApiErrorJson $string|j}
-  | `DecodeError(err) => D.ParseError.failureToDebugString(err)
-  | `NetworkError(string) => {j|NetworkError $string|j};
-
 let json:
   (string, Js.Json.t => Belt.Result.t('decoded, D.ParseError.failure)) =>
   Future.t(Belt.Result.t('decoded, [> error])) =

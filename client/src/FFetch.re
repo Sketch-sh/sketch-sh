@@ -1,7 +1,7 @@
 type error = [
   | `NetworkError(string)
-  | `ApiErrorJson(Js.Json.t)
-  | `ApiErrorText(string)
+  | `ApiErrorJson(string, Js.Json.t)
+  | `ApiErrorText(string, string)
 ];
 
 let fetch = (url, decoder) => {
@@ -19,7 +19,7 @@ let json: string => Future.t(Belt.Result.t(Js.Json.t, [> error])) =
     ->Future.flatMapOk(((isOk, json)) =>
         isOk
           ? Future.value(Belt.Result.Ok(json))
-          : Future.value(Belt.Result.Error(`ApiErrorJson(json)))
+          : Future.value(Belt.Result.Error(`ApiErrorJson((url, json))))
       );
   };
 
@@ -30,6 +30,6 @@ let text: string => Future.t(Belt.Result.t(string, [> error])) =
     ->Future.flatMapOk(((isOk, res)) =>
         isOk
           ? Future.value(Belt.Result.Ok(res))
-          : Future.value(Belt.Result.Error(`ApiErrorText(res)))
+          : Future.value(Belt.Result.Error(`ApiErrorText((url, res))))
       );
   };
