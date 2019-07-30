@@ -10,9 +10,7 @@ window->addMessageListener(
       switch (data##payload) {
       | Container_comm.Comm_file_update(filename, content) =>
         Container_fs.set(~filename, ~content);
-
         let entry_content = Container_fs.get(~filename=entry_file^);
-
         switch (entry_content) {
         | None => ()
         | Some(entry_content) => Container_bundler.eval(entry_content)

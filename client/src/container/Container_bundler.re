@@ -127,9 +127,19 @@ module Sketch_polestar = {
 
 let polestar = Sketch_polestar.polestar;
 
+let clean_dom: unit => unit = [%raw
+  () => {|
+  document.body.innerHTML = '<div id="root"></div>'
+|}
+];
+
 let eval = code => {
+  %log.debug
+  "Eval";
   open Js.Promise;
   let dependencies = Container_require_collector.parse(code);
+
+  clean_dom();
 
   let _ =
     polestar->Polestar.evaluate(dependencies, code)
