@@ -134,18 +134,38 @@ module Jsdelivr = {
   };
 
   /** Get all dependencies range of a package inside package.json */
-  let get_dependencies_range = slug => {
+  type pkg_json = {
+    dependencies: Js.Dict.t(string),
+    browser: Js.Dict.t(string),
+  };
+
+  let fetch_pkg_json = slug => {
     // cdn_base/npm/thangngoc89@1.0.0/package.json
     let url =
       [|cdn_base, "npm", slug->Pkg.Slug.to_string, "package.json"|]->Url.join;
-    let decoder = D.optionalField("dependencies", D.dict(D.string));
-    FFetch_decode.json(url, decoder)
-    ->Future.flatMapOk(deps =>
-        deps
-        ->Belt.Option.getWithDefault(Js.Dict.empty())
-        ->Belt.Result.Ok
-        ->Future.value
+    let decoder = json => {
+      D.Pipeline.(
+        succeed((dependencies, browser) =>
+          {
+            dependencies:
+              dependencies->Belt.Option.getWithDefault(Js.Dict.empty()),
+            browser:
+              // Get browser field and make sure all paths are relative
+              browser
+              ->Belt.Option.getWithDefault(Js.Dict.empty())
+              ->Js.Dict.entries
+              ->Belt.Array.map(((key, value)) =>
+                  (Node.Path.resolve("/", key), value)
+                )
+              ->Js.Dict.fromArray,
+          }
+        )
+        |> optionalField("dependencies", D.dict(D.string))
+        |> optionalField("browser", D.dict(D.string))
+        |> run(json)
       );
+    };
+    FFetch_decode.json(url, decoder);
   };
 
   let get_file = (pkg, file) => {
@@ -164,18 +184,26 @@ module Cache = {
     default_file: string,
     files: array(string),
     dependencies: Js.Dict.t(string),
+    browser: Js.Dict.t(string),
   };
   let cache = Map.make();
 
-  let set = (~slug, ~pkg, ~default_file, ~files, ~dependencies) => {
+  let set = (~slug, ~pkg, ~default_file, ~files, ~dependencies, ~browser) => {
     cache->Map.set(
       slug->Pkg.Slug.to_string,
-      {pkg, default_file, files, dependencies},
+      {pkg, default_file, files, dependencies, browser},
     );
   };
   let get = (~slug) => cache->Map.get(slug->Pkg.Slug.to_string);
 };
 
+/**
+ * This get the package metadata
+ * - Check in cache first
+ * - If not:
+ *   + Resolve version range into absolute version
+ *   + Send meta request
+ */
 let get_meta = pkg => {
   let orginal_pkg_slug = pkg->Pkg.Slug.of_pkg;
   switch (Cache.get(~slug=orginal_pkg_slug)) {
@@ -198,14 +226,22 @@ let get_meta = pkg => {
         let slug = pkg->Pkg.Slug.of_pkg;
 
         let list_file = slug->Jsdelivr.List_file.fetch;
-        let deps_range = slug->Jsdelivr.get_dependencies_range;
+        let fetch_pkg_json = slug->Jsdelivr.fetch_pkg_json;
 
-        Future.mapOk2(list_file, deps_range, (list_file, deps_range) =>
-          (pkg, list_file, deps_range)
+        Future.mapOk2(
+          list_file,
+          fetch_pkg_json,
+          (list_file, {Jsdelivr.dependencies: deps_range, browser}) =>
+          (pkg, list_file, deps_range, browser)
         );
       })
     ->Future.flatMapOk(value => {
-        let (pkg, {Jsdelivr.List_file.default_file, files}, deps_range) = value;
+        let (
+          pkg,
+          {Jsdelivr.List_file.default_file, files},
+          deps_range,
+          browser,
+        ) = value;
         let new_pkg_slug = pkg->Pkg.Slug.of_pkg;
         Cache.set(
           ~pkg,
@@ -213,6 +249,7 @@ let get_meta = pkg => {
           ~default_file,
           ~files,
           ~dependencies=deps_range,
+          ~browser,
         );
         if (orginal_pkg_slug != new_pkg_slug) {
           Cache.set(
@@ -221,13 +258,31 @@ let get_meta = pkg => {
             ~default_file,
             ~files,
             ~dependencies=deps_range,
+            ~browser,
           );
         };
-        {Cache.pkg, default_file, files, dependencies: deps_range}
+        {Cache.pkg, default_file, files, dependencies: deps_range, browser}
         ->Belt.Result.Ok
         ->Future.value;
       })
   };
+};
+
+let fetch_umd = (~pkg, ~umd_path, ~url) => {
+  Jsdelivr.get_file(pkg, umd_path)
+  ->Future.flatMapOk(code =>
+      Container_polestar.Fetcher.FetchResult.make(
+        ~url,
+        ~id={
+          {...pkg, path: Some(umd_path)}->Pkg.to_path;
+        },
+        ~dependencies=Umd,
+        ~code,
+        (),
+      )
+      ->Belt.Result.Ok
+      ->Future.value
+    );
 };
 
 external unsafe_reject: string => 'a = "%identity";
@@ -249,10 +304,7 @@ Try to require a full path, for example: require($(pkg_slug)/path_to_file.js)|j}
   | `Npm_fetcher_cant_resolve_file_path(pkg_slug) => {j|Npm fetcher: Can't resolve file path for package $(pkg_slug)
 Try to require a full path, for example: require($(pkg_slug)/path_to_file.js)|j};
 
-let handle_npm = (~url, ~meta, ~pathname) => {
-  let pkg = Pkg.parse(pathname);
-  Js.log4("[npm] fetching: ", pathname, meta, pkg->Pkg.to_path);
-
+let fetch_commonjs = (~pkg, ~url) => {
   let fetch_result:
     Future.t(
       Belt.Result.t(
@@ -263,7 +315,7 @@ let handle_npm = (~url, ~meta, ~pathname) => {
     get_meta(pkg)
     ->Future.flatMapOk(cache => {
         // Note: Cache.pkg path usually is incorrect, you need to relies on original pkg instead
-        let {Cache.pkg: _, default_file, files, dependencies} = cache;
+        let {Cache.pkg: _, default_file, files, dependencies, browser} = cache;
 
         /**
          * Path resolver
@@ -276,6 +328,7 @@ let handle_npm = (~url, ~meta, ~pathname) => {
           | None => Some(default_file)
           | Some(file_path) =>
             let file_path = Url.join([|"/", file_path|]);
+
             if (files->array_has(file_path)) {
               Some(file_path);
             } else if (files->array_has(file_path ++ ".js")) {
@@ -285,6 +338,17 @@ let handle_npm = (~url, ~meta, ~pathname) => {
             };
           };
         };
+
+        // Use browser field if available
+        let file_path =
+          switch (file_path) {
+          | None => None
+          | Some(file_path) =>
+            switch (browser->Js.Dict.get(file_path)) {
+            | None => Some(file_path)
+            | Some(file_path) => Some(file_path)
+            }
+          };
 
         let file_path =
           switch (file_path) {
@@ -317,6 +381,30 @@ let handle_npm = (~url, ~meta, ~pathname) => {
             ->Future.value
           );
       });
+  fetch_result;
+};
+
+/* TODO: This needs to come from kind of api */
+let umd_pathname: Js.Dict.t(string) = [%bs.raw
+  {|
+  {
+    "react": "umd/react.development.min.js",
+    "react-dom": "umd/react-dom.development.min.js"
+  }
+|}
+];
+
+let handle_npm = (~url, ~meta, ~pathname) => {
+  [%log.info "npm fetching"; ("path", pathname); ("meta", meta)];
+  let pkg = Pkg.parse(pathname);
+
+  let is_umd = Js.Dict.get(umd_pathname, pkg.Pkg.name);
+
+  let fetch_result =
+    switch (is_umd) {
+    | None => fetch_commonjs(~url, ~pkg)
+    | Some(umd_path) => fetch_umd(~pkg, ~umd_path, ~url)
+    };
 
   Js.Promise.make((~resolve, ~reject) =>
     fetch_result

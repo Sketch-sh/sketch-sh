@@ -18,7 +18,8 @@
   "bsc-flags": ["-bs-g"],
   "ppx-flags": [
     "@ryb73/decco/ppx/ppx_decco.sh",
-    "let-anything/lib/bs/native/let_anything.native"
+    "let-anything/lib/bs/native/let_anything.native",
+    "bs-log/ppx"
   ],
   "suffix": ".bs.js",
   "namespace": true,
@@ -34,7 +35,8 @@
     "@ryb73/decco",
     "bs-fetch",
     "bs-decode",
-    "reason-future"
+    "reason-future",
+    "bs-log"
   ],
   "bs-dev-dependencies": ["@glennsl/bs-jest"],
   "refmt": 3,

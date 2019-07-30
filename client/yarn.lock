@@ -3082,6 +3082,11 @@ bs-fetch@^0.5.0:
   resolved "https://registry.yarnpkg.com/bs-fetch/-/bs-fetch-0.5.0.tgz#6913b1d1ddfa0b0a4b832357854e9763d61d4b28"
   integrity sha512-cGjwRpyNcIaX+p2ssy/38zs7BM/miKNgmOR3NEhxKFete5mR05JcvjuV4raG89oGCG281SU1b56TTAKmf9VCug==
 
+bs-log@^0.1.1:
+  version "0.1.1"
+  resolved "https://registry.yarnpkg.com/bs-log/-/bs-log-0.1.1.tgz#03181ea3589c130b24ab4fc294b6948f823ff6a4"
+  integrity sha512-nPu3psKq3uEipyTYwGa/+xrvVTqkQ8jr4aKju/p0m48lAx5gBB8kmNavfGTYoS1sQ0YZ05BokzxCnZgvEkCslA==
+
 bs-platform@^5.0.6:
   version "5.0.6"
   resolved "https://registry.npmjs.org/bs-platform/-/bs-platform-5.0.6.tgz#88c13041fb020479800de3d82c680bf971091425"

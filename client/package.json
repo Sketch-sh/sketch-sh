@@ -38,6 +38,7 @@
     "bs-date-fns": "^0.1.6",
     "bs-decode": "^0.8.1",
     "bs-fetch": "^0.5.0",
+    "bs-log": "^0.1.1",
     "bs-webapi": "^0.15.2",
     "butter-toast": "^2.1.2",
     "codemirror": "^5.39.2",
