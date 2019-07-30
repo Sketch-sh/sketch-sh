@@ -14,6 +14,9 @@ let start_col = loc => loc.loc_start.Position.col;
 let end_line = loc => loc.loc_end.Position.line;
 let end_col = loc => loc.loc_end.Position.col;
 
+let is_empty = loc => {
+  start_line(loc) == end_line(loc) && start_col(loc) == end_col(loc);
+};
 // Check if a is before b or touching b
 let is_before = (a, b) => {
   a->end_line < b->start_line
