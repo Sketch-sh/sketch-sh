@@ -5,67 +5,22 @@ module S = {
   open Css;
   open Ds_unit;
 
-  let border_color = Color.light_3;
+  let header_element =
+    [borderBottom(BorderWidth.bw1, `solid, Color.light_3)]->style;
 
   let header =
     [
-      borderBottom(BorderWidth.bw1, `solid, Color.light_3),
-      paddingBottom(Space.s2),
-      paddingRight(Space.s4),
-      paddingLeft(Space.s4),
-      marginTop(Space.s2),
-      height(Space.s10),
-      zIndex(1),
+      marginBottom(Space.s1),
+      padding2(~v=Space.s2, ~h=Space.s4),
       display(`flex),
       alignItems(`center),
     ]
     ->style;
 
-  let main =
-    [
-      display(`flex),
-      flex(`num(1.)),
-      overflow(`hidden),
-      unsafe("flexFlow", "nowrap"),
-      zIndex(0),
-    ]
-    ->style;
-
-  let sidebar =
-    [
-      display(`flex),
-      flexDirection(`column),
-      maxWidth(`percent(50.)),
-      minWidth(`px(130)),
-      width(`px(250)),
-      position(`relative),
-      zIndex(5),
-    ]
-    ->style;
-
-  let editor_container = [display(`flex), flex(`num(1.))]->style;
-
-  let editor_wrap =
-    [
-      display(`flex),
-      flexDirection(`column),
-      flex(`num(1.)),
-      overflowX(`auto),
-      overflowY(`hidden),
-      borderLeft(BorderWidth.bw1, `solid, border_color),
-    ]
-    ->style;
+  let sidebar = [display(`flex), flexDirection(`column)]->style;
 
   let preview_container =
-    [
-      position(`relative),
-      width(`vw(40.)),
-      minWidth(`px(200)),
-      maxWidth(`percent(75.)),
-      minHeight(`px(100)),
-      borderLeft(BorderWidth.bw1, `solid, border_color),
-      unsafe("WebkitOverflowScrolling", "touch"),
-    ]
+    [position(`relative), width(`percent(100.)), height(`percent(100.))]
     ->style;
 
   let frame =
@@ -89,26 +44,20 @@ let default_value = {code|// Hey, welcome to Sketch's Bucklescript engine
 [%% bs.raw {|
   document.body.innerHTML = "Sketch <3 Bucklescript";
   document.body.style.backgroundColor = "yellow";
-|}];
-
-|code};
+|}];|code};
 
 let initial_files = {
   Belt.Map.String.empty
   ->Belt.Map.String.set("index.re", Edit_state.make_file(default_value))
   ->Belt.Map.String.set(
-      "second_file.re",
-      Edit_state.make_file(
-        "// Sketch doesn't support multiple files yet.\n// This is just for design mockup\n",
-      ),
+      "index.html",
+      Edit_state.make_file({html|<div id="root"></div>|html}),
     )
-  ->Belt.Map.String.set(
-      "npm.re",
-      Edit_state.make_file(
-        {|[@bs.module] external thangngoc89: Js.t('a) = "thangngoc89";\nJs.log(thangngoc89);|},
-      ),
-    );
+  ->Belt.Map.String.set("style.css", Edit_state.make_file(""));
 };
+
+%bs.raw
+{|require("react-reflex/styles.css")|};
 
 [@react.component]
 let make = () => {
@@ -149,18 +98,23 @@ let make = () => {
     None;
   });
 
-  <>
-    <header className=S.header> "Sketch.sh"->str </header>
-    <main className=S.main>
-      <div className=S.editor_container>
-        <section className=S.sidebar>
-          <Edit_treeview
-            files={state.files}
-            active_file={state.active_file}
-            on_file_click={filename => send(File_open(filename))}
-          />
-        </section>
-        <section className=S.editor_wrap>
+  <Reflex.Container orientation="horizontal">
+    <Reflex.Element className=S.header_element flex=0.05>
+      <header className=S.header> "Sketch.sh"->str </header>
+    </Reflex.Element>
+    <Reflex.Element>
+      <Reflex.Container orientation="vertical">
+        <Reflex.Element minSize=130 maxSize=200>
+          <section className=S.sidebar>
+            <Edit_treeview
+              files={state.files}
+              active_file={state.active_file}
+              on_file_click={filename => send(File_open(filename))}
+            />
+          </section>
+        </Reflex.Element>
+        <Reflex.Splitter className=Ds.splitter_className />
+        <Reflex.Element>
           {switch (state.files->Belt.Map.String.get(state.active_file)) {
            | None => "Nothing to show here"->str
            | Some({code, errors, warnings, compiled}) =>
@@ -174,17 +128,20 @@ let make = () => {
                }
              />
            }}
-        </section>
-      </div>
-      <div className=S.preview_container>
-        <iframe
-          id="frame"
-          className=S.frame
-          src="/container.html"
-          ref={ReactDOMRe.Ref.callbackDomRef(r => state.iframe_ref := r)}
-          sandbox="allow-modals allow-scripts allow-popups allow-forms allow-same-origin"
-        />
-      </div>
-    </main>
-  </>;
+        </Reflex.Element>
+        <Reflex.Splitter className=Ds.splitter_className />
+        <Reflex.Element>
+          <section className=S.preview_container>
+            <iframe
+              id="frame"
+              className=S.frame
+              src="/container.html"
+              ref={ReactDOMRe.Ref.callbackDomRef(r => state.iframe_ref := r)}
+              sandbox="allow-modals allow-scripts allow-popups allow-forms allow-same-origin"
+            />
+          </section>
+        </Reflex.Element>
+      </Reflex.Container>
+    </Reflex.Element>
+  </Reflex.Container>;
 };

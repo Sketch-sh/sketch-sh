@@ -64,6 +64,7 @@
     "react-helmet": "^5.2.0",
     "react-icons": "^3.0.4",
     "react-monaco-editor": "^0.26.2",
+    "react-reflex": "^3.0.16",
     "react-smooshpack": "^0.0.56",
     "reason-apollo": "^0.16.4",
     "reason-future": "github:RationalJS/future",

@@ -12,50 +12,43 @@ module S = {
   open Css;
   open Ds_unit;
 
-  global(".CodeMirror", [width(`percent(100.)), height(`percent(100.))]);
+  let editor =
+    [
+      width(`percent(100.)),
+      height(`percent(100.)),
+      fontSize(`px(14)),
+      overflow(`hidden),
+    ]
+    ->style;
+
   global(
-    ".CodeMirror-activeline-background",
+    ".react-codemirror2 .CodeMirror",
+    [width(`percent(100.)), height(`percent(100.))],
+  );
+  global(
+    ".react-codemirror2 .CodeMirror-activeline-background",
     [backgroundColor(Color.light_3)],
   );
-  global(".CodeMirror-activeline-gutter", [backgroundColor(Color.light_4)]);
-  global(".CodeMirror-linenumber", [color(Color.light)]);
   global(
-    ".CodeMirror-gutters",
+    ".react-codemirror2 .CodeMirror-activeline-gutter",
+    [backgroundColor(Color.light_4)],
+  );
+  global(".react-codemirror2 .CodeMirror-linenumber", [color(Color.light)]);
+  global(
+    ".react-codemirror2 .CodeMirror-gutters",
     [
       backgroundColor(Color.brand_invert),
       paddingRight(Space.s1),
       borderRightWidth(`zero),
     ],
   );
-
-  let wrap =
-    [
-      display(`flex),
-      flexDirection(`column),
-      flex(`num(1.)),
-      width(`percent(100.)),
-      height(`percent(100.)),
-      maxHeight(`percent(100.)),
-    ]
-    ->style;
-  let editor =
-    [width(`percent(100.)), height(`percent(100.)), fontSize(`px(14))]
-    ->style;
-  let view =
-    [
-      flex3(~grow=0., ~shrink=0., ~basis=`px(350)),
-      paddingLeft(Space.s2),
-      paddingRight(Space.s2),
-      backgroundColor(Color.light_4),
-    ]
-    ->style;
 };
 
 let base_config =
   CodeMirror.EditorConfiguration.make(
     ~lineNumbers=true,
     ~viewportMargin=infinity,
-    ~firstLineNumber=0,
+    ~firstLineNumber=1,
     ~lineWrapping=true,
     ~styleActiveLine=true,
     ~gutters=[|"CodeMirror-lint-markers", "CodeMirror-linenumbers"|],
@@ -78,22 +71,27 @@ let make = (~value, ~onChange, ~errors, ~warnings, ~compiled=?) => {
     ~editor_ref,
   );
 
-  <div className=S.wrap>
-    <ReactCodeMirror.Controlled
-      value
-      options=reason_config
-      onBeforeChange={(_editor, _changes, value) => onChange(value)}
-      editorDidMount={editor => {
-        %raw
-        {|window.editor = editor|};
-        editor_ref->React.Ref.setCurrent(Some(editor));
-      }}
-      className=S.editor
-    />
-    <ReactCodeMirror.Controlled
-      value={compiled->Belt.Option.getWithDefault("")}
-      options=compile_config
-      className=S.editor
-    />
-  </div>;
+  <Reflex.Container orientation="horizontal">
+    <Reflex.Element>
+      <ReactCodeMirror.Controlled
+        value
+        options=reason_config
+        onBeforeChange={(_editor, _changes, value) => onChange(value)}
+        editorDidMount={editor => {
+          %raw
+          {|window.editor = editor|};
+          editor_ref->React.Ref.setCurrent(Some(editor));
+        }}
+        className=S.editor
+      />
+    </Reflex.Element>
+    <Reflex.Splitter className=Ds.splitter_className />
+    <Reflex.Element>
+      <ReactCodeMirror.Controlled
+        value={compiled->Belt.Option.getWithDefault("")}
+        options=compile_config
+        className=S.editor
+      />
+    </Reflex.Element>
+  </Reflex.Container>;
 };
