@@ -34,8 +34,10 @@ let to_frame: (Dom.element, Container_comm.from_host) => unit = [%raw
   }
 ];
 
+module Map = Belt.Map.String;
+
 type state = {
-  files: Belt.Map.String.t(file),
+  files: Map.t(file),
   active_file: filename,
   iframe_ref: ref(Js.nullable(Dom.element)),
 };
@@ -45,7 +47,8 @@ type action =
   | File_rename(filename, file)
   | File_update(filename, string)
   | Compile_active_file
-  | Compile_result(filename, Engine_bs.compile_result);
+  | Compile_result(filename, Engine_bs.compile_result)
+  | Frame_msg(Container_comm.to_host);
 
 let debounce_compile =
   Debouncer.makeCancelable(((filename, code, send)) =>
@@ -137,6 +140,27 @@ let reducer = (action, state) => {
           None;
         },
       )
+    | Frame_msg(msg) =>
+      switch (msg) {
+      | Comm_ready =>
+        SideEffects(
+          ({state}) => {
+            switch ((state.iframe_ref^)->Js.Nullable.toOption) {
+            | None => ()
+            | Some(frame) =>
+              state.files
+              ->Map.forEach((filename, {compiled}) =>
+                  switch (compiled) {
+                  | None => ()
+                  | Some(code) =>
+                    to_frame(frame, Comm_file_update(filename, code))
+                  }
+                )
+            };
+            None;
+          },
+        )
+      }
     }
   );
 };

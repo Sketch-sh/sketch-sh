@@ -134,6 +134,21 @@ let make = () => {
     |],
   );
 
+  React.useEffect0(() => {
+    open Frame_comm;
+    window->addMessageListener(
+      event => {
+        let data = event##data;
+        switch (data##_type->Js.Nullable.toOption) {
+        | Some("sketch") => send(Frame_msg(data##payload))
+        | _ => ()
+        };
+      },
+      false,
+    );
+    None;
+  });
+
   <>
     <header className=S.header> "Sketch.sh"->str </header>
     <main className=S.main>
