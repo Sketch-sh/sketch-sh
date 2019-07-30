@@ -29,3 +29,12 @@ to_host(Comm_ready);
 ConsoleFeed.hook([%raw "window.console"], log =>
   to_host(Comm_send_log(log))
 );
+
+%bs.raw
+{|
+if (module.hot) {
+  module.hot.accept("./Container.bs.js", () => {
+    location.reload();
+  });
+}
+|};

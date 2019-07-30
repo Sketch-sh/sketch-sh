@@ -1,13 +1,7 @@
+open SStdlib;
+
 module Polestar = Container_polestar;
 module B = Container_bindings;
-module Url = Webapi.Url;
-
-let url_join = (~base, ~path) => {
-  let base = Url.make(base);
-  let new_url = Url.makeWithBase(path, base->Url.href);
-
-  new_url->Url.href;
-};
 
 module Config = {
   let bs_stdlib_url = "";
@@ -51,7 +45,6 @@ module Sketch_polestar = {
           },
         )
       | Some(code) =>
-        Js.log(code);
         resolve(.
           Polestar.Fetcher.FetchResult.make(
             ~url,
@@ -60,7 +53,7 @@ module Sketch_polestar = {
             ~code,
             (),
           ),
-        );
+        )
       }
     );
   };
@@ -81,30 +74,52 @@ module Sketch_polestar = {
        );
   };
 
-  let normalize_pathname = url => {
-    Js.String.replaceByRe([%re "/^(\\/.)/g"], "", url);
+  // npm://uuid@latest
+  // => ("npm:", "uuid@latest")
+
+  let get_protocol_pathname = url => {
+    Js.String.match([%re "/(^[a-zA-Z]+\\:)(?:\\/.)(.+)/"], url)
+    ->Belt.Option.flatMap(matches =>
+        switch (matches->Belt.Array.length) {
+        | 3 => Some((matches[1], matches[2]))
+        | _ => None
+        }
+      );
   };
   // let parse
   let fetcher =
     (. url, meta: Polestar.Fetcher.meta) => {
-      let parsed_url = Webapi.Url.make(url);
-      let protocol = parsed_url->Webapi.Url.protocol->Protocol.of_string;
-      let pathname = parsed_url->Webapi.Url.pathname->normalize_pathname;
+      let parsed = get_protocol_pathname(url);
 
-      switch (protocol) {
-      | Anonymous
-      | Vfs =>
-        if (pathname |> Js.String.startsWith("stdlib")) {
-          handle_bs_stdlib(~url, ~meta, ~pathname);
-        } else {
-          handle_filesystem(~url, ~meta, ~pathname);
+      Js.Promise.make((~resolve, ~reject) =>
+        switch (parsed) {
+        | None =>
+          reject(. Promise.unsafe_reject("[Fetcher] Invalid url " ++ url))
+        | Some(parsed) =>
+          [%log.debug "parsed"; parsed];
+          resolve(. parsed);
         }
-      | Npm => Container_fetcher_npm.handle_npm(~url, ~meta, ~pathname)
-      | _ =>
-        Js.Promise.make((~resolve as _, ~reject as _) =>
-          failwith("Unhandle polestar url: " ++ url)
-        )
-      };
+      )
+      |> Js.Promise.then_(((protocol, pathname)) =>
+           switch (protocol |> Protocol.of_string) {
+           | Anonymous
+           | Vfs =>
+             if (pathname |> Js.String.startsWith("stdlib")) {
+               handle_bs_stdlib(~url, ~meta, ~pathname);
+             } else {
+               handle_filesystem(~url, ~meta, ~pathname);
+             }
+           | Npm => Container_fetcher_npm.handle_npm(~url, ~meta, ~pathname)
+           | _ =>
+             Js.Promise.make((~resolve as _, ~reject) =>
+               reject(.
+                 Promise.unsafe_reject(
+                   "[Fetcher] Unhandle polestar url " ++ url,
+                 ),
+               )
+             )
+           }
+         );
     };
 
   let polestar =
@@ -120,7 +135,7 @@ module Sketch_polestar = {
         },
       "onError":
         (. error) => {
-          Js.log2("onError", error);
+          Js.log(error);
         },
     });
 };
@@ -143,10 +158,6 @@ let eval = code => {
 
   let _ =
     polestar->Polestar.evaluate(dependencies, code)
-    |> then_(_result => resolve())
-    |> catch(exn => {
-         Js.log(exn);
-         resolve();
-       });
+    |> then_(_result => resolve());
   ();
 };

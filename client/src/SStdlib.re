@@ -8,3 +8,7 @@ module ImmutableArray = {
   external _unshift_concat: (t('a), 'a, t('a)) => t('a) = "concat";
   let unshift = (arr, new_entry) => [||]->_unshift_concat(new_entry, arr);
 };
+
+module Promise = {
+  external unsafe_reject: string => 'a = "%identity";
+};

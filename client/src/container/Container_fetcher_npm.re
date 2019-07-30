@@ -1,4 +1,6 @@
+open SStdlib;
 open Utils;
+
 module Version: {
   type t =
     | Range(string)
@@ -285,8 +287,6 @@ let fetch_umd = (~pkg, ~umd_path, ~url) => {
     );
 };
 
-external unsafe_reject: string => 'a = "%identity";
-
 let error_handle =
   fun
   | `ApiErrorJson(url, json) => {
@@ -395,8 +395,19 @@ let umd_pathname: Js.Dict.t(string) = [%bs.raw
 ];
 
 let handle_npm = (~url, ~meta, ~pathname) => {
-  [%log.info "npm fetching"; ("path", pathname); ("meta", meta)];
+  [%log.info
+    "npm fetching";
+    ("url", url);
+    ("path", pathname);
+    ("meta", meta)
+  ];
   let pkg = Pkg.parse(pathname);
+
+  [%log.debug
+    "pkg_parsing";
+    ("pathname", pathname);
+    ("parsed_slug", Pkg.get_slug(pkg))
+  ];
 
   let is_umd = Js.Dict.get(umd_pathname, pkg.Pkg.name);
 
@@ -412,7 +423,7 @@ let handle_npm = (~url, ~meta, ~pathname) => {
         switch (result) {
         | Belt.Result.Ok(result) => resolve(. result)
         | Belt.Result.Error(error) =>
-          reject(. unsafe_reject(error_handle(error)))
+          reject(. Promise.unsafe_reject(error_handle(error)))
         }
       )
     ->ignore
