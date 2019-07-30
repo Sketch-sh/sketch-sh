@@ -146,11 +146,7 @@ let make = () => {
             </Reflex.Element>
             <Reflex.Splitter className=Ds.splitter_className />
             <Reflex.Element>
-              <ConsoleFeed.Display
-                logs={state.log}
-                variant="dark"
-                styles=Ds.console_style
-              />
+              <ConsoleFeed.Display logs={state.log} styles=Ds.console_style />
             </Reflex.Element>
           </Reflex.Container>
         </Reflex.Element>
