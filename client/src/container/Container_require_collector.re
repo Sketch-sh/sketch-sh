@@ -9,8 +9,8 @@ let requireOrDynamicImportRegExp = [%re
   {|/(?<!\.\s*)\b(?:require|import)\s*\(\s*([`'\"])([^'\"`]*?)(?:\1)\s*(:?,\s*)?\)/g|}
 ];
 
-let blockCommentRegExp = [%re "/\/\*[^]*?\*\//g"];
-let lineCommentRegExp = [%re "/\/\/.*/g"];
+let blockCommentRegExp = [%re {|/\/\*[^]*?\*\//g|}];
+let lineCommentRegExp = [%re {|/\/\/.*/g|}];
 
 let parse = code => {
   let dependencies = Belt.MutableSet.String.make();
