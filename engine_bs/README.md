@@ -31,7 +31,7 @@ js_of_ocaml is also needed to build the browser version of the BuckleScript comp
 opam install js_of_ocaml
 ```
 
-_Note: js_of_ocaml can be installed in any opam switch, even different than 4.02.3._
+_Note: js_of_ocaml should be installed using opam switch 4.02.3._
 
 ```sh
 git submodule update --init && node scripts/buildocaml.js # Build BuckleScript fork of OCaml
