@@ -1,16 +1,25 @@
 // TODO: move this into web worker
-
 // All the code below is taken from: https://github.com/facebook/jest/blob/master/packages/jest-haste-map/src/lib/dependencyExtractor.ts
+
+// Negative look behind is not supported in Firefox nor in Safari
+let notADotRegExp =
+  try (Js.Re.fromString("(?<!\\.\\s*)")) {
+  | _ => Js.Re.fromString("(?:^|[^.]\\s*)")
+  };
+
+let blockCommentRegExp = [%re {|/\/\*[^]*?\*\//g|}];
+let lineCommentRegExp = [%re {|/\/\/.*/g|}];
+
 let importOrExportRegExp = [%re
   {|/\b(?:import|export)\s+(?!type(?:of)?\s+)(?:[^'\"]+\s+from\s+)?([`'\"])([^'\"`]*?)(?:\1)/g|}
 ];
 
-let requireOrDynamicImportRegExp = [%re
-  {|/(?<!\.\s*)\b(?:require|import)\s*\(\s*([`'\"])([^'\"`]*?)(?:\1)\s*(:?,\s*)?\)/g|}
-];
-
-let blockCommentRegExp = [%re {|/\/\*[^]*?\*\//g|}];
-let lineCommentRegExp = [%re {|/\/\/.*/g|}];
+let requireOrDynamicImportRegExp =
+  Js.Re.fromStringWithFlags(
+    Js.Re.source(notADotRegExp)
+    ++ {|\b(?:require|import)\s*\(\s*([`'"])([^'"`]*?)(?:\1)\s*(:?,\s*)?\)|},
+    ~flags="g",
+  );
 
 let parse = code => {
   let dependencies = Belt.MutableSet.String.make();
