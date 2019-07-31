@@ -102,7 +102,7 @@ module Sketch_polestar = {
   // => ("npm:", "uuid@latest")
 
   let get_protocol_pathname = url => {
-    Js.String.match([%re "/(^[a-zA-Z]+\\:)(?:\\/.)(.+)/"], url)
+    Js.String.match([%re "/(^[a-zA-Z\-]+\\:)(?:\\/.)(.+)/"], url)
     ->Belt.Option.flatMap(matches =>
         switch (matches->Belt.Array.length) {
         | 3 => Some((matches[1], matches[2]))
@@ -133,7 +133,17 @@ module Sketch_polestar = {
              } else {
                handle_filesystem(~url, ~meta, ~pathname);
              }
-           | Npm => Container_fetcher_npm.handle_npm(~url, ~meta, ~pathname)
+           | Npm =>
+             if (pathname
+                 |> Js.String.startsWith("bs-platform@latest/lib/js/")) {
+               let new_filesystem =
+                 pathname
+                 |> Js.String.replace("bs-platform@latest/lib/js", "stdlib");
+               handle_bs_stdlib(~url, ~meta, ~pathname=new_filesystem);
+             } else {
+               Container_fetcher_npm.handle_npm(~url, ~meta, ~pathname);
+             }
+
            | _ =>
              Js.Promise.make((~resolve as _, ~reject) =>
                reject(.
