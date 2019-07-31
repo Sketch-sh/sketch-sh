@@ -25,11 +25,35 @@ module Protocol = {
 module Sketch_polestar = {
   open Js.Promise;
 
+  let make_hooked_console_method =
+    (. method) => {
+      (. _log: ConsoleFeed.raw_data) => {
+        let arguments = [%bs.raw {|[].slice.call(arguments)|}];
+        ConsoleFeed.parse(method, arguments)
+        ->ConsoleFeed.encode
+        ->Comm_send_log
+        ->Frame_comm.to_host;
+      };
+    };
+
   let globals = {
     "process": {
       "env": {
         "NODE_ENV": "production",
       },
+    },
+    "console": {
+      "log": make_hooked_console_method(. "log"),
+      "debug": make_hooked_console_method(. "debug"),
+      "info": make_hooked_console_method(. "info"),
+      "warn": make_hooked_console_method(. "warn"),
+      "error": make_hooked_console_method(. "error"),
+      "table": make_hooked_console_method(. "table"),
+      "clear": make_hooked_console_method(. "clear"),
+      "time": make_hooked_console_method(. "time"),
+      "timeEnd": make_hooked_console_method(. "timeEnd"),
+      "count": make_hooked_console_method(. "count"),
+      "assert": make_hooked_console_method(. "assert"),
     },
   };
 
