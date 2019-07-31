@@ -49,7 +49,6 @@
     "graphql": "^0.13.2",
     "graphql-tag": "^2.9.2",
     "jwt-decode": "^2.2.0",
-    "konan": "^1.2.1",
     "let-anything": "^1.0.3",
     "lz-string": "^1.4.4",
     "mousetrap": "^1.6.2",
