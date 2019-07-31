@@ -102,7 +102,7 @@ module Sketch_polestar = {
   // => ("npm:", "uuid@latest")
 
   let get_protocol_pathname = url => {
-    Js.String.match([%re "/(^[a-zA-Z]+\\:)(?:\\/.)(.+)/"], url)
+    Js.String.match([%re "/(^[a-zA-Z\-]+\\:)(?:\\/.)(.+)/"], url)
     ->Belt.Option.flatMap(matches =>
         switch (matches->Belt.Array.length) {
         | 3 => Some((matches[1], matches[2]))
