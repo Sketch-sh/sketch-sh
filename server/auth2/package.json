@@ -1,0 +1,33 @@
+{
+  "name": "auth2",
+  "version": "0.1.0",
+  "scripts": {
+    "build": "bsb -make-world",
+    "start": "bsb -make-world -w",
+    "clean": "bsb -clean-world"
+  },
+  "keywords": [
+    "BuckleScript"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@ryb73/decco": "^0.0.14",
+    "bs-platform": "^5.0.6",
+    "let-anything": "^1.0.3"
+  },
+  "dependencies": {
+    "bluebird": "^3.5.5",
+    "bs-express": "^0.12.0",
+    "cls-hooked": "^4.2.2",
+    "cuid": "^2.1.6",
+    "dotenv": "^8.0.0",
+    "express": "^4.17.1",
+    "helmet": "^3.20.0",
+    "jsonwebtoken": "^8.5.1",
+    "passport": "^0.4.0",
+    "passport-github2": "^0.1.11",
+    "pino": "^5.13.1",
+    "pino-pretty": "^3.2.0"
+  }
+}

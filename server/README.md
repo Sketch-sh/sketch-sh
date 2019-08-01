@@ -142,3 +142,10 @@ docker secerts create cloudflare.key ./cloudflare.key
 Now you can mount these secerts into `traefik`'s container under `/run/secerts`
 
 (check `docker-compose.prod.yml`)
+
+# Generating RS512 key for JWT tokens
+
+```sh
+ssh-keygen -t rsa -b 4096 -m PEM -f jwt.key
+openssl rsa -in jwt.key -pubout -outform PEM -out jwt.pub
+```
