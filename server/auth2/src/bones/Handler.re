@@ -1,3 +1,4 @@
+open Belt;
 open Pom;
 
 module Status = {
@@ -81,6 +82,7 @@ let requireQuery: Decco.decoder('query) => guard('query) =
     // fails, it will reject the promise instead of just
     // throwing and requiring a try/catch.
     let%Pom _ = resolved();
+
     switch (decoder(ExpressExt.queryJson(req))) {
     | Result.Error(e) =>
       abort @@
@@ -186,7 +188,7 @@ module MakeWithCustomMiddleware = (Cfg: HandlerConfigWithCustomMiddleware) => {
       ~path=Cfg.path,
       Array.concat(
         Cfg.middleware->Option.getWithDefault([||]),
-        [|RequestContext.contextMiddleware, expressHandler|],
+        [|expressHandler|],
       ),
     );
   };

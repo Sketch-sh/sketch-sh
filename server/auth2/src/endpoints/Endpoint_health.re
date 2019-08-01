@@ -2,7 +2,7 @@ open Pom;
 open Handler;
 
 let handler = _req => {
-  resolved @@ OkString("Ok");
+  resolved @@ OkString("ok");
 };
 
 module Endpoint =

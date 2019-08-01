@@ -12,20 +12,20 @@ module Bluebird = {
 
   let toJs: t('a) => Js.Promise.t('a) = Obj.magic;
 
-  [@bs.module "bluebird"] external resolve: 'a => t('a) = "";
-  [@bs.module "bluebird"] external reject: 'a => t('a) = "";
-  [@bs.module "bluebird"] external all: array(t('a)) => t(array('a)) = "";
+  [@bs.module "bluebird"] external resolve: 'a => t('a) = "resolve";
+  [@bs.module "bluebird"] external reject: 'a => t('a) = "reject"
+  [@bs.module "bluebird"] external all: array(t('a)) => t(array('a)) = "all";
 
   [@bs.send] external flatMap: (t('a), 'a => t('b)) => t('b) = "then";
-  [@bs.send] external tap: (t('a), 'a => unit) => t('a) = "";
+  [@bs.send] external tap: (t('a), 'a => unit) => t('a) = "tap";
   [@bs.send]
-  external tapCatch: (t('a), Js.Promise.error => unit) => t('a) = "";
+  external tapCatch: (t('a), Js.Promise.error => unit) => t('a) = "tapCatch";
   [@bs.send]
-  external catch: (t('a), Js.Promise.error => t('b)) => t('b) = "";
+  external catch: (t('a), Js.Promise.error => t('b)) => t('b) = "catch";
 };
 
 type pom('a) = Bluebird.t('a);
-type pomWithError('a, 'err) = Bluebird.t(Result.t('a, 'err));
+type pomWithError('a, 'err) = Bluebird.t(Belt.Result.t('a, 'err));
 
 // Use this function to turn a callback into a promise.
 // Call it to get back a tuple of (p, re).

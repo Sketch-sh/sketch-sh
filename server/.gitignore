@@ -1,3 +1,5 @@
 .env
 .env.*
 !.env.example
+jwt.key
+jwt.pub

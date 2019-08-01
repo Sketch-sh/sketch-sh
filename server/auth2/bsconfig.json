@@ -1,0 +1,23 @@
+{
+  "name": "auth2",
+  "version": "0.1.0",
+  "sources": {
+    "dir": "src",
+    "subdirs": true
+  },
+  "package-specs": {
+    "module": "commonjs",
+    "in-source": true
+  },
+  "suffix": ".bs.js",
+  "bs-dependencies": ["@ryb73/decco", "bs-express"],
+  "ppx-flags": [
+    "@ryb73/decco/ppx/ppx_decco.sh",
+    "let-anything/lib/bs/native/let_anything.native"
+  ],
+  "warnings": {
+    "error": "+101"
+  },
+  "namespace": true,
+  "refmt": 3
+}
