@@ -37,12 +37,23 @@ module S = {
     ->style;
 };
 
-let default_value = {code|// Hey, welcome to Sketch's Bucklescript engine
-// Try to make a mess and break it
-// Report issues/feature requests here: https://github.com/Sketch-sh/sketch-sh/issues
+let default_value = {code|let str = React.string;
 
-[@bs.module] external uuid: unit => string = "uuid";
-Js.log(uuid());|code};
+module Counter = {
+  [@react.component]
+  let make = (~name) => {
+    let (count, setCount) = React.useState(() => 0);
+
+    <div>
+      <p> {str(name ++ " clicked " ++ string_of_int(count) ++ " times")} </p>
+      <button onClick={_ => setCount(_ => count + 1)}>
+        {str("Click me")}
+      </button>
+    </div>
+  };
+};
+
+ReactDOMRe.renderToElementWithId(<Counter name="Counter" />, "root");|code};
 
 let initial_files = {
   Belt.Map.String.empty
