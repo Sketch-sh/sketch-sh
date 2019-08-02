@@ -20,5 +20,5 @@ let login_redirects_domain = {
 };
 
 let github_callback_url = Env.getExn("GITHUB_CALLBACK_URL");
-let github_client_id = Env.get("GITHUB_CLIENT_ID");
-let github_client_secret = Env.get("GITHUB_CLIENT_SECRET");
+let github_client_id = Env.getExn("GITHUB_CLIENT_ID");
+let github_client_secret = Env.getExn("GITHUB_CLIENT_SECRET");

@@ -1,2 +1,2 @@
-server: yarn workspace auth watch
-bsb: yarn workspace auth bs:watch
+server: yarn workspace server watch
+bsb: yarn workspace server bs:watch

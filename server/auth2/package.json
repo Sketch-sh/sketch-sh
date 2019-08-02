@@ -1,6 +1,6 @@
 {
   "private": true,
-  "name": "auth",
+  "name": "server",
   "version": "0.1.0",
   "scripts": {
     "bs:build": "bsb -make-world",
@@ -8,11 +8,6 @@
     "bs:clean": "bsb -clean-world",
     "watch": "nodemon ./index.js"
   },
-  "keywords": [
-    "BuckleScript"
-  ],
-  "author": "",
-  "license": "MIT",
   "devDependencies": {
     "@ryb73/decco": "^0.0.14",
     "bs-platform": "^5.0.6",
