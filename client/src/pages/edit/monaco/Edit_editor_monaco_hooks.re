@@ -83,8 +83,8 @@ let use_exec_result = (~exec_msg, ~monaco_ref) => {
       open MonacoEditor;
 
       let markers = ref([]);
-      let value_view = ref([]);
-      let stdout_view = ref([]);
+      let _value_view = ref([]);
+      let _stdout_view = ref([]);
 
       exec_msg->Belt.Map.Int.forEach(
         (
@@ -94,7 +94,7 @@ let use_exec_result = (~exec_msg, ~monaco_ref) => {
             exec_phr_kind: _,
             exec_content,
             exec_warning,
-            exec_stdout,
+            exec_stdout: _,
           },
         ) => {
         switch (exec_content) {

@@ -1,5 +1,3 @@
-open SStdlib;
-
 module Polestar = Container_polestar;
 module B = Container_bindings;
 
@@ -103,15 +101,17 @@ module Sketch_polestar = {
   // npm://uuid@latest
   // => ("npm:", "uuid@latest")
 
-  let get_protocol_pathname = url => {
-    Js.String.match([%re "/(^[a-zA-Z\-]+\\:)(?:\\/.)(.+)/"], url)
-    ->Belt.Option.flatMap(matches =>
-        switch (matches->Belt.Array.length) {
-        | 3 => Some((matches[1], matches[2]))
-        | _ => None
-        }
-      );
-  };
+  let get_protocol_pathname: string => option((string, string)) =
+    url => {
+      url
+      ->String.match([%re "/(^[a-zA-Z\\-]+\\:)(?:\\/.)(.+)/"])
+      ->Belt.Option.flatMap(matches =>
+          switch (matches->Belt.Array.length) {
+          | 3 => Some((matches[1], matches[2]))
+          | _ => None
+          }
+        );
+    };
   // let parse
   let fetcher =
     (. url, meta: Polestar.Fetcher.meta) => {

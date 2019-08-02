@@ -1,5 +1,3 @@
-open Engine_native.Types;
-
 /** Turn error into Monaco's marker */
 let make_error_marker: Error.t => MonacoEditor.IMarkerData.t;
 

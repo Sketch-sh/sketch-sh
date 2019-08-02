@@ -1,5 +1,3 @@
-open SStdlib;
-
 let env = Env.getWithDefault(~key="NODE_ENV", ~default="development");
 
 let is_prod = env == "production";

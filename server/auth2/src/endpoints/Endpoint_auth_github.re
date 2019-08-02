@@ -1,5 +1,3 @@
-open SStdlib;
-
 open Express;
 
 [@decco]
@@ -22,7 +20,7 @@ let handler_auth_github =
       let host =
         Node_url.make(redirectUrl)
         ->Option.flatMap(({Node_url.host}) => host)
-        ->Option.map(host => Config.login_redirects_domain->Array.has(host));
+        ->Option.map(host => Config.login_redirects_domain->Arr.has(host));
 
       Log.debug2(
         "Verify redirectUrl",

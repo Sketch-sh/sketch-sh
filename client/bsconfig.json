@@ -15,7 +15,7 @@
       "in-source": true
     }
   ],
-  "bsc-flags": ["-bs-g"],
+  "bsc-flags": ["-bs-g", "-open SStdlib"],
   "ppx-flags": [
     "@ryb73/decco/ppx/ppx_decco.sh",
     "let-anything/lib/bs/native/let_anything.native",
@@ -24,10 +24,9 @@
   "suffix": ".bs.js",
   "namespace": true,
   "bs-dependencies": [
+    "sketch-stdlib",
     "reason-react",
     "bs-webapi",
-    "reason-apollo",
-    "bs-date-fns",
     "re-classnames",
     "bs-css",
     "reason-react-update",

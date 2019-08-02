@@ -1,5 +1,13 @@
 {
-  "dependencies": {
-    "helmet": "^3.20.0"
-  }
+  "workspaces": {
+    "packages": [
+      "client",
+      "server/auth2",
+      "packages/sketch-stdlib"
+    ],
+    "no-hoist": [
+      "**decco**"
+    ]
+  },
+  "private": true
 }

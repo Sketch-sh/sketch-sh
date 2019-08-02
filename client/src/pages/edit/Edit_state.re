@@ -1,5 +1,3 @@
-open SStdlib;
-
 type filename = string;
 
 type file = {
@@ -13,10 +11,9 @@ let make_file = code => {
   {code, compiled: None, errors: [||], warnings: [||]};
 };
 
-let get_extension: string => string =
-  filename => [%raw
-    {|  filename.slice((filename.lastIndexOf(".") - 1 >>> 0) + 2)|}
-  ];
+let get_extension: string => string = [%raw
+  filename => {|  filename.slice((filename.lastIndexOf(".") - 1 >>> 0) + 2)|}
+];
 
 let get_extension = filename => {
   switch (get_extension(filename)) {

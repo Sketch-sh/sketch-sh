@@ -1,5 +1,3 @@
-open SStdlib;
-
 type error = [
   | `Default_role_is_not_in_allowed_roles(string, array(string), string)
 ];

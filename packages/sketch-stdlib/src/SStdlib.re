@@ -1,4 +1,4 @@
-module Array = {
+module Arr = {
   include Belt.Array;
   type t('a) = array('a);
 
@@ -46,7 +46,6 @@ module Option = {
     | None => f()
     | Some(a) => Some(a)
     };
-  
 };
 
 module Json = {

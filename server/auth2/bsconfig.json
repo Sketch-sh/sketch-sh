@@ -1,5 +1,5 @@
 {
-  "name": "auth2",
+  "name": "auth",
   "version": "0.1.0",
   "sources": {
     "dir": "src",
@@ -10,7 +10,8 @@
     "in-source": true
   },
   "suffix": ".bs.js",
-  "bs-dependencies": ["@ryb73/decco", "bs-express"],
+  "bsc-flags": ["-open SStdlib"],
+  "bs-dependencies": ["sketch-stdlib", "@ryb73/decco", "bs-express"],
   "ppx-flags": [
     "@ryb73/decco/ppx/ppx_decco.sh",
     "let-anything/lib/bs/native/let_anything.native"

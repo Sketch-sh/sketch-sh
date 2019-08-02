@@ -14,7 +14,7 @@ let make_marker = err => {
 };
 
 let make_error_marker = err => {
-  make_marker(err, ~severity=MarkerSeverity.(tToJs(Error)), ());
+  make_marker(err, ~severity=MarkerSeverity.tToJs(MarkerSeverity.Error), ());
 };
 
 let make_warning_marker = err => {

@@ -42,24 +42,6 @@ let (=>>) = (value, render) =>
 
 let handleError = Js.Promise.(catch(error => Js.log(error)->resolve));
 
-let splitOnChar = (sep, s) => {
-  let j = ref(String.length(s));
-  let r = ref([]);
-  for (i in String.length(s) - 1 downto 0) {
-    if (String.unsafe_get(s, i) == sep) {
-      r.contents = [String.sub(s, i + 1, j.contents - i - 1), ...r.contents];
-      j.contents = i;
-    };
-  };
-  let tl = r.contents;
-  [String.sub(s, 0, j.contents), ...tl];
-};
-
-let listFindOpt = (p, l) =>
-  try (Some(List.find(p, l))) {
-  | Not_found => None
-  };
-
 let js_countLine = s => s |> Js.String.split("\n") |> Js.Array.length;
 let countLine = js_countLine;
 

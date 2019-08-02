@@ -6,7 +6,7 @@ const path = require("path");
 const UglifyJsPlugin = require("uglifyjs-webpack-plugin");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const OptimizeCSSAssetsPlugin = require("optimize-css-assets-webpack-plugin");
-// const MonacoWebpackPlugin = require("monaco-editor-webpack-plugin");
+const Stylish = require("webpack-stylish");
 
 const postcssPresetEnv = require("postcss-preset-env");
 const postcssNormalize = require("postcss-normalize");
@@ -33,6 +33,7 @@ const base = {
       "/graphql": "http://localhost:8080/v1alpha1",
       "/api": "http://localhost:3001/",
     },
+    stats: "none",
   },
   output: {
     path: outputDir,
@@ -59,7 +60,7 @@ const base = {
       filename: isProd ? "[name].[contenthash].css" : "[name].css",
       chunkFilename: isProd ? "[id].[contenthash].css" : "[id].css",
     }),
-    // new MonacoWebpackPlugin(),
+    new Stylish(),
   ],
   optimization: {
     minimizer: [
