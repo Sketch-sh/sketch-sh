@@ -1,4 +1,4 @@
-FROM node:10-alpine
+FROM node:10
 
 RUN mkdir -p /opt/app
 
@@ -26,7 +26,8 @@ ENV PATH /opt/node_modules/.bin:$PATH
 WORKDIR /opt/app
 COPY . /opt/app
 
-RUN ./node_modules/.bin/bsb -clean-world -make-world
+RUN env | grep NODE_ENV
+RUN bsb -clean-world -make-world
 # if you want to use npm start instead, then use `docker run --init in production`
 # so that signals are passed properly. Note the code in index.js is needed to catch Docker signals
 # using node here is still more graceful stopping then npm with --init afaik
