@@ -3,12 +3,10 @@ services:
   postgres:
     image: postgres
     ports:
-    - "5432:5432"
+      - "5432:5432"
     environment:
-    - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-    restart: always
-    volumes:
-    - db_data:/var/lib/postgresql/data
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    restart: on-failure
   
   migration:
     depends_on:
@@ -17,19 +15,21 @@ services:
     build:
       context: .
       dockerfile: Dockerfile-migration
+    restart: on-failure
     environment:
       - HASURA_ENDPOINT=http://graphql-engine:8080
       - DATABASE_URL=postgres://postgres:${POSTGRES_PASSWORD}@postgres:5432/postgres
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - HASURA_ACCESS_KEY=${HASURA_ACCESS_KEY}
-
     command: ["sh", "./wait-for-pg.sh", "postgres", "npm run migrate"]
 
   graphql-engine:
     image: hasura/graphql-engine:v1.0.0-beta.3
+    ports:
+      - "8080:8080"
     depends_on:
       - postgres
-    restart: always
+    restart:  on-failure
     environment:
       - HASURA_GRAPHQL_DATABASE_URL=postgres://postgres:${POSTGRES_PASSWORD}@postgres:5432/postgres
       - HASURA_GRAPHQL_ACCESS_KEY=${HASURA_ACCESS_KEY}
@@ -39,20 +39,38 @@ services:
 
   auth:
     build:
-      context: auth
-      args:
-        - NODE_ENV=development
+      context: auth2
     environment:
-      - NODE_ENV=development
-      - JWT_TOKEN=${JWT_TOKEN}
+      - PORT=3001
       - HASURA_ENDPOINT=http://graphql-engine:8080/v1alpha1/graphql
+      - JWT_SECRET_FILE=${JWT_SECRET_FILE}
+      - ALLOWED_LOGIN_REDIRECT_DOMAINS=${ALLOWED_LOGIN_REDIRECT_DOMAINS}
+      - LOG_LEVEL=${LOG_LEVEL}
+      - GITHUB_CALLBACK_URL=${GITHUB_CALLBACK_URL}
       - GITHUB_CLIENT_ID=${GITHUB_CLIENT_ID}
       - GITHUB_CLIENT_SECRET=${GITHUB_CLIENT_SECRET}
-      - AUTH_URL=${AUTH_URL}
-      - FRONTEND_URL=${FRONTEND_URL}
-
     depends_on:
       - graphql-engine
+    restart: on-failure
+    command: ../node_modules/.bin/nodemon --inspect=0.0.0.0:9229
+    ports:
+      - "3001:3001"
+      - "9229:9229"
+      - "9230:9230"
+    volumes:
+      - ./jwt.key:/run/secrets/jwt.key
+      - ./auth:/opt/app:delegated
+      # bind-mounting these two files in will let you add packages during development without rebuilding
+      # for example, to add bower to your app while developing, just install it inside the container
+      # and then nodemon will restart. Your changes will last until you "docker-compose down" and will
+      # be saved on host for next build
+      # docker-compose exec node npm install --save bower
+      - ./auth/package.json:/opt/package.json
+      - ./auth/yarn.lock:/opt/yarn.lock
+      # this is a workaround to prevent host node_modules from accidently getting mounted in container
+      # in case you want to use node/npm both outside container for test/lint etc. and also inside container
+      # this will overwrite the default node_modules dir in container so it won't conflict with our
+      # /opt/node_modules location. Thanks to PR from @brnluiz
+      - notused:/opt/app/node_modules
 volumes:
-  db_data:
   notused:

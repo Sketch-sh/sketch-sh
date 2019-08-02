@@ -13,19 +13,20 @@ ENV PORT $PORT
 EXPOSE $PORT 5858 9229
 
 # check every 30s to ensure this service returns HTTP 200
-# HEALTHCHECK CMD curl -fs http://localhost:$PORT/healthz || exit 1
+HEALTHCHECK CMD curl -fs http://localhost:$PORT/health || exit 1
 
 # install dependencies first, in a different location for easier app bind mounting for local development
 WORKDIR /opt
 # Install dependencies
-COPY package.json package-lock.json ./
-RUN npm install && npm cache clean --force
+COPY package.json yarn.lock ./
+RUN yarn install && yarn cache clean
 ENV PATH /opt/node_modules/.bin:$PATH
 
 # copy in our source code last, as it changes the most
 WORKDIR /opt/app
 COPY . /opt/app
 
+RUN ./node_modules/.bin/bsb -clean-world -make-world
 # if you want to use npm start instead, then use `docker run --init in production`
 # so that signals are passed properly. Note the code in index.js is needed to catch Docker signals
 # using node here is still more graceful stopping then npm with --init afaik
