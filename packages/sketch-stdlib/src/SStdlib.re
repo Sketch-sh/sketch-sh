@@ -27,11 +27,23 @@ type result('ok, 'error) =
 module Result = {
   include Belt.Result;
 
-  let flatMapOk = (result, f) =>
-    switch (result) {
-    | Ok(a) => f(a)
-    | Error(err) => Error(err)
-    };
+  let flatMapOk:
+    (result('ok, 'error), 'ok => result('ok2, 'error2)) =>
+    result('ok2, 'error2) =
+    (result, f) =>
+      switch (result) {
+      | Ok(ok) => f(ok)
+      | Error(err) => Error(err)
+      };
+
+  let flatMapError:
+    (result('ok, 'error), 'error => result('ok2, 'error2)) =>
+    result('ok2, 'error2) =
+    (result, f) =>
+      switch (result) {
+      | Ok(ok) => Ok(ok)
+      | Error(err) => f(err)
+      };
 };
 
 module List = {

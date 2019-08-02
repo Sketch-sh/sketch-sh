@@ -3,13 +3,13 @@ services:
   postgres:
     image: postgres
     ports:
-    - "5432:5432"
+      - "5432:5432"
     environment:
-    - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-    restart: always
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    restart: on-failure
     volumes:
-    - db_data:/var/lib/postgresql/data
-  
+      - db_data:/var/lib/postgresql/data
+
   migration:
     depends_on:
       - postgres
@@ -17,42 +17,69 @@ services:
     build:
       context: .
       dockerfile: Dockerfile-migration
+    restart: on-failure
     environment:
       - HASURA_ENDPOINT=http://graphql-engine:8080
-      - DATABASE_URL=postgres://postgres:${POSTGRES_PASSWORD}@postgres:5432/postgres
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-      - HASURA_ACCESS_KEY=${HASURA_ACCESS_KEY}
-
+      - DATABASE_URL=${DATABASE_URL}
+      - HASURA_GRAPHQL_ADMIN_SECRET=${HASURA_GRAPHQL_ADMIN_SECRET}
     command: ["sh", "./wait-for-pg.sh", "postgres", "npm run migrate"]
+    volumes:
+      - ./schema/migrations/:/opt/schema/migrations/
 
   graphql-engine:
     image: hasura/graphql-engine:v1.0.0-beta.3
+    ports:
+      - "8080:8080"
     depends_on:
       - postgres
-    restart: always
+    restart: unless-stopped
     environment:
-      - HASURA_GRAPHQL_DATABASE_URL=postgres://postgres:${POSTGRES_PASSWORD}@postgres:5432/postgres
-      - HASURA_GRAPHQL_ACCESS_KEY=${HASURA_ACCESS_KEY}
-      - HASURA_GRAPHQL_AUTH_HOOK=http://auth/api/auth/webhook
+      - HASURA_GRAPHQL_SERVER_PORT=8080
+      - HASURA_GRAPHQL_DATABASE_URL=${DATABASE_URL}
+      - HASURA_GRAPHQL_JWT_SECRET=${HASURA_GRAPHQL_JWT_SECRET}
+      - HASURA_GRAPHQL_ADMIN_SECRET=${HASURA_GRAPHQL_ADMIN_SECRET}
+      - HASURA_GRAPHQL_ENABLE_TELEMETRY=false
     command: >
       /bin/sh -c "graphql-engine serve --enable-console;"
 
   auth:
     build:
-      context: auth
-      args:
+      context: auth2
+      args: 
         - NODE_ENV=development
     environment:
       - NODE_ENV=development
-      - JWT_TOKEN=${JWT_TOKEN}
+      - PORT=3001
       - HASURA_ENDPOINT=http://graphql-engine:8080/v1alpha1/graphql
+      - JWT_SECRET_FILE=/run/secrets/jwt.key
+      - ALLOWED_LOGIN_REDIRECT_DOMAINS=${ALLOWED_LOGIN_REDIRECT_DOMAINS}
+      - LOG_LEVEL=${LOG_LEVEL}
+      - GITHUB_CALLBACK_URL=${GITHUB_CALLBACK_URL}
       - GITHUB_CLIENT_ID=${GITHUB_CLIENT_ID}
       - GITHUB_CLIENT_SECRET=${GITHUB_CLIENT_SECRET}
-      - AUTH_URL=${AUTH_URL}
-      - FRONTEND_URL=${FRONTEND_URL}
-
     depends_on:
       - graphql-engine
+    restart: unless-stopped
+    command: ../node_modules/.bin/nodemon --inspect=0.0.0.0:9229
+    ports:
+      - "3001:3001"
+      - "9229:9229"
+      - "9230:9230"
+    volumes:
+      - ./jwt.key:/run/secrets/jwt.key
+      - ./auth2:/opt/app:delegated
+      # bind-mounting these two files in will let you add packages during development without rebuilding
+      # for example, to add bower to your app while developing, just install it inside the container
+      # and then nodemon will restart. Your changes will last until you "docker-compose down" and will
+      # be saved on host for next build
+      # docker-compose exec node npm install --save bower
+      - ./auth2/package.json:/opt/package.json
+      - ./auth2/yarn.lock:/opt/yarn.lock
+      # this is a workaround to prevent host node_modules from accidently getting mounted in container
+      # in case you want to use node/npm both outside container for test/lint etc. and also inside container
+      # this will overwrite the default node_modules dir in container so it won't conflict with our
+      # /opt/node_modules location. Thanks to PR from @brnluiz
+      - notused:/opt/app/node_modules
 volumes:
-  db_data:
   notused:
+  db_data:

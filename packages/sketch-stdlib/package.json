@@ -1,6 +1,16 @@
 {
-  "private": true,
   "name": "sketch-stdlib",
+  "description": "Sketch.sh standard library",
+  "files": [
+    "src/*",
+    "bsconfig.json"
+  ],
+  "keywords": [
+    "sketch.sh",
+    "reasonml",
+    "ocaml",
+    "bucklescript"
+  ],
   "version": "0.1.0",
   "dependencies": {
     "bs-platform": "5.0.6"

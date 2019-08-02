@@ -7,6 +7,7 @@ type authenticate_callback_options = {
 type strategy;
 
 [@bs.module "passport"] external use: strategy => unit = "use";
+
 // [@bs.module "passport"]
 // external authenticate: string => Express.Middleware.t = "authenticate";
 
@@ -19,11 +20,19 @@ module Github = {
     scope: array(string),
   };
 
-  type profile;
-  type callback_done = (. Js.Nullable.t(string), string) => unit;
-  type callback = (. string, string, profile, callback_done) => unit;
+  type callback_done('error, 'ok) =
+    (. Js.Nullable.t('error), Js.Nullable.t('ok)) => unit;
+  type callback('error, 'ok) =
+    (
+      . string,
+      Js.Nullable.t(string),
+      Js.Json.t,
+      callback_done('error, 'ok)
+    ) =>
+    unit;
+
   [@bs.new] [@bs.module "passport-github2"]
-  external make: (options, callback) => strategy = "Strategy";
+  external make: (options, callback('error, 'ok)) => strategy = "Strategy";
 
   [@bs.module "passport"]
   external authenticate: ([@bs.as "github"] _) => Express.Middleware.t =

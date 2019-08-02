@@ -22,14 +22,11 @@ let github_auth_options =
     ~scope=[|"user:email"|],
   );
 
-let github_stragegy_callback: Passport.Github.callback =
-  (. accessToken, refreshToken, profile, cb) => {
-    Log.info3(accessToken, refreshToken, profile);
-    cb(. Js.Nullable.null, "hey");
-  };
-
 Passport.use(
-  Passport.Github.make(github_auth_options, github_stragegy_callback),
+  Passport.Github.make(
+    github_auth_options,
+    Endpoint_auth_github_callback.github_stragegy_callback,
+  ),
 );
 
 router->Router.useOnPath(

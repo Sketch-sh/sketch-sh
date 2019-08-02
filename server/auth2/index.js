@@ -1,4 +1,6 @@
 require("dotenv").config();
+require("isomorphic-fetch");
+
 const { app } = require("./src/Server.bs.js");
 const logger = require("./src/bones/logger");
 const { port } = require("./src/Config.bs");

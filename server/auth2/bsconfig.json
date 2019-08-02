@@ -11,11 +11,15 @@
   },
   "suffix": ".bs.js",
   "bsc-flags": ["-open SStdlib"],
-  "bs-dependencies": ["sketch-stdlib", "@ryb73/decco", "bs-express"],
-  "ppx-flags": [
-    "@ryb73/decco/ppx/ppx_decco.sh",
-    "let-anything/lib/bs/native/let_anything.native"
+  "bs-dependencies": [
+    "sketch-stdlib",
+    "@ryb73/decco",
+    "bs-express",
+    "bs-decode",
+    "bs-fetch",
+    "reason-future"
   ],
+  "ppx-flags": ["@ryb73/decco/ppx/ppx_decco.sh", "graphql_ppx/ppx"],
   "warnings": {
     "error": "+101"
   },

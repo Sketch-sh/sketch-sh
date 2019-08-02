@@ -102,9 +102,9 @@ module Jsdelivr = {
         | Some(default_file) => Belt.Result.Ok({default_file, files})
         | None =>
           if (files |> Js.Array.indexOf("/index.js") == (-1)) {
-            Belt.Result.Error(`Npm_fetcher_cant_resolve_main_file(pkg_slug));
+            Error(`Npm_fetcher_cant_resolve_main_file(pkg_slug));
           } else {
-            Belt.Result.Ok({default_file: "/index.js", files});
+            Ok({default_file: "/index.js", files});
           }
         };
       };
