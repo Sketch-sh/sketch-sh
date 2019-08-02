@@ -1,5 +1,3 @@
-open SStdlib;
-
 let jwt_options =
   JWT.Sign_options.make(~expiresIn="10 minutes", ~algorithm=`RS512, ());
 
@@ -12,7 +10,7 @@ let make:
   result(string, [> error]) =
   (~user_id, ~allowed_roles, ~default_role) => {
     let result =
-      allowed_roles->Array.has(default_role)
+      allowed_roles->Arr.has(default_role)
         ? Ok({
             "https://hasura.io/jwt/claims": {
               "x-hasura-allowed-roles": allowed_roles,

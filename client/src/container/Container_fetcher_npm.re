@@ -1,6 +1,3 @@
-open SStdlib;
-open Utils;
-
 module Version: {
   type t =
     | Range(string)
@@ -329,9 +326,9 @@ let fetch_commonjs = (~pkg, ~url) => {
           | Some(file_path) =>
             let file_path = Url.join([|"/", file_path|]);
 
-            if (files->array_has(file_path)) {
+            if (files->Arr.has(file_path)) {
               Some(file_path);
-            } else if (files->array_has(file_path ++ ".js")) {
+            } else if (files->Arr.has(file_path ++ ".js")) {
               Some(file_path ++ ".js");
             } else {
               None;

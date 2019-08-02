@@ -1,5 +1,3 @@
-open SStdlib;
-
 [@bs.deriving abstract]
 type unsafe_t = {
   hash: string,

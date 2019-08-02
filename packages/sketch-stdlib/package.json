@@ -1,0 +1,8 @@
+{
+  "private": true,
+  "name": "sketch-stdlib",
+  "version": "0.1.0",
+  "dependencies": {
+    "bs-platform": "5.0.6"
+  }
+}

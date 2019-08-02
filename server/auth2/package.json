@@ -1,10 +1,12 @@
 {
-  "name": "auth2",
+  "private": true,
+  "name": "auth",
   "version": "0.1.0",
   "scripts": {
-    "build": "bsb -make-world",
-    "start": "bsb -make-world -w",
-    "clean": "bsb -clean-world"
+    "bs:build": "bsb -make-world",
+    "bs:watch": "bsb -make-world -w",
+    "bs:clean": "bsb -clean-world",
+    "watch": "nodemon ./index.js"
   },
   "keywords": [
     "BuckleScript"
@@ -23,11 +25,15 @@
     "cuid": "^2.1.6",
     "dotenv": "^8.0.0",
     "express": "^4.17.1",
+    "graphql_ppx": "^0.2.8",
     "helmet": "^3.20.0",
     "jsonwebtoken": "^8.5.1",
+    "node-fetch": "^2.6.0",
     "passport": "^0.4.0",
     "passport-github2": "^0.1.11",
     "pino": "^5.13.1",
-    "pino-pretty": "^3.2.0"
+    "pino-pretty": "^3.2.0",
+    "reason-future": "^2.4.0",
+    "sketch-stdlib": "0.1.0"
   }
 }

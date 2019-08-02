@@ -59,7 +59,7 @@ module Styles = {
   let size_to_font_weight = size => size->size_to_font_weight->fontWeight;
 
   let button = (primary, btnColor, size) => {
-    [
+    [|
       [
         size_to_pad(size),
         size_to_font_weight(size),
@@ -69,8 +69,8 @@ module Styles = {
         cursor(`pointer),
       ],
       colorToCssValue((primary, btnColor)),
-    ]
-    ->List.concat
+    |]
+    ->List.concatMany
     ->style;
   };
 };
