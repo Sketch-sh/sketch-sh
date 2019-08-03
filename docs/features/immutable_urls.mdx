@@ -1,0 +1,52 @@
+---
+name: Immutable URLs
+menu: Features
+---
+
+Each sketch has a unique and immutable url.
+It means the content of each URL never changes.
+This is extremely useful for archive or storage because context won't be lost
+because the URL was updated.
+
+## How?
+
+Below is the breakdown of each sketches url:
+
+### Basics
+
+```sh
+/s/__SKETCH_COMMIT_UUID__
+```
+
+This URL is immutable. Every time you hit save, you'll a new URL.
+But that'd be annoying right?
+
+### Signed in users
+
+Don't worry, we got you covered. When signed in, you can create pretty URLs that is linked
+to your user name like this one:
+
+```sh
+/u/thangngoc89/my-awesome-article__SKETCH_UUID__
+```
+
+You can share that URL and it will be redirected to the latest commit:
+
+```sh
+/u/thangngoc89/my-awesome-article__SKETCH_UUID__/__SKETCH_COMMIT_UUID__
+```
+
+Granted it won't help with "losing context" but you can see all the commits of a sketch
+along with the created time of each commit. That won't be accurate but enough to help you
+firgure out the context of the conversation.
+
+### Anonymous users
+
+Because anonymous users can't update anything in the database, you can't create pretty URLs.
+Please login to create pretty URLs.
+
+## Technical benefits of immutable URLs
+
+Because we don't analyze sketch's content server side, we can potentially move content storage
+to a cheaper storage solution like AWS S3 and 
+keep the main Postgres database small and fast for metadata.
