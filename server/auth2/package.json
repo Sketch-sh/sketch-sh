@@ -11,7 +11,8 @@
   "devDependencies": {
     "@ryb73/decco": "^0.0.14",
     "bs-platform": "^5.0.6",
-    "let-anything": "^1.0.3"
+    "let-anything": "^1.0.3",
+    "nodemon": "^1.19.1"
   },
   "dependencies": {
     "bluebird": "^3.5.5",

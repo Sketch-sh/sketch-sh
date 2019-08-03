@@ -2,7 +2,6 @@ FROM node:10-alpine
 
 # Install curl 
 RUN apk add --no-cache curl postgresql
-RUN echo "Install hasura for alpha 45"
 # Install hasura cli
 RUN curl -L https://hasura.io/install/linux-amd64 -o hasura && \
   chmod +x hasura && \
@@ -17,9 +16,13 @@ WORKDIR /opt
 COPY schema/package.json schema/package-lock.json ./
 RUN npm install && npm cache clean --force
 ENV PATH /opt/node_modules/.bin:$PATH
+
 WORKDIR /opt/schema
 COPY ./schema /opt/schema
-
 COPY ./hasura /opt/hasura
 
-CMD [ "./node_modules/.bin/knex", "migrate:latest" ]
+ENV HASURA_GRAPHQL_ADMIN_SECRET $HASURA_GRAPHQL_ADMIN_SECRET
+ENV DATABASE_URL $DATABASE_URL
+ENV HASURA_ENDPOINT $HASURA_ENDPOINT
+
+CMD ["npm run migrate"]
