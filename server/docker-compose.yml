@@ -40,6 +40,8 @@ services:
   auth:
     build:
       context: auth2
+      args: 
+        - NODE_ENV=development
     environment:
       - NODE_ENV=development
       - PORT=3001

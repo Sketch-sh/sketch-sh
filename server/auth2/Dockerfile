@@ -6,7 +6,6 @@ RUN mkdir -p /opt/app
 # defaults to production, compose overrides this to development on build and run
 ARG NODE_ENV=production
 ENV NODE_ENV $NODE_ENV
-
 # default to port 80 for node, and 5858 or 9229 for debug
 ARG PORT=80
 ENV PORT $PORT
@@ -25,8 +24,6 @@ ENV PATH /opt/node_modules/.bin:$PATH
 # copy in our source code last, as it changes the most
 WORKDIR /opt/app
 COPY . /opt/app
-
-RUN env | grep NODE_ENV
 RUN bsb -clean-world -make-world
 # if you want to use npm start instead, then use `docker run --init in production`
 # so that signals are passed properly. Note the code in index.js is needed to catch Docker signals
