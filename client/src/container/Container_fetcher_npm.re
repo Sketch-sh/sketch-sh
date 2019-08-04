@@ -78,6 +78,28 @@ module Pkg = {
   };
 };
 
+module Pkg_spec = {
+  /**
+   * This describe and specs of the currently package
+   * Currently supports:
+   *   - Commonjs
+   *   - Umd(path_to_umd_bundle)
+   */
+  type t =
+    | Commonjs
+    | Umd(string);
+
+  let make = pkg => {
+    let is_umd =
+      Js.Dict.get(Container_fetcher_npm_setting.umd_pathname, pkg.Pkg.name);
+
+    switch (is_umd) {
+    | None => Commonjs
+    | Some(umd_bundle) => Umd(umd_bundle)
+    };
+  };
+};
+
 module D = Decode.AsResult.OfParseError;
 
 module Jsdelivr = {
@@ -287,6 +309,124 @@ let fetch_umd = (~pkg, ~umd_path, ~url) => {
     );
 };
 
+module Fetch_commonjs: {
+  let fetch_commonjs:
+    (~pkg: Pkg.t, ~url: string) =>
+    Future.t(
+      Belt.Result.t(
+        Container_polestar.Fetcher.FetchResult.t,
+        [>
+          FFetch_decode.error
+          | `Npm_fetcher_cant_resolve_file_path(string)
+          | `Npm_fetcher_cant_resolve_main_file(string)
+        ],
+      ),
+    );
+} = {
+  /**
+   * Replace calls to Node's built in packages (path, fs, crypto)
+   * to a package on npm
+   */
+  let map_node_builtin_pkg = pkg => {
+    switch (
+      Container_fetcher_npm_setting.package_map->Js.Dict.get(pkg.Pkg.name)
+    ) {
+    | Some(name) => {...pkg, name}
+    | None => pkg
+    };
+  };
+
+  /**
+    * Resolve the require path into module absolute path
+    * Node allows you to omit `.js` extension, also `index.js` in a folder
+    * - Check if given file is in `files`
+    * - Add `.js` extension and retry
+    * TODO: check for `index.js` if it's a folder, support `.json`
+    */
+  let resolve_module = (~path, ~files) => {
+    let file_path = Url.join([|"/", path|]);
+
+    if (files->Arr.has(file_path)) {
+      Some(file_path);
+    } else if (files->Arr.has(file_path ++ ".js")) {
+      Some(file_path ++ ".js");
+    } else {
+      None;
+    };
+  };
+
+  /**
+   * Map give file to its browser counterpart if possible
+   * Some package contains special version for usage in browser
+   * It's provided in package.json/browser field
+   * browser: {
+   *   "original": "browser_counter_path"
+   * }
+   */
+  let resolve_browser_module = (~path, ~browser) => {
+    browser->Js.Dict.get(path)->Option.getWithDefault(path);
+  };
+
+  let fetch_commonjs:
+    (~pkg: Pkg.t, ~url: string) =>
+    Future.t(
+      Belt.Result.t(
+        Container_polestar.Fetcher.FetchResult.t,
+        [> FFetch_decode.error],
+      ),
+    ) =
+    (~pkg, ~url) => {
+      let pkg = pkg->map_node_builtin_pkg;
+
+      let fetch_result =
+        pkg
+        ->get_meta
+        ->Future.flatMapOk(cache => {
+            // Note: Cache.pkg path usually is incorrect, you need to relies on original pkg instead
+            let {Cache.pkg: _, default_file, files, dependencies, browser} = cache;
+
+            let file_path =
+              pkg.path
+              ->Option.getWithDefault(default_file)
+              ->resolve_module(~path=_, ~files)
+              ->Option.map(path => resolve_browser_module(~path, ~browser))
+              ->(
+                  fun
+                  | None =>
+                    Belt.Result.Error(
+                      `Npm_fetcher_cant_resolve_file_path(pkg->Pkg.to_path),
+                    )
+                  | Some(a) => Belt.Result.Ok(a)
+                );
+
+            Future.value(file_path)
+            ->Future.flatMapOk(file_path =>
+                Jsdelivr.get_file(pkg, file_path)
+                ->Future.flatMapOk(code =>
+                    (file_path, code)->Belt.Result.Ok->Future.value
+                  )
+              )
+            ->Future.flatMapOk(((file_path, code)) =>
+                Container_polestar.Fetcher.FetchResult.make(
+                  ~url,
+                  ~id={
+                    {...pkg, path: Some(file_path)}->Pkg.to_path;
+                  },
+                  ~dependencies=
+                    Array(Container_require_collector.parse(code)),
+                  ~dependencyVersionRanges=dependencies,
+                  ~code,
+                  (),
+                )
+                ->Belt.Result.Ok
+                ->Future.value
+              );
+          });
+
+      fetch_result;
+    };
+};
+
 let error_handle =
   fun
   | `ApiErrorJson(url, json) => {
@@ -304,117 +444,14 @@ Try to require a full path, for example: require($(pkg_slug)/path_to_file.js)|j}
   | `Npm_fetcher_cant_resolve_file_path(pkg_slug) => {j|Npm fetcher: Can't resolve file path for package $(pkg_slug)
 Try to require a full path, for example: require($(pkg_slug)/path_to_file.js)|j};
 
-let fetch_commonjs = (~pkg, ~url) => {
-  [%log.info "pkg_info"; ("pkg", pkg)];
-  let pkg =
-    switch (
-      Container_fetcher_npm_setting.package_map->Js.Dict.get(pkg.Pkg.name)
-    ) {
-    | Some(name) => {...pkg, name}
-    | None => pkg
-    };
-
-  let fetch_result:
-    Future.t(
-      Belt.Result.t(
-        Container_polestar.Fetcher.FetchResult.t,
-        [> FFetch_decode.error],
-      ),
-    ) =
-    get_meta(pkg)
-    ->Future.flatMapOk(cache => {
-        // Note: Cache.pkg path usually is incorrect, you need to relies on original pkg instead
-        let {Cache.pkg: _, default_file, files, dependencies, browser} = cache;
-
-        /**
-         * Path resolver
-         * - No path -> use default_file
-         * - Check if given file is in `files`
-         * - If not, try to add `.js` to it
-         */
-        let file_path = {
-          switch (pkg.path) {
-          | None => Some(default_file)
-          | Some(file_path) =>
-            let file_path = Url.join([|"/", file_path|]);
-
-            if (files->Arr.has(file_path)) {
-              Some(file_path);
-            } else if (files->Arr.has(file_path ++ ".js")) {
-              Some(file_path ++ ".js");
-            } else {
-              None;
-            };
-          };
-        };
-
-        // Use browser field if available
-        let file_path =
-          switch (file_path) {
-          | None => None
-          | Some(file_path) =>
-            switch (browser->Js.Dict.get(file_path)) {
-            | None => Some(file_path)
-            | Some(file_path) => Some(file_path)
-            }
-          };
-
-        let file_path =
-          switch (file_path) {
-          | None =>
-            Belt.Result.Error(
-              `Npm_fetcher_cant_resolve_file_path(pkg->Pkg.to_path),
-            )
-          | Some(a) => Belt.Result.Ok(a)
-          };
-
-        Future.value(file_path)
-        ->Future.flatMapOk(file_path =>
-            Jsdelivr.get_file(pkg, file_path)
-            ->Future.flatMapOk(code =>
-                (file_path, code)->Belt.Result.Ok->Future.value
-              )
-          )
-        ->Future.flatMapOk(((file_path, code)) =>
-            Container_polestar.Fetcher.FetchResult.make(
-              ~url,
-              ~id={
-                {...pkg, path: Some(file_path)}->Pkg.to_path;
-              },
-              ~dependencies=Array(Container_require_collector.parse(code)),
-              ~dependencyVersionRanges=dependencies,
-              ~code,
-              (),
-            )
-            ->Belt.Result.Ok
-            ->Future.value
-          );
-      });
-  fetch_result;
-};
-
-let handle_npm = (~url, ~meta, ~pathname) => {
-  [%log.info
-    "npm fetching";
-    ("url", url);
-    ("path", pathname);
-    ("meta", meta)
-  ];
+let handle_npm = (~url, ~meta as _, ~pathname) => {
+  [%log.info "npm fetching"; ("path", pathname)];
   let pkg = Pkg.parse(pathname);
 
-  [%log.debug
-    "pkg_parsing";
-    ("pathname", pathname);
-    ("parsed_slug", Pkg.get_slug(pkg))
-  ];
-
-  let is_umd =
-    Js.Dict.get(Container_fetcher_npm_setting.umd_pathname, pkg.Pkg.name);
-
   let fetch_result =
-    switch (is_umd) {
-    | None => fetch_commonjs(~url, ~pkg)
-    | Some(umd_path) => fetch_umd(~pkg, ~umd_path, ~url)
+    switch (Pkg_spec.make(pkg)) {
+    | Commonjs => Fetch_commonjs.fetch_commonjs(~url, ~pkg)
+    | Umd(umd_bundle) => fetch_umd(~pkg, ~umd_path=umd_bundle, ~url)
     };
 
   Js.Promise.make((~resolve, ~reject) =>
