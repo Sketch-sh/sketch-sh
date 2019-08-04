@@ -59,7 +59,7 @@ let default_value = {code|[@bs.module] external uuid: unit=>string="uuid";
 
 Js.log(uuid());|code};
 
-let default_value = {code|[%%bs.raw {|console.log(a)|} ]|code};
+let default_value = default_value_react;
 
 let initial_files = {
   Belt.Map.String.empty
