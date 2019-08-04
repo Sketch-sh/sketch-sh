@@ -1,6 +1,24 @@
 open Frame_comm;
 
 let entry_file = ref("index.re");
+let polestar = ref(None);
+
+let clear_polestar = () => {
+  polestar := None;
+};
+
+let get_polestar = () => {
+  switch (polestar^) {
+  | None =>
+    Container_bundler.make_polestar(~onError=exn => {
+      %log.debug
+      "Clear polestar instance";
+      Js.log(exn);
+      clear_polestar();
+    })
+  | Some(polestar) => polestar
+  };
+};
 
 window->addMessageListener(
   event => {
@@ -14,7 +32,8 @@ window->addMessageListener(
         let entry_content = Container_fs.get(~filename=entry_file^);
         switch (entry_content) {
         | None => ()
-        | Some(entry_content) => Container_bundler.eval(entry_content)
+        | Some(entry_content) =>
+          Container_bundler.eval(get_polestar(), entry_content)
         };
 
       | Comm_set_entry(filename) => entry_file := filename

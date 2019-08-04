@@ -55,9 +55,12 @@ module Counter = {
 
 ReactDOMRe.renderToElementWithId(<Counter name="Counter" />, "root");|code};
 
-let default_value = {code|[@bs.module] external ulid: unit=>string="ulid";
+let default_value = {code|[@bs.module] external uuid: unit=>string="uuid";
 
-Js.log(ulid());|code}
+Js.log(uuid());|code};
+
+let default_value = {code|[%%bs.raw {|console.log(a)|} ]|code};
+
 let initial_files = {
   Belt.Map.String.empty
   ->Belt.Map.String.set("index.re", Edit_state.make_file(default_value))

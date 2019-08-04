@@ -56,19 +56,12 @@ let debounce_compile =
       switch (filename->get_extension) {
       | Some("re") => Some(Engine_bs.reason_compile(code))
       | Some("ml") => Some(Engine_bs.ocaml_compile(code))
-      | _ =>
-        %log.info
-        "Can't get file_extension";
-        None;
+      | _ => None
       }
     )
     ->(
         fun
-        | Some(c) => {
-            %log.info
-            "got compile_result";
-            send(Compile_result(filename, c));
-          }
+        | Some(c) => send(Compile_result(filename, c))
         | None => ()
       )
   );
