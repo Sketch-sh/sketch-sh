@@ -231,21 +231,21 @@ module Cache = {
 let get_meta = pkg => {
   let orginal_pkg_slug = pkg->Pkg.Slug.of_pkg;
   switch (Cache.get(~slug=orginal_pkg_slug)) {
-  | Some(cache) => Future.value(Belt.Result.Ok(cache))
+  | Some(cache) => Future.value(Ok(cache))
   | None =>
-    Future.value(pkg)
-    ->Future.flatMap(pkg =>
-        switch (pkg.version) {
-        | Absolute(_) => Future.value(Belt.Result.Ok(pkg))
-        | Range(_) =>
-          Jsdelivr.resolve_latest(pkg->Pkg.Slug.of_pkg)
-          ->Future.flatMapOk(absolute_version =>
-              {...pkg, version: Absolute(absolute_version)}
-              ->Belt.Result.Ok
-              ->Future.value
-            )
-        }
-      )
+    let pkg =
+      switch (pkg.version) {
+      | Absolute(_) => Future.value(Ok(pkg))
+      | Range(_) =>
+        Jsdelivr.resolve_latest(pkg->Pkg.Slug.of_pkg)
+        ->Future.flatMapOk(absolute_version =>
+            {...pkg, version: Absolute(absolute_version)}
+            ->Belt.Result.Ok
+            ->Future.value
+          )
+      };
+
+    pkg
     ->Future.flatMapOk(pkg => {
         let slug = pkg->Pkg.Slug.of_pkg;
 
@@ -288,7 +288,7 @@ let get_meta = pkg => {
         {Cache.pkg, default_file, files, dependencies: deps_range, browser}
         ->Belt.Result.Ok
         ->Future.value;
-      })
+      });
   };
 };
 
@@ -388,15 +388,15 @@ module Fetch_commonjs: {
             let file_path =
               pkg.path
               ->Option.getWithDefault(default_file)
-              ->resolve_module(~path=_, ~files)
+              ->(path => resolve_module(~path, ~files))
               ->Option.map(path => resolve_browser_module(~path, ~browser))
               ->(
                   fun
                   | None =>
-                    Belt.Result.Error(
+                    Error(
                       `Npm_fetcher_cant_resolve_file_path(pkg->Pkg.to_path),
                     )
-                  | Some(a) => Belt.Result.Ok(a)
+                  | Some(a) => Ok(a)
                 );
 
             Future.value(file_path)
