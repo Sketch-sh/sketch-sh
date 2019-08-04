@@ -12,7 +12,7 @@ let make_file = code => {
 };
 
 let get_extension: string => string = [%raw
-  filename => {|  filename.slice((filename.lastIndexOf(".") - 1 >>> 0) + 2)|}
+  filename => {| return filename.slice((filename.lastIndexOf(".") - 1 >>> 0) + 2)|}
 ];
 
 let get_extension = filename => {
@@ -56,14 +56,21 @@ let debounce_compile =
       switch (filename->get_extension) {
       | Some("re") => Some(Engine_bs.reason_compile(code))
       | Some("ml") => Some(Engine_bs.ocaml_compile(code))
-      | _ => None
+      | _ =>
+        %log.info
+        "Can't get file_extension";
+        None;
       }
     )
-    |> (
-      fun
-      | Some(c) => send(Compile_result(filename, c))
-      | None => ()
-    )
+    ->(
+        fun
+        | Some(c) => {
+            %log.info
+            "got compile_result";
+            send(Compile_result(filename, c));
+          }
+        | None => ()
+      )
   );
 
 let reducer = (action, state) => {

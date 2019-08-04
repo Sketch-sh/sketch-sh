@@ -142,6 +142,9 @@ module Jsdelivr = {
     // cdn_base/npm/thangngoc89@1.0.0/package.json
     let url =
       [|cdn_base, "npm", slug->Pkg.Slug.to_string, "package.json"|]->Url.join;
+    let decode_browser = json => {
+      D.dict(D.string, json)->Result.flatMapError(_ => Ok(Js.Dict.empty()));
+    };
     let decoder = json => {
       D.Pipeline.(
         succeed((dependencies, browser) =>
@@ -160,7 +163,7 @@ module Jsdelivr = {
           }
         )
         |> optionalField("dependencies", D.dict(D.string))
-        |> optionalField("browser", D.dict(D.string))
+        |> optionalField("browser", decode_browser)
         |> run(json)
       );
     };
@@ -302,6 +305,15 @@ Try to require a full path, for example: require($(pkg_slug)/path_to_file.js)|j}
 Try to require a full path, for example: require($(pkg_slug)/path_to_file.js)|j};
 
 let fetch_commonjs = (~pkg, ~url) => {
+  [%log.info "pkg_info"; ("pkg", pkg)];
+  let pkg =
+    switch (
+      Container_fetcher_npm_setting.package_map->Js.Dict.get(pkg.Pkg.name)
+    ) {
+    | Some(name) => {...pkg, name}
+    | None => pkg
+    };
+
   let fetch_result:
     Future.t(
       Belt.Result.t(
@@ -381,16 +393,6 @@ let fetch_commonjs = (~pkg, ~url) => {
   fetch_result;
 };
 
-/* TODO: This needs to come from kind of api */
-let umd_pathname: Js.Dict.t(string) = [%bs.raw
-  {|
-  {
-    "react": "umd/react.development.min.js",
-    "react-dom": "umd/react-dom.development.min.js"
-  }
-|}
-];
-
 let handle_npm = (~url, ~meta, ~pathname) => {
   [%log.info
     "npm fetching";
@@ -406,7 +408,8 @@ let handle_npm = (~url, ~meta, ~pathname) => {
     ("parsed_slug", Pkg.get_slug(pkg))
   ];
 
-  let is_umd = Js.Dict.get(umd_pathname, pkg.Pkg.name);
+  let is_umd =
+    Js.Dict.get(Container_fetcher_npm_setting.umd_pathname, pkg.Pkg.name);
 
   let fetch_result =
     switch (is_umd) {

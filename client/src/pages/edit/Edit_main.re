@@ -37,7 +37,7 @@ module S = {
     ->style;
 };
 
-let default_value = {code|let str = React.string;
+let default_value_react = {code|let str = React.string;
 
 module Counter = {
   [@react.component]
@@ -55,6 +55,9 @@ module Counter = {
 
 ReactDOMRe.renderToElementWithId(<Counter name="Counter" />, "root");|code};
 
+let default_value = {code|[@bs.module] external ulid: unit=>string="ulid";
+
+Js.log(ulid());|code}
 let initial_files = {
   Belt.Map.String.empty
   ->Belt.Map.String.set("index.re", Edit_state.make_file(default_value))
