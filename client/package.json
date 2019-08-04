@@ -55,7 +55,7 @@
     "reason-react": "github:reasonml/reason-react",
     "reason-react-update": "^0.1.1",
     "relude": "^0.19.0",
-    "sketch-stdlib": "0.1.0",
+    "sketch-stdlib": "^0.2.0",
     "webpack-stylish": "^0.1.8"
   },
   "devDependencies": {

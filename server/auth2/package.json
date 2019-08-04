@@ -33,6 +33,6 @@
     "pino-pretty": "^3.2.0",
     "reason-future": "^2.4.0",
     "relude": "^0.19.0",
-    "sketch-stdlib": "0.1.0"
+    "sketch-stdlib": "^0.2.0"
   }
 }
