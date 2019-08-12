@@ -12,6 +12,8 @@
   "author": "",
   "license": "MIT",
   "devDependencies": {
-    "bs-platform": "5.0.6"
+    "bs-abstract": "^0.17.0",
+    "bs-platform": "5.0.6",
+    "relude": "^0.19.0"
   }
 }
