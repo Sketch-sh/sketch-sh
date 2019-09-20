@@ -1,14 +1,16 @@
-# ReasonML playground
+# Sketch.sh
 
-A note writing application for teaching and sharing ReasonML code with inline evaluation.
+Online Code Editor and ReasonML community
 
 [![CircleCI](https://circleci.com/gh/Sketch-sh/sketch-sh/tree/master.svg?style=svg)](https://circleci.com/gh/Sketch-sh/sketch-sh/tree/master)
 
-![](github/screenshot.png)
+![](.github/screenshot.png)
 
-## How does it work?
+## Links
 
-This project uses [rtop-evaluator](https://github.com/Sketch-sh/rtop-evaluator) for evaluating the input. The evaluator loads refmt & js_of_ocaml compiler as a web worker in the browser. We're not using BuckleScript since it currently doesn't support toplevel evaluation. That means BuckleScript modules like `Js` are not available, and instead one has to run functions from the OCaml stdlib like `print_string`. Belt however works well with js_of_ocaml and support is coming soon!
+- Website: [https://sketch.sh](https://sketch.sh)
+- Documentation: [https://sketch.sh/docs](https://sketch.sh/docs)
+- Beta with bucklescript support: [https://beta.sketch.sh](https://beta.sketch.sh)
 
 ## Contributions
 

@@ -1,0 +1,23 @@
+{
+  "name": "sketch",
+  "version": "1.0.0",
+  "description": "[![Build Status](https://dev.azure.com/esy-ocaml/esy-ocaml/_apis/build/status/esy-ocaml.hello-reason?branchName=master)](https://dev.azure.com/esy-ocaml/esy-ocaml/_build/latest?definitionId=1?branchName=master)",
+  "main": "frontend/index.js",
+  "dependencies": {
+    "monaco-editor": "^0.16.2"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "watch": "nodemon --watch src -e \"re rei ml mli dune\" --exec \"esy build\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/thangngoc89/sketch-v2.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/thangngoc89/sketch-v2/issues"
+  },
+  "homepage": "https://github.com/thangngoc89/sketch-v2#readme"
+}

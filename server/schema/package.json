@@ -1,11 +1,12 @@
 {
-  "name": "schema-migration",
+  "name": "migration",
+  "version": "0.1.0",
   "private": true,
   "dependencies": {
     "knex": "^0.15.2",
     "pg": "^7.4.3"
   },
   "scripts": {
-    "migrate": "knex migrate:latest && cd ../hasura && hasura metadata apply --access-key $HASURA_ACCESS_KEY --endpoint $HASURA_ENDPOINT"
+    "migrate": "knex migrate:latest && cd ../hasura && hasura metadata apply --admin-secret $HASURA_GRAPHQL_ADMIN_SECRET --endpoint $HASURA_ENDPOINT"
   }
 }

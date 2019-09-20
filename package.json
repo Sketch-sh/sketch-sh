@@ -1,0 +1,19 @@
+{
+  "workspaces": {
+    "packages": [
+      "client",
+      "server/auth2",
+      "server/schema",
+      "packages/sketch-stdlib"
+    ],
+    "no-hoist": [
+      "**decco**"
+    ]
+  },
+  "scripts": {
+    "db:migrate:new": "yarn workspace migration knex migrate:make",
+    "db:rollback": "yarn workspace migration knex migrate:rollback",
+    "db:latest": "yarn workspace migration knex migrate:latest"
+  },
+  "private": true
+}

@@ -1,0 +1,22 @@
+(executable
+  (name Sketch_jsoo)
+  (public_name sketch)
+  (package sketch)
+  (flags :standard -safe-string)
+  (js_of_ocaml 
+   (flags :standard --no-cmis --toplevel --linkall +toplevel.js +dynlink.js)
+  )
+  (modes byte)
+  (preprocess (pps js_of_ocaml-ppx ppx_jsobject_conv))
+  (link_flags -linkall)
+  (libraries 
+    js_of_ocaml 
+    js_of_ocaml-toplevel
+    ppx_jsobject_conv.runtime
+    console.lib
+    sketch.utop
+    sketch.util
+    sketch.repl
+    sketch.read_stdout_js
+  )
+)

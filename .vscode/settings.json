@@ -1,8 +1,13 @@
 {
   "git.ignoreLimitWarning": true,
-  "reason.diagnostics.tools": ["merlin", "bsb"],
-  "editor.formatOnSave": true,
-  "reason.format.width": 80,
   "javascript.updateImportsOnFileMove.enabled": "never",
-  "reason_language_server.show_debug_errors": false
+  "reason_language_server.show_debug_errors": false,
+  "workbench.colorCustomizations": {
+    "activityBar.background": "#65c89b",
+    "titleBar.activeBackground": "#42b883",
+    "titleBar.inactiveBackground": "#42b88399",
+    "statusBar.background": "#42b883",
+    "statusBarItem.hoverBackground": "#359268"
+  },
+  "peacock.color": "#42b883"
 }

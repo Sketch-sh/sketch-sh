@@ -1,9 +1,16 @@
 {
   "files.exclude": {
-    "src/*.bs.js": true,
-    "shared/*.js": true,
-    "src_editor/*.bs.js": true,
-    "src_analyzer/*.js": true,
-    "lib": true
+    "lib": true,
+    // "src/**/*.bs.js": true
+  },
+  "files.watcherExclude": {
+    "**/.git/objects/**": true,
+    "**/.git/subtree-cache/**": true,
+    "**/node_modules/*/**": true,
+    "lib": true,
+    "build": true,
+    "docz": true,
+    "_esy": true,
+    ".graphql_ppx_cache": true,
   }
 }

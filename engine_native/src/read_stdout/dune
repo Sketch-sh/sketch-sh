@@ -1,0 +1,19 @@
+(library
+  (name ReadStdout)
+  (public_name sketch.read_stdout)
+  (modules ReadStdout)
+)
+
+(library
+  (name ReadStdoutUnix)
+  (public_name sketch.read_stdout_unix)
+  (libraries unix sketch.read_stdout)
+  (modules ReadStdoutUnix)
+)
+
+(library
+  (name ReadStdoutJs)
+  (public_name sketch.read_stdout_js)
+  (libraries js_of_ocaml sketch.read_stdout)
+  (modules ReadStdoutJs)
+)

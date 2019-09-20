@@ -1,169 +1,24 @@
-refs:
-  wait_for_postgres: &wait_for_postgres
-    |
-    for i in `seq 1 60`;
-    do
-      nc -z localhost 5432 && echo Success && exit 0
-      echo -n .
-      sleep 1
-    done
-    echo Failed waiting for Postgres && exit 1
-  wait_for_postgres_step: &wait_for_postgres_step
-    run:
-      name: waiting for postgres to be ready
-      command: *wait_for_postgres
-
-defaults: &defaults
-  docker:
-    - image: thangngoc89/sketch-sh
-
 version: 2
 jobs:
   build:
-    <<: *defaults
-    working_directory: ~/rtop/client
+    working_directory: ~/app/client
     docker:
-      - image: thangngoc89/sketch-sh
-      - image: circleci/postgres:10-alpine
-        environment:
-          POSTGRES_USER: gql_test
-          POSTGRES_DB: gql_test
-      - image: hasura/graphql-engine:v1.0.0-alpha13
-        environment:
-          HASURA_GRAPHQL_DATABASE_URL: postgres://gql_test:@localhost:5432/gql_test
-          HASURA_GRAPHQL_ACCESS_KEY: verysecretaccesskey
-          HASURA_GRAPHQL_AUTH_HOOK: http://localhost:3001/api/auth/webhook
-        command:
-          - sh
-          - -c
-          - "sleep 30; graphql-engine serve"
-    environment:
-      TERM: xterm
-      NODE_ENV: development
-      JWT_TOKEN: secret
-      HASURA_ENDPOINT: http://localhost:8080/v1alpha1/graphql
-      GITHUB_CLIENT_ID: secret
-      GITHUB_CLIENT_SECRET: secret
-      GITHUB_CALLBACK_URL: secret
-      FRONTEND_URL: http://localhost:3000
-      FRONTEND_AUTH_CALLBACK: http://localhost:3000/auth/callback
-      FRONTEND_AUTH_FAILURE: http://localhost:3000/auth/failure
-      DATABASE_URL: postgres://gql_test:@localhost:5432/gql_test
-
+      - image: circleci/node:10.16.0
     steps:
       - checkout:
-          path: ~/rtop
+          path: ~/app
       - restore_cache:
-          key: v5-deps-{{ .Branch }}-{{ checksum "package.json" }}-{{ checksum "package-lock.json" }}
-          key: v5-deps-{{ .Branch }}
-          key: v5-deps
+          key: dependency-cache-{{ checksum "package.json" }}-{{ checksum "yarn.lock" }}
       - run:
-          name: Install Dependencies
-          command: npm ci   
-      - run:
-          name: Install and build auth server
-          command: |
-            cd ../server/auth
-            npm install 
-      - run:
-          name: Start auth
-          command: cd ../server/auth && node index.js
-          background: true
-      - *wait_for_postgres_step
-      - run:
-          name: Run migrations
-          command: |
-            cd ../server/schema
-            npm install 
-            ./node_modules/.bin/knex migrate:latest --env production
-            cd ../hasura
-            curl -L https://hasura.io/install/linux-amd64 -o hasura
-            chmod +x hasura
-            sudo mv hasura /usr/bin/hasura
-            hasura metadata apply --access-key verysecretaccesskey
-      - run:
-          name: Bsb build
-          command: | 
-            npm run bs:clean
-            npm run bs:build
-      - run:
-          name: Unit tests
-          command: | 
-            npm test
-      - run:
-          name: E2E tests with Cypress
-          command: npm run ci:cypress
-      - run:
-          name: Frontend production build
-          command: npm run ci:build
-
+          name: install depdencies
+          command: yarn
       - save_cache:
-          key: v5-deps-{{ .Branch }}-{{ checksum "package.json" }}-{{ checksum "package-lock.json" }}
+          key: dependency-cache-{{ checksum "package.json" }}-{{ checksum "yarn.lock" }}
           paths:
-            - ~/.npm
-            - ~/.cache
+            - ./node_modules
+      - run:
+          name: build
+          command: yarn ci:build
       - store_artifacts:
           path: build
-          destination: frontend_build
-      - run:
-          name: Copy now.sh configurations
-          command: cp ../now.json build/now.json
-
-      - persist_to_workspace:
-          root: ..
-          paths:
-            - client
-      
-  deploy-staging:
-    <<: *defaults
-    working_directory: ~/rtop
-    steps:
-      - attach_workspace:
-          # Must be absolute path or relative path from working_directory
-          at: .
-      - run: |
-          cd client 
-          npm install --no-save now
-          cd build
-          ../node_modules/.bin/now --token $NOW_TOKEN
-          ../node_modules/.bin/now alias --token $NOW_TOKEN sketch-staging.now.sh
-      - run: 
-          name: E2E test on staging
-          command: |
-            cd client
-            npm run ci:cypress:staging
-      - persist_to_workspace:
-          root: client
-          paths:
-            - build
-
-  deploy-production:
-    <<: *defaults
-    working_directory: ~/rtop
-    steps:
-      - attach_workspace:
-          # Must be absolute path or relative path from working_directory
-          at: .
-      - run: |
-          npm install --no-save now
-          cd build
-          ../node_modules/.bin/now --token $NOW_TOKEN
-          ../node_modules/.bin/now alias --token $NOW_TOKEN sketch.now.sh
-
-workflows:
-  version: 2
-  build-test-deploy:
-    jobs:
-      - build
-      - deploy-staging:
-          requires:
-            - build
-          filters:
-            branches:
-              only: master
-      - deploy-production:
-          requires:
-            - deploy-staging
-          filters:
-            branches:
-              only: master
+          prefix: client_build

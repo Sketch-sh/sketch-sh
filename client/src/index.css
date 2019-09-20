@@ -1,0 +1,67 @@
+@import "normalize.css";
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 16px;
+}
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
+    "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
+    sans-serif;
+  cursor: default;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+#main {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Full-app sizing */
+
+html,
+body,
+#main {
+  height: 100%;
+}
+
+.reflex-splitter {
+  position: relative;
+}
+.vertical > .reflex-splitter::after {
+  left: -4px;
+  top: 0;
+  width: 9px;
+  height: 100%;
+}
+
+.horizontal > .reflex-splitter::after {
+  top: -4px;
+  left: 0;
+  width: 100%;
+  height: 9px;
+}
+.reflex-splitter::after {
+  content: "";
+  position: absolute;
+}
+
+/* .foo {
+  --share-1: #fff;
+  --shade-2: #fffffe;
+  --shade-3: #f3f3f3;
+  --shade-4: #e8e8e8;
+  --shade-5: #d3d3d3;
+  --shade-6: #7f7f7f;
+  --shade-7: #474747;
+  --shade-8: #1a1a1a;
+} */

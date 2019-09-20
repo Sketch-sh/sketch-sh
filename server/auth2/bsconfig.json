@@ -1,0 +1,28 @@
+{
+  "name": "auth",
+  "version": "0.1.0",
+  "sources": {
+    "dir": "src",
+    "subdirs": true
+  },
+  "package-specs": {
+    "module": "commonjs",
+    "in-source": true
+  },
+  "suffix": ".bs.js",
+  "bsc-flags": ["-open SStdlib"],
+  "bs-dependencies": [
+    "sketch-stdlib",
+    "@ryb73/decco",
+    "bs-express",
+    "bs-decode",
+    "bs-fetch",
+    "reason-future"
+  ],
+  "ppx-flags": ["@ryb73/decco/ppx/ppx_decco.sh", "graphql_ppx/ppx"],
+  "warnings": {
+    "error": "+101"
+  },
+  "namespace": true,
+  "refmt": 3
+}

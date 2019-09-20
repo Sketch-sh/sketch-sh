@@ -1,0 +1,34 @@
+{
+  "name": "sketch",
+  "version": "0.1.0",
+  "description": "Example Reason Esy Project",
+  "license": "MIT",
+  "esy": { "build": "refmterr dune build -p #{self.name}" },
+  "scripts": {
+    "jsoo": "esy dune build --profile release src/jsoo/Sketch_jsoo.bc.js",
+    "copy_js": "cp _esy/default/build/default/src/jsoo/Sketch_jsoo.bc.js ../client/public/native.worker.js",
+    "test": "esy x RunTests.exe",
+    "doc": "esy dune build @doc",
+    "clean": "esy dune clean"
+  },
+  "dependencies": {
+    "@opam/reason": "^3.5.0",
+    "@opam/rtop": "^3.5.0",
+    "@opam/cppo": "1.6.5",
+    "@opam/dune": "^1.10.0",
+    "@opam/js_of_ocaml": "3.4.0",
+    "@opam/js_of_ocaml-ppx": "3.4.0",
+    "@opam/js_of_ocaml-toplevel": "3.4.0",
+    "@opam/ppx_deriving": "4.2.1",
+    "@opam/ppx_jsobject_conv": "0.6.0",
+    "@reason-native/console": "*",
+    "@reason-native/rely": "^2.1.0",
+    "ocaml": "~4.7.0",
+    "refmterr": "*"
+  },
+  "devDependencies": {
+    "@opam/merlin": "*",
+    "ocaml": "~4.7.0",
+    "@opam/odoc": "*"
+  }
+}
