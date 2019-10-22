@@ -59,13 +59,13 @@
     "subscriptions-transport-ws": "^0.9.14"
   },
   "devDependencies": {
-    "@glennsl/bs-jest": "^0.4.3",
+    "@glennsl/bs-jest": "^0.4.9",
     "babel-jest": "^23.4.0",
     "babel-preset-env": "^1.7.0",
     "bs-platform": "^4.0.5",
     "bundle-buddy": "^0.2.1",
     "css-loader": "^1.0.0",
-    "cypress": "^3.1.0",
+    "cypress": "^3.4.1",
     "cypress-image-snapshot": "^2.0.1",
     "faker": "^4.1.0",
     "file-loader": "^2.0.0",
@@ -83,9 +83,9 @@
     "style-loader": "^0.21.0",
     "uglifyjs-webpack-plugin": "^1.2.7",
     "webpack": "^4.0.1",
-    "webpack-bundle-analyzer": "^2.13.1",
-    "webpack-cli": "^2.0.10",
-    "webpack-dev-server": "^3.1.10",
+    "webpack-bundle-analyzer": "^3.6.0",
+    "webpack-cli": "^3.3.9",
+    "webpack-dev-server": "^3.9.0",
     "worker-loader": "^2.0.0",
     "workerize-loader": "^1.0.3"
   },
