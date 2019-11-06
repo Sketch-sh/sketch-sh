@@ -48,6 +48,7 @@ type action =
   | File_update(filename, string)
   | Compile_active_file
   | Compile_result(filename, Engine_bs.compile_result)
+  | Update_url
   | Frame_msg(Container_comm.to_host);
 
 let debounce_compile =
@@ -104,6 +105,18 @@ let reducer = (action, state) => {
             debounce_compile.invoke((filename, code, send));
 
             Some(() => debounce_compile.cancel());
+          },
+        )
+      };
+    | Update_url =>
+      let filename = state.active_file;
+      switch (state.files->Belt.Map.String.get(filename)) {
+      | None => NoUpdate
+      | Some({code}) =>
+        SideEffects(
+          (_) => {
+            ReasonReactRouter.push("?code=" ++ LzString.URI.compress(code));
+            None;
           },
         )
       };

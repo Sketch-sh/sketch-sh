@@ -14,6 +14,7 @@ module S = {
       padding2(~v=Space.s2, ~h=Space.s4),
       display(`flex),
       alignItems(`center),
+      justifyContent(`spaceBetween),
     ]
     ->style;
 
@@ -37,9 +38,7 @@ module S = {
     ->style;
 };
 
-let default_value_react = {code|[@bs.config {jsx: 3}];
-
-module Counter = {
+let default_value_react = {code|module Counter = {
   [@react.component]
   let make = (~name) => {
     let (count, setCount) = React.useState(() => 0);
@@ -55,15 +54,11 @@ module Counter = {
 
 ReactDOMRe.renderToElementWithId(<Counter name="Counter" />, "root");|code};
 
-let default_value = {code|[@bs.module] external uuid: unit=>string="uuid";
-
-Js.log(uuid());|code};
-
 let default_value = default_value_react;
 
-let initial_files = {
+let make_initial_files = value => {
   Belt.Map.String.empty
-  ->Belt.Map.String.set("index.re", Edit_state.make_file(default_value))
+  ->Belt.Map.String.set("index.re", Edit_state.make_file(value))
   ->Belt.Map.String.set(
       "index.html",
       Edit_state.make_file({html|<div id="root"></div>|html}),
@@ -75,11 +70,11 @@ let initial_files = {
 {|require("react-reflex/styles.css")|};
 
 [@react.component]
-let make = () => {
+let make = (~value=default_value) => {
   let (state, send) =
     ReactUpdate.useReducer(
       {
-        files: initial_files,
+        files: make_initial_files(value),
         active_file: "index.re",
         iframe_ref: ref(Js.Nullable.null),
         log: [||],
@@ -116,7 +111,10 @@ let make = () => {
 
   <Reflex.Container orientation="horizontal">
     <Reflex.Element className=S.header_element flex=0.05>
-      <header className=S.header> "Sketch.sh"->str </header>
+      <header className=S.header>
+        <span> "Nit"->str </span>
+        <button onClick={_ => send(Update_url)}> "Share"->str </button>
+      </header>
     </Reflex.Element>
     <Reflex.Element>
       <Reflex.Container orientation="vertical">
