@@ -45,6 +45,9 @@ const base = {
     fs: "empty",
     child_process: "empty",
   },
+  resolve: {
+    extensions: [".ts", ".tsx", ".mjs", ".js", ".json"],
+  },
   plugins: [
     new HtmlWebpackPlugin({
       template: path.join(__dirname, "src", "index.html"),
@@ -78,12 +81,12 @@ const base = {
         test: /\.tsx?$/,
         use: [
           {
-            loader: 'ts-loader',
+            loader: "ts-loader",
             options: {
-              transpileOnly: true
-            }
-          }
-        ]
+              transpileOnly: true,
+            },
+          },
+        ],
       },
       {
         test: file =>

@@ -945,6 +945,13 @@
   dependencies:
     regenerator-runtime "^0.13.2"
 
+"@babel/runtime@^7.6.3":
+  version "7.7.1"
+  resolved "https://registry.yarnpkg.com/@babel/runtime/-/runtime-7.7.1.tgz#b223497bbfbcbbb38116673904debc71470ca528"
+  integrity sha512-SQ0sS7KUJDvgCI2cpZG0nJygO6002oTbhgSuw4WcocsnbxLwL5Q8I3fqbJdyBAc3uFrWZiR2JomseuxSuci3SQ==
+  dependencies:
+    regenerator-runtime "^0.13.2"
+
 "@babel/standalone@^7.4.5":
   version "7.7.1"
   resolved "https://registry.yarnpkg.com/@babel/standalone/-/standalone-7.7.1.tgz#e528f0fb79b868a65a5d0a046477ca55fdd64572"
@@ -1173,6 +1180,20 @@
     regenerator-runtime "^0.12.1"
     replicator "^1.0.3"
 
+"@frontarm/demoboard-ui@^0.1.25":
+  version "0.1.25"
+  resolved "https://registry.yarnpkg.com/@frontarm/demoboard-ui/-/demoboard-ui-0.1.25.tgz#d448090c4fa52b658573e15d998020c49492b829"
+  integrity sha512-z1VDalH3eHFrZL5uhcNLnL0y9rvFTDniSrD5g1cB0wN0DSaberMYivKMct9FqJGtXyuMEk7UliY4gaJXfbptHw==
+  dependencies:
+    "@frontarm/demoboard-core" "^0.1.25"
+    codemirror "^5.49.2"
+    exenv "^1.2.2"
+    json-stringify-safe "^5.0.1"
+    polished "^3.4.2"
+    reakit "^1.0.0-beta.9"
+    tslib "1.10.0"
+    use-codemirror "^0.1.4"
+
 "@frontarm/demoboard-worker@^0.1.24":
   version "0.1.24"
   resolved "https://registry.yarnpkg.com/@frontarm/demoboard-worker/-/demoboard-worker-0.1.24.tgz#bcf6818c912037fe8ee18dc847087033903f294c"
@@ -1198,6 +1219,15 @@
     semver "^6.3.0"
     typographic-base "^1.0.4"
     unist-util-visit "^1.4.0"
+
+"@frontarm/demoboard@^0.1.25":
+  version "0.1.25"
+  resolved "https://registry.yarnpkg.com/@frontarm/demoboard/-/demoboard-0.1.25.tgz#f09daeaec5c6e48d429992fdcab02afe6a52b1bf"
+  integrity sha512-4qhANdUGM6c8nI/YTLfvLJPkzxXp1+21LcL04S2TnVCtVWokil+4FuYThZFowCRRuT+neKd9ngJIvU9q5a3owg==
+  dependencies:
+    "@frontarm/demoboard-core" "^0.1.25"
+    "@frontarm/demoboard-ui" "^0.1.25"
+    tslib "1.10.0"
 
 "@glennsl/bs-jest@^0.4.3":
   version "0.4.8"
@@ -2786,6 +2816,11 @@ body-parser@1.19.0:
     raw-body "2.4.0"
     type-is "~1.6.17"
 
+body-scroll-lock@^2.6.4:
+  version "2.6.4"
+  resolved "https://registry.yarnpkg.com/body-scroll-lock/-/body-scroll-lock-2.6.4.tgz#567abc60ef4d656a79156781771398ef40462e94"
+  integrity sha512-NP08WsovlmxEoZP9pdlqrE+AhNaivlTrz9a0FF37BQsnOrpN48eNqivKkE7SYpM9N+YIPjsdVzfLAUQDBm6OQw==
+
 bonjour@^3.5.0:
   version "3.5.0"
   resolved "https://registry.yarnpkg.com/bonjour/-/bonjour-3.5.0.tgz#8e890a183d8ee9a2393b3844c691a42bcf7bc9f5"
@@ -3548,6 +3583,11 @@ codemirror@^5.39.2, codemirror@^5.46.0:
   version "5.48.2"
   resolved "https://registry.yarnpkg.com/codemirror/-/codemirror-5.48.2.tgz#a9dd3d426dea4cd59efd59cd98e20a9152a30922"
   integrity sha512-i9VsmC8AfA5ji6EDIZ+aoSe4vt9FcwPLdHB1k1ItFbVyuOFRrcfvnoKqwZlC7EVA2UmTRiNEypE4Uo7YvzVY8Q==
+
+codemirror@^5.49.2:
+  version "5.49.2"
+  resolved "https://registry.yarnpkg.com/codemirror/-/codemirror-5.49.2.tgz#c84fdaf11b19803f828b0c67060c7bc6d154ccad"
+  integrity sha512-dwJ2HRPHm8w51WB5YTF9J7m6Z5dtkqbU9ntMZ1dqXyFB9IpjoUFDj80ahRVEoVanfIp6pfASJbOlbWdEf8FOzQ==
 
 codesandboxer-fs@^1.0.1:
   version "1.0.3"
@@ -10434,10 +10474,22 @@ polished@^3.3.0:
   dependencies:
     "@babel/runtime" "^7.4.5"
 
+polished@^3.4.2:
+  version "3.4.2"
+  resolved "https://registry.yarnpkg.com/polished/-/polished-3.4.2.tgz#b4780dad81d64df55615fbfc77acb52fd17d88cd"
+  integrity sha512-9Rch6iMZckABr6EFCLPZsxodeBpXMo9H4fRlfR/9VjMEyy5xpo1/WgXlJGgSjPyVhEZNycbW7UmYMNyWS5MI0g==
+  dependencies:
+    "@babel/runtime" "^7.6.3"
+
 popper.js@^1.14.7:
   version "1.15.0"
   resolved "https://registry.yarnpkg.com/popper.js/-/popper.js-1.15.0.tgz#5560b99bbad7647e9faa475c6b8056621f5a4ff2"
   integrity sha512-w010cY1oCUmI+9KwwlWki+r5jxKfTFDVoadl7MSrIujHU5MJ5OR6HTDj6Xo8aoR/QsA56x8jKjA59qGH4ELtrA==
+
+popper.js@^1.15.0:
+  version "1.16.0"
+  resolved "https://registry.yarnpkg.com/popper.js/-/popper.js-1.16.0.tgz#2e1816bcbbaa518ea6c2e15a466f4cb9c6e2fbb3"
+  integrity sha512-+G+EkOPoE5S/zChTpmBSSDYmhXJ5PsW8eMhH8cP/CQHMFPBG/kC9Y5IIw6qNYgdJ+/COf0ddY2li28iHaZRSjw==
 
 portfinder@^1.0.20:
   version "1.0.21"
@@ -11800,6 +11852,26 @@ readdirp@^3.1.1:
   integrity sha512-XXdSXZrQuvqoETj50+JAitxz1UPdt5dupjT6T5nVB+WvjMv2XKYj+s7hPeAVCXvmJrL36O4YYyWlIC3an2ePiQ==
   dependencies:
     picomatch "^2.0.4"
+
+reakit-system@^0.6.7:
+  version "0.6.7"
+  resolved "https://registry.yarnpkg.com/reakit-system/-/reakit-system-0.6.7.tgz#57f807518b8093026c24daf90a575c2628c6aa1c"
+  integrity sha512-Ih2S6VL3UFUPsZ1rjKJbiSjWTveEwNBxjqQFENWOx2WtHEGcBM3+ZuvNwjxAmnYngAoUN8QtABcrbFvDYHGGXA==
+
+reakit-utils@^0.6.7:
+  version "0.6.7"
+  resolved "https://registry.yarnpkg.com/reakit-utils/-/reakit-utils-0.6.7.tgz#262522b3ba976746ffcdd64e26aabd5ae6b98e4d"
+  integrity sha512-S/0PB9Oh7/oTVwbTnPU3y/ztG6rhFsUMX6C781MfJ5GYlgfiGBtqhLxcu5mbpj8EoLtwq/pSs3J8Y6nK10Sn0w==
+
+reakit@^1.0.0-beta.9:
+  version "1.0.0-beta.10"
+  resolved "https://registry.yarnpkg.com/reakit/-/reakit-1.0.0-beta.10.tgz#fbd7b5ed661f7b9c04a813dc7390c4f026a9cf80"
+  integrity sha512-cMzkKVOYYIxjc7TuDu0WrSodg43SXyRmC1YZroIFY5XDSR36j8xKOaEzAM0lz0bd9Jn972LCeCKJtPUqtcNvNA==
+  dependencies:
+    body-scroll-lock "^2.6.4"
+    popper.js "^1.15.0"
+    reakit-system "^0.6.7"
+    reakit-utils "^0.6.7"
 
 realpath-native@^1.1.0:
   version "1.1.0"
@@ -14260,6 +14332,14 @@ url@0.11.0, url@^0.11.0:
   dependencies:
     punycode "1.3.2"
     querystring "0.2.0"
+
+use-codemirror@^0.1.4:
+  version "0.1.4"
+  resolved "https://registry.yarnpkg.com/use-codemirror/-/use-codemirror-0.1.4.tgz#7d858db22104ff6ac9ad4186dd28de7b1cd55509"
+  integrity sha512-N/wMMbJu/MhNBfbVKRwQNwdUbnj18JSCAWyiYflMFVSVhxi5Voq5YtnZBH3hiAFPYijPWka9ICnl+6Uy4m3LQQ==
+  dependencies:
+    codemirror "^5.49.2"
+    tslib "1.10.0"
 
 use@^3.1.0:
   version "3.1.1"

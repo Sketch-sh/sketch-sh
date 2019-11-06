@@ -23,6 +23,7 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
+    "@frontarm/demoboard": "^0.1.25",
     "@frontarm/demoboard-core": "^0.1.25",
     "@reach/dialog": "^0.1.2",
     "@ryb73/decco": "^0.0.14",

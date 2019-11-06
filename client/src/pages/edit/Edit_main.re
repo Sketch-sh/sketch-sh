@@ -45,10 +45,10 @@ let default_value_react = {code|module Row = {
 module List = {
  type child = {. "index": string, "style": string, "data": string} => React.element;
  [@bs.module "react-window"] [@react.component]
- external make: (~children: child) => React.element = "List";
+ external make: (~children: child, ~height: int, ~itemCount: int, ~itemSize: int, ~width: int) => React.element = "FixedSizeList";
 }
 
-ReactDOMRe.renderToElementWithId(<List>{Row.make} </List>, "root");|code};
+ReactDOMRe.renderToElementWithId(<List height={300} itemCount={100} itemSize={100} width={200}>{Row.make} </List>, "root");|code};
 
 let default_value = {code|[@bs.module] external uuid: unit=>string="uuid";
 

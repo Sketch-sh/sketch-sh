@@ -1,26 +1,14 @@
-module Demoboard_binding = {
-  [@bs.module "@frontarm/demoboard-worker"]
-  external get_package: (~name: string, ~version: string) => Js.Promise
-}
-let npm_pattern = [%re
-  {|/^(?:npm:\/\/)?((?:@[\w.-]+\/)?\w[\w.-]+)(@[^/]+)?(\/.*)?$/|}
-];˝
-
-type npm_matches = {
-  name: string,
-  version: string,
-  pathname: option(string),
+type options = {
+  .
+  // "dependencies": Js.Dict.t(string),
+  "url": string,
 };
 
-external unsafe_undefined_to_option: string => option(string) = "%identity";
+[@bs.module "@frontarm/demoboard-worker/src/fetchDependency.ts"]
+  external fetchDependency: (options) => Js.Promise.t(Sketch.Container_polestar.Fetcher.FetchResult.t) = "fetchDependency";
 
-let handle_npm = (~url as _, ~pathname, ~meta as _) => {
-  let matches = switch (pathname->String.match(npm_pattern)) {
-  | Some([|_, name, version, pathname, _, _, _|]) =>
-    Result.Ok({name, version, pathname: pathname->unsafe_undefined_to_option})
-  | _ => Result.Error(`UnknownNpmPath)
-  };
-  matches -> Result.flatMapOk(({name, version, pathname}) => {
-
+let handle_npm = (~url, ~meta as _, ~pathname as _) => {
+  fetchDependency({
+    "url": url
   })
-};
+}

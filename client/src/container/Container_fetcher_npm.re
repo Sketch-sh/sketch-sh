@@ -490,3 +490,6 @@ let handle_npm = (~url, ~meta as _, ~pathname) => {
     ->ignore
   );
 };
+
+
+include Container_fetcher_npm_new;
