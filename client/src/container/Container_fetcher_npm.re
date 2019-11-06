@@ -123,7 +123,7 @@ module Jsdelivr = {
         switch (default_file) {
         | Some(default_file) => Belt.Result.Ok({default_file, files})
         | None =>
-          if (files |> Js.Array.indexOf("/index.js") == (-1)) {
+          if (!files->Arr.has("/index.js")) {
             Error(`Npm_fetcher_cant_resolve_main_file(pkg_slug));
           } else {
             Ok({default_file: "/index.js", files});
@@ -336,6 +336,17 @@ module Fetch_commonjs: {
     };
   };
 
+  let check_if_minified = (~file_path as path, ~files) =>
+    if (path->String.indexOf(".min.js") === (-1)) {
+      None;
+    } else {
+      let unminified_path = path->String.replace(".min.js", ".js");
+      if (files->Arr.has(unminified_path)) {
+        Some(path);
+      } else {
+        None;
+      };
+    };
   /**
     * Resolve the require path into module absolute path
     * Node allows you to omit `.js` extension, also `index.js` in a folder
@@ -351,7 +362,7 @@ module Fetch_commonjs: {
     } else if (files->Arr.has(file_path ++ ".js")) {
       Some(file_path ++ ".js");
     } else {
-      None;
+      check_if_minified(~file_path, ~files)
     };
   };
 
