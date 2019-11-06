@@ -114,6 +114,12 @@ let make = (~value=default_value) => {
       <header className=S.header>
         <span> "Nit"->str </span>
         <button onClick={_ => send(Update_url)}> "Share"->str </button>
+        <div>
+          <a
+            href="https://github.com/Sketch-sh/nit/issues/new" target="_blank">
+            "Bug report"->str
+          </a>
+        </div>
       </header>
     </Reflex.Element>
     <Reflex.Element>
