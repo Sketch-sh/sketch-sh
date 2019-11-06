@@ -37,18 +37,23 @@ module S = {
     ->style;
 };
 
-let default_value_react = {code|module Row = {
+let default_value_react = {code|[@bs.config {jsx: 3}];
+
+module Counter = {
   [@react.component]
-  let make = (~index: string, ~style: string, ~data: string) => React.string("Render a row here");
-}
+  let make = (~name) => {
+    let (count, setCount) = React.useState(() => 0);
 
-module List = {
- type child = {. "index": string, "style": string, "data": string} => React.element;
- [@bs.module "react-window"] [@react.component]
- external make: (~children: child, ~height: int, ~itemCount: int, ~itemSize: int, ~width: int) => React.element = "FixedSizeList";
-}
+    <div>
+      <p> {React.string(name ++ " clicked " ++ string_of_int(count) ++ " times")} </p>
+      <button onClick={_ => setCount(_ => count + 1)}>
+        {React.string("Click me")}
+      </button>
+    </div>
+  };
+};
 
-ReactDOMRe.renderToElementWithId(<List height={300} itemCount={100} itemSize={100} width={200}>{Row.make} </List>, "root");|code};
+ReactDOMRe.renderToElementWithId(<Counter name="Counter" />, "root");|code};
 
 let default_value = {code|[@bs.module] external uuid: unit=>string="uuid";
 
@@ -115,16 +120,6 @@ let make = () => {
     </Reflex.Element>
     <Reflex.Element>
       <Reflex.Container orientation="vertical">
-        <Reflex.Element minSize=130 maxSize=200>
-          <section className=S.sidebar>
-            <Edit_treeview
-              files={state.files}
-              active_file={state.active_file}
-              on_file_click={filename => send(File_open(filename))}
-            />
-          </section>
-        </Reflex.Element>
-        <Reflex.Splitter className=Ds.splitter_className />
         <Reflex.Element>
           {switch (state.files->Belt.Map.String.get(state.active_file)) {
            | None => "Nothing to show here"->str
