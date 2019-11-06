@@ -469,7 +469,7 @@ Try to require a full path, for example: require($(pkg_slug)/path_to_file.js)|j}
 Try to require a full path, for example: require($(pkg_slug)/path_to_file.js)|j};
 
 let handle_npm = (~url, ~meta as _, ~pathname) => {
-  [%log.info "Handle npm"; ("path", pathname)];
+  [%log.info "Handle npm"; ("path", pathname); ("url", url)];
   let pkg = Pkg.parse(pathname);
 
   let fetch_result =

@@ -23,7 +23,6 @@ let get_polestar = () => {
 window->addMessageListener(
   event => {
     let data = event##data;
-    Js.log("receive data");
     switch (data##_type->Js.Nullable.toOption) {
     | Some("sketch") =>
       switch (data##payload) {
