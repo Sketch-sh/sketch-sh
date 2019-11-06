@@ -75,6 +75,17 @@ const base = {
   module: {
     rules: [
       {
+        test: /\.tsx?$/,
+        use: [
+          {
+            loader: 'ts-loader',
+            options: {
+              transpileOnly: true
+            }
+          }
+        ]
+      },
+      {
         test: file =>
           file.endsWith(".js") &&
           !file.endsWith(".bs.js") &&

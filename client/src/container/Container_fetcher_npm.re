@@ -126,7 +126,7 @@ module Jsdelivr = {
   let cdn_base = "https://cdn.jsdelivr.net/";
   module List_file = {
     type t = {
-      default_file: string,
+      default_file: option(string),
       files: array(string),
     };
 
@@ -137,15 +137,7 @@ module Jsdelivr = {
       let url = Url.join([|api_base, "package/npm", pkg_slug, "/flat"|]);
 
       let make = (default_file, files) => {
-        switch (default_file) {
-        | Some(default_file) => Belt.Result.Ok({default_file, files})
-        | None =>
-          if (!files->Arr.has("/index.js")) {
-            Error(`Npm_fetcher_cant_resolve_main_file(pkg_slug));
-          } else {
-            Ok({default_file: "/index.js", files});
-          }
-        };
+        Result.Ok({default_file, files});
       };
 
       let decoder = json => {
@@ -222,7 +214,7 @@ module Cache = {
 
   type t = {
     pkg: Pkg.t,
-    default_file: string,
+    default_file: option(string),
     files: array(string),
     dependencies: Js.Dict.t(string),
     browser: Js.Dict.t(string),
@@ -415,8 +407,12 @@ module Fetch_commonjs: {
 
             let file_path =
               pkg.path
-              ->Option.getWithDefault(default_file)
-              ->(path => resolve_module(~path, ~files))
+              ->{
+                  fun
+                  | None => default_file
+                  | Some(path) => Some(path);
+                }
+              ->Option.flatMap(path => resolve_module(~path, ~files))
               ->Option.map(path => resolve_browser_module(~path, ~browser))
               ->(
                   fun
