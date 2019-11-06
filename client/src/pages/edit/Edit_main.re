@@ -37,23 +37,18 @@ module S = {
     ->style;
 };
 
-let default_value_react = {code|let str = React.string;
-
-module Counter = {
+let default_value_react = {code|module Row = {
   [@react.component]
-  let make = (~name) => {
-    let (count, setCount) = React.useState(() => 0);
+  let make = (~index: string, ~style: string, ~data: string) => React.string("Render a row here");
+}
 
-    <div>
-      <p> {str(name ++ " clicked " ++ string_of_int(count) ++ " times")} </p>
-      <button onClick={_ => setCount(_ => count + 1)}>
-        {str("Click me")}
-      </button>
-    </div>
-  };
-};
+module List = {
+ type child = {. "index": string, "style": string, "data": string} => React.element;
+ [@bs.module "react-window"] [@react.component]
+ external make: (~children: child) => React.element = "List";
+}
 
-ReactDOMRe.renderToElementWithId(<Counter name="Counter" />, "root");|code};
+ReactDOMRe.renderToElementWithId(<List>{Row.make} </List>, "root");|code};
 
 let default_value = {code|[@bs.module] external uuid: unit=>string="uuid";
 

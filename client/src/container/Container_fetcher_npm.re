@@ -36,8 +36,25 @@ module Pkg = {
     );
   };
 
+  let nth_index: (string, string, int) => int = [%raw
+    {|
+    function nthIndex(str, pat, n){
+    var L= str.length, i= -1;
+    while(n-- && i++<L){
+        i= str.indexOf(pat, i);
+        if (i < 0) break;
+    }
+    return i;
+}
+  |}
+  ];
   let parse = fullpath => {
-    let slash_pos = fullpath |> Js.String.indexOf("/");
+    let slash_pos =
+      if (fullpath |> Js.String.startsWith("@")) {
+        nth_index(fullpath, "/", 2);
+      } else {
+        fullpath |> Js.String.indexOf("/");
+      };
     let (slug, path) =
       switch (slash_pos) {
       | (-1) => (fullpath, None)
@@ -362,7 +379,7 @@ module Fetch_commonjs: {
     } else if (files->Arr.has(file_path ++ ".js")) {
       Some(file_path ++ ".js");
     } else {
-      check_if_minified(~file_path, ~files)
+      check_if_minified(~file_path, ~files);
     };
   };
 
