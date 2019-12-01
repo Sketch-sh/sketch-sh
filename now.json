@@ -3,9 +3,8 @@
   "name": "sketch",
   "builds": [
     {
-      "src": "client/package.json",
-      "use": "@now/static-build",
-      "config": { "distDir": "build" }
+      "src": "client/build/*.*",
+      "use": "@now/static"
     },
     {
       "src": "docs/package.json",
@@ -17,7 +16,7 @@
     { "src": "/docs/static/(.*)", "dest": "/docs/static/$1" },
     { "src": "/docs/assets.json", "dest": "/docs/assets.json" },
     { "src": "/docs/(.*)", "dest": "/docs/index.html" },
-    { "src": "/(.+)\\.(.+)", "dest": "/client/$1.$2" },
-    { "src": "/(.*)", "dest": "/client/index.html" }
+    { "src": "/(.+)\\.(.+)", "dest": "/client/build/$1.$2" },
+    { "src": "/(.*)", "dest": "/client/build/index.html" }
   ]
 }

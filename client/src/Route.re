@@ -50,6 +50,8 @@ let urlToRoute: ReasonReact.Router.url => t =
     | ["new", "ocaml"]
     | ["new", "ml"] => NoteNew(ML)
     | ["new"] => NoteTemplateChoose
+    /* This remove the anonymous sketches listing page */
+    | ["u", "anonymous"] => NotFound
     | ["u", username] => User(username)
     | ["auth", "github"] => AuthGithub
     | ["auth", "failure"] => AuthFailure
