@@ -32,7 +32,7 @@ let a: string = 1;|};
 
 let text7 = {|## Pretty print code
 
-Press Ctrl+Shift+I to pretty print Reason code. Try me!
+Press Ctrl+Shift+I (or Cmd+Shift+I on MacOS) to pretty print Reason code. Try me!
 
 **Note:** This feature is currently unavailable in Ocaml sketches |};
 
