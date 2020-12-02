@@ -1,9 +1,9 @@
 #/bin/bash -e
 
-tmp=$(mktemp)
+mktemp
 
 hash () {
-  md5sum $1 | tr ' ' '\n' | head -1
+  md5 $1 | tr ' ' '\n' | head -1
 }
 
 hash_traefik=$(hash "./traefik.toml")

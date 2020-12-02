@@ -4,6 +4,7 @@ services:
     image: thangngoc89/sketch-migration:latest
     networks:
       - web
+      - internal
     depends_on:
       - graphql-engine
     build:
@@ -27,6 +28,7 @@ services:
     restart: unless-stopped
     networks:
       - web
+      - internal
     environment:
       - NODE_ENV=production
       - JWT_TOKEN=${JWT_TOKEN}
@@ -38,77 +40,34 @@ services:
       - DATABASE_URL=${DATABASE_URL}
     depends_on:
       - graphql-engine
-      - proxy
-    deploy:
-      labels:
-        - traefik.enable=true
-        - traefik.port=80
-        - traefik.backend=auth
-        - traefik.frontend.rule=Host:api.sketch.sh;PathPrefix:/auth;AddPrefix:/api;
+    labels:
+      - traefik.enable=true
+      - traefik.port=80
+      - traefik.backend=auth
+      - traefik.frontend.rule=Host:api.sketch.sh;PathPrefix:/auth;AddPrefix:/api;
 
   graphql-engine:
     image: hasura/graphql-engine:v1.0.0-beta.3
     restart: always
     networks:
       - web
-    depends_on:
-      - proxy
+      - internal
     environment:
       - HASURA_GRAPHQL_DATABASE_URL=${DATABASE_URL}
       - HASURA_GRAPHQL_ACCESS_KEY=${HASURA_ACCESS_KEY}
       - HASURA_GRAPHQL_AUTH_HOOK=http://auth/api/auth/webhook
     command: >
       /bin/sh -c "graphql-engine serve --enable-console;"
-    deploy:
-      labels:
-        - traefik.enable=true
-        - traefik.port=8080
-        - traefik.backend=hasura
-        - traefil.backend.healthcheck.path=/healthz
-        - traefik.graphql.frontend.rule=Host:api.sketch.sh;Path:/graphql;AddPrefix:/v1
-        - traefik.console.frontend.rule=Host:console.api.sketch.sh;
-
-  proxy:
-    image: traefik:latest
-    networks:
-      - web
-    restart: "always"
-    ports:
-      - "80:80"
-      - "443:443"
-      - "8080:8080"
-    configs:
-      - source: traefik.toml
-        target: /etc/traefik/traefik.toml
-    secrets:
-      - cloudflare.cert
-      - cloudflare.key
-
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      #- ./traefik.toml:/etc/traefik/traefik.toml
-    deploy:
-      labels:
-        - traefik.logLevel=ERROR
-      placement:
-        constraints:
-          - node.role == manager
-      update_config:
-        parallelism: 1
-        delay: 10s
-      restart_policy:
-        condition: on-failure
-
-configs:
-  traefik.toml:
-    file: ./traefik.toml
-    name: traefik-${TRAEFIK_CONF}
-secrets:
-  cloudflare.cert:
-    external: true
-  cloudflare.key:
-    external: true
+    labels:
+      - traefik.enable=true
+      - traefik.port=8080
+      - traefik.backend=hasura
+      - traefil.backend.healthcheck.path=/healthz
+      - traefik.graphql.frontend.rule=Host:api.sketch.sh;Path:/graphql;AddPrefix:/v1
+      - traefik.console.frontend.rule=Host:console.api.sketch.sh;
 
 networks:
   web:
-    name: traefik
+    external: true
+  internal:
+    external: false
