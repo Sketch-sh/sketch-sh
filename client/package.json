@@ -53,7 +53,7 @@
     "react-dom": "^16.4.1",
     "react-helmet": "^5.2.0",
     "react-icons": "^3.0.4",
-    "reason-apollo": "^0.14.1",
+    "reason-apollo": "0.14.1",
     "reason-loadable": "thangngoc89/reason-loadable#delay",
     "reason-react": "^0.5.3",
     "subscriptions-transport-ws": "^0.9.14"
@@ -81,7 +81,7 @@
     "start-server-and-test": "^1.7.0",
     "style-loader": "^0.21.0",
     "uglifyjs-webpack-plugin": "^1.2.7",
-    "webpack": "^4.0.1",
+    "webpack": "4.16.1",
     "webpack-bundle-analyzer": "^2.13.1",
     "webpack-cli": "^2.0.10",
     "webpack-dev-server": "^3.1.10",
