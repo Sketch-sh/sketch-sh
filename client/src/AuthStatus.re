@@ -100,33 +100,31 @@ module UserInfo = {
   let make = children => {
     ...component,
     render: _self => {
-      let%Epitath authState = children =>
-        <IsAuthenticated> ...children </IsAuthenticated>;
-
-      switch (authState) {
-      | Anonymous => children(None)
-      | Login(userId) =>
-        open GqlUserInfo;
-        let query = UserInfoGql.make(~userId, ());
-        let%Epitath {result} = (
-          children =>
+      <IsAuthenticated>
+        ...{authState =>
+          switch (authState) {
+          | Anonymous => children(None)
+          | Login(userId) =>
+            open GqlUserInfo;
+            let query = UserInfoGql.make(~userId, ());
             <UserInfoComponent variables=query##variables>
-              ...children
-            </UserInfoComponent>
-        );
-
-        switch (result) {
-        | Loading => children(None)
-        | Error(_) => children(None)
-        | Data(response) =>
-          response##user
-          ->(
-              arrayFirst(~empty=children(None), ~render=user =>
-                children(Some((user, userId)))
-              )
-            )
-        };
-      };
+              ...{({result}) =>
+                switch (result) {
+                | Loading => children(None)
+                | Error(_) => children(None)
+                | Data(response) =>
+                  response##user
+                  ->(
+                      arrayFirst(~empty=children(None), ~render=user =>
+                        children(Some((user, userId)))
+                      )
+                    )
+                }
+              }
+            </UserInfoComponent>;
+          }
+        }
+      </IsAuthenticated>;
     },
   };
 };

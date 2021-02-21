@@ -10,6 +10,22 @@ type action =
 
 let component = ReasonReact.reducerComponent("Sketch.sh");
 
+let homeImport = () => [%bs.raw
+  {| import(/* webpackChunkName: "Home" */ "./Home.bs.js") |}
+];
+
+let noteImport = () => [%bs.raw
+  {| import(/* webpackChunkName: "Note" */ "./Note.bs.js") |}
+];
+
+let noteTemplateImport = () => [%bs.raw
+  {| import(/* webpackChunkName: "NoteTemplateChoose" */ "./NoteTemplateChoose.bs.js") |}
+];
+
+let userImport = () => [%bs.raw
+  {| import(/* webpackChunkName: "User" */ "./User.bs.js") |}
+];
+
 let make = _children => {
   ...component,
   initialState: () =>
@@ -35,40 +51,31 @@ let make = _children => {
       {switch (state) {
        | Home =>
          <Layout_WithTopbar>
-           ...{
-                let%Epitath authState = children =>
-                  <AuthStatus.IsAuthenticated>
-                    ...children
-                  </AuthStatus.IsAuthenticated>;
-
-                switch (authState) {
-                | Anonymous =>
-                  let (lang, links, blocks) = Editor_Introduction.blocks;
-                  <NoteNewLazy
-                    title="Sketch.sh - Interactive ReasonML sketchbook"
-                    blocks
-                    links
-                    lang
-                  />;
-                | Login(userId) =>
-                  <HomeLazy
-                    fetch={() =>
-                      %bs.raw
-                      {| import(/* webpackChunkName: "Home" */ "./Home.bs.js") |}
-                    }
-                    onLoading={() => <UI_FullpageLoading />}
-                    render={((module Home)) => <Home userId />}
-                  />
-                };
-              }
+           ...<AuthStatus.IsAuthenticated>
+                ...{authState =>
+                  switch (authState) {
+                  | Anonymous =>
+                    let (lang, links, blocks) = Editor_Introduction.blocks;
+                    <NoteNewLazy
+                      title="Sketch.sh - Interactive ReasonML sketchbook"
+                      blocks
+                      links
+                      lang
+                    />;
+                  | Login(userId) =>
+                    <HomeLazy
+                      fetch=homeImport
+                      onLoading={() => <UI_FullpageLoading />}
+                      render={((module Home)) => <Home userId />}
+                    />
+                  }
+                }
+              </AuthStatus.IsAuthenticated>
          </Layout_WithTopbar>
        | Note(noteInfo) =>
          <Layout_WithTopbar>
            ...<NoteLazy
-                fetch={() =>
-                  %bs.raw
-                  {| import(/* webpackChunkName: "Note" */ "./Note.bs.js") |}
-                }
+                fetch=noteImport
                 onLoading={() => <UI_FullpageLoading />}
                 render={((module Note)) => <Note noteInfo />}
               />
@@ -76,10 +83,7 @@ let make = _children => {
        | NoteTemplateChoose =>
          <Layout_WithTopbar>
            ...<NoteTemplateChooseLazy
-                fetch={() =>
-                  %bs.raw
-                  {| import(/* webpackChunkName: "NoteTemplateChoose" */ "./NoteTemplateChoose.bs.js") |}
-                }
+                fetch=noteTemplateImport
                 onLoading={() => <UI_FullpageLoading />}
                 render={((module NoteTemplateChoose)) =>
                   <NoteTemplateChoose />
@@ -91,10 +95,7 @@ let make = _children => {
        | User(userName) =>
          <Layout_WithTopbar>
            ...<UserLazy
-                fetch={() =>
-                  %bs.raw
-                  {| import(/* webpackChunkName: "User" */ "./User.bs.js") |}
-                }
+                fetch=userImport
                 onLoading={() => <UI_FullpageLoading />}
                 render={((module User)) => <User userName />}
               />
