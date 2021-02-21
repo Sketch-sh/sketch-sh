@@ -5,7 +5,7 @@ let authDomain =
     "https://api.sketch.sh/auth" : "http://localhost:3000/api/auth";
 
 let stagingHost = "staging.sketch.sh";
-let productionHost = "sketch.sh";
+let productionHost = "sketch-sh.github.io";
 let graphqlEndpoint =
   env == "production" ?
     {
