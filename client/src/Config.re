@@ -14,10 +14,8 @@ let graphqlEndpoint =
 
       if (host == stagingHost) {
         "https://rtop-server.herokuapp.com/v1alpha1/graphql";
-      } else if (host == productionHost) {
-        "https://api.sketch.sh/graphql";
       } else {
-        "/graphql";
+        "https://api.sketch.sh/graphql";
       };
     } :
     "/graphql";
