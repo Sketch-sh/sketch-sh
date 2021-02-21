@@ -1,0 +1,1 @@
+.Home h1{margin:0 0 var(--space5) 0}.Home__section--title{color:var(--c-text-sub2);margin:0 0 var(--space3) 0}.Home__section--list{margin:var(--space4) 0}@media screen and (min-width:48rem){.Home__main{display:grid;grid-template-columns:1fr 1fr;grid-column-gap:var(--space5)}.Home__section--title{text-align:center}}
