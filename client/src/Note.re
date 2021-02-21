@@ -23,58 +23,56 @@ let make = (~noteInfo: Route.noteRouteConfig, _children: React.childless) => {
   render: _self => {
     let noteId = noteInfo.noteId;
     let noteQuery = GetNoteById.make(~noteId, ());
+    let%Epitath authStatus = children =>
+      <AuthStatus.IsAuthenticated> ...children </AuthStatus.IsAuthenticated>;
 
-    <GetNoteByIdComponent variables=noteQuery##variables>
-      ...{({result}) =>
-        switch (result) {
-        | Loading => <Editor_NotePlaceholder />
-        | Error(error) => error##message->str
-        | Data(response) =>
-          let notes = response##note;
-          notes->(
-                   arrayFirst(
-                     ~empty=<NotFound entity="note" />,
-                     ~render=note => {
-                       let (lang, links, blocks) =
-                         switch (note##data) {
-                         | None => (Editor_Types.RE, [||], [||])
-                         | Some(data) => data->Editor_Json.V1.decode
-                         };
-                       <AuthStatus.IsAuthenticated>
-                         ...{authStatus => {
-                           let hasSavePermission =
-                             switch (authStatus) {
-                             | Login(currentUserId) =>
-                               note##user_id == currentUserId
-                             | Anonymous =>
-                               response##note_edit_token->Array.length > 0
-                             };
+    let%Epitath {result} =
+      children =>
+        <GetNoteByIdComponent variables=noteQuery##variables>
+          ...children
+        </GetNoteByIdComponent>;
 
-                           let blocks =
-                             Editor_Blocks_Utils.filterDeletedBlocks(blocks);
+    switch (result) {
+    | Loading => <Editor_NotePlaceholder />
+    | Error(error) => error##message->str
+    | Data(response) =>
+      let notes = response##note;
+      notes->(
+               arrayFirst(
+                 ~empty=<NotFound entity="note" />,
+                 ~render=note => {
+                   let (lang, links, blocks) =
+                     switch (note##data) {
+                     | None => (Editor_Types.RE, [||], [||])
+                     | Some(data) => data->Editor_Json.V1.decode
+                     };
+                   let hasSavePermission =
+                     switch (authStatus) {
+                     | Login(currentUserId) => note##user_id == currentUserId
+                     | Anonymous => response##note_edit_token->Array.length > 0
+                     };
 
-                           <RedirectSketchURL noteId>
-                             ...<Editor_Note
-                                  key=noteId
-                                  noteOwnerId=note##user_id
-                                  noteLastEdited={Some(note##updated_at)}
-                                  noteId
-                                  noteState=NoteState_Old
-                                  title=?{note##title}
-                                  lang
-                                  links
-                                  blocks
-                                  forkFrom=?{note##fork_from}
-                                  hasSavePermission
-                                />
-                           </RedirectSketchURL>;
-                         }}
-                       </AuthStatus.IsAuthenticated>;
-                     },
-                   )
-                 );
-        }
-      }
-    </GetNoteByIdComponent>;
+                   let blocks =
+                     Editor_Blocks_Utils.filterDeletedBlocks(blocks);
+
+                   <RedirectSketchURL noteId>
+                     ...<Editor_Note
+                          key=noteId
+                          noteOwnerId=note##user_id
+                          noteLastEdited={Some(note##updated_at)}
+                          noteId
+                          noteState=NoteState_Old
+                          title=?{note##title}
+                          lang
+                          links
+                          blocks
+                          forkFrom=?{note##fork_from}
+                          hasSavePermission
+                        />
+                   </RedirectSketchURL>;
+                 },
+               )
+             );
+    };
   },
 };

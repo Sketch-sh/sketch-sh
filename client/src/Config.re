@@ -1,11 +1,9 @@
 open Utils;
 
-let authDomain =
-  env == "production" ?
-    "https://api.sketch.sh/auth" : "http://localhost:3000/api/auth";
+let authDomain = "https://api.sketch.sh/auth";
 
 let stagingHost = "staging.sketch.sh";
-let productionHost = "sketch-sh.github.io";
+let productionHost = "sketch.sh";
 let graphqlEndpoint =
   env == "production" ?
     {

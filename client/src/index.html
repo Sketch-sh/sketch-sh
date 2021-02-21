@@ -27,15 +27,6 @@
   </head>
   <body>
     <div id="main"></div>
-    <script>
-      (function(){
-        var redirect = sessionStorage.redirect;
-        delete sessionStorage.redirect;
-        if (redirect && redirect != location.href) {
-          history.replaceState(null, null, redirect);
-        }
-      })();
-    </script>
     <script
       nomodule
       src="https://polyfill.io/v2/polyfill.min.js?features=URL"

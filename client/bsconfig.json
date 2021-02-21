@@ -28,11 +28,10 @@
       "in-source": true
     }
   ],
-  "bsc-flags": [
-    "-bs-g"
-  ],
+  "bsc-flags": ["-bs-g"],
   "ppx-flags": [
-    "graphql_ppx/ppx"
+    "graphql_ppx/ppx",
+    "let-anything/lib/bs/native/let_anything.native"
   ],
   "suffix": ".bs.js",
   "namespace": true,
@@ -47,9 +46,7 @@
     "re-classnames",
     "bs-epitath"
   ],
-  "bs-dev-dependencies": [
-    "@glennsl/bs-jest"
-  ],
+  "bs-dev-dependencies": ["@glennsl/bs-jest"],
   "refmt": 3,
   "warnings": {
     "error": "+5+8"

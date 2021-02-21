@@ -2,7 +2,7 @@ This is a mono repository that holds all of Sketch.sh code.
 
 # General coding style
 
-I use refmt with default width (80 chars). By running `yarn install` inside client directory, a git hook will be setup for you to auto format on staged files.
+I use refmt with default width (80 chars). By running `npm install` inside client directory, a git hook will be setup for you to auto format on staged files.
 
 You can clone this project by running this command:
 
@@ -31,25 +31,25 @@ git clone https://github.com/sketch-sh/sketch-sh
 - cd into client and install dependencies
 
 ```sh
-~/sketch-sh: > cd client && yarn install
+~/sketch-sh: > cd client && npm install
 ```
 
 - Run an initial bsb build
 
 ```sh
-~/sketch-sh/client: > yarn bs:build
+~/sketch-sh/client: > npm run bs:build
 ```
 
 - Start webpack development server
 
 ```sh
-~/sketch-sh/client: > yarn start
+~/sketch-sh/client: > npm start
 ```
 
 - Run Bucklescript in watch mode (another tab)
 
 ```sh
-~/sketch-sh/client: > yarn bs:start
+~/sketch-sh/client: > npm run bs:start
 ```
 
 > Tips: You don't need to do this if you're using VSCode with VSCode ReasonML plugin
@@ -59,12 +59,12 @@ git clone https://github.com/sketch-sh/sketch-sh
 - To make a production bundle:
 
 ```sh
-~/sketch-sh/client: > yarn build
+~/sketch-sh/client: > npm run build
 ```
 
 # Server
 
-Server implementation contains 2 microservices: auth, hasura's graphql engine
+Server implementation contains 2 microserives: auth, hasura's graphql engine
 
 ## Folder structures
 
