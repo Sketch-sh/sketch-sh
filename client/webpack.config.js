@@ -34,7 +34,7 @@ const base = {
   },
   output: {
     path: outputDir,
-    publicPath: "/",
+    publicPath: "/sketch-sh/",
     filename: isProd ? "[name].[chunkhash].js" : "[name].js",
     globalObject: "this",
   },
