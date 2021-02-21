@@ -24,35 +24,11 @@
       name="google-site-verification"
       content="xKEO8aWmMqZjpU3umKXhLYxzCRULcTJjiTygKIg_fHo"
     />
+    <script>
+        sessionStorage.redirect = location.href;
+    </script>
+    <meta http-equiv="refresh" content="0;URL='/'">
   </head>
   <body>
-    <div id="main"></div>
-    <script>
-      (function(){
-        var redirect = sessionStorage.redirect;
-        delete sessionStorage.redirect;
-        if (redirect && redirect != location.href) {
-          history.replaceState(null, null, redirect);
-        }
-      })();
-    </script>
-    <script
-      nomodule
-      src="https://polyfill.io/v2/polyfill.min.js?features=URL"
-    ></script>
-    <!-- Global site tag (gtag.js) - Google Analytics -->
-    <script
-      async
-      src="https://www.googletagmanager.com/gtag/js?id=UA-142842824-1"
-    ></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag() {
-        dataLayer.push(arguments);
-      }
-      gtag("js", new Date());
-
-      gtag("config", "UA-142842824-1");
-    </script>
   </body>
 </html>

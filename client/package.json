@@ -39,6 +39,7 @@
     "codemirror": "5.39.2",
     "comlink": "^3.0.3",
     "copy-text-to-clipboard": "^1.0.4",
+    "copy-webpack-plugin": "^5.0.0",
     "fontfaceobserver": "^2.0.13",
     "graphql": "^0.13.2",
     "graphql-tag": "^2.9.2",

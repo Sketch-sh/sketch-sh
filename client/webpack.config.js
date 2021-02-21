@@ -2,6 +2,7 @@
 
 const webpack = require("webpack");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 const path = require("path");
 const UglifyJsPlugin = require("uglifyjs-webpack-plugin");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
@@ -48,6 +49,9 @@ const base = {
       chunks: ["app"],
       filename: "index.html",
     }),
+    new CopyWebpackPlugin([
+      { from: 'src/404.html' },
+    ]),
     new HtmlWebpackPlugin({
       template: path.join(__dirname, "src", "embed.html"),
       chunks: ["embedApp"],
