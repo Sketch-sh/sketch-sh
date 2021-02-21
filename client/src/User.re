@@ -5,7 +5,7 @@ module GetNotes = [%graphql
   {|
   query getNotes($userName: String!, $limit: Int, $offset: Int) {
     note(
-      where: {owner: {username: {_eq: $userName}}}
+      where: {user: {username: {_eq: $userName}}}
       order_by: {
         updated_at: desc
       },
@@ -71,47 +71,42 @@ let make = (~userName, _children) => {
       <h1> {j|$(userName)'s sketches|j}->str </h1>
       <GetNotesComponent
         fetchPolicy="network-only" variables=notesQuery##variables>
-        ...{
-             ({result, fetchMore}) =>
-               switch (result) {
-               | Loading =>
-                 <div style={ReactDOMRe.Style.make(~width="500px", ())}>
-                   <UI_SketchList.Placeholder />
-                 </div>
-               | Error(error) => error##message->str
-               | Data(response) =>
-                 let notesQuery =
-                   getNotesQuery(
-                     ~userName,
-                     ~offset=Array.length(response##note),
-                     (),
-                   );
-                 let fetchMore = _e =>
-                   Js.Promise.(
-                     fetchMore(
-                       ~variables=notesQuery##variables,
-                       ~updateQuery,
-                       (),
-                     )
-                     |> then_(_ => {
-                          self.send(ChangeCount);
-                          resolve();
-                        })
-                   )
-                   |> ignore;
+        ...{({result, fetchMore}) =>
+          switch (result) {
+          | Loading =>
+            <div style={ReactDOMRe.Style.make(~width="500px", ())}>
+              <UI_SketchList.Placeholder />
+            </div>
+          | Error(error) => error##message->str
+          | Data(response) =>
+            let notesQuery =
+              getNotesQuery(
+                ~userName,
+                ~offset=Array.length(response##note),
+                (),
+              );
+            let fetchMore = _e =>
+              Js.Promise.(
+                fetchMore(~variables=notesQuery##variables, ~updateQuery, ())
+                |> then_(_ => {
+                     self.send(ChangeCount);
+                     resolve();
+                   })
+              )
+              |> ignore;
 
-                 shouldFetchMore(response##note, self.state.count) ?
-                   <UI_SketchList
-                     sketches=response##note
-                     noSketches={<UI_NoSketches />}
-                     fetchMore
-                   /> :
-                   <UI_SketchList
-                     sketches=response##note
-                     noSketches={<UI_NoSketches />}
-                   />;
-               }
-           }
+            shouldFetchMore(response##note, self.state.count) ?
+              <UI_SketchList
+                sketches=response##note
+                noSketches={<UI_NoSketches />}
+                fetchMore
+              /> :
+              <UI_SketchList
+                sketches=response##note
+                noSketches={<UI_NoSketches />}
+              />;
+          }
+        }
       </GetNotesComponent>
     </section>;
   },
