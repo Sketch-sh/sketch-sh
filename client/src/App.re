@@ -106,7 +106,6 @@ let make = _children => {
        | AuthFailure => "auth failure"->str
        | NotFound => <NotFound />
        }}
-      <UI_WarningStagingServer />
     </ReasonApollo.Provider>,
 };
 

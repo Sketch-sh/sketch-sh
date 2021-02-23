@@ -8,7 +8,7 @@ services:
     depends_on:
       - graphql-engine
     build:
-      context: .
+      context: server
       dockerfile: Dockerfile-migration
     environment:
       - HASURA_ENDPOINT=http://graphql-engine:8080
@@ -22,7 +22,7 @@ services:
   auth:
     image: thangngoc89/sketch-auth:latest
     build:
-      context: auth
+      context: server/auth
       args:
         - NODE_ENV=production
     restart: unless-stopped
@@ -55,7 +55,7 @@ services:
     environment:
       - HASURA_GRAPHQL_DATABASE_URL=${DATABASE_URL}
       - HASURA_GRAPHQL_ACCESS_KEY=${HASURA_ACCESS_KEY}
-      - HASURA_GRAPHQL_AUTH_HOOK=http://auth/api/auth/webhook
+      - HASURA_GRAPHQL_AUTH_HOOK=http://auth:3001/api/auth/webhook
     command: >
       /bin/sh -c "graphql-engine serve --enable-console;"
     labels:
@@ -65,6 +65,12 @@ services:
       - traefil.backend.healthcheck.path=/healthz
       - traefik.graphql.frontend.rule=Host:api.sketch.sh;Path:/graphql;AddPrefix:/v1
       - traefik.console.frontend.rule=Host:console.api.sketch.sh;
+
+  nginx:
+    environment:
+      - NODE_ENV=production
+    ports:
+      - "80:80"
 
 networks:
   web:

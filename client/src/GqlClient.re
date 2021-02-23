@@ -21,7 +21,7 @@ let cache =
   );
 
 /* Create an HTTP Link */
-let httpLink = ApolloLinks.createHttpLink(~uri=Config.graphqlEndpoint, ());
+let httpLink = ApolloLinks.createHttpLink(~uri="/graphql", ());
 
 let authLink =
   ApolloLinks.createContextLink(() => {

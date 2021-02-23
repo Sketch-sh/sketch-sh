@@ -15,7 +15,7 @@ services:
       - postgres
       - graphql-engine
     build:
-      context: .
+      context: server
       dockerfile: Dockerfile-migration
     environment:
       - HASURA_ENDPOINT=http://graphql-engine:8080
@@ -33,13 +33,13 @@ services:
     environment:
       - HASURA_GRAPHQL_DATABASE_URL=postgres://postgres:${POSTGRES_PASSWORD}@postgres:5432/postgres
       - HASURA_GRAPHQL_ACCESS_KEY=${HASURA_ACCESS_KEY}
-      - HASURA_GRAPHQL_AUTH_HOOK=http://auth/api/auth/webhook
+      - HASURA_GRAPHQL_AUTH_HOOK=http://auth:3001/api/auth/webhook
     command: >
       /bin/sh -c "graphql-engine serve --enable-console;"
 
   auth:
     build:
-      context: auth
+      context: server/auth
       args:
         - NODE_ENV=development
     environment:
@@ -52,6 +52,13 @@ services:
       - FRONTEND_URL=${FRONTEND_URL}
 
     depends_on:
+      - graphql-engine
+
+  nginx:
+    build:
+      context: client
+    depends_on:
+      - auth
       - graphql-engine
 volumes:
   db_data:

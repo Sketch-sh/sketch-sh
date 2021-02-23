@@ -60,21 +60,23 @@ let make =
           switch (typ) {
           | FcTyp_BlockFocusDown =>
             let doc = editor->CodeMirror.Editor.getDoc;
-            doc
-            ->(
-                CodeMirror.Doc.setCursor(
-                  CodeMirror.Position.make(~line=0, ~ch=0, ()),
-                )
-              );
+            doc->(
+                   CodeMirror.Doc.setCursor(
+                     CodeMirror.Position.make(~line=0, ~ch=0, ()),
+                   )
+                 );
           | FcTyp_BlockFocusUp =>
             let doc = editor->CodeMirror.Editor.getDoc;
             let lastLinePlusOne = editor->CodeMirror.Editor.lineCount;
-            doc
-            ->(
-                CodeMirror.Doc.setCursor(
-                  CodeMirror.Position.make(~line=lastLinePlusOne, ~ch=0, ()),
-                )
-              );
+            doc->(
+                   CodeMirror.Doc.setCursor(
+                     CodeMirror.Position.make(
+                       ~line=lastLinePlusOne,
+                       ~ch=0,
+                       (),
+                     ),
+                   )
+                 );
           | FcTyp_BlockNew
           | FcTyp_BlockExecuteAndFocusNextBlock
           | FcTyp_EditorFocus => ()
@@ -108,15 +110,15 @@ let make =
       switch (onChange) {
       | None => ()
       | Some(onChange) =>
-        editor
-        ->(
-            CodeMirror.Editor.onChange((editor, diff) => {
-              let currentEditorValue = editor->CodeMirror.Editor.getValue;
-              if (value != currentEditorValue) {
-                onChange(currentEditorValue, diff);
-              };
-            })
-          )
+        editor->(
+                  CodeMirror.Editor.onChange((editor, diff) => {
+                    let currentEditorValue =
+                      editor->CodeMirror.Editor.getValue;
+                    if (value != currentEditorValue) {
+                      onChange(currentEditorValue, diff);
+                    };
+                  })
+                )
       };
 
       switch (onBlur) {
@@ -138,39 +140,34 @@ let make =
       open Webapi.Dom;
       switch (onBlockUp, onBlockDown) {
       | (Some(onBlockUp), Some(onBlockDown)) =>
-        editor
-        ->(
-            CodeMirror.Editor.onKeydown((editor, event) => {
-              open CodeMirror.Position;
-              let doc = editor->CodeMirror.Editor.getDoc;
-              let cursor = doc->(CodeMirror.Doc.getCursor(`head));
-              switch (event->KeyboardEvent.key) {
-              | "PageUp"
-              | "ArrowUp" when cursor->lineGet == 0 && cursor->chGet == 0 =>
-                onBlockUp()
-              | "PageDown"
-              | "ArrowDown" =>
-                let lastLine = editor->CodeMirror.Editor.lineCount - 1;
-                let lastChar =
-                  editor
-                  ->(CodeMirror.Editor.getLine(lastLine))
-                  ->Js.String.length;
-                if (lineGet(cursor) == lastLine && lastChar == cursor->chGet) {
-                  onBlockDown();
-                };
-              | _ => ()
-              };
-            })
-          )
+        editor->(
+                  CodeMirror.Editor.onKeydown((editor, event) => {
+                    open CodeMirror.Position;
+                    let doc = editor->CodeMirror.Editor.getDoc;
+                    let cursor = doc->(CodeMirror.Doc.getCursor(`head));
+                    switch (event->KeyboardEvent.key) {
+                    | "PageUp"
+                    | "ArrowUp" when cursor->lineGet == 0 && cursor->chGet == 0 =>
+                      onBlockUp()
+                    | "PageDown"
+                    | "ArrowDown" =>
+                      let lastLine = editor->CodeMirror.Editor.lineCount - 1;
+                      let lastChar =
+                        editor
+                        ->(CodeMirror.Editor.getLine(lastLine))
+                        ->Js.String.length;
+                      if (lineGet(cursor) == lastLine
+                          && lastChar == cursor->chGet) {
+                        onBlockDown();
+                      };
+                    | _ => ()
+                    };
+                  })
+                )
       | _ => ()
       };
 
       state.editor := Some(editor);
-      if (Webapi.Dom.location->Webapi.Dom.Location.host
-          != Config.productionHost) {
-        %bs.raw
-        {|window.editor = editor|};
-      };
     },
   render: ({handle, state: _}) =>
     <div ?className ref={handle(setDivRef)} />,
