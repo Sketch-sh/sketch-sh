@@ -103,7 +103,8 @@ module EditorConfiguration = {
     dragDrop: bool,
     /** When given , this will be called when the editor is handling a dragenter , dragover , or drop event.
         It will be passed the editor instance and the event object as arguments.
-        The callback can choose to handle the event itself , in which case it should return true to indicate that CodeMirror should not do anything further. */ /* TODO */ /* onDragEvent?: (instance: CodeMirror.Editor, event: Event) => boolean; *//** This provides a rather low - level hook into CodeMirror's key handling.
+        The callback can choose to handle the event itself , in which case it should return true to indicate that CodeMirror should not do anything further. */ /* TODO *//* onDragEvent?: (instance: CodeMirror.Editor, event: Event) => boolean; */
+                                                                    /** This provides a rather low - level hook into CodeMirror's key handling.
         If provided, this function will be called on every keydown, keyup, and keypress event that CodeMirror captures.
         It will be passed two arguments, the editor instance and the key event.
         This key event is pretty much the raw key event, except that a stop() method is always added to it.
@@ -112,7 +113,7 @@ module EditorConfiguration = {
         It may return true to tell CodeMirror to ignore the event.
         Be wary that, on some browsers, stopping a keydown does not stop the keypress from firing, whereas on others it does.
         If you respond to an event, you should probably inspect its type property and only do something when it is keydown
-        (or keypress for actions that need character data). *//* TODO */ /* onKeyEvent?: (instance: CodeMirror.Editor, event: Event) => boolean; */ /** Half - period in milliseconds used for cursor blinking. The default blink rate is 530ms. */
+        (or keypress for actions that need character data). */ /* TODO *//* onKeyEvent?: (instance: CodeMirror.Editor, event: Event) => boolean; */ /** Half - period in milliseconds used for cursor blinking. The default blink rate is 530ms. */
     [@bs.optional]
     cursorBlinkRate: int,
     /** Determines the height of the cursor. Default is 1 , meaning it spans the whole height of the line.
@@ -149,7 +150,7 @@ module EditorConfiguration = {
         and thus the browser's text search works on it. This will have bad effects on performance of big documents. */
     [@bs.optional]
     viewportMargin: float,
-    /** Optional lint configuration to be used in conjunction with CodeMirror's linter addon. *//* TODO */ /* lint?: boolean | LintOptions; */ /** Optional value to be used in conjunction with CodeMirror’s placeholder add-on. */
+    /** Optional lint configuration to be used in conjunction with CodeMirror's linter addon. */ /* TODO *//* lint?: boolean | LintOptions; */ /** Optional value to be used in conjunction with CodeMirror’s placeholder add-on. */
     [@bs.optional]
     placeholder: string,
     [@bs.optional]
@@ -182,12 +183,14 @@ module LineWidget = {
   type t;
   /**
     Removes the widget.
-  */ [@bs.send] external clear: t => unit = "";
+  */
+  [@bs.send]
+  external clear: t => unit = "clear";
 
   /** Call this if you made some change to the widget's DOM node that might affect its height.
   It'll force CodeMirror to update the height of the line that contains the widget. */
   [@bs.send]
-  external changed: t => unit = "";
+  external changed: t => unit = "changed";
   [@bs.deriving abstract]
   type options = {
     /** Whether the widget should cover the gutter. */
@@ -222,7 +225,7 @@ module EditorChange = {
 module TextMarker = {
   type t;
 
-  [@bs.send] external clear: t => unit = "";
+  [@bs.send] external clear: t => unit = "clear";
 
   [@bs.deriving abstract]
   type findResult = {
@@ -230,7 +233,7 @@ module TextMarker = {
     [@bs.as "to"]
     to_: Position.t,
   };
-  [@bs.send] external find: t => findResult = "";
+  [@bs.send] external find: t => findResult = "find";
 };
 
 module Doc = {
@@ -245,11 +248,11 @@ module Doc = {
   external getCursor:
     (t, [@bs.string] [ | `start | [@bs.as "end"] `end_ | `head | `anchor]) =>
     Position.t =
-    "";
+    "getCursor";
 
-  [@bs.send] external setCursor: (t, Position.t) => unit = "";
+  [@bs.send] external setCursor: (t, Position.t) => unit = "setCursor";
 
-  [@bs.send] external clearHistory: t => unit = "";
+  [@bs.send] external clearHistory: t => unit = "clearHistory";
 
   [@bs.deriving abstract]
   type markTextOption = {
@@ -290,7 +293,7 @@ module Doc = {
   external markText:
     (t, ~from: Position.t, ~to_: Position.t, ~option: markTextOption) =>
     TextMarker.t =
-    "";
+    "markText";
 };
 
 module Token = {
@@ -307,16 +310,17 @@ module Token = {
 };
 
 module Editor = {
-  [@bs.send] external getValue: editor => string = "";
-  [@bs.send] external setValue: (editor, string) => unit = "";
-  [@bs.send] external setOption: (editor, string, 'a) => unit = "";
-  [@bs.send] external getOption: (editor, string) => 'a = "";
-  [@bs.send] external getWrapperElement: editor => Dom.element = "";
-  [@bs.send] external operation: (editor, (. unit) => 'a) => 'a = "";
+  [@bs.send] external getValue: editor => string = "getValue";
+  [@bs.send] external setValue: (editor, string) => unit = "setValue";
+  [@bs.send] external setOption: (editor, string, 'a) => unit = "setOption";
+  [@bs.send] external getOption: (editor, string) => 'a = "getOption";
+  [@bs.send]
+  external getWrapperElement: editor => Dom.element = "getWrapperElement";
+  [@bs.send] external operation: (editor, (. unit) => 'a) => 'a = "operation";
   [@bs.send]
   external getLineTokens:
     (editor, ~line: int, ~precise: bool) => array(Token.t) =
-    "";
+    "getLineTokens";
 
   module GetOption = {
     [@bs.send]
@@ -324,7 +328,8 @@ module Editor = {
       "getOption";
   };
 
-  [@bs.send] external replaceSelection: (editor, string) => unit = "";
+  [@bs.send]
+  external replaceSelection: (editor, string) => unit = "replaceSelection";
   [@bs.send]
   external addLineWidget:
     (
@@ -334,14 +339,14 @@ module Editor = {
       ~options: LineWidget.options
     ) =>
     LineWidget.t =
-    "";
+    "addLineWidget";
 
-  [@bs.send] external getDoc: editor => Doc.t = "";
-  [@bs.send] external hasFocus: editor => bool = "";
-  [@bs.send] external focus: editor => unit = "";
+  [@bs.send] external getDoc: editor => Doc.t = "getDoc";
+  [@bs.send] external hasFocus: editor => bool = "hasFocus";
+  [@bs.send] external focus: editor => unit = "focus";
 
-  [@bs.send] external getLine: (editor, int) => string = "";
-  [@bs.send] external lineCount: editor => int = "";
+  [@bs.send] external getLine: (editor, int) => string = "getLine";
+  [@bs.send] external lineCount: editor => int = "lineCount";
 
   [@bs.send]
   external onChange:
@@ -401,6 +406,6 @@ module Editor = {
       unit
     ) =>
     unit =
-    "";
+    "toggleComment";
   /* Set the lines in the given range to be line comments. Will fall back to blockComment when no line comment style is defined for the mode. */
 };

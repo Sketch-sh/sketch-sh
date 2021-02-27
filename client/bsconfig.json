@@ -32,13 +32,13 @@
     "-bs-g"
   ],
   "ppx-flags": [
-    "graphql_ppx/ppx"
+    "@baransu/graphql_ppx_re/ppx"
   ],
   "suffix": ".bs.js",
   "namespace": true,
   "bs-dependencies": [
-    "reason-react",
     "@glennsl/bs-json",
+    "reason-react",
     "bs-webapi",
     "reason-apollo",
     "bs-dynamic-import",

@@ -3,8 +3,8 @@ let component = ReasonReact.statelessComponent("Logo");
 let make = (~size=1., ~className=?, _children) => {
   ...component,
   render: _self => {
-    let width = (172.327 *. size)->string_of_float;
-    let height = (193.867 *. size)->string_of_float;
+    let width = (172.327 *. size)->Js.Float.toString;
+    let height = (193.867 *. size)->Js.Float.toString;
     <svg ?className width height viewBox="0 0 172.327 193.867">
       <path
         fill="#1874d5"

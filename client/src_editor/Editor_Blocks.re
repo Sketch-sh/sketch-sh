@@ -2,7 +2,6 @@
  * Tips: Fold code at level 2 would help alot with readability
  * If you're using VSCode, use <C-K> <C-2>
  */
-[%%debugger.chrome];
 Modules.require("./Editor_Blocks.css");
 
 open Utils;
@@ -71,17 +70,12 @@ module Actions = {
             );
           } else {
             let result =
-              result
-              ->Belt.List.reduce(
-                  [],
-                  (
-                    (acc, {refmt_id, refmt_value}) =>
-                      switch (refmt_value) {
-                      | Ok(code) => [(refmt_id, code), ...acc]
-                      | Error(_) => acc
-                      }
-                  ),
-                );
+              result->Belt.List.reduce([], (acc, {refmt_id, refmt_value}) =>
+                switch (refmt_value) {
+                | Ok(code) => [(refmt_id, code), ...acc]
+                | Error(_) => acc
+                }
+              );
             self.send(Block_MapRefmtToBlocks(result));
           },
       );
@@ -92,7 +86,7 @@ module Actions = {
     | ML =>
       ReasonReact.UpdateWithSideEffects(
         {...state, stateUpdateReason: Some(action)},
-        (_self => Notify.info("Prettify ML code is not currently supported")),
+        _self => Notify.info("Prettify ML code is not currently supported"),
       )
     | RE =>
       ReasonReact.UpdateWithSideEffects(
@@ -124,7 +118,7 @@ module Actions = {
           blocks: blocksCopy,
           stateUpdateReason: Some(action),
         },
-        (self => self.send(Block_Execute(false, BTyp_Code))),
+        self => self.send(Block_Execute(false, BTyp_Code)),
       )
     };
   let mapRefmtToBlocks = (action, state, results) =>
@@ -137,14 +131,15 @@ module Actions = {
           ->(
               Belt.Array.mapU((. block) => {
                 let {b_data, b_id, b_deleted} = block;
-                b_deleted ?
-                  block :
-                  (
+                b_deleted
+                  ? block
+                  : (
                     switch (b_data) {
                     | B_Code(bcode) =>
                       let mappedBlock =
-                        results
-                        ->Belt.List.getBy((((id, _code)) => id == b_id));
+                        results->Belt.List.getBy(((id, _code)) =>
+                          id == b_id
+                        );
                       switch (mappedBlock) {
                       | None => block
                       | Some((_id, code)) => {
@@ -271,13 +266,13 @@ module Actions = {
     switch (state.focusedBlock) {
     | None => ReasonReact.NoUpdate
     | Some((focusedBlockId, _, _)) =>
-      focusedBlockId == blockId ?
-        ReasonReact.Update({
-          ...state,
-          stateUpdateReason: Some(action),
-          focusedBlock: None,
-        }) :
-        ReasonReact.NoUpdate
+      focusedBlockId == blockId
+        ? ReasonReact.Update({
+            ...state,
+            stateUpdateReason: Some(action),
+            focusedBlock: None,
+          })
+        : ReasonReact.NoUpdate
     };
   /*
    * Block delete and restore
@@ -392,7 +387,7 @@ module Actions = {
             ->syncLineNumber,
           stateUpdateReason: Some(action),
         },
-        (_self => Js.Global.clearTimeout(timeoutId)),
+        _self => Js.Global.clearTimeout(timeoutId),
       );
     };
   };
@@ -428,35 +423,33 @@ module Actions = {
             | Ok((linksWithResults, blocksWithResults)) => {
                 onExecute(false);
 
-                blocksWithResults
-                ->(
-                    Belt.List.forEachU(
-                      (. {Toplevel.Types.id: blockId, result}) => {
-                      let widgets = executeResultToWidget(result);
-                      self.send(Block_AddWidgets(blockId, widgets));
-                    })
-                  );
+                blocksWithResults->(
+                                     Belt.List.forEachU(
+                                       (.
+                                         {Toplevel.Types.id: blockId, result},
+                                       ) => {
+                                       let widgets =
+                                         executeResultToWidget(result);
+                                       self.send(
+                                         Block_AddWidgets(blockId, widgets),
+                                       );
+                                     })
+                                   );
 
-                linksWithResults
-                ->Belt.List.forEachU(
-                    (
-                      (. linkResult) => {
-                        let linkResult: Toplevel.Types.linkResult = linkResult;
-                        let link: Editor_Types.Link.link = linkResult.link;
-                        let result: Worker_Types.linkResult =
-                          linkResult.result;
+                linksWithResults->Belt.List.forEachU((. linkResult) => {
+                  let linkResult: Toplevel.Types.linkResult = linkResult;
+                  let link: Editor_Types.Link.link = linkResult.link;
+                  let result: Worker_Types.linkResult = linkResult.result;
 
-                        switch (result) {
-                        | Ok () => ()
-                        | Error(message) =>
-                          let name = getNameFromLink(link);
-                          Notify.error(
-                            {j|Module "$name" failed to link: $message|j},
-                          );
-                        };
-                      }
-                    ),
-                  );
+                  switch (result) {
+                  | Ok () => ()
+                  | Error(message) =>
+                    let name = getNameFromLink(link);
+                    Notify.error(
+                      {j|Module "$name" failed to link: $message|j},
+                    );
+                  };
+                });
               },
           );
 
@@ -494,7 +487,7 @@ module Actions = {
       switch (state.focusedBlock) {
       | None => blockLength - 1
       | Some((id, _blockTyp, _)) =>
-        switch (state.blocks->arrayFindIndex((({b_id}) => b_id == id))) {
+        switch (state.blocks->arrayFindIndex(({b_id}) => b_id == id)) {
         | None => blockLength - 1
         | Some(index) => index
         }
@@ -551,12 +544,12 @@ module Actions = {
                         bc_widgets: {
                           let removeWidgetBelowMe = diff->getFirstLineFromDiff;
                           let currentWidgets = bcode.bc_widgets;
-                          currentWidgets
-                          ->(
-                              Belt.Array.keepU((. {Widget.lw_line, _}) =>
-                                lw_line < removeWidgetBelowMe
-                              )
-                            );
+                          currentWidgets->(
+                                            Belt.Array.keepU(
+                                              (. {Widget.lw_line, _}) =>
+                                              lw_line < removeWidgetBelowMe
+                                            )
+                                          );
                         },
                       }),
                   }
@@ -584,7 +577,7 @@ let blockControlsButtons = (blockId, isDeleted, send) =>
       ...<button
            className="block__controls--button"
            ariaLabel="Add code block"
-           onClick=(_ => send(Block_Add(blockId, BTyp_Code)))>
+           onClick={_ => send(Block_Add(blockId, BTyp_Code))}>
            <Fi.Code />
            <sup> "+"->str </sup>
          </button>
@@ -593,32 +586,30 @@ let blockControlsButtons = (blockId, isDeleted, send) =>
       ...<button
            className="block__controls--button"
            ariaLabel="Add text block"
-           onClick=(_ => send(Block_Add(blockId, BTyp_Text)))>
+           onClick={_ => send(Block_Add(blockId, BTyp_Text))}>
            <Fi.Edit2 />
            <sup> "+"->str </sup>
          </button>
     </UI_Balloon>
-    (
-      !isDeleted ?
-        <UI_Balloon message="Delete block" position=Down>
-          ...<button
-               className="block__controls--button block__controls--danger"
-               ariaLabel="Delete block"
-               onClick=(_ => send(Block_QueueDelete(blockId)))>
-               <Fi.Trash2 />
-               <sup> "-"->str </sup>
-             </button>
-        </UI_Balloon> :
-        <UI_Balloon message="Restore block" position=Down>
-          ...<button
-               className="block__controls--button"
-               ariaLabel="Restore block"
-               onClick=(_ => send(Block_Restore(blockId)))>
-               <Fi.RefreshCw />
-               <sup> "+"->str </sup>
-             </button>
-        </UI_Balloon>
-    )
+    {!isDeleted
+       ? <UI_Balloon message="Delete block" position=Down>
+           ...<button
+                className="block__controls--button block__controls--danger"
+                ariaLabel="Delete block"
+                onClick={_ => send(Block_QueueDelete(blockId))}>
+                <Fi.Trash2 />
+                <sup> "-"->str </sup>
+              </button>
+         </UI_Balloon>
+       : <UI_Balloon message="Restore block" position=Down>
+           ...<button
+                className="block__controls--button"
+                ariaLabel="Restore block"
+                onClick={_ => send(Block_Restore(blockId))}>
+                <Fi.RefreshCw />
+                <sup> "+"->str </sup>
+              </button>
+         </UI_Balloon>}
   </div>;
 
 let component = ReasonReact.reducerComponent("Editor_Page");
@@ -799,110 +790,104 @@ let make =
       },
     render: ({send, state}) =>
       <>
-        state.blocks
-        ->(
-            Belt.Array.mapU((. {b_id, b_data, b_deleted}) =>
-              b_deleted ?
-                <div key=b_id id=b_id className="block__container">
-                  <div className="block__deleted">
-                    <h3> "This block has been removed"->str </h3>
-                    <p>
-                      "It will be permanently deleted after 10 seconds"->str
-                    </p>
-                    <div className="block__deleted--buttons">
-                      <button
-                        className="block__deleted--button restore"
-                        onClick=(_ => send(Block_Restore(b_id)))
-                        ariaLabel="Restore block">
-                        <Fi.RefreshCw />
-                        "Restore"->str
-                      </button>
-                      <button
-                        className="block__deleted--button delete-immediately"
-                        onClick=(_ => send(Block_DeleteQueued(b_id)))
-                        ariaLabel="Delete block immediately">
-                        <Fi.Trash2 />
-                        "Delete Immediately"->str
-                      </button>
-                    </div>
-                    <div className="block__deleted--progress" />
-                  </div>
-                  <div className="block__controls">
-                    (blockControlsButtons(b_id, b_deleted, send))
-                  </div>
-                </div> :
-                (
-                  switch (b_data) {
-                  | B_Code({bc_value, bc_widgets, bc_firstLineNumber}) =>
-                    <div key=b_id id=b_id className="block__container">
-                      <div className="source-editor">
-                        <Editor_CodeBlock
-                          value=bc_value
-                          focused=(
-                            switch (state.focusedBlock) {
-                            | None => None
-                            | Some((id, _blockTyp, changeTyp)) =>
-                              id == b_id ? Some(changeTyp) : None
-                            }
-                          )
-                          onChange=(
-                            (newValue, diff) =>
-                              send(Block_UpdateValue(b_id, newValue, diff))
-                          )
-                          onBlur=(() => send(Block_Blur(b_id)))
-                          onFocus=(() => send(Block_Focus(b_id, BTyp_Code)))
-                          onBlockUp=(() => send(Block_FocusUp(b_id)))
-                          onBlockDown=(() => send(Block_FocusDown(b_id)))
-                          widgets=bc_widgets
-                          readOnly
-                          firstLineNumber=bc_firstLineNumber
-                          lang
-                        />
-                      </div>
-                      <div className="block__controls">
-                        (
-                          readOnly ?
-                            React.null :
-                            blockControlsButtons(b_id, b_deleted, send)
-                        )
-                      </div>
-                    </div>
-                  | B_Text(text) =>
-                    <div key=b_id id=b_id className="block__container">
-                      <div className="text-editor">
-                        <Editor_TextBlock
-                          value=text
-                          focused=(
-                            switch (state.focusedBlock) {
-                            | None => None
-                            | Some((id, _blockTyp, changeTyp)) =>
-                              id == b_id ? Some(changeTyp) : None
-                            }
-                          )
-                          onBlur=(() => send(Block_Blur(b_id)))
-                          onFocus=(() => send(Block_Focus(b_id, BTyp_Text)))
-                          onBlockUp=(() => send(Block_FocusUp(b_id)))
-                          onBlockDown=(() => send(Block_FocusDown(b_id)))
-                          onChange=(
-                            (newValue, diff) =>
-                              send(Block_UpdateValue(b_id, newValue, diff))
-                          )
-                          readOnly
-                        />
-                      </div>
-                      (
-                        readOnly ?
-                          React.null :
-                          <div className="block__controls">
-                            (blockControlsButtons(b_id, b_deleted, send))
-                          </div>
-                      )
-                    </div>
-                  }
-                )
-            )
-          )
-        ->ReasonReact.array
+        {state.blocks
+         ->(
+             Belt.Array.mapU((. {b_id, b_data, b_deleted}) =>
+               b_deleted
+                 ? <div key=b_id id=b_id className="block__container">
+                     <div className="block__deleted">
+                       <h3> "This block has been removed"->str </h3>
+                       <p>
+                         "It will be permanently deleted after 10 seconds"->str
+                       </p>
+                       <div className="block__deleted--buttons">
+                         <button
+                           className="block__deleted--button restore"
+                           onClick={_ => send(Block_Restore(b_id))}
+                           ariaLabel="Restore block">
+                           <Fi.RefreshCw />
+                           "Restore"->str
+                         </button>
+                         <button
+                           className="block__deleted--button delete-immediately"
+                           onClick={_ => send(Block_DeleteQueued(b_id))}
+                           ariaLabel="Delete block immediately">
+                           <Fi.Trash2 />
+                           "Delete Immediately"->str
+                         </button>
+                       </div>
+                       <div className="block__deleted--progress" />
+                     </div>
+                     <div className="block__controls">
+                       {blockControlsButtons(b_id, b_deleted, send)}
+                     </div>
+                   </div>
+                 : (
+                   switch (b_data) {
+                   | B_Code({bc_value, bc_widgets, bc_firstLineNumber}) =>
+                     <div key=b_id id=b_id className="block__container">
+                       <div className="source-editor">
+                         <Editor_CodeBlock
+                           value=bc_value
+                           focused={
+                             switch (state.focusedBlock) {
+                             | None => None
+                             | Some((id, _blockTyp, changeTyp)) =>
+                               id == b_id ? Some(changeTyp) : None
+                             }
+                           }
+                           onChange={(newValue, diff) =>
+                             send(Block_UpdateValue(b_id, newValue, diff))
+                           }
+                           onBlur={() => send(Block_Blur(b_id))}
+                           onFocus={() => send(Block_Focus(b_id, BTyp_Code))}
+                           onBlockUp={() => send(Block_FocusUp(b_id))}
+                           onBlockDown={() => send(Block_FocusDown(b_id))}
+                           widgets=bc_widgets
+                           readOnly
+                           firstLineNumber=bc_firstLineNumber
+                           lang
+                         />
+                       </div>
+                       <div className="block__controls">
+                         {readOnly
+                            ? React.null
+                            : blockControlsButtons(b_id, b_deleted, send)}
+                       </div>
+                     </div>
+                   | B_Text(text) =>
+                     <div key=b_id id=b_id className="block__container">
+                       <div className="text-editor">
+                         <Editor_TextBlock
+                           value=text
+                           focused={
+                             switch (state.focusedBlock) {
+                             | None => None
+                             | Some((id, _blockTyp, changeTyp)) =>
+                               id == b_id ? Some(changeTyp) : None
+                             }
+                           }
+                           onBlur={() => send(Block_Blur(b_id))}
+                           onFocus={() => send(Block_Focus(b_id, BTyp_Text))}
+                           onBlockUp={() => send(Block_FocusUp(b_id))}
+                           onBlockDown={() => send(Block_FocusDown(b_id))}
+                           onChange={(newValue, diff) =>
+                             send(Block_UpdateValue(b_id, newValue, diff))
+                           }
+                           readOnly
+                         />
+                       </div>
+                       {readOnly
+                          ? React.null
+                          : <div className="block__controls">
+                              {blockControlsButtons(b_id, b_deleted, send)}
+                            </div>}
+                     </div>
+                   }
+                 )
+             )
+           )
+         ->ReasonReact.array}
       </>,
   };
 };

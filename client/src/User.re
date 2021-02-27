@@ -6,9 +6,9 @@ module GetNotes = [%graphql
   query getNotes($userName: String!, $limit: Int, $offset: Int) {
     note(
       where: {user: {username: {_eq: $userName}}}
-      order_by: {
+      order_by: [{
         updated_at: desc
-      },
+      }],
       limit: $limit,
       offset: $offset
       ) {
@@ -95,16 +95,16 @@ let make = (~userName, _children) => {
               )
               |> ignore;
 
-            shouldFetchMore(response##note, self.state.count) ?
-              <UI_SketchList
-                sketches=response##note
-                noSketches={<UI_NoSketches />}
-                fetchMore
-              /> :
-              <UI_SketchList
-                sketches=response##note
-                noSketches={<UI_NoSketches />}
-              />;
+            shouldFetchMore(response##note, self.state.count)
+              ? <UI_SketchList
+                  sketches=response##note
+                  noSketches={<UI_NoSketches />}
+                  fetchMore
+                />
+              : <UI_SketchList
+                  sketches=response##note
+                  noSketches={<UI_NoSketches />}
+                />;
           }
         }
       </GetNotesComponent>

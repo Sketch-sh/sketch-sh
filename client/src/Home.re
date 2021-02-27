@@ -5,9 +5,9 @@ module GetRecentSketches = [%graphql
     query getRecentSketches($userId: String!) {
       sketches: note(
         where: {user_id: {_eq: $userId}}
-        order_by: {
+        order_by: [{
           updated_at: desc
-        },
+        }],
         limit: 5
       ) {
         id
@@ -31,9 +31,9 @@ module GetCommunitySketches = [%graphql
             {user_id: {_neq: "anonymous"}}
           ]
         },
-        order_by: {
+        order_by: [{
           created_at: desc
-        },
+        }],
         limit: 5
       ) {
         id
@@ -67,54 +67,44 @@ let make = (~userId, _children) => {
       <h1> "Home"->str </h1>
       <main className="Home__main">
         <GetRecentSketchesComponent variables=recentSketchesQuery##variables>
-          ...{
-               ({result}) =>
-                 <section>
-                   <h2 className="Home__section--title">
-                     "Your recent sketches"->str
-                   </h2>
-                   {
-                     switch (result) {
-                     | Loading =>
-                       <UI_SketchList.Placeholder
-                         className="Home__section--list"
-                       />
-                     | Error(error) => error##message->str
-                     | Data(response) =>
-                       <UI_SketchList
-                         sketches=response##sketches
-                         className="Home__section--list"
-                         noSketches={<UI_NoSketches />}
-                       />
-                     }
-                   }
-                 </section>
-             }
+          ...{({result}) =>
+            <section>
+              <h2 className="Home__section--title">
+                "Your recent sketches"->str
+              </h2>
+              {switch (result) {
+               | Loading =>
+                 <UI_SketchList.Placeholder className="Home__section--list" />
+               | Error(error) => error##message->str
+               | Data(response) =>
+                 <UI_SketchList
+                   sketches=response##sketches
+                   className="Home__section--list"
+                   noSketches={<UI_NoSketches />}
+                 />
+               }}
+            </section>
+          }
         </GetRecentSketchesComponent>
         <GetCommunitySketchesComponent
           variables=recentSketchesQuery##variables>
-          ...{
-               ({result}) =>
-                 <section>
-                   <h2 className="Home__section--title">
-                     "New community sketches"->str
-                   </h2>
-                   {
-                     switch (result) {
-                     | Loading =>
-                       <UI_SketchList.Placeholder
-                         className="Home__section--list"
-                       />
-                     | Error(error) => error##message->str
-                     | Data(response) =>
-                       <UI_SketchList.WithUserInfo
-                         sketches=response##sketches
-                         className="Home__section--list"
-                       />
-                     }
-                   }
-                 </section>
-             }
+          ...{({result}) =>
+            <section>
+              <h2 className="Home__section--title">
+                "New community sketches"->str
+              </h2>
+              {switch (result) {
+               | Loading =>
+                 <UI_SketchList.Placeholder className="Home__section--list" />
+               | Error(error) => error##message->str
+               | Data(response) =>
+                 <UI_SketchList.WithUserInfo
+                   sketches=response##sketches
+                   className="Home__section--list"
+                 />
+               }}
+            </section>
+          }
         </GetCommunitySketchesComponent>
       </main>
     </div>;
