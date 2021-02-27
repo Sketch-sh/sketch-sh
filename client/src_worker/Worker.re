@@ -32,7 +32,7 @@ module Make = (Config: Config) => {
     external postMessageFromWorker: Config.workerToTopData => unit =
       "postMessage";
     [@bs.val] external self: self = "self";
-    [@bs.val] external importScripts: string => unit = "";
+    [@bs.val] external importScripts: string => unit = "importScripts";
     [@bs.set]
     external onMessageFromTop:
       (self, {. "data": Config.topToWorkerData} => unit) => unit =

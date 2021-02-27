@@ -86,7 +86,7 @@ module Make = (ESig: Worker_Evaluator.EvaluatorSig) => {
       | ML => mlSyntax()
       | RE => reSyntax()
       };
-      let lang = lang->langToString->String.lowercase;
+      let lang = lang->langToString->String.lowercase_ascii;
       let js_linkResult = insertModule(. name, code, lang);
       Belt.Result.(
         switch (js_linkResult->LinkResult.kindGet) {
@@ -152,9 +152,9 @@ module Make = (ESig: Worker_Evaluator.EvaluatorSig) => {
           let (result, hasError) = execute(. code);
 
           let currentBlockResult = {id, result};
-          hasError ?
-            [currentBlockResult, ...acc] :
-            loop(rest, [currentBlockResult, ...acc]);
+          hasError
+            ? [currentBlockResult, ...acc]
+            : loop(rest, [currentBlockResult, ...acc]);
         };
       let executeResults = loop(codeBlocks, []);
 

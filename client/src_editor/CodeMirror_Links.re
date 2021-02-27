@@ -1,4 +1,3 @@
-[%%debugger.chrome];
 open Utils;
 open CodeMirror;
 
@@ -17,49 +16,46 @@ type collectorState =
 
 let linkCollector = (tokens: array(Token.t), ~line): list(extractedToken) => {
   let collect =
-    tokens
-    ->Belt.Array.reduce(
-        (NotTracking, []),
-        ((state, result), token) =>
-          switch (token->Token.typGet->Js.Nullable.toOption) {
-          | Some(typ) =>
-            let splitted = typ |> Js.String.split(" ");
-            if (inArray(splitted, "link") || inArray(splitted, "url")) {
-              let string = token->Token.stringGet;
+    tokens->Belt.Array.reduce((NotTracking, []), ((state, result), token) =>
+      switch (token->Token.typGet->Js.Nullable.toOption) {
+      | Some(typ) =>
+        let splitted = typ |> Js.String.split(" ");
+        if (inArray(splitted, "link") || inArray(splitted, "url")) {
+          let string = token->Token.stringGet;
 
-              let state =
-                switch (state) {
-                | NotTracking =>
-                  Tracking({
-                    content: string,
-                    colStart: token->Token.startGet,
-                    colEnd: token->Token.end_Get,
-                    line,
-                    withTitle: false,
-                  })
-                | Tracking(data) =>
-                  let {content, colStart: _} = data;
-                  Tracking({
-                    ...data,
-                    content: content ++ string,
-                    colEnd: token->Token.end_Get,
-                    withTitle: inArray(splitted, "url"),
-                  });
-                };
-              (state, result);
-            } else {
-              switch (state) {
-              | NotTracking => (state, result)
-              | Tracking(data) => (NotTracking, [data, ...result])
-              };
-            };
-          | _ =>
+          let state =
             switch (state) {
-            | NotTracking => (state, result)
-            | Tracking(data) => (NotTracking, [data, ...result])
-            }
-          },
-      );
+            | NotTracking =>
+              Tracking({
+                content: string,
+                colStart: token->Token.startGet,
+                colEnd: token->Token.end_Get,
+                line,
+                withTitle: false,
+              })
+            | Tracking(data) =>
+              let {content, colStart: _} = data;
+              Tracking({
+                ...data,
+                content: content ++ string,
+                colEnd: token->Token.end_Get,
+                withTitle: inArray(splitted, "url"),
+              });
+            };
+          (state, result);
+        } else {
+          switch (state) {
+          | NotTracking => (state, result)
+          | Tracking(data) => (NotTracking, [data, ...result])
+          };
+        };
+      | _ =>
+        switch (state) {
+        | NotTracking => (state, result)
+        | Tracking(data) => (NotTracking, [data, ...result])
+        }
+      }
+    );
   let (state, collected) = collect;
   switch (state) {
   | NotTracking => collected
@@ -129,13 +125,12 @@ let createLinkHandleNodeWithTitle = (~href, ~title) => {
   marker->Element.setClassName("cm-link-marker");
 
   let textNode = document |> Document.createElement("span");
-  textNode
-  ->Element.setInnerHTML(
-      {j|
+  textNode->Element.setInnerHTML(
+    {j|
         <span class="cm-link">[$(title)]</span>
         <span class="cm-string cm-url">($(href))</span>
       |j},
-    );
+  );
   marker |> Element.appendChild(textNode);
 
   let widget = document |> Document.createElement("a");
@@ -153,16 +148,18 @@ let createLinkHandleNode = (text, withTitle) =>
     let split = text |> Js.String.splitByRe(withTitleRegex);
 
     if (split |> Array.length == 4) {
+      let title = split[1];
       let href = split[2];
-      if (urlRegex |> Js.Re.test(href)) {
-        Some(createLinkHandleNodeWithTitle(~href, ~title=split[1]));
-      } else {
-        None;
+      switch (title, href) {
+      | (Some(title), Some(href)) =>
+        urlRegex->Js.Re.test_(href)
+          ? Some(createLinkHandleNodeWithTitle(~href, ~title)) : None
+      | _ => None
       };
     } else {
       None;
     };
-  } else if (urlRegex |> Js.Re.test(text)) {
+  } else if (urlRegex->Js.Re.test_(text)) {
     Some(createLinkHandleNode(text));
   } else {
     None;
@@ -174,38 +171,34 @@ let createLinkHandleNode = (text, withTitle) =>
  * focus on editor
  */
 let breakMark = (cm, marker) =>
-  cm
-  ->Editor.operation(
-      (.) => {
-        let pos = marker->TextMarker.find->TextMarker.fromGet;
-        let doc = cm->Editor.getDoc;
+  cm->Editor.operation((.) => {
+    let pos = marker->TextMarker.find->TextMarker.fromGet;
+    let doc = cm->Editor.getDoc;
 
-        doc->Doc.setCursor(pos);
-        cm->Editor.focus;
-        marker->TextMarker.clear;
-      },
-    );
+    doc->Doc.setCursor(pos);
+    cm->Editor.focus;
+    marker->TextMarker.clear;
+  });
 
 let linkToMarker = (cm, doc, link) =>
   switch (createLinkHandleNode(link.content, link.withTitle)) {
   | None => None
   | Some((markerNode, textNode)) =>
     let marker =
-      doc
-      ->(
-          Doc.markText(
-            ~from=Position.make(~line=link.line, ~ch=link.colStart, ()),
-            ~to_=Position.make(~line=link.line, ~ch=link.colEnd, ()),
-            ~option=
-              Doc.markTextOption(
-                ~clearOnEnter=true,
-                ~clearWhenEmpty=true,
-                ~handleMouseEvents=false,
-                ~replacedWith=markerNode,
-                (),
-              ),
-          )
-        );
+      doc->(
+             Doc.markText(
+               ~from=Position.make(~line=link.line, ~ch=link.colStart, ()),
+               ~to_=Position.make(~line=link.line, ~ch=link.colEnd, ()),
+               ~option=
+                 Doc.markTextOption(
+                   ~clearOnEnter=true,
+                   ~clearWhenEmpty=true,
+                   ~handleMouseEvents=false,
+                   ~replacedWith=markerNode,
+                   (),
+                 ),
+             )
+           );
     textNode
     |> Webapi.Dom.Element.addClickEventListener(_event =>
          breakMark(cm, marker)
@@ -219,41 +212,30 @@ let setMarkers = (cm, cachedMarkers) => {
   let allLinks = cm->(getAllLinks(~start=0, ~end_=lastLine));
 
   cachedMarkers :=
-    allLinks
-    ->Belt.List.reduce(
-        [],
-        (acc, link) =>
-          switch (linkToMarker(cm, doc, link)) {
-          | None => acc
-          | Some(marker) => [marker, ...acc]
-          },
-      );
+    allLinks->Belt.List.reduce([], (acc, link) =>
+      switch (linkToMarker(cm, doc, link)) {
+      | None => acc
+      | Some(marker) => [marker, ...acc]
+      }
+    );
 };
 
 let register = cm => {
   let cachedMarkers = ref([]);
 
   /* This is for initial setValue */
-  cm
-  ->Editor.onChange(
-      (cm, _) =>
-        if (!cm->Editor.hasFocus) {
-          setMarkers(cm, cachedMarkers);
-        },
-    );
+  cm->Editor.onChange((cm, _) =>
+    if (!cm->Editor.hasFocus) {
+      setMarkers(cm, cachedMarkers);
+    }
+  );
 
   cm->Editor.onBlur((cm, _) => setMarkers(cm, cachedMarkers));
 
-  cm
-  ->Editor.onFocus(
-      (cm, _) => {
-        cm
-        ->Editor.operation(
-            (.) =>
-              (cachedMarkers^)
-              ->Belt.List.forEach(marker => marker->TextMarker.clear),
-          );
-        cachedMarkers := [];
-      },
+  cm->Editor.onFocus((cm, _) => {
+    cm->Editor.operation((.) =>
+      (cachedMarkers^)->Belt.List.forEach(marker => marker->TextMarker.clear)
     );
+    cachedMarkers := [];
+  });
 };

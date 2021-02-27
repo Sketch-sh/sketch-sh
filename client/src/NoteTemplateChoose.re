@@ -110,7 +110,7 @@ let make = _children => {
         <div className="NoteTC__select--element">
           <Router.Link
             id="re"
-            route=(Route.NoteNew(RE))
+            route={Route.NoteNew(RE)}
             className="NoteTC__select--link"
             title="Create ReasonML Sketch">
             <ReasonLogo />
@@ -119,7 +119,7 @@ let make = _children => {
         <div className="NoteTC__select--element">
           <Router.Link
             id="ml"
-            route=(Route.NoteNew(ML))
+            route={Route.NoteNew(ML)}
             className="NoteTC__select--link"
             title="Create ReasonML Sketch">
             <OCamlLogo />

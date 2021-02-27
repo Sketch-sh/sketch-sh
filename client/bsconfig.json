@@ -5,6 +5,7 @@
   },
   "sources": [
     "src",
+    "src/compat",
     "src/components",
     "src/gql",
     "shared",
@@ -32,20 +33,17 @@
     "-bs-g"
   ],
   "ppx-flags": [
-    "graphql_ppx/ppx"
+    "@baransu/graphql_ppx_re/ppx"
   ],
   "suffix": ".bs.js",
   "namespace": true,
   "bs-dependencies": [
-    "reason-react",
     "@glennsl/bs-json",
+    "reason-react",
     "bs-webapi",
     "reason-apollo",
-    "bs-dynamic-import",
-    "reason-loadable",
     "bs-date-fns",
-    "re-classnames",
-    "bs-epitath"
+    "re-classnames"
   ],
   "bs-dev-dependencies": [
     "@glennsl/bs-jest"

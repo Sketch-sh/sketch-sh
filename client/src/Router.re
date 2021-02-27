@@ -35,7 +35,7 @@ module Unload = {
       (. {. [@bs.set] "returnValue": string}) => Js.Nullable.t(string),
   };
 
-  [@bs.val] external window: window = "";
+  [@bs.val] external window: window = "window";
 
   module Provider = {
     let component = ReasonReact.reducerComponent("Router_UnloadProvider");
@@ -43,16 +43,14 @@ module Unload = {
     let make = (_children: React.childless): React.component(unit, 'a, unit) => {
       ...component,
       didMount: _self =>
-        window
-        ->onbeforeunloadSet(
-            (. event) =>
-              switch (getUnloadMessage()) {
-              | None => Js.Nullable.null
-              | Some(message) =>
-                event##returnValue #= message;
-                Js.Nullable.return(message);
-              },
-          ),
+        window->onbeforeunloadSet((. event) =>
+          switch (getUnloadMessage()) {
+          | None => Js.Nullable.null
+          | Some(message) =>
+            event##returnValue #= message;
+            Js.Nullable.return(message);
+          }
+        ),
       render: _self => React.null,
     };
   };
@@ -77,7 +75,7 @@ let push = route => pushUnsafe(Route.routeToUrl(route));
 external pushState:
   (Dom.history, [@bs.as {json|null|json}] _, [@bs.as ""] _, ~href: string) =>
   unit =
-  "";
+  "pushState";
 
 let pushSilentUnsafe = path =>
   switch ([%external history], [%external window]) {
@@ -93,7 +91,7 @@ let pushSilent = route => pushSilentUnsafe(Route.routeToUrl(route));
 external replaceState:
   (Dom.history, [@bs.as {json|null|json}] _, [@bs.as ""] _, ~href: string) =>
   unit =
-  "";
+  "replaceState";
 
 let replaceSilentUnsafe = path =>
   switch ([%external history], [%external window]) {
@@ -117,7 +115,7 @@ module LinkUnsafe = {
         ?title
         ?role
         href
-        onClick=(
+        onClick={
           self.handle((event, _self) =>
             if (!event->ReactEvent.Mouse.ctrlKey
                 && event->ReactEvent.Mouse.button != 1) {
@@ -129,7 +127,7 @@ module LinkUnsafe = {
               };
             }
           )
-        )>
+        }>
         ...children
       </a>,
   };

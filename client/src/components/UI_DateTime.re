@@ -14,7 +14,7 @@ module Transformer: {
     if (compareResult == 1) {
       formatingDate |> DateFns.format(formatPattern);
     } else {
-      formatingDate |> DateFns.distanceInWordsToNow(~addSuffix=true);
+      DateFns.distanceInWordsToNow(~addSuffix=true, formatingDate);
     };
   };
 };
@@ -34,7 +34,7 @@ let make =
     switch (date) {
     | None => ReasonReact.null
     | Some(date) =>
-      <time dateTime=date ?className> (date |> transformer |> str) </time>
+      <time dateTime=date ?className> {date->transformer->str} </time>
     };
   },
 };
