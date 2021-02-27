@@ -2,7 +2,7 @@ type state = bool;
 
 let component = ReasonReact.reducerComponent("UI_WarningStagingServer");
 
-let make = _children: ReasonReact.component(state, 'a, state) => {
+let make = (_children): ReasonReact.component(state, 'a, state) => {
   ...component,
   initialState: () => false,
   reducer: (newState, _) => ReasonReact.Update(newState),
@@ -13,10 +13,10 @@ let make = _children: ReasonReact.component(state, 'a, state) => {
       }
     ),
   render: ({state: shouldDisplay}) =>
-    shouldDisplay ?
-      <div className="warning-staging-server">
-        "WARNING: This is a staging server of ReasonML playground. All data will be reset every day"
-        ->Utils.str
-      </div> :
-      ReasonReact.null,
+    shouldDisplay
+      ? <div className="warning-staging-server">
+          "WARNING: This is a staging server of ReasonML playground. All data will be reset every day"
+          ->Utils.str
+        </div>
+      : ReasonReact.null,
 };

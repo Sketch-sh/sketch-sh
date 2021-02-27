@@ -59,25 +59,23 @@ module AuthCallback = {
       | ChangeState(state) =>
         ReasonReact.UpdateWithSideEffects(
           state,
-          (
-            _ => {
-              open Webapi.Dom.Window;
-              let window = Webapi.Dom.window;
-              switch (window->opener) {
-              | Some(_) => window->close
-              | None =>
-                Js.Global.setTimeout(
-                  () => Router.push(Route.Home),
-                  switch (state) {
-                  | Initial
-                  | Success => 1500
-                  | Failure(_) => 3000
-                  },
-                )
-                ->ignore
-              };
-            }
-          ),
+          _ => {
+            open Webapi.Dom.Window;
+            let window = Webapi.Dom.window;
+            switch (window->opener) {
+            | Some(_) => window->close
+            | None =>
+              Js.Global.setTimeout(
+                () => Router.push(Route.Home),
+                switch (state) {
+                | Initial
+                | Success => 1500
+                | Failure(_) => 3000
+                },
+              )
+              ->ignore
+            };
+          },
         )
       },
     didMount: ({send}) =>
@@ -115,7 +113,7 @@ module AuthCallback = {
 module AuthGithub = {
   let component = ReasonReact.statelessComponent("AuthGithub");
 
-  let make = _children: ReasonReact.component(unit, 'a, unit) => {
+  let make = (_children): ReasonReact.component(unit, 'a, unit) => {
     ...component,
     didMount: _ => Router.redirect(Auth.githubLoginRedirect),
     render: _self => "Redirecting to Github..."->str,
