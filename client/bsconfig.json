@@ -5,6 +5,7 @@
   },
   "sources": [
     "src",
+    "src/compat",
     "src/components",
     "src/gql",
     "shared",
@@ -41,11 +42,8 @@
     "reason-react",
     "bs-webapi",
     "reason-apollo",
-    "bs-dynamic-import",
-    "reason-loadable",
     "bs-date-fns",
-    "re-classnames",
-    "bs-epitath"
+    "re-classnames"
   ],
   "bs-dev-dependencies": [
     "@glennsl/bs-jest"

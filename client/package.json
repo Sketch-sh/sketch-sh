@@ -32,8 +32,6 @@
     "apollo-link-http": "^1.5.4",
     "apollo-link-ws": "^1.0.8",
     "bs-date-fns": "^0.1.6",
-    "bs-dynamic-import": "^0.3.0",
-    "bs-epitath": "^0.1.0",
     "bs-webapi": "^0.10.0",
     "butter-toast": "^2.1.2",
     "codemirror": "5.39.2",
@@ -55,8 +53,7 @@
     "react-helmet": "^5.2.0",
     "react-icons": "^3.0.4",
     "reason-apollo": "0.15.2",
-    "reason-loadable": "thangngoc89/reason-loadable#delay",
-    "reason-react": "^0.9.1",
+    "reason-react": "^0.7.0",
     "subscriptions-transport-ws": "^0.9.14"
   },
   "devDependencies": {
