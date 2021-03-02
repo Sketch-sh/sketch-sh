@@ -12,9 +12,9 @@ jobs:
       - name: Set environment variables
         run: |
           REPOSITORY=$(echo $GITHUB_REPOSITORY | tr '[A-Z]' '[a-z]')
-          echo "::set-env name=AUTH_IMAGE::docker.pkg.github.com/${REPOSITORY}/auth:${GITHUB_SHA}"
-          echo "::set-env name=MIGRATION_IMAGE::docker.pkg.github.com/${REPOSITORY}/migration:${GITHUB_SHA}"
-          echo "::set-env name=NGINX_IMAGE::docker.pkg.github.com/${REPOSITORY}/nginx:${GITHUB_SHA}"
+          echo AUTH_IMAGE=docker.pkg.github.com/${REPOSITORY}/auth:${GITHUB_SHA} >> $GITHUB_ENV
+          echo MIGRATION_IMAGE=docker.pkg.github.com/${REPOSITORY}/migration:${GITHUB_SHA} >> $GITHUB_ENV
+          echo NGINX_IMAGE=docker.pkg.github.com/${REPOSITORY}/nginx:${GITHUB_SHA} >> $GITHUB_ENV
       - name: Add environment variables to .env
         run: |
           echo DEBUG=0 >> .env
