@@ -1,15 +1,20 @@
 version: '3.6'
 services: 
+  migration:
+    image: "${MIGRATION_IMAGE}"
+  
+  graphql-engine:
+    restart: always
+
   auth:
+    image: "${AUTH_IMAGE}"
     build:
       args:
         - NODE_ENV=production
     restart: unless-stopped
 
-  graphql-engine:
-    restart: always
-
   nginx:
+    image: "${NGINX_IMAGE}"
     environment:
       - NODE_ENV=production
     ports:
