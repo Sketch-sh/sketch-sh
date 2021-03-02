@@ -11,9 +11,10 @@ jobs:
         uses: actions/checkout@v1
       - name: Set environment variables
         run: |
-          echo AUTH_IMAGE=docker.pkg.github.com/${GITHUB_REPOSITORY}/auth:${COMMIT_SHA} >> $GITHUB_ENV
-          echo MIGRATION_IMAGE=docker.pkg.github.com/${GITHUB_REPOSITORY}/migration:${COMMIT_SHA} >> $GITHUB_ENV
-          echo NGINX_IMAGE=docker.pkg.github.com/${GITHUB_REPOSITORY}/nginx:${COMMIT_SHA} >> $GITHUB_ENV
+          REPOSITORY=$(echo $GITHUB_REPOSITORY | tr '[A-Z]' '[a-z]')
+          echo AUTH_IMAGE=docker.pkg.github.com/${REPOSITORY}/auth:${GITHUB_SHA} >> $GITHUB_ENV
+          echo MIGRATION_IMAGE=docker.pkg.github.com/${REPOSITORY}/migration:${GITHUB_SHA} >> $GITHUB_ENV
+          echo NGINX_IMAGE=docker.pkg.github.com/${REPOSITORY}/nginx:${GITHUB_SHA} >> $GITHUB_ENV
       - name: Add environment variables to .env
         run: |
           echo DEBUG=0 >> .env
