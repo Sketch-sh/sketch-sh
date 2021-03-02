@@ -27,6 +27,6 @@ jobs:
           docker-compose -f docker-compose.yml -f docker-compose.prod.yml build
       - name: Push images
         run: |
-          docker push ${{ AUTH_IMAGE }}
-          docker push ${{ MIGRATION_IMAGE }}
-          docker push ${{ NGINX_IMAGE }}
+          docker push "${{ env.AUTH_IMAGE }}"
+          docker push "${{ env.MIGRATION_IMAGE }}"
+          docker push "${{ env.NGINX_IMAGE }}""
