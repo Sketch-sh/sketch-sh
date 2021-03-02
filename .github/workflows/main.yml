@@ -2,19 +2,18 @@ name: Build and deploy
 
 on: [push]
 
-env:
-  AUTH_IMAGE: docker.pkg.github.com/$GITHUB_REPOSITORY/auth:$COMMIT_SHA
-  MIGRATION_IMAGE: docker.pkg.github.com/$GITHUB_REPOSITORY/migration:$COMMIT_SHA
-  NGINX_IMAGE: docker.pkg.github.com/$GITHUB_REPOSITORY/nginx:$COMMIT_SHA
-
 jobs:
-
   build:
     name: Build Docker images
     runs-on: ubuntu-latest
     steps:
       - name: Checkout master
         uses: actions/checkout@v1
+      - name: Set environment variables
+        run: |
+          echo AUTH_IMAGE=docker.pkg.github.com/${GITHUB_REPOSITORY}/auth:${COMMIT_SHA} >> $GITHUB_ENV
+          echo MIGRATION_IMAGE=docker.pkg.github.com/${GITHUB_REPOSITORY}/migration:${COMMIT_SHA} >> $GITHUB_ENV
+          echo NGINX_IMAGE=docker.pkg.github.com/${GITHUB_REPOSITORY}/nginx:${COMMIT_SHA} >> $GITHUB_ENV
       - name: Add environment variables to .env
         run: |
           echo DEBUG=0 >> .env
@@ -29,4 +28,4 @@ jobs:
         run: |
           docker push "${{ env.AUTH_IMAGE }}"
           docker push "${{ env.MIGRATION_IMAGE }}"
-          docker push "${{ env.NGINX_IMAGE }}""
+          docker push "${{ env.NGINX_IMAGE }}"
