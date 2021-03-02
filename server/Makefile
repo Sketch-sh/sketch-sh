@@ -40,7 +40,7 @@ dev-build:
 	docker-compose -f docker-compose.yml -f docker-compose.dev.yml build
 
 do-build:
-	docker-compose -f docker-compose.prod.yml build && docker-compose -f docker-compose.prod.yml push
+	docker-compose -f docker-compose.yml -f docker-compose.prod.yml build && docker-compose -f docker-compose.yml -f docker-compose.prod.yml push
 do-ps:
 	docker stack ps sketch
 do-deploy:

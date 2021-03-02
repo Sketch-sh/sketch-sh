@@ -1,23 +1,32 @@
-name: Build and Deploy
-on:
-  push:
-    branches:
-      - master
+name: Build and deploy
+
+on: [push]
+
+env:
+  AUTH_IMAGE: docker.pkg.github.com/$GITHUB_REPOSITORY/auth:$COMMIT_SHA
+  MIGRATION_IMAGE: docker.pkg.github.com/$GITHUB_REPOSITORY/migration:$COMMIT_SHA
+  NGINX_IMAGE: docker.pkg.github.com/$GITHUB_REPOSITORY/nginx:$COMMIT_SHA
+
 jobs:
-  build-and-deploy:
+
+  build:
+    name: Build Docker images
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout 🛎️
-        uses: actions/checkout@v2.3.1
-
-      - name: Install and Build 🔧 # This example project is built using yarn and outputs the result to the 'client/build' folder. Replace with the commands required to build your project, or remove this step entirely if your site is pre-built.
-        working-directory: ./client
+      - name: Checkout master
+        uses: actions/checkout@v1
+      - name: Add environment variables to .env
         run: |
-          yarn install
-          yarn build
-
-      - name: Deploy 🚀
-        uses: JamesIves/github-pages-deploy-action@4.0.0
-        with:
-          branch: gh-pages # The branch the action should deploy to.
-          folder: client/build # The folder the action should deploy.
+          echo DEBUG=0 >> .env
+      - name: Log in to GitHub Packages
+        run: echo ${GITHUB_TOKEN} | docker login -u ${GITHUB_ACTOR} --password-stdin docker.pkg.github.com
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build images
+        run: |
+          docker-compose -f docker-compose.yml -f docker-compose.prod.yml build
+      - name: Push images
+        run: |
+          docker push ${{ AUTH_IMAGE }}
+          docker push ${{ MIGRATION_IMAGE }}
+          docker push ${{ NGINX_IMAGE }}

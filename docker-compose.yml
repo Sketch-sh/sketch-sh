@@ -22,14 +22,12 @@ services:
       - DATABASE_URL=postgres://postgres:${POSTGRES_PASSWORD}@postgres:5432/postgres
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - HASURA_ACCESS_KEY=${HASURA_ACCESS_KEY}
-
     command: ["sh", "./wait-for-pg.sh", "postgres", "npm run migrate"]
 
   graphql-engine:
     image: hasura/graphql-engine:v1.0.0-beta.3
     depends_on:
       - postgres
-    restart: always
     environment:
       - HASURA_GRAPHQL_DATABASE_URL=postgres://postgres:${POSTGRES_PASSWORD}@postgres:5432/postgres
       - HASURA_GRAPHQL_ACCESS_KEY=${HASURA_ACCESS_KEY}
@@ -50,7 +48,6 @@ services:
       - GITHUB_CLIENT_SECRET=${GITHUB_CLIENT_SECRET}
       - AUTH_URL=${AUTH_URL}
       - FRONTEND_URL=${FRONTEND_URL}
-
     depends_on:
       - graphql-engine
 
