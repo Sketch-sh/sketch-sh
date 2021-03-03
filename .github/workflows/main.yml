@@ -46,7 +46,6 @@ jobs:
           ssh -o StrictHostKeyChecking=no ${{ secrets.DIGITAL_OCEAN_USER }}@${{ secrets.DIGITAL_OCEAN_IP_ADDRESS }} << 'ENDSSH'
             cd app
             source .env
-            echo ${GITHUB_TOKEN} | docker login -u ${GITHUB_ACTOR} --password-stdin docker.pkg.github.com
             docker pull ${AUTH_IMAGE}
             docker pull ${MIGRATION_IMAGE}
             docker pull ${NGINX_IMAGE}
