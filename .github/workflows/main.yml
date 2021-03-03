@@ -3,7 +3,7 @@ name: Build and deploy
 on: [push]
 
 env:
-  DOCKER_LOGIN_COMMAND: echo "${{ secrets.GITHUB_TOKEN }}" | docker login docker.pkg.github.com -u ${{ github.actor }} --password-stdin
+  DOCKER_LOGIN_COMMAND: s
 
 jobs:
   deploy:
@@ -38,9 +38,11 @@ jobs:
           SSH_AUTH_SOCK: /tmp/ssh_agent.sock
         run: |
           mkdir -p ~/.ssh
-          ssh-agent -a $SSH_AUTH_SOCK > /dev/null
-          ssh-keyscan github.com >> ~/.ssh/known_hosts
-          ssh-add - <<< "${{ secrets.DIGITAL_OCEAN_KEY }}"
+          ssh-keyscan ${{ secrets.DIGITAL_OCEAN_IP_ADDRESS }} >> ~/.ssh/known_hosts
+          echo "${{ secrets.DIGITAL_OCEAN_KEY }}" > ~/.ssh/github_actions
+          chmod 600 ~/.ssh/github_actions
+          ssh-agent -a $SSH_AUTH_SOCK > /dev/null   
+          ssh-add ~/.ssh/github_actions
       - name: Log into registry
         run: ssh -o StrictHostKeyChecking=no ${{ secrets.DIGITAL_OCEAN_USER }}@${{ secrets.DIGITAL_OCEAN_IP_ADDRESS }} "$DOCKER_LOGIN_COMMAND"
       - name: Build and deploy images on DigitalOcean
