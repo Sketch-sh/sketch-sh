@@ -96,7 +96,7 @@ Server implementation contains 2 microservices: auth, hasura's graphql engine
 ~/sketch-sh/server: > cp .env.example .env
 ```
 
-- Open `.env` and add `GITHUB_CLIENT_ID` and `GITHUB_CLIENT_SECRET`
+- Open `.env` and add `AUTH_GITHUB_CLIENT_ID` and `AUTH_GITHUB_CLIENT_SECRET`
 
 - Start docker-compose in detach mode
 

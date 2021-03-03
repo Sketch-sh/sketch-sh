@@ -14,7 +14,7 @@ module.exports = {
 
   production: {
     client: "pg",
-    connection: process.env.DATABASE_URL,
+    connection: `postgres://postgres:${process.env.POSTGRES_PASSWORD}@postgres:5432/postgres`,
     pool: {
       min: 2,
       max: 10,

@@ -44,8 +44,8 @@ services:
       - NODE_ENV=development
       - JWT_TOKEN=${JWT_TOKEN}
       - HASURA_ENDPOINT=http://graphql-engine:8080/v1alpha1/graphql
-      - GITHUB_CLIENT_ID=${GITHUB_CLIENT_ID}
-      - GITHUB_CLIENT_SECRET=${GITHUB_CLIENT_SECRET}
+      - AUTH_GITHUB_CLIENT_ID=${AUTH_GITHUB_CLIENT_ID}
+      - AUTH_GITHUB_CLIENT_SECRET=${AUTH_GITHUB_CLIENT_SECRET}
       - AUTH_URL=${AUTH_URL}
       - FRONTEND_URL=${FRONTEND_URL}
     depends_on:
