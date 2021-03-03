@@ -32,17 +32,15 @@ jobs:
           SSH_AUTH_SOCK: /tmp/ssh_agent.sock
         run: |
           mkdir -p ~/.ssh
-          ssh-keyscan ${{ secrets.DIGITAL_OCEAN_IP_ADDRESS }} >> ~/.ssh/known_hosts
-          echo "${{ secrets.DIGITAL_OCEAN_KEY }}" > ~/.ssh/github_actions
-          chmod 600 ~/.ssh/github_actions
-          ssh-agent -a $SSH_AUTH_SOCK > /dev/null   
-          ssh-add ~/.ssh/github_actions
+          ssh-agent -a $SSH_AUTH_SOCK > /dev/null
+          ssh-keyscan github.com >> ~/.ssh/known_hosts
+          ssh-add - <<< "${{ secrets.DIGITAL_OCEAN_KEY }}"
       - name: Build and deploy images on DigitalOcean
         env:
           SSH_AUTH_SOCK: /tmp/ssh_agent.sock
         run: |
-          scp -o StrictHostKeyChecking=no -r ./.env ./docker-compose.yml ./docker-compose.prod.yml {{ secrets.DIGITAL_OCEAN_USER }}@${{ secrets.DIGITAL_OCEAN_IP_ADDRESS }}:/app
-          ssh -o StrictHostKeyChecking=no {{ secrets.DIGITAL_OCEAN_USER }}@${{ secrets.DIGITAL_OCEAN_IP_ADDRESS }} << 'ENDSSH'
+          scp -o StrictHostKeyChecking=no -r ./.env ./docker-compose.yml ./docker-compose.prod.yml ${{ secrets.DIGITAL_OCEAN_USER }}@${{ secrets.DIGITAL_OCEAN_IP_ADDRESS }}:/app
+          ssh -o StrictHostKeyChecking=no ${{ secrets.DIGITAL_OCEAN_USER }}@${{ secrets.DIGITAL_OCEAN_IP_ADDRESS }} << 'ENDSSH'
             cd /app
             source .env
             echo ${GITHUB_TOKEN} | docker login -u ${GITHUB_ACTOR} --password-stdin docker.pkg.github.com
