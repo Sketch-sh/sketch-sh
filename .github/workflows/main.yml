@@ -39,9 +39,9 @@ jobs:
         env:
           SSH_AUTH_SOCK: /tmp/ssh_agent.sock
         run: |
-          scp -o StrictHostKeyChecking=no -r ./.env ./docker-compose.yml ./docker-compose.prod.yml ${{ secrets.DIGITAL_OCEAN_USER }}@${{ secrets.DIGITAL_OCEAN_IP_ADDRESS }}:/app
+          scp -o StrictHostKeyChecking=no -r ./.env ./docker-compose.yml ./docker-compose.prod.yml ${{ secrets.DIGITAL_OCEAN_USER }}@${{ secrets.DIGITAL_OCEAN_IP_ADDRESS }}:app
           ssh -o StrictHostKeyChecking=no ${{ secrets.DIGITAL_OCEAN_USER }}@${{ secrets.DIGITAL_OCEAN_IP_ADDRESS }} << 'ENDSSH'
-            cd /app
+            cd app
             source .env
             echo ${GITHUB_TOKEN} | docker login -u ${GITHUB_ACTOR} --password-stdin docker.pkg.github.com
             docker pull ${AUTH_IMAGE}
