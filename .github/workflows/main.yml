@@ -3,9 +3,8 @@ name: Build and deploy
 on: [push]
 
 jobs:
-  environment: Production
-
   deploy:
+    environment: Production
     name: Deploy to DigitalOcean
     runs-on: ubuntu-latest
     # needs: build
