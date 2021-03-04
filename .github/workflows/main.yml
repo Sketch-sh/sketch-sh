@@ -51,6 +51,7 @@ jobs:
         run: ssh production "$DOCKER_LOGIN_COMMAND"
       - name: Build and deploy images on DigitalOcean
         run: |
+          scp -r ./.env ./docker-compose.yml ./docker-compose.prod.yml production:~/app
           ssh production << 'ENDSSH'
             cd app
             source .env
