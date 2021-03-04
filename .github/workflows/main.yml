@@ -92,5 +92,5 @@ jobs:
             docker pull $AUTH_IMAGE
             docker pull $MIGRATION_IMAGE
             docker pull $NGINX_IMAGE
-            docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d
+            docker-compose -f docker-compose.yml -f docker-compose.prod.yml up --no-build -d
           ENDSSH
