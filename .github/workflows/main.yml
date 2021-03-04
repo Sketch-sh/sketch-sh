@@ -47,8 +47,6 @@ jobs:
             IdentityFile ~/.ssh/production.key
             StrictHostKeyChecking no
           END
-      - name: Log into registry
-        run: ssh production "$DOCKER_LOGIN_COMMAND"
       - name: Build and deploy images on DigitalOcean
         run: |
           scp production -r ./.env ./docker-compose.yml ./docker-compose.prod.yml ~/app
