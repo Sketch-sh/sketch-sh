@@ -3,7 +3,7 @@ name: Build and deploy
 on: [push]
 
 env:
-  DOCKER_LOGIN_COMMAND: s
+  DOCKER_LOGIN_COMMAND: echo "${{ secrets.GITHUB_TOKEN }}" | docker login docker.pkg.github.com -u ${{ github.actor }} --password-stdin
 
 jobs:
   deploy:
@@ -30,7 +30,7 @@ jobs:
           echo FRONTEND_URL=${{ secrets.FRONTEND_URL }} >> .env
           echo JWT_TOKEN=${{ secrets.JWT_TOKEN }} >> .env
           echo POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }} >> .env
-          echo WEB_IMAGE=${{ env.WEB_IMAGE }} >> .env
+          echo AUTH_IMAGE=${{ env.AUTH_IMAGE }} >> .env
           echo MIGRATION_IMAGE=${{ env.MIGRATION_IMAGE }} >> .env
           echo NGINX_IMAGE=${{ env.NGINX_IMAGE }} >> .env
       - name: Add the private SSH key to the ssh-agent
@@ -41,6 +41,8 @@ jobs:
           ssh-agent -a $SSH_AUTH_SOCK > /dev/null
           ssh-keyscan github.com >> ~/.ssh/known_hosts
           ssh-add - <<< "${{ secrets.DIGITAL_OCEAN_KEY }}"
+      - name: Log into registry
+        run: ssh -o StrictHostKeyChecking=no ${{ secrets.DIGITAL_OCEAN_USER }}@${{ secrets.DIGITAL_OCEAN_IP_ADDRESS }} "$DOCKER_LOGIN_COMMAND"
       - name: Build and deploy images on DigitalOcean
         run: |
           scp -o StrictHostKeyChecking=no -r ./.env ./docker-compose.yml ./docker-compose.prod.yml ${{ secrets.DIGITAL_OCEAN_USER }}@${{ secrets.DIGITAL_OCEAN_IP_ADDRESS }}:app
