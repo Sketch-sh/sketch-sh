@@ -54,9 +54,8 @@ jobs:
           ssh production << 'ENDSSH'
             cd app
             source .env
-            docker login -u ${GITHUB_ACTOR} -p {GITHUB_TOKEN} docker.pkg.github.com
-            docker pull ${AUTH_IMAGE}
-            docker pull ${MIGRATION_IMAGE}
-            docker pull ${NGINX_IMAGE}
+            docker pull $AUTH_IMAGE
+            docker pull $MIGRATION_IMAGE
+            docker pull $NGINX_IMAGE
             docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d
           ENDSSH
