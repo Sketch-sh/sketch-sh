@@ -37,16 +37,22 @@ jobs:
         env:
           SSH_AUTH_SOCK: /tmp/ssh_agent.sock
         run: |
-          mkdir -p ~/.ssh
-          ssh-agent -a $SSH_AUTH_SOCK > /dev/null
-          ssh-keyscan github.com >> ~/.ssh/known_hosts
-          ssh-add - <<< "${{ secrets.DIGITAL_OCEAN_KEY }}"
+          mkdir -p ~/.ssh/
+          echo "${{ secrets.DIGITAL_OCEAN_KEY }}" > ~/.ssh/production.key
+          chmod 600 ~/.ssh/production.key
+          cat >>~/.ssh/config <<END
+          Host production
+            HostName ${{ secrets.DIGITAL_OCEAN_IP_ADDRESS }}
+            User ${{ secrets.DIGITAL_OCEAN_USER }}
+            IdentityFile ~/.ssh/production.key
+            StrictHostKeyChecking no
+          END
       - name: Log into registry
-        run: ssh -o StrictHostKeyChecking=no ${{ secrets.DIGITAL_OCEAN_USER }}@${{ secrets.DIGITAL_OCEAN_IP_ADDRESS }} "$DOCKER_LOGIN_COMMAND"
+        run: ssh production "$DOCKER_LOGIN_COMMAND"
       - name: Build and deploy images on DigitalOcean
         run: |
-          scp -o StrictHostKeyChecking=no -r ./.env ./docker-compose.yml ./docker-compose.prod.yml ${{ secrets.DIGITAL_OCEAN_USER }}@${{ secrets.DIGITAL_OCEAN_IP_ADDRESS }}:app
-          ssh -o StrictHostKeyChecking=no ${{ secrets.DIGITAL_OCEAN_USER }}@${{ secrets.DIGITAL_OCEAN_IP_ADDRESS }} << 'ENDSSH'
+          scp production -r ./.env ./docker-compose.yml ./docker-compose.prod.yml ~/app
+          ssh production << 'ENDSSH'
             cd app
             source .env
             docker login -u ${GITHUB_ACTOR} -p {GITHUB_TOKEN} docker.pkg.github.com
