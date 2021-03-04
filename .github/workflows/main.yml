@@ -66,8 +66,6 @@ jobs:
           echo MIGRATION_IMAGE=${{ env.MIGRATION_IMAGE }} >> .env
           echo NGINX_IMAGE=${{ env.NGINX_IMAGE }} >> .env
       - name: Add the private SSH key to the ssh-agent
-        env:
-          SSH_AUTH_SOCK: /tmp/ssh_agent.sock
         run: |
           mkdir -p ~/.ssh/
           echo "${{ secrets.DIGITAL_OCEAN_KEY }}" > ~/.ssh/production.key
