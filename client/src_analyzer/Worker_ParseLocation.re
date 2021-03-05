@@ -13,21 +13,24 @@ let parse = output =>
                  [%bs.re {|/line\s(\d+), characters (\d+)-(\d+):\n/gi|}],
                );
           let item =
-            switch (matches->Belt.Array.length) {
-            | 5 =>
-              let line = matches[1]->int_of_string;
-              let content = matches[4]->Js.String.trim;
+            switch (matches) {
+            | [|
+                _,
+                Some(line),
+                Some(err_beginning),
+                Some(err_end),
+                Some(content),
+              |] =>
+              let line = line->int_of_string;
+              let content = content->Js.String.trim;
               let errContent = {
                 errMsg_content: content,
                 errMsg_loc: (
                   {
                     Worker_Types.line: line - 1,
-                    col: matches[2]->int_of_string,
+                    col: err_beginning->int_of_string,
                   },
-                  {
-                    Worker_Types.line: line - 1,
-                    col: matches[3]->int_of_string,
-                  },
+                  {Worker_Types.line: line - 1, col: err_end->int_of_string},
                 ),
               };
               /* Error and Warning at the beginning */

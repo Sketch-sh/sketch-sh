@@ -1,4 +1,3 @@
-[%%debugger.chrome];
 Modules.require("./Editor_Note.css");
 open Utils;
 open Editor_Types;
@@ -102,13 +101,11 @@ module Editor_Note = {
           ReasonReact.Update({...state, executeCallback: Some(callback)})
         | Execute =>
           ReasonReact.SideEffects(
-            (
-              ({state}) =>
-                switch (state.executeCallback) {
-                | None => ()
-                | Some(callback) => callback()
-                }
-            ),
+            ({state}) =>
+              switch (state.executeCallback) {
+              | None => ()
+              | Some(callback) => callback()
+              },
           )
         | ToggleLinkMenu =>
           ReasonReact.Update({
@@ -119,13 +116,11 @@ module Editor_Note = {
         | LinkUpdate(links) =>
           ReasonReact.UpdateWithSideEffects(
             {...state, links, editorContentStatus: Ec_Dirty},
-            (
-              _ =>
-                switch (state.executeCallback) {
-                | None => ()
-                | Some(callback) => callback()
-                }
-            ),
+            _ =>
+              switch (state.executeCallback) {
+              | None => ()
+              | Some(callback) => callback()
+              },
           )
         | BlockUpdate(blocks) =>
           state.blocks := blocks;
@@ -160,12 +155,10 @@ module Editor_Note = {
                 noteState: NoteState_Old,
                 noteLastEdited: Some(lastEdited),
               },
-              (
-                _ =>
-                  Router.pushSilent(
-                    Route.Note({noteId: state.noteId, data: None}),
-                  )
-              ),
+              _ =>
+                Router.pushSilent(
+                  Route.Note({noteId: state.noteId, data: None}),
+                ),
             );
           | (_, SaveStatus_Error) =>
             Notify.error("Save error");
@@ -187,7 +180,7 @@ module Editor_Note = {
                 noteOwnerId: owner,
                 hasSavePermission: true,
               },
-              (_ => Router.push(Route.Note({noteId: newId, data: None}))),
+              _ => Router.push(Route.Note({noteId: newId, data: None})),
             );
           | ForkStatus_Error =>
             Notify.error("Fork error");
@@ -201,123 +194,114 @@ module Editor_Note = {
         let {editorContentStatus, lang} = state;
         <>
           <UI_Topbar.Actions>
-            ...{
-                 (~buttonClassName) =>
-                   <>
-                     <UI_Balloon
-                       position=Down
-                       length=Fit
-                       message="Execute code (Ctrl+Enter)">
-                       ...<button
-                            disabled={state.isExecuting}
-                            className=buttonClassName
-                            onClick={
-                              _ =>
-                                switch (state.executeCallback) {
-                                | None => ()
-                                | Some(callback) => callback()
-                                }
-                            }>
-                            <UI_LoadingWrapper
-                              loading={state.isExecuting} delayMs=500>
-                              ...{
-                                   loading =>
-                                     loading ?
-                                       <Fi.Loader
-                                         className="EditorNav__button--spin"
-                                       /> :
-                                       <Fi.Play />
-                                 }
-                            </UI_LoadingWrapper>
-                            <span> "Run"->str </span>
-                          </button>
-                     </UI_Balloon>
-                     <Editor_Note_SaveButton
-                       hasSavePermission={state.hasSavePermission}
-                       noteId={state.noteId}
-                       noteState={state.noteState}
-                       editorContentStatus
-                       updateSaveStatus={
-                         saveStatus => saveStatus->UpdateNoteSaveStatus->send
-                       }
-                       getCurrentData={
-                         () => (
-                           state.title,
-                           Editor_Json.V1.encode(
-                             state.lang,
-                             state.links,
-                             Editor_Blocks_Utils.filterDeletedBlocks(
-                               state.blocks^,
-                             ),
-                           ),
-                         )
-                       }
-                       registerShortcut
+            ...{(~buttonClassName) =>
+              <>
+                <UI_Balloon
+                  position=Down length=Fit message="Execute code (Ctrl+Enter)">
+                  ...<button
+                       disabled={state.isExecuting}
                        className=buttonClassName
-                     />
-                     <Editor_Note_ForkButton
-                       hasSavePermission={state.hasSavePermission}
-                       noteId={state.noteId}
-                       noteState={state.noteState}
-                       updateForkStatus={
-                         forkStatus => forkStatus->UpdateForkStatus->send
-                       }
-                       getCurrentData={
-                         () => (
-                           state.title,
-                           Editor_Json.V1.encode(
-                             state.lang,
-                             state.links,
-                             Editor_Blocks_Utils.filterDeletedBlocks(
-                               state.blocks^,
-                             ),
-                           ),
-                         )
-                       }
-                       className=buttonClassName
-                       forkStatus={state.forkStatus}
-                     />
-                     <UI_Balloon message="Sketch language" position=Down>
-                       ...<fieldset
-                            className="EditorNote__lang"
-                            ariaLabel="Language toggle">
-                            <span>
-                              <input
-                                type_="radio"
-                                id="RE"
-                                name="language"
-                                checked={lang == RE}
-                                onChange={_ => send(ChangeLang(RE))}
-                              />
-                              <label
-                                htmlFor="RE" className="EditorNote__lang--RE">
-                                "RE"->str
-                              </label>
-                            </span>
-                            <span>
-                              <input
-                                type_="radio"
-                                id="ML"
-                                name="language"
-                                checked={lang == ML}
-                                onChange={_ => send(ChangeLang(ML))}
-                              />
-                              <label
-                                htmlFor="ML" className="EditorNote__lang--ML">
-                                "ML"->str
-                              </label>
-                            </span>
-                          </fieldset>
-                     </UI_Balloon>
-                   </>
-               }
+                       onClick={_ =>
+                         switch (state.executeCallback) {
+                         | None => ()
+                         | Some(callback) => callback()
+                         }
+                       }>
+                       <UI_LoadingWrapper
+                         loading={state.isExecuting} delayMs=500>
+                         ...{loading =>
+                           loading
+                             ? <Fi.Loader
+                                 className="EditorNav__button--spin"
+                               />
+                             : <Fi.Play />
+                         }
+                       </UI_LoadingWrapper>
+                       <span> "Run"->str </span>
+                     </button>
+                </UI_Balloon>
+                <Editor_Note_SaveButton
+                  hasSavePermission={state.hasSavePermission}
+                  noteId={state.noteId}
+                  noteState={state.noteState}
+                  editorContentStatus
+                  updateSaveStatus={saveStatus =>
+                    saveStatus->UpdateNoteSaveStatus->send
+                  }
+                  getCurrentData={() =>
+                    (
+                      state.title,
+                      Editor_Json.V1.encode(
+                        state.lang,
+                        state.links,
+                        Editor_Blocks_Utils.filterDeletedBlocks(
+                          state.blocks^,
+                        ),
+                      ),
+                    )
+                  }
+                  registerShortcut
+                  className=buttonClassName
+                />
+                <Editor_Note_ForkButton
+                  hasSavePermission={state.hasSavePermission}
+                  noteId={state.noteId}
+                  noteState={state.noteState}
+                  updateForkStatus={forkStatus =>
+                    forkStatus->UpdateForkStatus->send
+                  }
+                  getCurrentData={() =>
+                    (
+                      state.title,
+                      Editor_Json.V1.encode(
+                        state.lang,
+                        state.links,
+                        Editor_Blocks_Utils.filterDeletedBlocks(
+                          state.blocks^,
+                        ),
+                      ),
+                    )
+                  }
+                  className=buttonClassName
+                  forkStatus={state.forkStatus}
+                />
+                <UI_Balloon message="Sketch language" position=Down>
+                  ...<fieldset
+                       className="EditorNote__lang"
+                       ariaLabel="Language toggle">
+                       <span>
+                         <input
+                           type_="radio"
+                           id="RE"
+                           name="language"
+                           checked={lang == RE}
+                           onChange={_ => send(ChangeLang(RE))}
+                         />
+                         <label htmlFor="RE" className="EditorNote__lang--RE">
+                           "RE"->str
+                         </label>
+                       </span>
+                       <span>
+                         <input
+                           type_="radio"
+                           id="ML"
+                           name="language"
+                           checked={lang == ML}
+                           onChange={_ => send(ChangeLang(ML))}
+                         />
+                         <label htmlFor="ML" className="EditorNote__lang--ML">
+                           "ML"->str
+                         </label>
+                       </span>
+                     </fieldset>
+                </UI_Balloon>
+              </>
+            }
           </UI_Topbar.Actions>
           <Helmet>
             <title>
-              {
-                let title = state.title == "" ? "untitled" : state.title;
-                title->str;
-              }
+              {let title = state.title == "" ? "untitled" : state.title;
+               title->str}
             </title>
           </Helmet>
           <main className="EditorNote Layout__center">
@@ -343,65 +327,59 @@ module Editor_Note = {
                 </Editor_Note_GetUserInfo>
                 <UI_Balloon position=Down message="Link sketches">
                   ...<button
-                       className={
-                         ClassNames.make([
-                           "EditorNote__linkMenu",
-                           state.isLinkMenuOpen
-                           ->ClassNames.ifTrue("EditorNote__linkMenu--open"),
-                         ])
-                       }
+                       className={ClassNames.make([
+                         "EditorNote__linkMenu",
+                         state.isLinkMenuOpen
+                         ->ClassNames.ifTrue("EditorNote__linkMenu--open"),
+                       ])}
                        onClick={_ => send(ToggleLinkMenu)}>
                        <Fi.Link />
                      </button>
                 </UI_Balloon>
                 <i className="EditorNote__links">
-                  state.links
-                  ->(
-                      Belt.Array.mapU((. link) =>
-                        link
-                        ->Editor_Links_Utils.getNameFromLink
-                        ->String.capitalize
-                      )
-                    )
-                  ->joinWithComma
-                  ->str
+                  {state.links
+                   ->(
+                       Belt.Array.mapU((. link) =>
+                         link
+                         ->Editor_Links_Utils.getNameFromLink
+                         ->String.capitalize_ascii
+                       )
+                     )
+                   ->joinWithComma
+                   ->str}
                 </i>
               </div>
-              {
-                state.forkFrom
-                =>> (
-                  forkFrom =>
-                    <div className="EditorNote__forkFrom">
-                      <p>
-                        "Forked from"->str
-                        <Router.Link
-                          route={Route.Note({noteId: forkFrom, data: None})}>
-                          {j|/s/$(forkFrom)|j}->str
-                        </Router.Link>
-                      </p>
-                    </div>
-                )
-              }
+              {state.forkFrom
+               =>> (
+                 forkFrom =>
+                   <div className="EditorNote__forkFrom">
+                     <p>
+                       "Forked from"->str
+                       <Router.Link
+                         route={Route.Note({noteId: forkFrom, data: None})}>
+                         {j|/s/$(forkFrom)|j}->str
+                       </Router.Link>
+                     </p>
+                   </div>
+               )}
             </div>
-            {
-              state.isLinkMenuOpen ?
-                <Editor_Links
-                  key={
-                    state.noteId ++ string_of_int(Array.length(state.links))
-                  }
-                  currentSketchId={state.noteId}
-                  links={state.links}
-                  onUpdate={links => send(LinkUpdate(links))}
-                /> :
-                ReasonReact.null
-            }
+            {state.isLinkMenuOpen
+               ? <Editor_Links
+                   key={
+                     state.noteId ++ string_of_int(Array.length(state.links))
+                   }
+                   currentSketchId={state.noteId}
+                   links={state.links}
+                   onUpdate={links => send(LinkUpdate(links))}
+                 />
+               : ReasonReact.null}
             <Editor_Blocks
               key={state.noteId}
               lang
               blocks=state.blocks^
               links={state.links}
-              registerExecuteCallback={
-                callback => send(RegisterExecuteCallback(callback))
+              registerExecuteCallback={callback =>
+                send(RegisterExecuteCallback(callback))
               }
               registerShortcut
               onUpdate={blocks => send(BlockUpdate(blocks))}
@@ -434,22 +412,21 @@ module WithShortcut = {
     ...component,
     render: _self =>
       <Shortcut.Consumer>
-        ...{
-             registerShortcut =>
-               <Editor_Note
-                 initialHasSavePermission=hasSavePermission
-                 initialNoteId=noteId
-                 initialNoteState=noteState
-                 initialLang=?lang
-                 initialTitle=?title
-                 initialLinks=links
-                 initialBlocks=blocks
-                 initialNoteOwnerId=noteOwnerId
-                 initialNoteLastEdited=noteLastEdited
-                 initialForkFrom=?forkFrom
-                 registerShortcut
-               />
-           }
+        ...{registerShortcut =>
+          <Editor_Note
+            initialHasSavePermission=hasSavePermission
+            initialNoteId=noteId
+            initialNoteState=noteState
+            initialLang=?lang
+            initialTitle=?title
+            initialLinks=links
+            initialBlocks=blocks
+            initialNoteOwnerId=noteOwnerId
+            initialNoteLastEdited=noteLastEdited
+            initialForkFrom=?forkFrom
+            registerShortcut
+          />
+        }
       </Shortcut.Consumer>,
   };
 };

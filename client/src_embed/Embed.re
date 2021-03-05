@@ -2,8 +2,8 @@ open Utils;
 Modules.require("../src/App.css");
 Modules.require("./Embed.css");
 
-[@bs.val] external atob: string => string = "";
-[@bs.val] external btoa: string => string = "";
+[@bs.val] external atob: string => string = "atob";
+[@bs.val] external btoa: string => string = "btoa";
 
 let getScrollHeight: unit => float =
   () => [%bs.raw {|document.body.scrollHeight|}];
@@ -112,41 +112,37 @@ let make = _children => {
     | UpdateWidgets(widgets) => ReasonReact.Update({...state, widgets})
     | EditorUpdate =>
       ReasonReact.SideEffects(
-        (
-          ({state}) => {
-            let newScrollHeight = getScrollHeight();
+        ({state}) => {
+          let newScrollHeight = getScrollHeight();
 
-            if (newScrollHeight != state.scrollHeight^) {
-              let src: string = [%bs.raw "window.location.href"];
-              postMessage({
-                "type": "iframe.resize",
-                "src": src,
-                "height": newScrollHeight,
-              });
-              state.scrollHeight := newScrollHeight;
-            };
-          }
-        ),
+          if (newScrollHeight != state.scrollHeight^) {
+            let src: string = [%bs.raw "window.location.href"];
+            postMessage({
+              "type": "iframe.resize",
+              "src": src,
+              "height": newScrollHeight,
+            });
+            state.scrollHeight := newScrollHeight;
+          };
+        },
       )
     | Run =>
       ReasonReact.SideEffects(
-        (
-          ({state, send, onUnmount}) => {
-            let cancelToken =
-              Toplevel_Consumer.executeEmbed(
-                ~lang=state.lang,
-                ~code=state.value,
-                fun
-                | Belt.Result.Ok(result) => {
-                    let widgets =
-                      Editor_Blocks_Utils.executeResultToWidget(result);
-                    send(UpdateWidgets(widgets));
-                  }
-                | Belt.Result.Error(message) => Js.log(message),
-              );
-            onUnmount(() => Toplevel_Consumer.cancel(cancelToken));
-          }
-        ),
+        ({state, send, onUnmount}) => {
+          let cancelToken =
+            Toplevel_Consumer.executeEmbed(
+              ~lang=state.lang,
+              ~code=state.value,
+              fun
+              | Belt.Result.Ok(result) => {
+                  let widgets =
+                    Editor_Blocks_Utils.executeResultToWidget(result);
+                  send(UpdateWidgets(widgets));
+                }
+              | Belt.Result.Error(message) => Js.log(message),
+            );
+          onUnmount(() => Toplevel_Consumer.cancel(cancelToken));
+        },
       )
     | WorkerPackageLoaded =>
       ReasonReact.UpdateWithSideEffects(
@@ -157,12 +153,10 @@ let make = _children => {
             packageLoaded: true,
           },
         },
-        (
-          ({state, send}) =>
-            if (state.workerState->isReady) {
-              send(Run);
-            }
-        ),
+        ({state, send}) =>
+          if (state.workerState->isReady) {
+            send(Run);
+          },
       )
     | WorkerReady =>
       ReasonReact.UpdateWithSideEffects(
@@ -173,12 +167,10 @@ let make = _children => {
             ready: true,
           },
         },
-        (
-          ({state, send}) =>
-            if (state.workerState->isReady) {
-              send(Run);
-            }
-        ),
+        ({state, send}) =>
+          if (state.workerState->isReady) {
+            send(Run);
+          },
       )
     },
   render: ({state, send}) => {
@@ -202,7 +194,7 @@ let make = _children => {
           onUpdate=?{
             switch (heightTyp) {
             | Fixed => None
-            | Auto => Some((() => send(EditorUpdate)))
+            | Auto => Some(() => send(EditorUpdate))
             }
           }
         />
@@ -218,12 +210,10 @@ let make = _children => {
         </a>
         <span className="footer_spacing" />
         <span className="footer-cell">
-          {
-            switch (state.workerState->isReady) {
-            | false => "Initialize"->str
-            | true => ReasonReact.null
-            }
-          }
+          {switch (state.workerState->isReady) {
+           | false => "Initialize"->str
+           | true => ReasonReact.null
+           }}
         </span>
         <button className="footer_run" onClick={_ => send(Run)}>
           <Fi.Play className="footer_run_icon" />
