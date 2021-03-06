@@ -8,7 +8,8 @@ RUN yarn build
 
 # # server
 FROM nginx:1.18-alpine
+ARG APP_ENV
 COPY --from=builder /app/build /bin/www
-COPY nginx.${APP_ENV}.conf /etc/nginx/conf.d/default.conf
+COPY nginx.$APP_ENV.conf /etc/nginx/conf.d/default.conf
 EXPOSE 80
 CMD [ "nginx", "-g", "daemon off;" ]

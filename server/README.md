@@ -122,23 +122,10 @@ pg_restore -d CONNECTION_STRING_HERE --no-privileges --no-owner BACKUP_FILE_NAME
 
 ## Certificate management
 
-For simplicity, I use Cloudflare Origin CA + Full (Strict) SSL mode.
+For simplicity, we use Let's encrypt certificates. The approach is taken from https://github.com/wmnnd/nginx-certbot/.
 
-- Generate a new Cloudflare Origin CA
+- ssh into the production server
+- clone the repo in some temporary folder, and make sure `init-letsencrypt.sh` has proper `domains` and `email` values.
+- run `chmod +x ./init-letsencrypt.sh && sudo init-letsencrypt.sh`.
 
-Go to CF's Dashboard > Crypto > Origin Certificates > Create Certificate
-
-Keep default configs and save the public key + private key as `cloudflare.cert` and `cloudflare.key`.
-
-- Add these configs into Docker Secrets
-
-Make sure you are connecting with Swarm master node.
-
-```
-docker secrets create cloudflare.cert ./cloudflare.cert
-docker secerts create cloudflare.key ./cloudflare.key
-```
-
-Now you can mount these secerts into `traefik`'s container under `/run/secerts`
-
-(check `docker-compose.prod.yml`)
+Then, the `nginx` folder contents can be copied into the folder where the deployed app will run from.
