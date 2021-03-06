@@ -33,6 +33,8 @@ services:
       - "8080:8080"
 
   nginx:
+    environment:
+      - APP_ENV=dev
     ports:
       - "4000:80"
 
