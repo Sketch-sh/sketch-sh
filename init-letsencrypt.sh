@@ -11,7 +11,7 @@ if ! [ -x "$(command -v docker-compose)" ]; then
   exit 1
 fi
 
-domains=(sketch.javierchavarri.com)
+domains=(sketch.sh)
 rsa_key_size=4096
 data_path="./nginx/certbot"
 email="" # Adding a valid address is strongly recommended
