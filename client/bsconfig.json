@@ -1,7 +1,7 @@
 {
   "name": "sketch",
   "reason": {
-    "react-jsx": 2
+    "react-jsx": 3
   },
   "sources": [
     "src",
@@ -32,20 +32,19 @@
     "-bs-g"
   ],
   "ppx-flags": [
-    "graphql_ppx/ppx"
+    "@reasonml-community/graphql-ppx/ppx"
   ],
   "suffix": ".bs.js",
   "namespace": true,
   "bs-dependencies": [
+    "@reasonml-community/graphql-ppx",
     "reason-react",
     "@glennsl/bs-json",
     "bs-webapi",
     "reason-apollo",
-    "bs-dynamic-import",
     "reason-loadable",
     "bs-date-fns",
-    "re-classnames",
-    "bs-epitath"
+    "re-classnames"
   ],
   "bs-dev-dependencies": [
     "@glennsl/bs-jest"

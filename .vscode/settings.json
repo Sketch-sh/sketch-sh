@@ -1,8 +1,4 @@
 {
   "git.ignoreLimitWarning": true,
-  "reason.diagnostics.tools": ["merlin", "bsb"],
-  "editor.formatOnSave": true,
-  "reason.format.width": 80,
   "javascript.updateImportsOnFileMove.enabled": "never",
-  "reason_language_server.show_debug_errors": false
 }

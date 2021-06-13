@@ -1,4 +1,3 @@
-[%%debugger.chrome];
 Modules.require("./Editor_Links.css");
 Modules.require("@reach/dialog/styles.css");
 
@@ -99,95 +98,78 @@ module SingleLink = {
         </td>
         <td> <span className="link__input"> name->str </span> </td>
         <td>
-          <span className="link__input"> name->String.capitalize->str </span>
+          <span className="link__input"> {name->String.capitalize->str} </span>
         </td>
-        {
-          switch (onDelete, onRefresh) {
-          | (None, None) => ReasonReact.null
-          | _ =>
-            <td className="link__container">
-              {
-                switch (onDelete) {
-                | None => ReasonReact.null
-                | Some(onDelete) =>
-                  <button
-                    className="link__button link__button--danger action__button"
-                    onClick=(_ => onDelete())>
-                    <Fi.Trash2 />
-                  </button>
-                }
-              }
-              {
-                switch (onRefresh) {
-                | None => ReasonReact.null
-                | Some(onRefresh) =>
-                  <>
-                    {
-                      !state.isLinkRefreshing ?
-                        <button
-                          className="link__button link__button--danger action__button"
-                          onClick=(_ => send(Link_Refresh))>
-                          <Fi.FiRefreshCw />
-                        </button> :
-                        <Fi.Loader />
-                    }
-                    {
-                      !state.isLinkRefreshing ?
-                        ReasonReact.null :
-                        {
-                          let getLinkQuery = GetLink.make(~noteId=id, ());
-                          <GetLinkComponent variables=getLinkQuery##variables>
-                            ...(
-                                 ({result}) => {
-                                   switch (result) {
-                                   | Loading => ()
+        {switch (onDelete, onRefresh) {
+         | (None, None) => ReasonReact.null
+         | _ =>
+           <td className="link__container">
+             {switch (onDelete) {
+              | None => ReasonReact.null
+              | Some(onDelete) =>
+                <button
+                  className="link__button link__button--danger action__button"
+                  onClick={_ => onDelete()}>
+                  <Fi.Trash2 />
+                </button>
+              }}
+             {switch (onRefresh) {
+              | None => ReasonReact.null
+              | Some(onRefresh) =>
+                <>
+                  {!state.isLinkRefreshing
+                     ? <button
+                         className="link__button link__button--danger action__button"
+                         onClick={_ => send(Link_Refresh)}>
+                         <Fi.FiRefreshCw />
+                       </button>
+                     : <Fi.Loader />}
+                  {!state.isLinkRefreshing
+                     ? ReasonReact.null
+                     : {
+                       let getLinkQuery = GetLink.make(~noteId=id, ());
+                       <GetLinkComponent variables=getLinkQuery##variables>
+                         ...{({result}) => {
+                           switch (result) {
+                           | Loading => ()
 
-                                   | Error(_error) =>
-                                     Notify.error(
-                                       "Fetching link " ++ id ++ " failed.",
-                                     );
-                                     send(Link_Refresh);
+                           | Error(_error) =>
+                             Notify.error(
+                               "Fetching link " ++ id ++ " failed.",
+                             );
+                             send(Link_Refresh);
 
-                                   | Data(response) =>
-                                     let note =
-                                       response##note->Belt.Array.get(0);
-                                     switch (note) {
-                                     | Some(note) =>
-                                       let link: Link.link =
-                                         createInternalLink(~name, ~note);
-                                       onRefresh(link);
-                                       send(Link_Refresh);
-                                     | None =>
-                                       Notify.error(
-                                         "Link " ++ id ++ " not found.",
-                                       )
-                                     };
-                                   };
-                                   ReasonReact.null;
-                                 }
-                               )
-                          </GetLinkComponent>;
-                        }
-                    }
-                  </>
-                }
-              }
-            </td>
-          }
-        }
+                           | Data(response) =>
+                             let note = response##note->Belt.Array.get(0);
+                             switch (note) {
+                             | Some(note) =>
+                               let link: Link.link =
+                                 createInternalLink(~name, ~note);
+                               onRefresh(link);
+                               send(Link_Refresh);
+                             | None =>
+                               Notify.error("Link " ++ id ++ " not found.")
+                             };
+                           };
+                           ReasonReact.null;
+                         }}
+                       </GetLinkComponent>;
+                     }}
+                </>
+              }}
+           </td>
+         }}
         <td>
-          {
-            switch (timestamp) {
-            | None => ReasonReact.null
-            | Some(timestamp) =>
-              <span className="link__timestamp">
-                <span className="link__timestamp__hint">
-                  "Revision from "->str
-                </span>
-                <UI_DateTime date=timestamp />
-              </span>
-            }
-          }
+          {switch (timestamp) {
+           | None => ReasonReact.null
+           | Some(timestamp) =>
+             <span className="link__timestamp">
+               <span className="link__timestamp__hint">
+                 "Revision from "->str
+               </span>
+               <UI_DateTime date=timestamp />
+             </span>
+           }}
         </td>
       </tr>,
   };
@@ -245,28 +227,25 @@ module EmptyLink = {
               <td>
                 <button
                   className="link__button"
-                  onClick={
-                    _ =>
-                      if (state.name != "" && state.id != "") {
-                        onSubmit((state.name, state.id));
-                      }
-                  }
-                  disabled={status == Loading}>
-                  {
-                    switch (status, state.dirty) {
-                    | (NotAsked, _) => <Fi.PlusCircle />
-                    | (Loading, _) => <Fi.Loader />
-                    | (Error(message), false) =>
-                      <>
-                        <Fi.PlusCircle />
-                        <i className="link__button__error">
-                          ("  " ++ message)->str
-                        </i>
-                      </>
-                    | (Error(_), true) => <Fi.PlusCircle />
-                    | (Fetched, _) => <Fi.Trash2 />
+                  onClick={_ =>
+                    if (state.name != "" && state.id != "") {
+                      onSubmit((state.name, state.id));
                     }
                   }
+                  disabled={status == Loading}>
+                  {switch (status, state.dirty) {
+                   | (NotAsked, _) => <Fi.PlusCircle />
+                   | (Loading, _) => <Fi.Loader />
+                   | (Error(message), false) =>
+                     <>
+                       <Fi.PlusCircle />
+                       <i className="link__button__error">
+                         {("  " ++ message)->str}
+                       </i>
+                     </>
+                   | (Error(_), true) => <Fi.PlusCircle />
+                   | (Fetched, _) => <Fi.Trash2 />
+                   }}
                 </button>
               </td>
             </tr>
@@ -295,7 +274,7 @@ let make = (~currentSketchId, ~links, ~onUpdate, _children) => {
 
       if (id == currentSketchId) {
         ReasonReact.SideEffects(
-          (_ => Notify.error("Cannot link current sketch.")),
+          _ => Notify.error("Cannot link current sketch."),
         );
       } else {
         let linkWithSameNameExists =
@@ -304,7 +283,7 @@ let make = (~currentSketchId, ~links, ~onUpdate, _children) => {
         switch (linkWithSameNameExists) {
         | Some(_) =>
           ReasonReact.SideEffects(
-            (_ => Notify.error("Link with same module name already exists.")),
+            _ => Notify.error("Link with same module name already exists."),
           )
         | None =>
           let linkWithSameIdExists =
@@ -313,7 +292,7 @@ let make = (~currentSketchId, ~links, ~onUpdate, _children) => {
           switch (linkWithSameIdExists) {
           | Some(_) =>
             ReasonReact.SideEffects(
-              (_ => Notify.error("Link with same id already exists.")),
+              _ => Notify.error("Link with same id already exists."),
             )
           | None =>
             ReasonReact.Update({
@@ -326,81 +305,68 @@ let make = (~currentSketchId, ~links, ~onUpdate, _children) => {
     | Link_Fetched(link) =>
       ReasonReact.UpdateWithSideEffects(
         {...state, fetchingLink: None},
-        (
-          _ => {
-            let id = getIdFromLink(link);
-            Notify.info("Link " ++ id ++ " has been fetched.");
+        _ => {
+          let id = getIdFromLink(link);
+          Notify.info("Link " ++ id ++ " has been fetched.");
 
-            let links = Belt.Array.concat(links, [|link|]);
-            onUpdate(links);
-          }
-        ),
+          let links = Belt.Array.concat(links, [|link|]);
+          onUpdate(links);
+        },
       )
     | Link_Delete(linkToDelete) =>
       ReasonReact.SideEffects(
-        (
-          _ => {
-            let links =
-              Belt.Array.keepU(links, (. link) =>
-                switch (link, linkToDelete) {
-                | (Internal(linkA), Internal(linkB)) =>
-                  linkA.sketch_id != linkB.sketch_id
-                | _ => true
-                }
-              );
+        _ => {
+          let links =
+            Belt.Array.keepU(links, (. link) =>
+              switch (link, linkToDelete) {
+              | (Internal(linkA), Internal(linkB)) =>
+                linkA.sketch_id != linkB.sketch_id
+              | _ => true
+              }
+            );
 
-            onUpdate(links);
-          }
-        ),
+          onUpdate(links);
+        },
       )
     | Link_Refresh(linkToRefresh) =>
       ReasonReact.SideEffects(
-        (
-          _ =>
-            onUpdate(
-              Belt.Array.mapU(links, (. link) =>
-                switch (link, linkToRefresh) {
-                | (Internal(linkA), Internal(linkB)) =>
-                  linkA.sketch_id == linkB.sketch_id ? linkToRefresh : link
-                | _ => link
-                }
-              ),
-            )
-        ),
+        _ =>
+          onUpdate(
+            Belt.Array.mapU(links, (. link) =>
+              switch (link, linkToRefresh) {
+              | (Internal(linkA), Internal(linkB)) =>
+                linkA.sketch_id == linkB.sketch_id ? linkToRefresh : link
+              | _ => link
+              }
+            ),
+          ),
       )
     },
   render: ({send, state}) => {
     let onSubmit = uiLink => send(Link_Add(uiLink));
     let displayLinks =
-      links
-      ->Belt.Array.mapU((. link: Link.link) =>
-          switch (link) {
-          | Internal({sketch_id, name, revision_at}) =>
-            <SingleLink
-              id=sketch_id
-              key=sketch_id
-              name
-              timestamp=revision_at
-            />
-          | _ => failwith("There are no external links yet.")
-          }
-        );
+      links->Belt.Array.mapU((. link: Link.link) =>
+        switch (link) {
+        | Internal({sketch_id, name, revision_at}) =>
+          <SingleLink id=sketch_id key=sketch_id name timestamp=revision_at />
+        | _ => failwith("There are no external links yet.")
+        }
+      );
     let modalLinks =
-      links
-      ->Belt.Array.mapU((. link: Link.link) =>
-          switch (link) {
-          | Internal({sketch_id, name, revision_at}) =>
-            <SingleLink
-              id=sketch_id
-              key=sketch_id
-              name
-              timestamp=revision_at
-              onDelete=(() => send(Link_Delete(link)))
-              onRefresh=(link => send(Link_Refresh(link)))
-            />
-          | _ => failwith("There are no external links yet.")
-          }
-        );
+      links->Belt.Array.mapU((. link: Link.link) =>
+        switch (link) {
+        | Internal({sketch_id, name, revision_at}) =>
+          <SingleLink
+            id=sketch_id
+            key=sketch_id
+            name
+            timestamp=revision_at
+            onDelete={() => send(Link_Delete(link))}
+            onRefresh={link => send(Link_Refresh(link))}
+          />
+        | _ => failwith("There are no external links yet.")
+        }
+      );
     <>
       <br />
       <span id="linkedLists" className="UI_SketchOwnerInfo__username">
@@ -437,61 +403,50 @@ let make = (~currentSketchId, ~links, ~onUpdate, _children) => {
             <table style=Style.table>
               <tbody> modalLinks->ReasonReact.array </tbody>
             </table>
-            {
-              switch (state.fetchingLink) {
-              | None => <EmptyLink key="notAsked" status=NotAsked onSubmit />
-              | Some({name, id, timestamp}) =>
-                let getLinkQuery = GetLink.make(~noteId=id, ());
-                <GetLinkComponent variables=getLinkQuery##variables>
-                  ...(
-                       ({result}) => {
-                         let emptyLink =
-                           getEmptyLink(~timestamp, ~id, ~name, ~onSubmit);
-                         switch (result) {
-                         | Loading => emptyLink(~status=Loading, ())
+            {switch (state.fetchingLink) {
+             | None => <EmptyLink key="notAsked" status=NotAsked onSubmit />
+             | Some({name, id, timestamp}) =>
+               let getLinkQuery = GetLink.make(~noteId=id, ());
+               <GetLinkComponent variables=getLinkQuery##variables>
+                 ...{({result}) => {
+                   let emptyLink =
+                     getEmptyLink(~timestamp, ~id, ~name, ~onSubmit);
+                   switch (result) {
+                   | Loading => emptyLink(~status=Loading, ())
 
-                         | Error(_error) =>
-                           Notify.error("Fetching link " ++ id ++ " failed.");
-                           emptyLink(
-                             ~status=Error({|Fetching failed.|}),
-                             (),
-                           );
+                   | Error(_error) =>
+                     Notify.error("Fetching link " ++ id ++ " failed.");
+                     emptyLink(~status=Error({|Fetching failed.|}), ());
 
-                         | Data(response) =>
-                           let note = response##note->Belt.Array.get(0);
+                   | Data(response) =>
+                     let note = response##note->Belt.Array.get(0);
 
-                           switch (note) {
-                           | Some(note) =>
-                             let link: Link.link =
-                               createInternalLink(~name, ~note);
-                             let timestamp =
-                               note##updated_at
-                               |> Js.Json.decodeString
-                               |> Belt.Option.getExn;
-                             let onFetched = () => send(Link_Fetched(link));
-                             getEmptyLink(
-                               ~status=Fetched,
-                               ~id,
-                               ~name,
-                               ~onSubmit,
-                               ~timestamp,
-                               ~onFetched,
-                               (),
-                             );
+                     switch (note) {
+                     | Some(note) =>
+                       let link: Link.link = createInternalLink(~name, ~note);
+                       let timestamp =
+                         note##updated_at
+                         |> Js.Json.decodeString
+                         |> Belt.Option.getExn;
+                       let onFetched = () => send(Link_Fetched(link));
+                       getEmptyLink(
+                         ~status=Fetched,
+                         ~id,
+                         ~name,
+                         ~onSubmit,
+                         ~timestamp,
+                         ~onFetched,
+                         (),
+                       );
 
-                           | None =>
-                             Notify.error("Link " ++ id ++ " not found.");
-                             emptyLink(
-                               ~status=Error({|No such link found.|}),
-                               (),
-                             );
-                           };
-                         };
-                       }
-                     )
-                </GetLinkComponent>;
-              }
-            }
+                     | None =>
+                       Notify.error("Link " ++ id ++ " not found.");
+                       emptyLink(~status=Error({|No such link found.|}), ());
+                     };
+                   };
+                 }}
+               </GetLinkComponent>;
+             }}
           </div>
         </Reach_Modal.DialogContent>
       </Reach_Modal.DialogOverlay>

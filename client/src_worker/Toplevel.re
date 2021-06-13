@@ -1,5 +1,3 @@
-[%%debugger.chrome];
-
 module Types = {
   type blockInput = {
     binput_id: string,

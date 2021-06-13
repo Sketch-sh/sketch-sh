@@ -1,14 +1,14 @@
 open Utils;
 
 let authDomain =
-  env == "production" ?
-    "https://api.sketch.sh/auth" : "http://localhost:3000/api/auth";
+  env == "production"
+    ? "https://api.sketch.sh/auth" : "http://localhost:3000/api/auth";
 
 let stagingHost = "staging.sketch.sh";
 let productionHost = "sketch-sh.github.io";
 let graphqlEndpoint =
-  env == "production" ?
-    {
+  env == "production"
+    ? {
       open Webapi.Dom;
       let host = location->Location.host;
 
@@ -17,8 +17,8 @@ let graphqlEndpoint =
       } else {
         "https://api.sketch.sh/graphql";
       };
-    } :
-    "/graphql";
+    }
+    : "/graphql";
 
 let anonymousUserId = "anonymous";
 

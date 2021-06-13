@@ -1,8 +1,6 @@
 Modules.require("./UI_DotFlashing.css");
 
-let component = ReasonReact.statelessComponent("UI_DotFlashing");
-
-let make = _children => {
-  ...component,
-  render: _self => <div className="dot-flashing" />,
+[@react.component]
+let make = () => {
+  <div className="dot-flashing" />;
 };

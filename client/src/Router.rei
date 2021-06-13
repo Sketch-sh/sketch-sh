@@ -22,8 +22,8 @@ module Unload: {
    * Put this in any component
    */
   module Provider: {
-    let make:
-      React.childless => React.component(unit, React.noRetainedProps, unit);
+    [@react.component]
+    let make: unit => React.element;
   };
 };
 
@@ -33,6 +33,7 @@ let pushSilent: Route.t => unit;
 let replaceSilent: Route.t => unit;
 
 module Link: {
+  [@react.component]
   let make:
     (
       ~route: Route.t,
@@ -41,7 +42,7 @@ module Link: {
       ~className: string=?,
       ~popup: bool=?,
       ~role: string=?,
-      array(React.reactElement)
+      ~children: React.element
     ) =>
-    React.component(React.stateless, React.noRetainedProps, React.actionless);
+    React.element;
 };

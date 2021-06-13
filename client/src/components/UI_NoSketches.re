@@ -6,7 +6,7 @@ let component = ReasonReact.statelessComponent("UI_NoSketches");
 let make = (~className=?, _children) => {
   ...component,
   render: _self =>
-    <section className=(Cn.make(["UI_NoSketches", Cn.unwrap(className)]))>
+    <section className=Cn.("UI_NoSketches" + Cn.unwrap(className))>
       <Fi.Package className="UI_NoSketches--icon" />
       "Your sketches will show up here"->str
       <Router.Link

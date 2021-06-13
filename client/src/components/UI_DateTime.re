@@ -34,7 +34,7 @@ let make =
     switch (date) {
     | None => ReasonReact.null
     | Some(date) =>
-      <time dateTime=date ?className> (date |> transformer |> str) </time>
+      <time dateTime=date ?className> {date |> transformer |> str} </time>
     };
   },
 };

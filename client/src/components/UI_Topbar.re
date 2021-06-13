@@ -29,7 +29,7 @@ let make = _children => {
       <div className="Topbar__right">
         <UI_Balloon position=Down message="New sketch">
           ...<Router.Link
-               route=(Route.NoteNew(RE))
+               route={Route.NoteNew(RE)}
                className="Topbar__action Topbar__action--highlight"
                title="Create new Sketch">
                <Fi.Plus />
@@ -37,13 +37,12 @@ let make = _children => {
              </Router.Link>
         </UI_Balloon>
         <AuthStatus.UserInfo>
-          ...(
-               user =>
-                 switch (user) {
-                 | None => loginButton
-                 | Some((user, _userId)) => <UI_TopbarUserInfo user />
-                 }
-             )
+          ...{user =>
+            switch (user) {
+            | None => loginButton
+            | Some((user, _userId)) => <UI_TopbarUserInfo user />
+            }
+          }
         </AuthStatus.UserInfo>
       </div>
     </header>,
@@ -63,15 +62,15 @@ module Actions = {
       },
     didMount: self => self.send(Mounted),
     render: ({state}) =>
-      state ?
-        switch (Webapi.Dom.(document |> Document.getElementById(id))) {
-        | None => ReasonReact.null
-        | Some(element) =>
-          ReactDOMRe.createPortal(
-            children(~buttonClassName="Topbar__action"),
-            element,
-          )
-        } :
-        ReasonReact.null,
+      state
+        ? switch (Webapi.Dom.(document |> Document.getElementById(id))) {
+          | None => ReasonReact.null
+          | Some(element) =>
+            ReactDOMRe.createPortal(
+              children(~buttonClassName="Topbar__action"),
+              element,
+            )
+          }
+        : ReasonReact.null,
   };
 };

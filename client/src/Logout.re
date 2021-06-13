@@ -1,6 +1,6 @@
 let component = ReasonReact.reducerComponent("Logout");
 
-let make = _children: ReasonReact.component(unit, 'a, unit) => {
+let make = (_children): ReasonReact.component(unit, 'a, unit) => {
   ...component,
   didMount: _ => {
     open Auth.Auth;

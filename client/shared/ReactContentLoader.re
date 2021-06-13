@@ -1,8 +1,7 @@
 [@bs.module "react-content-loader"]
-external rawClass: ReasonReact.reactClass = "default";
+external rawClass: React.element = "default";
 
-[@bs.module "react-content-loader"]
-external codeClass: ReasonReact.reactClass = "Code";
+[@bs.module "react-content-loader"] external codeClass: React.element = "Code";
 
 [@bs.deriving abstract]
 type jsProps = {
