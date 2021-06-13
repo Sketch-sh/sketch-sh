@@ -52,10 +52,6 @@ git clone https://github.com/sketch-sh/sketch-sh
 ~/sketch-sh/client: > yarn bs:start
 ```
 
-> Tips: You don't need to do this if you're using VSCode with VSCode ReasonML plugin
-> just hit save and bsb will compile everything for you
-> More information here: https://github.com/reasonml-editor/vscode-reasonml/#bsb
-
 - To make a production bundle:
 
 ```sh
@@ -69,17 +65,17 @@ Server implementation contains 2 microservices: auth, hasura's graphql engine
 ## Folder structures
 
 ```
+└── client
+   └── nginx.conf                   # nginx proxy config (will serve static files but also proxy requests to services below)
 └── server
-   ├── auth                         # auth microserives
+   ├── auth                         # auth microservice
    ├── hasura                       # hasura's metadata
    ├── schema                       # PostgreSQL database migrations
-   ├── docker-compose.yaml          # Docker Compose for easy development setup
    └── Makefile                     # Makefile for running commands quickly
+└── docker-compose.yaml             # Docker Compose for easy development setup
 ```
 
 ## Installation
-
-// TODO: deploy a staging server for local development
 
 - You need to have these installed
   - `docker`: Find installation instructions for your platform from [docker's docs](https://docs.docker.com/install/#supported-platforms).
@@ -89,7 +85,7 @@ Server implementation contains 2 microservices: auth, hasura's graphql engine
 
   - Go to https://github.com/settings/developers
   - Create a new app
-  - Set `Authorization callback URL` to `http://localhost:3000/api/auth/github/callback`
+  - Set `Authorization callback URL` to `http://localhost:3000/api/auth/github/callback` (for usage with Webpack dev server) or `http://localhost:4000/api/auth/github/callback` (for usage with local nginx proxy to emulate production setup)
   - Save `Client ID` and `Client Secret`
 
 ## Starting development server
@@ -100,7 +96,7 @@ Server implementation contains 2 microservices: auth, hasura's graphql engine
 ~/sketch-sh/server: > cp .env.example .env
 ```
 
-- Open `.env` and add `GITHUB_CLIENT_ID` and `GITHUB_CLIENT_SECRET`
+- Open `.env` and add `AUTH_GITHUB_CLIENT_ID` and `AUTH_GITHUB_CLIENT_SECRET`
 
 - Start docker-compose in detach mode
 

@@ -1,23 +1,109 @@
-name: Build and Deploy
-on:
-  push:
-    branches:
-      - master
+name: Build and deploy
+
+on: [push]
+
 jobs:
-  build-and-deploy:
+  build:
+    name: Build Docker images
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout 🛎️
-        uses: actions/checkout@v2.3.1
-
-      - name: Install and Build 🔧 # This example project is built using yarn and outputs the result to the 'client/build' folder. Replace with the commands required to build your project, or remove this step entirely if your site is pre-built.
-        working-directory: ./client
+      - name: Checkout master
+        uses: actions/checkout@v1
+      - name: Set environment variables
         run: |
-          yarn install
-          yarn build
+          REPOSITORY=$(echo $GITHUB_REPOSITORY | tr '[A-Z]' '[a-z]')
+          echo AUTH_IMAGE=docker.pkg.github.com/${REPOSITORY}/auth:${GITHUB_SHA} >> $GITHUB_ENV
+          echo MIGRATION_IMAGE=docker.pkg.github.com/${REPOSITORY}/migration:${GITHUB_SHA} >> $GITHUB_ENV
+          echo NGINX_IMAGE=docker.pkg.github.com/${REPOSITORY}/nginx:${GITHUB_SHA} >> $GITHUB_ENV
+          echo AUTH_IMAGE_LATEST=docker.pkg.github.com/${REPOSITORY}/auth:latest >> $GITHUB_ENV
+          echo MIGRATION_IMAGE_LATEST=docker.pkg.github.com/${REPOSITORY}/migration:latest >> $GITHUB_ENV
+          echo NGINX_IMAGE_LATEST=docker.pkg.github.com/${REPOSITORY}/nginx:latest >> $GITHUB_ENV
+      - name: Add environment variables to .env
+        run: |
+          echo HASURA_ACCESS_KEY=${{ secrets.HASURA_ACCESS_KEY }} >> .env
+          echo AUTH_GITHUB_CLIENT_ID=${{ secrets.AUTH_GITHUB_CLIENT_ID }} >> .env
+          echo AUTH_GITHUB_CLIENT_SECRET=${{ secrets.AUTH_GITHUB_CLIENT_SECRET }} >> .env
+          echo AUTH_GITHUB_CALLBACK_URL=${{ secrets.AUTH_GITHUB_CALLBACK_URL }} >> .env
+          echo AUTH_URL=${{ secrets.AUTH_URL }} >> .env
+          echo FRONTEND_URL=${{ secrets.FRONTEND_URL }} >> .env
+          echo JWT_TOKEN=${{ secrets.JWT_TOKEN }} >> .env
+          echo POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }} >> .env
+      - name: Log in to GitHub Packages
+        run: echo ${GITHUB_TOKEN} | docker login -u ${GITHUB_ACTOR} --password-stdin docker.pkg.github.com
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Pull latest images
+        run: |
+          docker pull ${AUTH_IMAGE_LATEST} || true
+          docker pull ${MIGRATION_IMAGE_LATEST} || true
+          docker pull ${NGINX_IMAGE_LATEST} || true
+      - name: Build images
+        run: |
+          docker-compose -f docker-compose.yml -f docker-compose.prod.yml build
+      - name: Push images
+        run: |
+          docker push ${AUTH_IMAGE}
+          docker push ${MIGRATION_IMAGE}
+          docker push ${NGINX_IMAGE}
+          docker tag ${AUTH_IMAGE} ${AUTH_IMAGE_LATEST} 
+          docker tag ${MIGRATION_IMAGE} ${MIGRATION_IMAGE_LATEST} 
+          docker tag ${NGINX_IMAGE} ${NGINX_IMAGE_LATEST} 
+          docker push ${AUTH_IMAGE_LATEST}
+          docker push ${MIGRATION_IMAGE_LATEST}
+          docker push ${NGINX_IMAGE_LATEST}
 
-      - name: Deploy 🚀
-        uses: JamesIves/github-pages-deploy-action@4.0.0
-        with:
-          branch: gh-pages # The branch the action should deploy to.
-          folder: client/build # The folder the action should deploy.
+  deploy:
+    environment: Production
+    name: Deploy to DigitalOcean
+    runs-on: ubuntu-latest
+    needs: build
+    if: github.ref == 'refs/heads/master'
+    steps:
+      - name: Checkout master
+        uses: actions/checkout@v1
+      - name: Set environment variables
+        run: |
+          REPOSITORY=$(echo $GITHUB_REPOSITORY | tr '[A-Z]' '[a-z]')
+          echo AUTH_IMAGE=docker.pkg.github.com/${REPOSITORY}/auth:${GITHUB_SHA} >> $GITHUB_ENV
+          echo MIGRATION_IMAGE=docker.pkg.github.com/${REPOSITORY}/migration:${GITHUB_SHA} >> $GITHUB_ENV
+          echo NGINX_IMAGE=docker.pkg.github.com/${REPOSITORY}/nginx:${GITHUB_SHA} >> $GITHUB_ENV
+      - name: Add environment variables to .env
+        run: |
+          echo HASURA_ACCESS_KEY=${{ secrets.HASURA_ACCESS_KEY }} >> .env
+          echo AUTH_GITHUB_CLIENT_ID=${{ secrets.AUTH_GITHUB_CLIENT_ID }} >> .env
+          echo AUTH_GITHUB_CLIENT_SECRET=${{ secrets.AUTH_GITHUB_CLIENT_SECRET }} >> .env
+          echo AUTH_GITHUB_CALLBACK_URL=${{ secrets.AUTH_GITHUB_CALLBACK_URL }} >> .env
+          echo AUTH_URL=${{ secrets.AUTH_URL }} >> .env
+          echo FRONTEND_URL=${{ secrets.FRONTEND_URL }} >> .env
+          echo JWT_TOKEN=${{ secrets.JWT_TOKEN }} >> .env
+          echo POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }} >> .env
+          echo AUTH_IMAGE=${{ env.AUTH_IMAGE }} >> .env
+          echo MIGRATION_IMAGE=${{ env.MIGRATION_IMAGE }} >> .env
+          echo NGINX_IMAGE=${{ env.NGINX_IMAGE }} >> .env
+      - name: Add the private SSH key to the ssh-agent
+        run: |
+          mkdir -p ~/.ssh/
+          echo "${{ secrets.DIGITAL_OCEAN_KEY }}" > ~/.ssh/production.key
+          chmod 600 ~/.ssh/production.key
+          cat >>~/.ssh/config <<END
+          Host production
+            HostName ${{ secrets.DIGITAL_OCEAN_IP_ADDRESS }}
+            User ${{ secrets.DIGITAL_OCEAN_USER }}
+            IdentityFile ~/.ssh/production.key
+            StrictHostKeyChecking no
+          END
+      - name: Log into registry
+        env:
+          DOCKER_LOGIN_COMMAND: echo "${{ secrets.GITHUB_TOKEN }}" | docker login docker.pkg.github.com -u ${{ github.actor }} --password-stdin
+        run: ssh production "$DOCKER_LOGIN_COMMAND"
+      - name: Deploy images to DigitalOcean
+        run: |
+          scp -r ./.env ./docker-compose.yml ./docker-compose.prod.yml production:~/app
+          ssh production << 'ENDSSH'
+            cd app
+            source .env
+            docker pull $AUTH_IMAGE
+            docker pull $MIGRATION_IMAGE
+            docker pull $NGINX_IMAGE
+            docker-compose -f docker-compose.yml -f docker-compose.prod.yml up --no-build -d
+          ENDSSH

@@ -32,7 +32,7 @@ let tapLog = a => {
   a;
 };
 
-let valueFromEvent = event: string => event->ReactEvent.Form.target##value;
+let valueFromEvent = (event): string => event->ReactEvent.Form.target##value;
 
 let (=>>) = (value, render) =>
   switch (value) {
@@ -79,8 +79,6 @@ let countLine = js_countLine;
    }; */
 
 let min = (min, value) => value < min ? min : value;
-
-[@bs.val] external env: string = "process.env.NODE_ENV";
 
 let arrayFindIndex = (array, f) => {
   let length = Array.length(array);

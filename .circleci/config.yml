@@ -42,9 +42,9 @@ jobs:
       NODE_ENV: development
       JWT_TOKEN: secret
       HASURA_ENDPOINT: http://localhost:8080/v1alpha1/graphql
-      GITHUB_CLIENT_ID: secret
-      GITHUB_CLIENT_SECRET: secret
-      GITHUB_CALLBACK_URL: secret
+      AUTH_GITHUB_CLIENT_ID: secret
+      AUTH_GITHUB_CLIENT_SECRET: secret
+      AUTH_GITHUB_CALLBACK_URL: secret
       FRONTEND_URL: http://localhost:3000
       FRONTEND_AUTH_CALLBACK: http://localhost:3000/auth/callback
       FRONTEND_AUTH_FAILURE: http://localhost:3000/auth/failure

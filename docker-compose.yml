@@ -15,43 +15,47 @@ services:
       - postgres
       - graphql-engine
     build:
-      context: .
+      context: server
       dockerfile: Dockerfile-migration
     environment:
       - HASURA_ENDPOINT=http://graphql-engine:8080
       - DATABASE_URL=postgres://postgres:${POSTGRES_PASSWORD}@postgres:5432/postgres
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - HASURA_ACCESS_KEY=${HASURA_ACCESS_KEY}
-
     command: ["sh", "./wait-for-pg.sh", "postgres", "npm run migrate"]
 
   graphql-engine:
     image: hasura/graphql-engine:v1.0.0-beta.3
     depends_on:
       - postgres
-    restart: always
     environment:
       - HASURA_GRAPHQL_DATABASE_URL=postgres://postgres:${POSTGRES_PASSWORD}@postgres:5432/postgres
       - HASURA_GRAPHQL_ACCESS_KEY=${HASURA_ACCESS_KEY}
-      - HASURA_GRAPHQL_AUTH_HOOK=http://auth/api/auth/webhook
+      - HASURA_GRAPHQL_AUTH_HOOK=http://auth:3001/api/auth/webhook
     command: >
       /bin/sh -c "graphql-engine serve --enable-console;"
 
   auth:
     build:
-      context: auth
+      context: server/auth
       args:
         - NODE_ENV=development
     environment:
       - NODE_ENV=development
       - JWT_TOKEN=${JWT_TOKEN}
       - HASURA_ENDPOINT=http://graphql-engine:8080/v1alpha1/graphql
-      - GITHUB_CLIENT_ID=${GITHUB_CLIENT_ID}
-      - GITHUB_CLIENT_SECRET=${GITHUB_CLIENT_SECRET}
+      - AUTH_GITHUB_CLIENT_ID=${AUTH_GITHUB_CLIENT_ID}
+      - AUTH_GITHUB_CLIENT_SECRET=${AUTH_GITHUB_CLIENT_SECRET}
       - AUTH_URL=${AUTH_URL}
       - FRONTEND_URL=${FRONTEND_URL}
-
     depends_on:
+      - graphql-engine
+
+  nginx:
+    build:
+      context: client
+    depends_on:
+      - auth
       - graphql-engine
 volumes:
   db_data:

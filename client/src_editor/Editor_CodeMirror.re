@@ -167,11 +167,6 @@ let make =
       };
 
       state.editor := Some(editor);
-      if (Webapi.Dom.location->Webapi.Dom.Location.host
-          != Config.productionHost) {
-        %bs.raw
-        {|window.editor = editor|};
-      };
     },
   render: ({handle, state: _}) =>
     <div ?className ref={handle(setDivRef)} />,
