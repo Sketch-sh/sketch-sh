@@ -11,5 +11,5 @@ client/src/*.js
 .env.*
 !.env.example
 **.DS_Store
-sqlite/data/*.db
+sqlite/data/*.db*
 sqlite/data/*.json
