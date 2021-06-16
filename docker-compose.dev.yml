@@ -32,13 +32,6 @@ services:
     ports:
       - "8080:8080"
 
-  nginx:
-    build:
-      args:
-        APP_ENV: "dev"
-    ports:
-      - "4000:80"
-
 volumes:
   db_data:
   notused:
