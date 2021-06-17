@@ -46,7 +46,7 @@ app.get("/sketches/communitySketches", (req, res) => {
     n.created_at as date, 
     user.id as userId,
     user.avatar as userAvatar,
-    user.userName
+    user.username as userName
   FROM note n
   INNER JOIN user ON user_id = user.id
   WHERE n.user_id <> ? AND n.user_id <> 'anonymous'
