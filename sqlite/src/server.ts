@@ -1,8 +1,10 @@
 import express from "express"
 import { z } from "zod";
 import {db} from "./db" 
+import morgan from 'morgan'
 
 const app = express();
+app.use(morgan(process.env.NODE_ENV === "production" ? "combined" : "dev"));
 const PORT = parseInt(process.env.PORT) || 3002;
 
 const ValidateUser = z.object({ userId: z.string() });
@@ -23,7 +25,6 @@ app.get("/sketches/recentSketches", (req, res) => {
     .prepare(
       `
   SELECT n.id, n.title, n.updated_at as date FROM note n
-  INNER JOIN user ON user_id = user.id
   WHERE n.user_id = ?
   ORDER BY n.updated_at
   LIMIT 5;
