@@ -35,8 +35,10 @@ app.get("/sketches/recentSketches", (req, res) => {
   });
 });
 
+const CommunitySketches = z.object({ userId: z.string().optional() });
 app.get("/sketches/communitySketches", (req, res) => {
-  const { userId } = ValidateUser.parse(req.query);
+  // Default value to avoid n.user_id <> NULL (which means no rows)
+  const { userId = "" } = CommunitySketches.parse(req.query);
   const sketches = db
     .prepare(
       `
