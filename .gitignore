@@ -13,3 +13,4 @@ client/src/*.js
 **.DS_Store
 sqlite/data/*.db*
 sqlite/data/*.json
+sqlite/.env
