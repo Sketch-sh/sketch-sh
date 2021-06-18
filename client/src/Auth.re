@@ -89,6 +89,7 @@ module AuthCallback = {
              resolve();
            })
         |> catch(error => {
+             Js.log(token);
              send(ChangeState(Failure("Invalid auth token")));
              resolve(Js.log(error));
            })

@@ -20,7 +20,7 @@ app.get("/api/auth/github/callback",
     session: false,
     failureRedirect: FRONTEND_AUTH_FAILURE,
   }),
-  function (req, res) {
+  (req, res) => {
     const userId = req.user;
 
     const jwtToken = jwt.sign(
@@ -28,12 +28,14 @@ app.get("/api/auth/github/callback",
         userId,
         role: "user",
       },
-      process.env.SECRET_JWT_TOKEN
+      process.env.SECRET_JWT_TOKEN,
+      {
+        algorithm: "HS256"
+      }
     );
 
     const redirectUrl =
       FRONTEND_AUTH_CALLBACK + "?" + qs.stringify({ token: jwtToken });
-
     res.redirect(redirectUrl);
   }
 

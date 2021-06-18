@@ -16,7 +16,7 @@ interface GithubProfile extends Profile {
     avatar_url: string
   }
 }
-const findUserIdFromGithubIdStmt = db.prepare(`SELECT * FROM user_identity
+const findUserIdFromGithubIdStmt = db.prepare(`SELECT user_id FROM user_identity
 WHERE identity_id= ? AND identity_type= 'github' `);
 const insertGithubIdentity = db.prepare(`
   INSERT INTO user_identity (user_id, identity_type, identity_id, data)
@@ -42,9 +42,9 @@ const verify: VerifyFunction =
     /**
      * Check if this user is already authenticated with Github
      */
-    const userId = findUserIdFromGithubIdStmt.get(profile.id);
+    const userIdentity: {user_id: string} | undefined = findUserIdFromGithubIdStmt.get(profile.id);
 
-    if (!userId) {
+    if (!userIdentity) {
       const email =
         profile.emails && profile.emails[0] && profile.emails[0].value;
       const newUserId = generateId();
@@ -66,7 +66,7 @@ const verify: VerifyFunction =
 
       done(null, newUserId);
     } else {
-      done(null, userId);
+      done(null, userIdentity.user_id);
     }
   }
 

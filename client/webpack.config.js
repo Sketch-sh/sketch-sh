@@ -30,7 +30,7 @@ const base = {
     disableHostCheck: true,
     proxy: {
       "/graphql": "http://localhost:8080/v1",
-      "/api": "http://localhost:3001",
+      "/api": "http://localhost:3002",
     },
   },
   output: {
