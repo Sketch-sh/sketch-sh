@@ -43,7 +43,4 @@ app.get("/api/auth/github/callback",
 )
 app.use("/api/v1", router)
 
-const PORT = parseInt(process.env.PORT) || 3002;
-app.listen(PORT, () => {
-  console.log(`server started at http://localhost:${PORT}`);
-});
+export default app
