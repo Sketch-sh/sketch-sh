@@ -51,12 +51,6 @@ services:
     depends_on:
       - graphql-engine
 
-  nginx:
-    build:
-      context: client
-    depends_on:
-      - auth
-      - graphql-engine
 volumes:
   db_data:
   notused:

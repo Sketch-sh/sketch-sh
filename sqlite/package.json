@@ -1,0 +1,37 @@
+{
+  "name": "sketch_server",
+  "version": "1.0.0",
+  "description": "Just run these commands, replace `DATABASE_URL` with your PostgreSQL connection",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "DEBUG=sketch:* ts-node-dev --respawn --transpile-only src/index.ts"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "better-sqlite3": "^7.4.1",
+    "debug": "^4.3.1",
+    "express": "^4.17.1",
+    "express-jwt": "^6.0.0",
+    "jsonwebtoken": "^8.5.1",
+    "nanoid": "^3.1.23",
+    "passport": "^0.4.1",
+    "passport-github2": "^0.1.12",
+    "zod": "^3.2.0"
+  },
+  "devDependencies": {
+    "@types/better-sqlite3": "^5.4.1",
+    "@types/express": "^4.17.12",
+    "@types/express-jwt": "^6.0.1",
+    "@types/jsonwebtoken": "^8.5.1",
+    "@types/nanoid": "^3.0.0",
+    "@types/passport": "^1.0.6",
+    "@types/passport-github2": "^1.2.4",
+    "dotenv": "^10.0.0",
+    "ts-node": "^10.0.0",
+    "ts-node-dev": "^1.1.6",
+    "tsc": "^2.0.3",
+    "typescript": "^3.9.10"
+  }
+}

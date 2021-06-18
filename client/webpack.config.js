@@ -29,8 +29,8 @@ const base = {
     historyApiFallback: true,
     disableHostCheck: true,
     proxy: {
-      "/graphql": "http://localhost:4000",
-      "/api": "http://localhost:4000",
+      "/graphql": "http://localhost:8080/v1",
+      "/api": "http://localhost:3002",
     },
   },
   output: {
