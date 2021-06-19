@@ -1,10 +1,10 @@
-exports.up = function(knex, Promise) {
+exports.up = function (knex) {
   return knex("user").insert({
     id: "anonymous",
     username: "anonymous",
   });
 };
 
-exports.down = function(knex, Promise) {
-  return new Promise(resolve => resolve());
+exports.down = function (knex) {
+  return new Promise((resolve) => resolve());
 };
