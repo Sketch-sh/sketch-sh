@@ -3,6 +3,8 @@ services:
   graphql-engine:
     ports:
       - "8080:8080"
+    depends_on:
+      - postgres  
   auth:
     # you can use legacy debug config or new inspect
     # NOTE: if nodemon isn't restarting on changes, you might be on Windows
@@ -28,10 +30,6 @@ services:
       # this will overwrite the default node_modules dir in container so it won't conflict with our
       # /opt/node_modules location. Thanks to PR from @brnluiz
       - notused:/opt/app/node_modules
-  graphql-engine:
-    ports:
-      - "8080:8080"
-
   nginx:
     build:
       args:
