@@ -18,10 +18,9 @@ let make = (~size=1., ~className=?) => {
 };
 
 module Jsx2 = {
-  let component = ReasonReact.statelessComponent("Logo");
+  let component = ReasonReact.statelessComponent(__MODULE__);
 
   let make = (~size: float, ~className: option(string)=?, children) => {
-    let children = React.array(children);
     ReasonReactCompat.wrapReactForReasonReact(
       make,
       makeProps(~size, ~className?, ()),

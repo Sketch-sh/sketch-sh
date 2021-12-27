@@ -1,8 +1,14 @@
+[@bs.config {jsx: 3}];
+
 Modules.require("./UI_DotFlashing.css");
 
-let component = ReasonReact.statelessComponent("UI_DotFlashing");
+[@react.component]
+let make = () => <div className="dot-flashing" />;
 
-let make = _children => {
-  ...component,
-  render: _self => <div className="dot-flashing" />,
+module Jsx2 = {
+  let component = ReasonReact.statelessComponent(__MODULE__);
+
+  let make = children => {
+    ReasonReactCompat.wrapReactForReasonReact(make, makeProps(), children);
+  };
 };
