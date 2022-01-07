@@ -169,7 +169,7 @@ module SingleLink = {
                <span className="link__timestamp__hint">
                  "Revision from "->str
                </span>
-               <UI_DateTime date=timestamp />
+               <UI_DateTime.Jsx2 date=timestamp />
              </span>
            }}
         </td>
