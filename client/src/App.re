@@ -64,7 +64,7 @@ let make = _children => {
                   | Login(userId) =>
                     <HomeLazy
                       fetch=homeImport
-                      onLoading={() => <UI_FullpageLoading />}
+                      onLoading={() => <UI_FullpageLoading.Jsx2 />}
                       render={((module Home)) => <Home userId />}
                     />
                   }
@@ -75,7 +75,7 @@ let make = _children => {
          <Layout_WithTopbar>
            ...<NoteLazy
                 fetch=noteImport
-                onLoading={() => <UI_FullpageLoading />}
+                onLoading={() => <UI_FullpageLoading.Jsx2 />}
                 render={((module Note)) => <Note noteInfo />}
               />
          </Layout_WithTopbar>
@@ -83,7 +83,7 @@ let make = _children => {
          <Layout_WithTopbar>
            ...<NoteTemplateChooseLazy
                 fetch=noteTemplateImport
-                onLoading={() => <UI_FullpageLoading />}
+                onLoading={() => <UI_FullpageLoading.Jsx2 />}
                 render={((module NoteTemplateChoose)) =>
                   <NoteTemplateChoose />
                 }
@@ -95,7 +95,7 @@ let make = _children => {
          <Layout_WithTopbar>
            ...<UserLazy
                 fetch=userImport
-                onLoading={() => <UI_FullpageLoading />}
+                onLoading={() => <UI_FullpageLoading.Jsx2 />}
                 render={((module User)) => <User userName />}
               />
          </Layout_WithTopbar>
@@ -103,7 +103,7 @@ let make = _children => {
        | AuthLogout => <Logout />
        | AuthGithub => <Auth.AuthGithub />
        | AuthFailure => "auth failure"->str
-       | NotFound => <NotFound />
+       | NotFound => <NotFound.Jsx2 />
        }}
     </ReasonApollo.Provider>,
 };
