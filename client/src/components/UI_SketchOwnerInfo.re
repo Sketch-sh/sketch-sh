@@ -1,37 +1,47 @@
-Modules.require("./UI_SketchOwnerInfo.css");
+[@bs.config {jsx: 3}];
 open Utils;
-let component = ReasonReact.statelessComponent("Edit_NoteOwnerInfo");
 
-let make = (~owner, ~noteLastEdited=?, ~className=?, _children) => {
-  ...component,
-  render: _self =>
-    <div className={Cn.make(["UI_SketchOwnerInfo", Cn.unwrap(className)])}>
-      <Router.Link route={Route.User(owner##username)}>
-        {owner##avatar
-         =>> (
-           avatar =>
-             <img
-               src=avatar
-               width="24"
-               height="24"
-               className="UI_SketchOwnerInfo__avatar"
-               alt={owner##username ++ " avatar"}
-             />
-         )}
-        <span className="UI_SketchOwnerInfo__username">
-          {owner##username->str}
-        </span>
-      </Router.Link>
-      {noteLastEdited
+Modules.require("./UI_SketchOwnerInfo.css");
+
+[@react.component]
+let make = (~owner, ~noteLastEdited=?, ~className=?) => {
+  <div ?className>
+    <Router.Link route={Route.User(owner##username)}>
+      {owner##avatar
        =>> (
-         noteLastEdited =>
-           <span className="UI_SketchOwnerInfo__lastEdited">
-             "last edited"->str
-             <UI_DateTime
-               date=noteLastEdited
-               className="UI_SketchOwnerInfo__time"
-             />
-           </span>
+         avatar =>
+           <img
+             src=avatar
+             width="24"
+             height="24"
+             className="UI_SketchOwnerInfo__avatar"
+             alt={owner##username ++ " avatar"}
+           />
        )}
-    </div>,
+      <span className="UI_SketchOwnerInfo__username">
+        {owner##username->str}
+      </span>
+    </Router.Link>
+    {noteLastEdited
+     =>> (
+       noteLastEdited =>
+         <span className="UI_SketchOwnerInfo__lastEdited">
+           "last edited"->str
+           <UI_DateTime
+             date=noteLastEdited
+             className="UI_SketchOwnerInfo__time"
+           />
+         </span>
+     )}
+  </div>;
+};
+
+module Jsx2 = {
+  let component = ReasonReact.statelessComponent(__MODULE__);
+  let make = (~owner, ~noteLastEdited=?, ~className=?) => {
+    ReasonReactCompat.wrapReactForReasonReact(
+      make,
+      makeProps(~owner, ~noteLastEdited?, ~className?, ()),
+    );
+  };
 };
