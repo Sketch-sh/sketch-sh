@@ -33,7 +33,7 @@ module Provider = {
   let component = ReasonReact.reducerComponent("FontFaceObserver_Provider");
 
   let make:
-    (~className: string=?, ~font: string=?, React.childless) =>
+    (~className: string=?, ~font: string=?, ReactOld.childless) =>
     ReasonReact.component(unit, 'a, unit) =
     (~className="fira-code", ~font="Fira Code", _children) => {
       ...component,

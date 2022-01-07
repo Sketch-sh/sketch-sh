@@ -38,8 +38,8 @@ module ForkButton = {
              <UI_LoadingWrapper loading={forkStatus == ForkStatus_Loading}>
                ...{loading =>
                  loading
-                   ? <Fi.Loader className="EditorNav__button--spin" />
-                   : <Fi.GitBranch />
+                   ? <Fi.Loader.Jsx2 className="EditorNav__button--spin" />
+                   : <Fi.GitBranch.Jsx2 />
                }
              </UI_LoadingWrapper>
              <span> "Fork"->str </span>
@@ -263,7 +263,7 @@ let make =
   ...component,
   render: _self =>
     switch (noteState) {
-    | NoteState_New => React.null
+    | NoteState_New => ReactOld.null
     | NoteState_Old =>
       <AuthStatus.IsAuthenticated>
         ...(

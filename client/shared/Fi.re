@@ -1,591 +1,285 @@
 [@bs.config {jsx: 3}];
 
-/* react-icons: feather icon */
-module IconContext = {
-  [@bs.deriving abstract]
-  type iconContext = {
-    [@bs.as "Provider"]
-    provider: ReasonReact.reactClass,
-  };
-  [@bs.module "react-icons"] external iconContext: iconContext = "IconContext";
-
-  module Provider = {
-    let reactClass = providerGet(iconContext);
-
-    let make = (~value, children) =>
-      ReasonReact.wrapJsForReason(
-        ~reactClass,
-        ~props={"value": value},
-        children,
-      );
-  };
-};
-/*
- module Save = {
-   [@bs.module "react-icons/fi"]
-   external reactClass: ReasonReact.reactClass = "FiSave";
-
-   let make = (~className="", children) =>
-     ReasonReact.wrapJsForReason(
-       ~reactClass,
-       ~props={"className": className},
-       children,
-     );
- };
- */
 module Save = {
   [@bs.module "react-icons/fi"] [@react.component]
-  external make:
-    (~className: string=?, ~children: React.element) => React.element =
-    "FiSave";
+  external make: (~className: string=?) => React.element = "FiSave";
 
   module Jsx2 = {
     let component = ReasonReact.statelessComponent(__MODULE__);
-    let make = (~className: string=?, children) => {
+    let make = (~className=?) => {
       ReasonReactCompat.wrapReactForReasonReact(
         make,
-        makeProps(~className, ()),
-        children,
+        makeProps(~className?, ()),
       );
     };
   };
 };
-/*
- module Loader = {
-   [@bs.module "react-icons/fi"]
-   external reactClass: ReasonReact.reactClass = "FiLoader";
 
-   let make = (~className="", children) =>
-     ReasonReact.wrapJsForReason(
-       ~reactClass,
-       ~props={"className": className},
-       children,
-     );
- };
- */
 module Loader = {
   [@bs.module "react-icons/fi"] [@react.component]
-  external make:
-    (~className: string=?, ~children: React.element) => React.element =
-    "FiLoader";
+  external make: (~className: string=?) => React.element = "FiLoader";
 
   module Jsx2 = {
     let component = ReasonReact.statelessComponent(__MODULE__);
-    let make = (~className: string=?, children) => {
+    let make = (~className=?) => {
       ReasonReactCompat.wrapReactForReasonReact(
         make,
-        makeProps(~className, ()),
-        children,
+        makeProps(~className?, ()),
       );
     };
   };
 };
-/*
- module Home = {
-   [@bs.module "react-icons/fi"]
-   external reactClass: ReasonReact.reactClass = "FiHome";
 
-   let make = (~className="", children) =>
-     ReasonReact.wrapJsForReason(
-       ~reactClass,
-       ~props={"className": className},
-       children,
-     );
- };
- */
 module Home = {
   [@bs.module "react-icons/fi"] [@react.component]
-  external make:
-    (~className: string=?, ~children: React.element) => React.element =
-    "FiHome";
+  external make: (~className: string=?) => React.element = "FiHome";
 
   module Jsx2 = {
     let component = ReasonReact.statelessComponent(__MODULE__);
-    let make = (~className: string=?, children) => {
+    let make = (~className=?) => {
       ReasonReactCompat.wrapReactForReasonReact(
         make,
-        makeProps(~className, ()),
-        children,
+        makeProps(~className?, ()),
       );
     };
   };
 };
-/*
- module Github = {
-   [@bs.module "react-icons/fi"]
-   external reactClass: ReasonReact.reactClass = "FiGithub";
 
-   let make = (~className="", children) =>
-     ReasonReact.wrapJsForReason(
-       ~reactClass,
-       ~props={"className": className},
-       children,
-     );
- };
- */
 module Github = {
   [@bs.module "react-icons/fi"] [@react.component]
-  external make:
-    (~className: string=?, ~children: React.element) => React.element =
-    "Github";
+  external make: (~className: string=?) => React.element = "FiGithub";
 
   module Jsx2 = {
     let component = ReasonReact.statelessComponent(__MODULE__);
-    let make = (~className: string=?, children) => {
+    let make = (~className=?) => {
       ReasonReactCompat.wrapReactForReasonReact(
         make,
-        makeProps(~className, ()),
-        children,
+        makeProps(~className?, ()),
       );
     };
   };
 };
-/*
- module GitBranch = {
-   [@bs.module "react-icons/fi"]
-   external reactClass: ReasonReact.reactClass = "FiGitBranch";
 
-   let make = (~className="", children) =>
-     ReasonReact.wrapJsForReason(
-       ~reactClass,
-       ~props={"className": className},
-       children,
-     );
- };
- */
 module GitBranch = {
   [@bs.module "react-icons/fi"] [@react.component]
-  external make:
-    (~className: string=?, ~children: React.element) => React.element =
-    "FiGitBranch";
+  external make: (~className: string=?) => React.element = "FiGitBranch";
 
   module Jsx2 = {
     let component = ReasonReact.statelessComponent(__MODULE__);
-    let make = (~className: string=?, children) => {
+    let make = (~className=?) => {
       ReasonReactCompat.wrapReactForReasonReact(
         make,
-        makeProps(~className, ()),
-        children,
+        makeProps(~className?, ()),
       );
     };
   };
 };
-/*
- module Terminal = {
-   [@bs.module "react-icons/fi"]
-   external reactClass: ReasonReact.reactClass = "FiTerminal";
 
-   let make = (~className="", children) =>
-     ReasonReact.wrapJsForReason(
-       ~reactClass,
-       ~props={"className": className},
-       children,
-     );
- };
- */
 module Terminal = {
   [@bs.module "react-icons/fi"] [@react.component]
-  external make:
-    (~className: string=?, ~children: React.element) => React.element =
-    "FiTerminal";
+  external make: (~className: string=?) => React.element = "FiTerminal";
 
   module Jsx2 = {
     let component = ReasonReact.statelessComponent(__MODULE__);
-    let make = (~className: string=?, children) => {
+    let make = (~className=?) => {
       ReasonReactCompat.wrapReactForReasonReact(
         make,
-        makeProps(~className, ()),
-        children,
+        makeProps(~className?, ()),
       );
     };
   };
 };
-/*
- module PlusCircle = {
-   [@bs.module "react-icons/fi"]
-   external reactClass: ReasonReact.reactClass = "FiPlusCircle";
 
-   let make = (~className="", children) =>
-     ReasonReact.wrapJsForReason(
-       ~reactClass,
-       ~props={"className": className},
-       children,
-     );
- };
- */
 module PlusCircle = {
   [@bs.module "react-icons/fi"] [@react.component]
-  external make:
-    (~className: string=?, ~children: React.element) => React.element =
-    "FiPlusCircle";
+  external make: (~className: string=?) => React.element = "FiPlusCircle";
 
   module Jsx2 = {
     let component = ReasonReact.statelessComponent(__MODULE__);
-    let make = (~className: string=?, children) => {
+    let make = (~className=?) => {
       ReasonReactCompat.wrapReactForReasonReact(
         make,
-        makeProps(~className, ()),
-        children,
+        makeProps(~className?, ()),
       );
     };
   };
 };
-/*
- module FilePlus = {
-   [@bs.module "react-icons/fi"]
-   external reactClass: ReasonReact.reactClass = "FiFilePlus";
 
-   let make = (~className="", children) =>
-     ReasonReact.wrapJsForReason(
-       ~reactClass,
-       ~props={"className": className},
-       children,
-     );
- };
- */
 module FilePlus = {
   [@bs.module "react-icons/fi"] [@react.component]
-  external make:
-    (~className: string=?, ~children: React.element) => React.element =
-    "FiFilePlus";
+  external make: (~className: string=?) => React.element = "FiFilePlus";
 
   module Jsx2 = {
     let component = ReasonReact.statelessComponent(__MODULE__);
-    let make = (~className: string=?, children) => {
+    let make = (~className=?) => {
       ReasonReactCompat.wrapReactForReasonReact(
         make,
-        makeProps(~className, ()),
-        children,
+        makeProps(~className?, ()),
       );
     };
   };
 };
-/*
- module Plus = {
-   [@bs.module "react-icons/fi"]
-   external reactClass: ReasonReact.reactClass = "FiPlus";
 
-   let make = (~className="", children) =>
-     ReasonReact.wrapJsForReason(
-       ~reactClass,
-       ~props={"className": className},
-       children,
-     );
- };
- */
 module Plus = {
   [@bs.module "react-icons/fi"] [@react.component]
-  external make:
-    (~className: string=?, ~children: React.element) => React.element =
-    "FiPlus";
+  external make: (~className: string=?) => React.element = "FiPlus";
 
   module Jsx2 = {
     let component = ReasonReact.statelessComponent(__MODULE__);
-    let make = (~className: string=?, children) => {
+    let make = (~className=?) => {
       ReasonReactCompat.wrapReactForReasonReact(
         make,
-        makeProps(~className, ()),
-        children,
+        makeProps(~className?, ()),
       );
     };
   };
 };
-/*
- module Code = {
-   [@bs.module "react-icons/fi"]
-   external reactClass: ReasonReact.reactClass = "FiCode";
 
-   let make = (~className="", children) =>
-     ReasonReact.wrapJsForReason(
-       ~reactClass,
-       ~props={"className": className},
-       children,
-     );
- };
- */
 module Code = {
   [@bs.module "react-icons/fi"] [@react.component]
-  external make:
-    (~className: string=?, ~children: React.element) => React.element =
-    "FiCode";
+  external make: (~className: string=?) => React.element = "FiCode";
 
   module Jsx2 = {
     let component = ReasonReact.statelessComponent(__MODULE__);
-    let make = (~className: string=?, children) => {
+    let make = (~className=?) => {
       ReasonReactCompat.wrapReactForReasonReact(
         make,
-        makeProps(~className, ()),
-        children,
+        makeProps(~className?, ()),
       );
     };
   };
 };
-/*
- module Edit2 = {
-   [@bs.module "react-icons/fi"]
-   external reactClass: ReasonReact.reactClass = "FiEdit2";
 
-   let make = (~className="", children) =>
-     ReasonReact.wrapJsForReason(
-       ~reactClass,
-       ~props={"className": className},
-       children,
-     );
- };
- */
 module Edit2 = {
   [@bs.module "react-icons/fi"] [@react.component]
-  external make:
-    (~className: string=?, ~children: React.element) => React.element =
-    "FiEdit2";
+  external make: (~className: string=?) => React.element = "FiEdit2";
 
   module Jsx2 = {
     let component = ReasonReact.statelessComponent(__MODULE__);
-    let make = (~className: string=?, children) => {
+    let make = (~className=?) => {
       ReasonReactCompat.wrapReactForReasonReact(
         make,
-        makeProps(~className, ()),
-        children,
+        makeProps(~className?, ()),
       );
     };
   };
 };
-/*
- module Trash2 = {
-   [@bs.module "react-icons/fi"]
-   external reactClass: ReasonReact.reactClass = "FiTrash2";
 
-   let make = (~className="", children) =>
-     ReasonReact.wrapJsForReason(
-       ~reactClass,
-       ~props={"className": className},
-       children,
-     );
- };
- */
 module Trash2 = {
   [@bs.module "react-icons/fi"] [@react.component]
-  external make:
-    (~className: string=?, ~children: React.element) => React.element =
-    "FiTrash2";
+  external make: (~className: string=?) => React.element = "FiTrash2";
 
   module Jsx2 = {
     let component = ReasonReact.statelessComponent(__MODULE__);
-    let make = (~className: string=?, children) => {
+    let make = (~className=?) => {
       ReasonReactCompat.wrapReactForReasonReact(
         make,
-        makeProps(~className, ()),
-        children,
+        makeProps(~className?, ()),
       );
     };
   };
 };
-/*
- module RefreshCw = {
-   [@bs.module "react-icons/fi"]
-   external reactClass: ReasonReact.reactClass = "FiRefreshCw";
 
-   let make = (~className="", children) =>
-     ReasonReact.wrapJsForReason(
-       ~reactClass,
-       ~props={"className": className},
-       children,
-     );
- };
- */
 module RefreshCw = {
   [@bs.module "react-icons/fi"] [@react.component]
-  external make:
-    (~className: string=?, ~children: React.element) => React.element =
-    "FiRefreshCw";
+  external make: (~className: string=?) => React.element = "FiRefreshCw";
 
   module Jsx2 = {
     let component = ReasonReact.statelessComponent(__MODULE__);
-    let make = (~className: string=?, children) => {
+    let make = (~className=?) => {
       ReasonReactCompat.wrapReactForReasonReact(
         make,
-        makeProps(~className, ()),
-        children,
+        makeProps(~className?, ()),
       );
     };
   };
 };
-/*
- module Package = {
-   [@bs.module "react-icons/fi"]
-   external reactClass: ReasonReact.reactClass = "FiPackage";
 
-   let make = (~className="", children) =>
-     ReasonReact.wrapJsForReason(
-       ~reactClass,
-       ~props={"className": className},
-       children,
-     );
- };
- */
 module Package = {
   [@bs.module "react-icons/fi"] [@react.component]
-  external make:
-    (~className: string=?, ~children: React.element) => React.element =
-    "FiPackage";
+  external make: (~className: string=?) => React.element = "FiPackage";
 
   module Jsx2 = {
     let component = ReasonReact.statelessComponent(__MODULE__);
-    let make = (~className: string=?, children) => {
+    let make = (~className=?) => {
       ReasonReactCompat.wrapReactForReasonReact(
         make,
-        makeProps(~className, ()),
-        children,
+        makeProps(~className?, ()),
       );
     };
   };
 };
-/*
- module Play = {
-   [@bs.module "react-icons/fi"]
-   external reactClass: ReasonReact.reactClass = "FiPlay";
 
-   let make = (~className="", children) =>
-     ReasonReact.wrapJsForReason(
-       ~reactClass,
-       ~props={"className": className},
-       children,
-     );
- };
- */
 module Play = {
   [@bs.module "react-icons/fi"] [@react.component]
-  external make:
-    (~className: string=?, ~children: React.element) => React.element =
-    "FiPlay";
+  external make: (~className: string=?) => React.element = "FiPlay";
 
   module Jsx2 = {
     let component = ReasonReact.statelessComponent(__MODULE__);
-    let make = (~className: string=?, children) => {
+    let make = (~className=?) => {
       ReasonReactCompat.wrapReactForReasonReact(
         make,
-        makeProps(~className, ()),
-        children,
+        makeProps(~className?, ()),
       );
     };
   };
 };
-/*
- module Link = {
-   [@bs.module "react-icons/fi"]
-   external reactClass: ReasonReact.reactClass = "FiLink";
 
-   let make = (~className="", children) =>
-     ReasonReact.wrapJsForReason(
-       ~reactClass,
-       ~props={"className": className},
-       children,
-     );
- };
- */
 module Link = {
   [@bs.module "react-icons/fi"] [@react.component]
-  external make:
-    (~className: string=?, ~children: React.element) => React.element =
-    "FiLink";
+  external make: (~className: string=?) => React.element = "FiLink";
 
   module Jsx2 = {
     let component = ReasonReact.statelessComponent(__MODULE__);
-    let make = (~className: string=?, children) => {
+    let make = (~className=?) => {
       ReasonReactCompat.wrapReactForReasonReact(
         make,
-        makeProps(~className, ()),
-        children,
+        makeProps(~className?, ()),
       );
     };
   };
 };
-/*
- module RefreshCCW = {
-   [@bs.module "react-icons/fi"]
-   external reactClass: ReasonReact.reactClass = "FiRefreshCcw";
 
-   let make = (~className="", children) =>
-     ReasonReact.wrapJsForReason(
-       ~reactClass,
-       ~props={"className": className},
-       children,
-     );
- };
- */
 module RefreshCCW = {
   [@bs.module "react-icons/fi"] [@react.component]
-  external make:
-    (~className: string=?, ~children: React.element) => React.element =
-    "FiRefreshCcw";
+  external make: (~className: string=?) => React.element = "FiRefreshCcw";
 
   module Jsx2 = {
     let component = ReasonReact.statelessComponent(__MODULE__);
-    let make = (~className: string=?, children) => {
+    let make = (~className=?) => {
       ReasonReactCompat.wrapReactForReasonReact(
         make,
-        makeProps(~className, ()),
-        children,
+        makeProps(~className?, ()),
       );
     };
   };
 };
-/*
- module FiXCircle = {
-   [@bs.module "react-icons/fi"]
-   external reactClass: ReasonReact.reactClass = "FiXCircle";
 
-   let make = (~className="", children) =>
-     ReasonReact.wrapJsForReason(
-       ~reactClass,
-       ~props={"className": className},
-       children,
-     );
- };
- */
 module FiXCircle = {
   [@bs.module "react-icons/fi"] [@react.component]
-  external make:
-    (~className: string=?, ~children: React.element) => React.element =
-    "FiXCircle";
+  external make: (~className: string=?) => React.element = "FiXCircle";
 
   module Jsx2 = {
     let component = ReasonReact.statelessComponent(__MODULE__);
-    let make = (~className: string=?, children) => {
+    let make = (~className=?) => {
       ReasonReactCompat.wrapReactForReasonReact(
         make,
-        makeProps(~className, ()),
-        children,
+        makeProps(~className?, ()),
       );
     };
   };
 };
-/*
- module FiRefreshCw = {
-   [@bs.module "react-icons/fi"]
-   external reactClass: ReasonReact.reactClass = "FiRefreshCw";
 
-   let make = (~className="", children) =>
-     ReasonReact.wrapJsForReason(
-       ~reactClass,
-       ~props={"className": className},
-       children,
-     );
- };
- */
 module FiRefreshCw = {
   [@bs.module "react-icons/fi"] [@react.component]
-  external make:
-    (~className: string=?, ~children: React.element) => React.element =
-    "FiRefreshCw";
+  external make: (~className: string=?) => React.element = "FiRefreshCw";
 
   module Jsx2 = {
     let component = ReasonReact.statelessComponent(__MODULE__);
-    let make = (~className: string=?, children) => {
+    let make = (~className=?) => {
       ReasonReactCompat.wrapReactForReasonReact(
         make,
-        makeProps(~className, ()),
-        children,
+        makeProps(~className?, ()),
       );
     };
   };

@@ -40,7 +40,8 @@ module Unload = {
   module Provider = {
     let component = ReasonReact.reducerComponent("Router_UnloadProvider");
 
-    let make = (_children: React.childless): React.component(unit, 'a, unit) => {
+    let make =
+        (_children: ReactOld.childless): ReactOld.component(unit, 'a, unit) => {
       ...component,
       didMount: _self =>
         window->onbeforeunloadSet((. event) =>
@@ -51,7 +52,7 @@ module Unload = {
             Js.Nullable.return(message);
           }
         ),
-      render: _self => React.null,
+      render: _self => ReactOld.null,
     };
   };
 };

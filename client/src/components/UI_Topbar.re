@@ -8,7 +8,7 @@ let loginButton =
     className="btn btn-primary Topbar__login"
     popup=true
     route=Route.AuthGithub>
-    <Fi.Github />
+    <Fi.Github.Jsx2 />
     "Login with Github"->str
   </Router.Link>;
 
@@ -32,7 +32,7 @@ let make = _children => {
                route={Route.NoteNew(RE)}
                className="Topbar__action Topbar__action--highlight"
                title="Create new Sketch">
-               <Fi.Plus />
+               <Fi.Plus.Jsx2 />
                "New Sketch"->str
              </Router.Link>
         </UI_Balloon>

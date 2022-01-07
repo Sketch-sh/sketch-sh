@@ -7,13 +7,13 @@ let make = (~className=?, _children) => {
   ...component,
   render: _self =>
     <section className={Cn.make(["UI_NoSketches", Cn.unwrap(className)])}>
-      <Fi.Package className="UI_NoSketches--icon" />
+      <Fi.Package.Jsx2 className="UI_NoSketches--icon" />
       "Your sketches will show up here"->str
       <Router.Link
         route=Route.NoteTemplateChoose
         className="btn btn-primary btn--large UI_NoSketches--button"
         role="button">
-        <Fi.Plus />
+        <Fi.Plus.Jsx2 />
         "Create New Sketch"->str
       </Router.Link>
     </section>,
