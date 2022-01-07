@@ -1,0 +1,6 @@
+{
+    "name": "sketch.sh",
+    "dependencies": {
+        "@opam/reason": "*"
+    }
+}
