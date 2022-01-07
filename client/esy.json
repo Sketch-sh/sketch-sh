@@ -1,6 +1,7 @@
 {
-    "name": "sketch.sh",
-    "dependencies": {
-        "@opam/reason": "*"
-    }
+  "name": "sketch.sh",
+  "dependencies": {
+    "@opam/ocaml-lsp-server": "1.9.0",
+    "@opam/reason": "*"
+  }
 }
