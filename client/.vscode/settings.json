@@ -5,5 +5,9 @@
     "src_editor/*.bs.js": true,
     "src_analyzer/*.js": true,
     "lib": true
+  },
+  "ocaml.sandbox": {
+    "kind": "esy",
+    "root": "${workspaceFolder:client}"
   }
 }
