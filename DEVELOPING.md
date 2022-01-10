@@ -58,6 +58,13 @@ git clone https://github.com/sketch-sh/sketch-sh
 ~/sketch-sh/client: > yarn build
 ```
 
+To use `esy` as your LSP sandbox, you need to install `esy`
+
+```
+npm install -g esy
+```
+and run `esy` from client folder, once esy is installed you can choose client folder as your ocaml sandbox for your editor.
+
 # Server
 
 Server implementation contains 2 microservices: auth, hasura's graphql engine
