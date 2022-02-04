@@ -18,7 +18,8 @@
     "ci:cypress:staging": "CYPRESS_GRAPHQL_ENDPOINT=https://rtop-server.herokuapp.com/v1alpha1/graphql cypress run --record --browser chrome -c baseUrl=\"https://staging.sketch.sh\",defaultCommandTimeout=20000",
     "cy:open": "cypress open",
     "cy:run": "cypress run",
-    "cy:run:record": "cypress run --record --browser chrome"
+    "cy:run:record": "cypress run --record --browser chrome",
+    "refmt": "yarn bsrefmt --in-place $(find src shared src_editor src_analyzer src_embed src_worker -type f \\( -name *.re -o -name *.rei \\))"
   },
   "author": "",
   "license": "MIT",
