@@ -69,7 +69,7 @@ module ToastOption = {
 
   [@bs.deriving abstract]
   type t = {
-    content: contentArgs => React.reactElement,
+    content: contentArgs => ReactOld.reactElement,
     [@bs.optional]
     dismissOnClick: bool,
     [@bs.optional]
@@ -87,7 +87,7 @@ module ToastOption = {
         ~name=?,
         ~toastTimeout=?,
         content:
-          (~toastId: string, ~dismiss: unit => unit) => React.reactElement,
+          (~toastId: string, ~dismiss: unit => unit) => ReactOld.reactElement,
       ) =>
     t(
       ~content=
