@@ -105,7 +105,8 @@ let replaceSilent = route => replaceSilentUnsafe(Route.routeToUrl(route));
 
 module LinkUnsafe = {
   [@react.component]
-  let make = (~href, ~id=?, ~className=?, ~title=?, ~popup, ~role=?, children) => {
+  let make =
+      (~href, ~id=?, ~className=?, ~title=?, ~popup, ~role=?, ~children) => {
     <a
       ?id
       ?className
@@ -138,7 +139,7 @@ module Link = {
         ~className=?,
         ~popup=false,
         ~role=?,
-        children,
+        ~children,
       ) => {
     let href = Route.routeToUrl(route);
     <LinkUnsafe href ?id ?className ?title popup ?role> children </LinkUnsafe>;

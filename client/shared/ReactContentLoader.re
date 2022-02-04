@@ -13,7 +13,8 @@ module Default = {
       ~primaryOpacity: float=?,
       ~secondaryOpacity: float=?,
       ~style: ReactDOMRe.Style.t=?,
-      ~uniquekey: string=?
+      ~uniquekey: string=?,
+      ~children: React.element=?
     ) =>
     React.element =
     "default";
@@ -34,7 +35,8 @@ module Code = {
       ~primaryOpacity: float=?,
       ~secondaryOpacity: float=?,
       ~style: ReactDOMRe.Style.t=?,
-      ~uniquekey: string=?
+      ~uniquekey: string=?,
+      ~children: React.element=?
     ) =>
     React.element =
     "Code";
@@ -60,6 +62,7 @@ let make =
       ~secondaryOpacity=?,
       ~style=?,
       ~uniquekey=?,
+      ~children=React.null,
     ) =>
   switch (typ) {
   | Raw =>
@@ -75,8 +78,9 @@ let make =
       ?primaryOpacity
       ?secondaryOpacity
       ?style
-      ?uniquekey
-    />
+      ?uniquekey>
+      children
+    </Default>
   | Code =>
     <Code
       ?animate
@@ -90,6 +94,7 @@ let make =
       ?primaryOpacity
       ?secondaryOpacity
       ?style
-      ?uniquekey
-    />
+      ?uniquekey>
+      children
+    </Code>
   };

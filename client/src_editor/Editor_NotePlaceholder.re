@@ -32,7 +32,9 @@ let make = () => {
           <rect x="0" y="80" rx="3" ry="3" width="30" height="10" />
         </ReactContentLoader>
       </div>
-      <div> <ReactContentLoader width=400 height=90 typ=Code /> </div>
+      <div>
+        <ReactContentLoader width=400 height=90 typ=ReactContentLoader.Code />
+      </div>
     </div>
   </div>;
 };
