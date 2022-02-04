@@ -98,17 +98,6 @@
       "/public/"
     ]
   },
-  "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged"
-    }
-  },
-  "lint-staged": {
-    "*.{re,rei}": [
-      "bsrefmt --in-place",
-      "git add"
-    ]
-  },
   "browserslist": [
     "last 2 version"
   ]
