@@ -62,7 +62,7 @@ let make =
       ~secondaryOpacity=?,
       ~style=?,
       ~uniquekey=?,
-      ~children=React.null,
+      ~children=ReactOld.null,
     ) =>
   switch (typ) {
   | Raw =>

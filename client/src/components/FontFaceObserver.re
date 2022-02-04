@@ -50,6 +50,6 @@ module Provider = {
       };
       None;
     });
-    React.null;
+    ReactOld.null;
   };
 };

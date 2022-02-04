@@ -263,7 +263,7 @@ let make =
   ...component,
   render: _self =>
     switch (noteState) {
-    | NoteState_New => React.null
+    | NoteState_New => ReactOld.null
     | NoteState_Old =>
       <AuthStatus.IsAuthenticated>
         ...(
