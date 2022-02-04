@@ -38,11 +38,9 @@ module Unload = {
   [@bs.val] external window: window = "window";
 
   module Provider = {
-    let component = ReasonReact.reducerComponent("Router_UnloadProvider");
-
-    let make = (_children: React.childless): React.component(unit, 'a, unit) => {
-      ...component,
-      didMount: _self =>
+    [@react.component]
+    let make = _children => {
+      React.useEffect0(() => {
         window->onbeforeunloadSet((. event) =>
           switch (getUnloadMessage()) {
           | None => Js.Nullable.null
@@ -50,8 +48,10 @@ module Unload = {
             event##returnValue #= message;
             Js.Nullable.return(message);
           }
-        ),
-      render: _self => React.null,
+        );
+        None;
+      });
+      React.null;
     };
   };
 };
@@ -104,38 +104,32 @@ let replaceSilentUnsafe = path =>
 let replaceSilent = route => replaceSilentUnsafe(Route.routeToUrl(route));
 
 module LinkUnsafe = {
-  let component = ReasonReact.statelessComponent("LinkUnsafe");
-
+  [@react.component]
   let make = (~href, ~id=?, ~className=?, ~title=?, ~popup, ~role=?, children) => {
-    ...component,
-    render: self =>
-      <a
-        ?id
-        ?className
-        ?title
-        ?role
-        href
-        onClick={
-          self.handle((event, _self) =>
-            if (!event->ReactEvent.Mouse.ctrlKey
-                && event->ReactEvent.Mouse.button != 1) {
-              event->ReactEvent.Mouse.preventDefault;
-              if (popup) {
-                Popup.openPopup(href);
-              } else {
-                pushUnsafe(href);
-              };
-            }
-          )
-        }>
-        ...children
-      </a>,
+    <a
+      ?id
+      ?className
+      ?title
+      ?role
+      href
+      onClick={event =>
+        if (!event->ReactEvent.Mouse.ctrlKey
+            && event->ReactEvent.Mouse.button != 1) {
+          event->ReactEvent.Mouse.preventDefault;
+          if (popup) {
+            Popup.openPopup(href);
+          } else {
+            pushUnsafe(href);
+          };
+        }
+      }>
+      children
+    </a>;
   };
 };
 
 module Link = {
-  let component = ReasonReact.statelessComponent("LinkSafe");
-
+  [@react.component]
   let make =
       (
         ~route: Route.t,
@@ -146,12 +140,7 @@ module Link = {
         ~role=?,
         children,
       ) => {
-    ...component,
-    render: _self => {
-      let href = Route.routeToUrl(route);
-      <LinkUnsafe href ?id ?className ?title popup ?role>
-        ...children
-      </LinkUnsafe>;
-    },
+    let href = Route.routeToUrl(route);
+    <LinkUnsafe href ?id ?className ?title popup ?role> children </LinkUnsafe>;
   };
 };

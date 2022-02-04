@@ -26,7 +26,53 @@ let getEditor = (state, ~default, ~f) =>
   | Some(editor) => f(editor)
   };
 
-let component = ReasonReact.reducerComponent("Editor_CodeMirror");
+// willReceiveProps: ({state}) =>
+// getEditor(
+//   state,
+//   ~default=state,
+//   ~f=editor => {
+//     switch (focused) {
+//     | None => ()
+//     | Some(typ) =>
+//       open Editor_Types.Block;
+//       editor->CodeMirror.Editor.focus;
+//       switch (typ) {
+//       | FcTyp_BlockFocusDown =>
+//         let doc = editor->CodeMirror.Editor.getDoc;
+//         doc->(
+//                CodeMirror.Doc.setCursor(
+//                  CodeMirror.Position.make(~line=0, ~ch=0, ()),
+//                )
+//              );
+//       | FcTyp_BlockFocusUp =>
+//         let doc = editor->CodeMirror.Editor.getDoc;
+//         let lastLinePlusOne = editor->CodeMirror.Editor.lineCount;
+//         doc->(
+//                CodeMirror.Doc.setCursor(
+//                  CodeMirror.Position.make(
+//                    ~line=lastLinePlusOne,
+//                    ~ch=0,
+//                    (),
+//                  ),
+//                )
+//              );
+//       | FcTyp_BlockNew
+//       | FcTyp_BlockExecuteAndFocusNextBlock
+//       | FcTyp_EditorFocus => ()
+//       };
+//     };
+//     {
+//       ...state,
+//       value: {
+//         if (state.value != value
+//             && value != editor->CodeMirror.Editor.getValue) {
+//           editor->(CodeMirror.Editor.setValue(value));
+//         };
+//         value;
+//       },
+//     };
+//   },
+// ),
 
 let make =
     (
@@ -42,58 +88,9 @@ let make =
       ~onBlur: option(unit => unit)=?,
       ~onUpdate: option(unit => unit)=?,
       _children,
-    )
-    : ReasonReact.component(state, _, unit) => {
-  ...component,
-  initialState: () => {editor: ref(None), divRef: ref(None), value},
-  willReceiveProps: ({state}) =>
-    getEditor(
-      state,
-      ~default=state,
-      ~f=editor => {
-        switch (focused) {
-        | None => ()
-        | Some(typ) =>
-          open Editor_Types.Block;
-          editor->CodeMirror.Editor.focus;
-          switch (typ) {
-          | FcTyp_BlockFocusDown =>
-            let doc = editor->CodeMirror.Editor.getDoc;
-            doc->(
-                   CodeMirror.Doc.setCursor(
-                     CodeMirror.Position.make(~line=0, ~ch=0, ()),
-                   )
-                 );
-          | FcTyp_BlockFocusUp =>
-            let doc = editor->CodeMirror.Editor.getDoc;
-            let lastLinePlusOne = editor->CodeMirror.Editor.lineCount;
-            doc->(
-                   CodeMirror.Doc.setCursor(
-                     CodeMirror.Position.make(
-                       ~line=lastLinePlusOne,
-                       ~ch=0,
-                       (),
-                     ),
-                   )
-                 );
-          | FcTyp_BlockNew
-          | FcTyp_BlockExecuteAndFocusNextBlock
-          | FcTyp_EditorFocus => ()
-          };
-        };
-        {
-          ...state,
-          value: {
-            if (state.value != value
-                && value != editor->CodeMirror.Editor.getValue) {
-              editor->(CodeMirror.Editor.setValue(value));
-            };
-            value;
-          },
-        };
-      },
-    ),
-  didMount: ({state}) =>
+    ) => {
+  let state = React.useState({editor: ref(None), divRef: ref(None), value});
+  React.useEffect0(() => {
     switch (state.divRef^) {
     | None => ()
     | Some(div) =>
@@ -167,7 +164,8 @@ let make =
       };
 
       state.editor := Some(editor);
-    },
-  render: ({handle, state: _}) =>
-    <div ?className ref={handle(setDivRef)} />,
+      None;
+    }
+  });
+  <div ?className ref={handle(setDivRef)} />;
 };

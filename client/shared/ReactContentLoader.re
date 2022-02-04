@@ -1,46 +1,50 @@
-[@bs.module "react-content-loader"]
-external rawClass: ReasonReact.reactClass = "default";
+module Default = {
+  [@react.component "react-content-loader"] [@bs.module]
+  external make:
+    (
+      ~animate: bool=?,
+      ~speed: float=?,
+      ~className: string=?,
+      ~width: int=?,
+      ~height: int=?,
+      ~preserveAspectRatio: string=?,
+      ~primaryColor: string=?,
+      ~secondaryColor: string=?,
+      ~primaryOpacity: float=?,
+      ~secondaryOpacity: float=?,
+      ~style: ReactDOMRe.Style.t=?,
+      ~uniquekey: string=?
+    ) =>
+    React.element =
+    "default";
+};
 
-[@bs.module "react-content-loader"]
-external codeClass: ReasonReact.reactClass = "Code";
-
-[@bs.deriving abstract]
-type jsProps = {
-  [@bs.optional]
-  animate: bool,
-  [@bs.optional]
-  speed: float,
-  [@bs.optional]
-  className: string,
-  [@bs.optional]
-  width: int,
-  [@bs.optional]
-  height: int,
-  [@bs.optional]
-  preserveAspectRatio: string,
-  [@bs.optional]
-  primaryColor: string,
-  [@bs.optional]
-  secondaryColor: string,
-  [@bs.optional]
-  primaryOpacity: float,
-  [@bs.optional]
-  secondaryOpacity: float,
-  [@bs.optional]
-  style: ReactDOMRe.Style.t,
-  [@bs.optional]
-  uniquekey: string,
+module Code = {
+  [@react.component "react-content-loader"] [@bs.module]
+  external make:
+    (
+      ~animate: bool=?,
+      ~speed: float=?,
+      ~className: string=?,
+      ~width: int=?,
+      ~height: int=?,
+      ~preserveAspectRatio: string=?,
+      ~primaryColor: string=?,
+      ~secondaryColor: string=?,
+      ~primaryOpacity: float=?,
+      ~secondaryOpacity: float=?,
+      ~style: ReactDOMRe.Style.t=?,
+      ~uniquekey: string=?
+    ) =>
+    React.element =
+    "Code";
 };
 
 type contentType =
   | Raw
   | Code;
 
-let contentTypeToClass =
-  fun
-  | Raw => rawClass
-  | Code => codeClass;
-
+[@react.component]
 let make =
     (
       ~typ=Raw,
@@ -56,25 +60,36 @@ let make =
       ~secondaryOpacity=?,
       ~style=?,
       ~uniquekey=?,
-      children,
     ) =>
-  ReasonReact.wrapJsForReason(
-    ~reactClass=typ->contentTypeToClass,
-    ~props=
-      jsProps(
-        ~animate?,
-        ~speed?,
-        ~className?,
-        ~width?,
-        ~height?,
-        ~preserveAspectRatio?,
-        ~primaryColor?,
-        ~secondaryColor?,
-        ~primaryOpacity?,
-        ~secondaryOpacity?,
-        ~style?,
-        ~uniquekey?,
-        (),
-      ),
-    children,
-  );
+  switch (typ) {
+  | Raw =>
+    <Default
+      ?animate
+      ?speed
+      ?className
+      ?width
+      ?height
+      ?preserveAspectRatio
+      ?primaryColor
+      ?secondaryColor
+      ?primaryOpacity
+      ?secondaryOpacity
+      ?style
+      ?uniquekey
+    />
+  | Code =>
+    <Code
+      ?animate
+      ?speed
+      ?className
+      ?width
+      ?height
+      ?preserveAspectRatio
+      ?primaryColor
+      ?secondaryColor
+      ?primaryOpacity
+      ?secondaryOpacity
+      ?style
+      ?uniquekey
+    />
+  };
