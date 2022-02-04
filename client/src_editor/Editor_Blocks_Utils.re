@@ -1,15 +1,12 @@
 open Editor_Types;
 let mapCode = (blocks: array(Block.block), cb) =>
-  blocks
-  ->Belt.Array.mapU(
-      (. block) => {
-        let {Block.b_id, b_deleted, b_data} = block;
-        switch (b_data) {
-        | B_Code(bcode) => cb(~block, ~id=b_id, ~deleted=b_deleted, ~bcode)
-        | B_Text(_) => block
-        };
-      },
-    );
+  blocks->Belt.Array.mapU((. block) => {
+    let {Block.b_id, b_deleted, b_data} = block;
+    switch (b_data) {
+    | B_Code(bcode) => cb(~block, ~id=b_id, ~deleted=b_deleted, ~bcode)
+    | B_Text(_) => block
+    };
+  });
 /*
  * Block Execution Utils
  */
@@ -31,88 +28,95 @@ let executeResultToWidget = (result: list(Worker_Types.blockData)) => {
   let clampLineNumber = line => max(0, line);
 
   let widgets =
-    result
-    ->(
-        Belt.List.reduceU(
-          [||],
-          (. acc, exeResult) => {
-            let {block_result: result, block_loc} = exeResult;
-            let (_, {line}) = block_loc;
-            let line = line->clampLineNumber;
+    result->(
+              Belt.List.reduceU(
+                [||],
+                (. acc, exeResult) => {
+                  let {block_result: result, block_loc} = exeResult;
+                  let (_, {line}) = block_loc;
+                  let line = line->clampLineNumber;
 
-            let evaluate =
-              result.blockResult_evaluate
-              ->(
-                  Belt.Option.map(content =>
-                    Widget.{lw_line: line, lw_data: Lw_Value(content)}
-                  )
-                );
+                  let evaluate =
+                    result.blockResult_evaluate
+                    ->(
+                        Belt.Option.map(content =>
+                          Widget.{lw_line: line, lw_data: Lw_Value(content)}
+                        )
+                      );
 
-            let stdout =
-              result.blockResult_stdout
-              ->(
-                  Belt.Option.map(content =>
-                    Widget.{lw_line: line, lw_data: Lw_Stdout(content)}
-                  )
-                );
+                  let stdout =
+                    result.blockResult_stdout
+                    ->(
+                        Belt.Option.map(content =>
+                          Widget.{lw_line: line, lw_data: Lw_Stdout(content)}
+                        )
+                      );
 
-            let stderr =
-              switch (result.blockResult_stderr) {
-              | None => [||]
-              | Some(errors) =>
-                errors
-                ->(
-                    Belt.Array.mapU((. error) => {
-                      let toWidgetContent = (content: ErrorMessage.content) => {
-                        let ({line, col: colStart}, {col: colEnd}) =
-                          content.errMsg_loc;
+                  let stderr =
+                    switch (result.blockResult_stderr) {
+                    | None => [||]
+                    | Some(errors) =>
+                      errors->(
+                                Belt.Array.mapU((. error) => {
+                                  let toWidgetContent =
+                                      (content: ErrorMessage.content) => {
+                                    let (
+                                      {line, col: colStart},
+                                      {col: colEnd},
+                                    ) =
+                                      content.errMsg_loc;
 
-                        (
-                          line,
-                          renderErrorIndicator(
-                            colStart,
-                            colEnd,
-                            content.errMsg_content,
-                          ),
-                        );
-                      };
+                                    (
+                                      line,
+                                      renderErrorIndicator(
+                                        colStart,
+                                        colEnd,
+                                        content.errMsg_content,
+                                      ),
+                                    );
+                                  };
 
-                      switch (error) {
-                      | ErrorMessage.Err_Warning(content) =>
-                        let (lw_line, content) = toWidgetContent(content);
-                        Widget.{
-                          lw_line,
-                          lw_data: Widget.Lw_Warning(content),
-                        };
-                      | Err_Error(content) =>
-                        let (lw_line, content) = toWidgetContent(content);
+                                  switch (error) {
+                                  | ErrorMessage.Err_Warning(content) =>
+                                    let (lw_line, content) =
+                                      toWidgetContent(content);
+                                    Widget.{
+                                      lw_line,
+                                      lw_data: Widget.Lw_Warning(content),
+                                    };
+                                  | Err_Error(content) =>
+                                    let (lw_line, content) =
+                                      toWidgetContent(content);
 
-                        Widget.{lw_line, lw_data: Widget.Lw_Error(content)};
-                      | Err_Unknown(content) =>
-                        Widget.{
-                          lw_line: line,
-                          lw_data: Widget.Lw_Error(content),
-                        }
-                      };
-                    })
-                  )
-              };
+                                    Widget.{
+                                      lw_line,
+                                      lw_data: Widget.Lw_Error(content),
+                                    };
+                                  | Err_Unknown(content) =>
+                                    Widget.{
+                                      lw_line: line,
+                                      lw_data: Widget.Lw_Error(content),
+                                    }
+                                  };
+                                })
+                              )
+                    };
 
-            let finalWidgets =
-              [|stdout, evaluate|]
-              ->(
-                  Belt.Array.reduceU([||], (. acc2, lineWidget) =>
-                    switch (lineWidget) {
-                    | None => acc2
-                    | Some(lw) => Belt.Array.concat(acc2, [|lw|])
-                    }
-                  )
-                );
+                  let finalWidgets =
+                    [|stdout, evaluate|]
+                    ->(
+                        Belt.Array.reduceU([||], (. acc2, lineWidget) =>
+                          switch (lineWidget) {
+                          | None => acc2
+                          | Some(lw) => Belt.Array.concat(acc2, [|lw|])
+                          }
+                        )
+                      );
 
-            Belt.Array.concatMany([|acc, stderr, finalWidgets|]);
-          },
-        )
-      );
+                  Belt.Array.concatMany([|acc, stderr, finalWidgets|]);
+                },
+              )
+            );
   widgets;
 };
 
@@ -207,9 +211,9 @@ let codeBlockDataPairs = blocks =>
     blocks
     ->(
         Belt.Array.reduceU([], (. acc, {b_id, b_data, b_deleted}) =>
-          b_deleted ?
-            acc :
-            (
+          b_deleted
+            ? acc
+            : (
               switch (b_data) {
               | B_Text(_) => acc
               | B_Code({bc_value}) => [
@@ -224,15 +228,14 @@ let codeBlockDataPairs = blocks =>
   );
 
 let concatCodeBlocksToString = blocks =>
-  blocks
-  ->(
-      Belt.Array.reduceU("", (. acc, {b_data}) =>
-        switch (b_data) {
-        | B_Text(_) => acc
-        | B_Code({bc_value}) => acc ++ bc_value
-        }
-      )
-    );
+  blocks->(
+            Belt.Array.reduceU("", (. acc, {b_data}) =>
+              switch (b_data) {
+              | B_Text(_) => acc
+              | B_Code({bc_value}) => acc ++ bc_value
+              }
+            )
+          );
 
 let filterDeletedBlocks = blocks => {
   let blocksAfterDelete =

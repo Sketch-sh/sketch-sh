@@ -24,9 +24,9 @@ module Make = (ESig: Worker_Evaluator.EvaluatorSig) => {
         let refmtResult = {refmt_id: id, refmt_value: result};
 
         let hasError =
-          hasError ?
-            hasError :
-            (
+          hasError
+            ? hasError
+            : (
               switch (result) {
               | Ok(_) => false
               | Error(_) => true
