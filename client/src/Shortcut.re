@@ -74,3 +74,19 @@ module Consumer = {
     render: _self => children(Store.subscribe),
   };
 };
+/* JSX3
+   module Consumer = {
+   [@react.component]
+     let make = (~children) => {children(Store.subscribe);};
+
+     module Jsx2 = {
+       let component = ReasonReact.statelessComponent(__MODULE__);
+       let make = (children) => {
+         ReasonReactCompat.wrapReactForReasonReact(
+           make,
+           makeProps(~children, ()),
+         );
+       };
+     };
+   };
+   */
