@@ -9,7 +9,7 @@ open Editor_Types;
 module RedirectSketchURL = {
   let component = ReasonReact.reducerComponent("Note_RedirectSketchURL");
 
-  let make = (~noteId, children): React.component(unit, 'a, unit) => {
+  let make = (~noteId, children): ReactOld.component(unit, 'a, unit) => {
     ...component,
     didMount: _ => Router.replaceSilent(Route.Note({noteId, data: None})),
     render: _send => children,
@@ -18,7 +18,7 @@ module RedirectSketchURL = {
 
 let component = ReasonReact.statelessComponent("Note");
 
-let make = (~noteInfo: Route.noteRouteConfig, _children: React.childless) => {
+let make = (~noteInfo: Route.noteRouteConfig, _children: ReactOld.childless) => {
   ...component,
   render: _self => {
     let noteId = noteInfo.noteId;

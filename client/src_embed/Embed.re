@@ -216,7 +216,7 @@ let make = _children => {
            }}
         </span>
         <button className="footer_run" onClick={_ => send(Run)}>
-          <Fi.Play className="footer_run_icon" />
+          <Fi.Play.Jsx2 className="footer_run_icon" />
           "Run"->str
         </button>
       </footer>

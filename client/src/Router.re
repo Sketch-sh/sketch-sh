@@ -40,7 +40,8 @@ module Unload = {
   module Provider = {
     let component = ReasonReact.reducerComponent("Router_UnloadProvider");
 
-    let make = (_children: React.childless): React.component(unit, 'a, unit) => {
+    let make =
+        (_children: ReactOld.childless): ReactOld.component(unit, 'a, unit) => {
       ...component,
       didMount: _self =>
         window->onbeforeunloadSet((. event) =>
@@ -51,7 +52,7 @@ module Unload = {
             Js.Nullable.return(message);
           }
         ),
-      render: _self => React.null,
+      render: _self => ReactOld.null,
     };
   };
 };
@@ -102,17 +103,55 @@ let replaceSilentUnsafe = path =>
   };
 
 let replaceSilent = route => replaceSilentUnsafe(Route.routeToUrl(route));
+/*
+ module LinkUnsafe = {
+   [@bs.config {jsx: 3}];
 
+   [@react.component]
+   let make = (~href, ~id=?, ~title=?, ~className=?, ~popup, ~role=?, ~children) => {
+     <a
+       ?id
+       ?title
+       ?className
+       ?role
+       href
+       onClick={
+         self.handle((event, _self) =>
+           if (!event->ReactEvent.Mouse.ctrlKey && event->ReactEvent.Mouse.button != 1) {
+             event->ReactEvent.Mouse.preventDefault;
+             if (popup) {
+               Popup.openPopup(href);
+             } else {
+               pushUnsafe(href);
+             };
+           }
+         )
+       }>
+       children
+     </a>
+   };
+
+   module Jsx2 = {
+     let component = ReasonReact.statelessComponent(__MODULE__);
+     let make = (~href, ~id=?, ~title=?, ~className=?, ~popup, ~role=?, children) => {
+       ReasonReactCompat.wrapReactForReasonReact(
+         make,
+         makeProps(~href, ~id?, ~title?, ~className?, ~popup, ~role?, ~children, ()),
+       );
+     };
+   };
+ };
+ */
 module LinkUnsafe = {
   let component = ReasonReact.statelessComponent("LinkUnsafe");
 
-  let make = (~href, ~id=?, ~className=?, ~title=?, ~popup, ~role=?, children) => {
+  let make = (~href, ~id=?, ~title=?, ~className=?, ~popup, ~role=?, children) => {
     ...component,
     render: self =>
       <a
         ?id
-        ?className
         ?title
+        ?className
         ?role
         href
         onClick={
@@ -132,7 +171,29 @@ module LinkUnsafe = {
       </a>,
   };
 };
+/*
+ module Link = {
+   [@bs.config {jsx: 3}];
 
+   [@react.component]
+   let make = (~route: Route.t, ~id=?, ~title=?, ~className=?, ~popup=false, ~role=?, ~children) => {
+     let href = Route.routeToUrl(route);
+     <LinkUnsafe href ?id ?className ?title popup ?role>
+       children
+     </LinkUnsafe>;
+   };
+
+   module Jsx2 = {
+     let component = ReasonReact.statelessComponent(__MODULE__);
+     let make = (~route: Route.t, ~id=?, ~title=?, ~className=?, ~popup=false, ~role=?, children) => {
+       ReasonReactCompat.wrapReactForReasonReact(
+         make,
+         makeProps(~route?, ~id?, ~title?, ~className?, ~popup?, ~role?, ~children, ()),
+       );
+     };
+   };
+ };
+ */
 module Link = {
   let component = ReasonReact.statelessComponent("LinkSafe");
 

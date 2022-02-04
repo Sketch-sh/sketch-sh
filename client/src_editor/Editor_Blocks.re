@@ -578,7 +578,7 @@ let blockControlsButtons = (blockId, isDeleted, send) =>
            className="block__controls--button"
            ariaLabel="Add code block"
            onClick={_ => send(Block_Add(blockId, BTyp_Code))}>
-           <Fi.Code />
+           <Fi.Code.Jsx2 />
            <sup> "+"->str </sup>
          </button>
     </UI_Balloon>
@@ -587,7 +587,7 @@ let blockControlsButtons = (blockId, isDeleted, send) =>
            className="block__controls--button"
            ariaLabel="Add text block"
            onClick={_ => send(Block_Add(blockId, BTyp_Text))}>
-           <Fi.Edit2 />
+           <Fi.Edit2.Jsx2 />
            <sup> "+"->str </sup>
          </button>
     </UI_Balloon>
@@ -597,7 +597,7 @@ let blockControlsButtons = (blockId, isDeleted, send) =>
                 className="block__controls--button block__controls--danger"
                 ariaLabel="Delete block"
                 onClick={_ => send(Block_QueueDelete(blockId))}>
-                <Fi.Trash2 />
+                <Fi.Trash2.Jsx2 />
                 <sup> "-"->str </sup>
               </button>
          </UI_Balloon>
@@ -606,7 +606,7 @@ let blockControlsButtons = (blockId, isDeleted, send) =>
                 className="block__controls--button"
                 ariaLabel="Restore block"
                 onClick={_ => send(Block_Restore(blockId))}>
-                <Fi.RefreshCw />
+                <Fi.RefreshCw.Jsx2 />
                 <sup> "+"->str </sup>
               </button>
          </UI_Balloon>}
@@ -624,7 +624,7 @@ let make =
       ~onExecute,
       ~registerExecuteCallback=?,
       ~registerShortcut: option(Shortcut.subscribeFun)=?,
-      _children: React.childless,
+      _children: ReactOld.childless,
     ) => {
   let makeInitialState = () => {
     lang,
@@ -805,14 +805,14 @@ let make =
                            className="block__deleted--button restore"
                            onClick={_ => send(Block_Restore(b_id))}
                            ariaLabel="Restore block">
-                           <Fi.RefreshCw />
+                           <Fi.RefreshCw.Jsx2 />
                            "Restore"->str
                          </button>
                          <button
                            className="block__deleted--button delete-immediately"
                            onClick={_ => send(Block_DeleteQueued(b_id))}
                            ariaLabel="Delete block immediately">
-                           <Fi.Trash2 />
+                           <Fi.Trash2.Jsx2 />
                            "Delete Immediately"->str
                          </button>
                        </div>
@@ -851,7 +851,7 @@ let make =
                        </div>
                        <div className="block__controls">
                          {readOnly
-                            ? React.null
+                            ? ReactOld.null
                             : blockControlsButtons(b_id, b_deleted, send)}
                        </div>
                      </div>
@@ -878,7 +878,7 @@ let make =
                          />
                        </div>
                        {readOnly
-                          ? React.null
+                          ? ReactOld.null
                           : <div className="block__controls">
                               {blockControlsButtons(b_id, b_deleted, send)}
                             </div>}

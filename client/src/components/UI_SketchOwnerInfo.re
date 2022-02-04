@@ -27,7 +27,7 @@ let make = (~owner, ~noteLastEdited=?, ~className=?, _children) => {
          noteLastEdited =>
            <span className="UI_SketchOwnerInfo__lastEdited">
              "last edited"->str
-             <UI_DateTime
+             <UI_DateTime.Jsx2
                date=noteLastEdited
                className="UI_SketchOwnerInfo__time"
              />

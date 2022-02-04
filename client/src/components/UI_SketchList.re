@@ -53,7 +53,7 @@ let make =
                                <div
                                  className="UI_SketchList__sketch--lastEdited">
                                  "last edited"->str
-                                 <UI_DateTime
+                                 <UI_DateTime.Jsx2
                                    date=sketch##date
                                    className="UI_SketchList__sketch--time"
                                  />

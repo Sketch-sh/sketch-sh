@@ -112,7 +112,7 @@ module SingleLink = {
                 <button
                   className="link__button link__button--danger action__button"
                   onClick={_ => onDelete()}>
-                  <Fi.Trash2 />
+                  <Fi.Trash2.Jsx2 />
                 </button>
               }}
              {switch (onRefresh) {
@@ -123,9 +123,9 @@ module SingleLink = {
                      ? <button
                          className="link__button link__button--danger action__button"
                          onClick={_ => send(Link_Refresh)}>
-                         <Fi.FiRefreshCw />
+                         <Fi.FiRefreshCw.Jsx2 />
                        </button>
-                     : <Fi.Loader />}
+                     : <Fi.Loader.Jsx2 />}
                   {!state.isLinkRefreshing
                      ? ReasonReact.null
                      : {
@@ -169,7 +169,7 @@ module SingleLink = {
                <span className="link__timestamp__hint">
                  "Revision from "->str
                </span>
-               <UI_DateTime date=timestamp />
+               <UI_DateTime.Jsx2 date=timestamp />
              </span>
            }}
         </td>
@@ -236,17 +236,17 @@ module EmptyLink = {
                   }
                   disabled={status == Loading}>
                   {switch (status, state.dirty) {
-                   | (NotAsked, _) => <Fi.PlusCircle />
-                   | (Loading, _) => <Fi.Loader />
+                   | (NotAsked, _) => <Fi.PlusCircle.Jsx2 />
+                   | (Loading, _) => <Fi.Loader.Jsx2 />
                    | (Error(message), false) =>
                      <>
-                       <Fi.PlusCircle />
+                       <Fi.PlusCircle.Jsx2 />
                        <i className="link__button__error">
                          {("  " ++ message)->str}
                        </i>
                      </>
-                   | (Error(_), true) => <Fi.PlusCircle />
-                   | (Fetched, _) => <Fi.Trash2 />
+                   | (Error(_), true) => <Fi.PlusCircle.Jsx2 />
+                   | (Fetched, _) => <Fi.Trash2.Jsx2 />
                    }}
                 </button>
               </td>
@@ -378,7 +378,7 @@ let make = (~currentSketchId, ~links, ~onUpdate, _children) => {
         ...<button
              className="EditorNote__linkMenu"
              onClick={_ => send(ToggleLinkModal)}>
-             <Fi.Edit2 />
+             <Fi.Edit2.Jsx2 />
            </button>
       </UI_Balloon>
       <hr />
@@ -394,7 +394,7 @@ let make = (~currentSketchId, ~links, ~onUpdate, _children) => {
           <button
             className="EditorNote__linkMenu EditorNote__Modal--content--close"
             onClick={_ => send(ToggleLinkModal)}>
-            <Fi.FiXCircle />
+            <Fi.FiXCircle.Jsx2 />
           </button>
           <h2 className="links__new"> {str("Linkings")} </h2>
           <div className="links__container">

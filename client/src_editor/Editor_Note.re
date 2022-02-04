@@ -211,10 +211,10 @@ module Editor_Note = {
                          loading={state.isExecuting} delayMs=500>
                          ...{loading =>
                            loading
-                             ? <Fi.Loader
+                             ? <Fi.Loader.Jsx2
                                  className="EditorNav__button--spin"
                                />
-                             : <Fi.Play />
+                             : <Fi.Play.Jsx2 />
                          }
                        </UI_LoadingWrapper>
                        <span> "Run"->str </span>
@@ -316,7 +316,7 @@ module Editor_Note = {
                 <Editor_Note_GetUserInfo userId={state.noteOwnerId}>
                   ...{
                        fun
-                       | None => React.null
+                       | None => ReactOld.null
                        | Some((user: Js.t('a))) =>
                          <UI_SketchOwnerInfo
                            owner=user
@@ -333,7 +333,7 @@ module Editor_Note = {
                          ->ClassNames.ifTrue("EditorNote__linkMenu--open"),
                        ])}
                        onClick={_ => send(ToggleLinkMenu)}>
-                       <Fi.Link />
+                       <Fi.Link.Jsx2 />
                      </button>
                 </UI_Balloon>
                 <i className="EditorNote__links">

@@ -39,6 +39,6 @@ let make:
     ~onExecute: bool => 'a,
     ~registerExecuteCallback: (unit => unit) => unit=?,
     ~registerShortcut: Shortcut.subscribeFun=?,
-    React.childless
+    ReactOld.childless
   ) =>
   ReasonReact.component(state, ReasonReact.noRetainedProps, action);

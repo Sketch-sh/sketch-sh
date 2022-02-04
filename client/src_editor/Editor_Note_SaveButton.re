@@ -17,7 +17,7 @@ module SaveButton = {
         ~registerShortcut: Shortcut.subscribeFun,
         _children,
       )
-      : React.component(unit, 'a, action) => {
+      : ReactOld.component(unit, 'a, action) => {
     ...component,
     didMount: ({send, onUnmount}) =>
       registerShortcut(
@@ -70,8 +70,8 @@ module SaveButton = {
              <UI_LoadingWrapper loading={editorContentStatus == Ec_Saving}>
                ...{loading =>
                  loading
-                   ? <Fi.Loader className="EditorNav__button--spin" />
-                   : <Fi.Save />
+                   ? <Fi.Loader.Jsx2 className="EditorNav__button--spin" />
+                   : <Fi.Save.Jsx2 />
                }
              </UI_LoadingWrapper>
              <span> "Save"->str </span>

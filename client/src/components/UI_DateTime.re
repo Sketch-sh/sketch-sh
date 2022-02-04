@@ -1,3 +1,4 @@
+[@bs.config {jsx: 3}];
 open Utils;
 
 module Transformer: {
@@ -19,22 +20,22 @@ module Transformer: {
   };
 };
 
-let component = ReasonReact.statelessComponent("DateDisplay");
+[@react.component]
+let make = (~date: Js.Json.t, ~transformer=Transformer.relative, ~className=?) => {
+  let date = date |> Js.Json.decodeString;
+  switch (date) {
+  | None => ReasonReact.null
+  | Some(date) =>
+    <time dateTime=date ?className> {date->transformer->str} </time>
+  };
+};
 
-let make =
-    (
-      ~date: Js.Json.t,
-      ~transformer=Transformer.relative,
-      ~className=?,
-      _children,
-    ) => {
-  ...component,
-  render: _self => {
-    let date = date |> Js.Json.decodeString;
-    switch (date) {
-    | None => ReasonReact.null
-    | Some(date) =>
-      <time dateTime=date ?className> {date->transformer->str} </time>
-    };
-  },
+module Jsx2 = {
+  let component = ReasonReact.statelessComponent(__MODULE__);
+  let make = (~date: Js.Json.t, ~transformer=?, ~className=?) => {
+    ReasonReactCompat.wrapReactForReasonReact(
+      make,
+      makeProps(~date, ~transformer?, ~className?, ()),
+    );
+  };
 };
