@@ -1,4 +1,4 @@
-Modules.require("./UI_Topbar.css");
+Modules.import("./UI_Topbar.css");
 open Utils;
 
 let loginButton =
@@ -46,7 +46,7 @@ let make = () => {
 
 module Actions = {
   [@react.component]
-  let make = children => {
+  let make = (~children) => {
     let (isMounted, setIsMounted) = React.useState(() => false);
     React.useEffect0(() => {
       setIsMounted(_ => true);

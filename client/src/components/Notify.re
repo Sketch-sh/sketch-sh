@@ -1,6 +1,7 @@
-Modules.require("./Notify.css");
+Modules.import("./Notify.css");
 open Utils;
 
+[@react.component]
 let base = (~className, ~sticky=false, message) =>
   ButterToast.(
     make(
