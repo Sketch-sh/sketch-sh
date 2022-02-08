@@ -23,7 +23,7 @@ module Transformer: {
 let make = (~date: Js.Json.t, ~transformer=Transformer.relative, ~className=?) => {
   let date = date |> Js.Json.decodeString;
   switch (date) {
-  | None => ReasonReact.null
+  | None => React.null
   | Some(date) =>
     <time dateTime=date ?className> {date->transformer->str} </time>
   };

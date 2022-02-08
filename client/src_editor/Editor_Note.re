@@ -372,7 +372,7 @@ module Editor_Note = {
                    links={state.links}
                    onUpdate={links => send(LinkUpdate(links))}
                  />
-               : ReasonReact.null}
+               : React.null}
             <Editor_Blocks
               key={state.noteId}
               lang

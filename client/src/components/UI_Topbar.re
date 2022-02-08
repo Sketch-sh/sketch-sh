@@ -54,13 +54,13 @@ module Actions = {
     });
     isMounted
       ? switch (Webapi.Dom.(document |> Document.getElementById(id))) {
-        | None => ReasonReact.null
+        | None => React.null
         | Some(element) =>
           ReactDOMRe.createPortal(
             children(~buttonClassName="Topbar__action"),
             element,
           )
         }
-      : ReasonReact.null;
+      : React.null;
   };
 };

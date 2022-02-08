@@ -212,7 +212,7 @@ let make = _children => {
         <span className="footer-cell">
           {switch (state.workerState->isReady) {
            | false => "Initialize"->str
-           | true => ReasonReact.null
+           | true => React.null
            }}
         </span>
         <button className="footer_run" onClick={_ => send(Run)}>

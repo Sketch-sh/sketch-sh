@@ -76,7 +76,7 @@ module Provider = {
         Window.removeEventListener("storage", listener) |> ignore
       );
     },
-    render: _self => ReasonReact.null,
+    render: _self => React.null,
   };
 };
 

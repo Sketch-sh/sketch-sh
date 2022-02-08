@@ -6,7 +6,7 @@
 let str = ReasonReact.string;
 let optionStr =
   fun
-  | None => ReasonReact.null
+  | None => React.null
   | Some(s) => ReasonReact.string(s);
 
 let optionToEmptyString =
@@ -36,7 +36,7 @@ let valueFromEvent = (event): string => event->ReactEvent.Form.target##value;
 
 let (=>>) = (value, render) =>
   switch (value) {
-  | None => ReasonReact.null
+  | None => React.null
   | Some(value) => render(value)
   };
 
@@ -56,7 +56,7 @@ let splitOnChar = (sep, s) => {
 };
 
 let listFindOpt = (p, l) =>
-  try (Some(List.find(p, l))) {
+  try(Some(List.find(p, l))) {
   | Not_found => None
   };
 

@@ -85,7 +85,7 @@ let make =
          ->React.array}
       </ul>
       {switch (fetchMore) {
-       | None => ReasonReact.null
+       | None => React.null
        | Some(fetchMore) =>
          <button className="btn btn-primary" onClick=fetchMore>
            "Load more sketches"->str

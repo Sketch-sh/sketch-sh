@@ -103,11 +103,11 @@ module SingleLink = {
           </span>
         </td>
         {switch (onDelete, onRefresh) {
-         | (None, None) => ReasonReact.null
+         | (None, None) => React.null
          | _ =>
            <td className="link__container">
              {switch (onDelete) {
-              | None => ReasonReact.null
+              | None => React.null
               | Some(onDelete) =>
                 <button
                   className="link__button link__button--danger action__button"
@@ -116,7 +116,7 @@ module SingleLink = {
                 </button>
               }}
              {switch (onRefresh) {
-              | None => ReasonReact.null
+              | None => React.null
               | Some(onRefresh) =>
                 <>
                   {!state.isLinkRefreshing
@@ -127,7 +127,7 @@ module SingleLink = {
                        </button>
                      : <Fi.Loader />}
                   {!state.isLinkRefreshing
-                     ? ReasonReact.null
+                     ? React.null
                      : {
                        let getLinkQuery = GetLink.make(~noteId=id, ());
                        <GetLinkComponent variables=getLinkQuery##variables>
@@ -153,7 +153,7 @@ module SingleLink = {
                                Notify.error("Link " ++ id ++ " not found.")
                              };
                            };
-                           ReasonReact.null;
+                           React.null;
                          }}
                        </GetLinkComponent>;
                      }}
@@ -163,7 +163,7 @@ module SingleLink = {
          }}
         <td>
           {switch (timestamp) {
-           | None => ReasonReact.null
+           | None => React.null
            | Some(timestamp) =>
              <span className="link__timestamp">
                <span className="link__timestamp__hint">
