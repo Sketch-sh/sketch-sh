@@ -316,7 +316,7 @@ module Editor_Note = {
                 <Editor_Note_GetUserInfo userId={state.noteOwnerId}>
                   ...{
                        fun
-                       | None => ReactOld.null
+                       | None => React.null
                        | Some((user: Js.t('a))) =>
                          <UI_SketchOwnerInfo
                            owner=user

@@ -23,8 +23,7 @@ module Unload: {
    */
   module Provider: {
     let make:
-      ReactOld.childless =>
-      ReactOld.component(unit, ReactOld.noRetainedProps, unit);
+      React.childless => React.component(unit, React.noRetainedProps, unit);
   };
 };
 
@@ -42,11 +41,7 @@ module Link: {
       ~className: string=?,
       ~popup: bool=?,
       ~role: string=?,
-      array(ReactOld.reactElement)
+      array(React.reactElement)
     ) =>
-    ReactOld.component(
-      ReactOld.stateless,
-      ReactOld.noRetainedProps,
-      ReactOld.actionless,
-    );
+    React.component(React.stateless, React.noRetainedProps, React.actionless);
 };

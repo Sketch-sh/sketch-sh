@@ -62,5 +62,5 @@ let make = (~delayMs=1000, ~loading: bool, ~children) => {
     [|loading|],
   );
 
-  displayLoading ? children : ReactOld.null;
+  displayLoading ? children : React.null;
 };

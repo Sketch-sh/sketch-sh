@@ -51,7 +51,7 @@ module Unload = {
         );
         None;
       });
-      ReactOld.null;
+      React.null;
     };
   };
 };

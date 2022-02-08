@@ -17,7 +17,7 @@ module SaveButton = {
         ~registerShortcut: Shortcut.subscribeFun,
         _children,
       )
-      : ReactOld.component(unit, 'a, action) => {
+      : React.component(unit, 'a, action) => {
     ...component,
     didMount: ({send, onUnmount}) =>
       registerShortcut(

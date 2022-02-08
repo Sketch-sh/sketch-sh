@@ -624,7 +624,7 @@ let make =
       ~onExecute,
       ~registerExecuteCallback=?,
       ~registerShortcut: option(Shortcut.subscribeFun)=?,
-      _children: ReactOld.childless,
+      _children: React.childless,
     ) => {
   let makeInitialState = () => {
     lang,
@@ -851,7 +851,7 @@ let make =
                        </div>
                        <div className="block__controls">
                          {readOnly
-                            ? ReactOld.null
+                            ? React.null
                             : blockControlsButtons(b_id, b_deleted, send)}
                        </div>
                      </div>
@@ -878,7 +878,7 @@ let make =
                          />
                        </div>
                        {readOnly
-                          ? ReactOld.null
+                          ? React.null
                           : <div className="block__controls">
                               {blockControlsButtons(b_id, b_deleted, send)}
                             </div>}
