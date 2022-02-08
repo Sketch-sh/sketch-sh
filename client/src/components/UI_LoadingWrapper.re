@@ -29,10 +29,7 @@ let make = (~delayMs=1000, ~loading: bool, ~children) => {
 
   let {loading, displayLoading, timeoutId} = state;
 
-  React.useEffect(() => {
-    clearTimeout(timeoutId^);
-    None;
-  });
+  React.useEffect(() => {Some(clearTimeout(timeoutId^))});
 
   React.useEffect1(
     () => {
