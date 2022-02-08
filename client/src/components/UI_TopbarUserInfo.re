@@ -1,4 +1,4 @@
-Modules.import("./UI_TopbarUserInfo.css");
+Modules.require("./UI_TopbarUserInfo.css");
 open Utils;
 
 [@react.component]

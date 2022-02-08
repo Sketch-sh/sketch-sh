@@ -1,4 +1,4 @@
-Modules.import("./Notify.css");
+Modules.require("./Notify.css");
 open Utils;
 
 [@react.component]

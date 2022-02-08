@@ -1,4 +1,4 @@
-Modules.import("./UI_SketchOwnerInfo.css");
+Modules.require("./UI_SketchOwnerInfo.css");
 open Utils;
 
 [@react.component]

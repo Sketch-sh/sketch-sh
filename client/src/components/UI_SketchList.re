@@ -1,4 +1,4 @@
-Modules.import("./UI_SketchList.css");
+Modules.require("./UI_SketchList.css");
 open Utils;
 
 module DeleteNote = [%graphql

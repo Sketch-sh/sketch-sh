@@ -1,4 +1,4 @@
-Modules.import("./UI_Topbar.css");
+Modules.require("./UI_Topbar.css");
 open Utils;
 
 let loginButton =

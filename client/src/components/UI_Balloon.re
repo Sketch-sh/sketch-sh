@@ -1,4 +1,4 @@
-Modules.import("./Balloon.css");
+Modules.require("./Balloon.css");
 
 type position =
   | Up

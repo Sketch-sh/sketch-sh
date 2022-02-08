@@ -1,6 +1,6 @@
 type t;
 
-let async: unit => Js.Promise.t(t) = () => Modules.import("lz-string");
+let async: unit => Js.Promise.t(t) = () => Modules.require("lz-string");
 
 module URI = {
   [@bs.send]

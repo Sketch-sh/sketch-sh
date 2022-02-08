@@ -1,4 +1,4 @@
-Modules.import("./UI_NoSketches.css");
+Modules.require("./UI_NoSketches.css");
 open Utils;
 
 [@react.component]
