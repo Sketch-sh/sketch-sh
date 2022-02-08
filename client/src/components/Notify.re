@@ -2,7 +2,7 @@ Modules.require("./Notify.css");
 open Utils;
 
 [@react.component]
-let base = (~className, ~sticky=false, message) =>
+let base = (~className, ~sticky=false, ~message) =>
   ButterToast.(
     make(
       ToastOption.make(~sticky, (~toastId, ~dismiss) =>
