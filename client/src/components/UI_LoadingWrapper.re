@@ -59,5 +59,5 @@ let make = (~delayMs=1000, ~loading: bool, ~children) => {
     [|loading|],
   );
 
-  displayLoading ? children : React.null;
+  children(displayLoading);
 };
