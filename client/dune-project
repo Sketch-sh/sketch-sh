@@ -1,0 +1,28 @@
+(lang dune 2.9)
+
+(name sketch-client)
+
+(authors "thangngoc89")
+
+(maintainers "ahrefs")
+
+(homepage https://sketch.sh/)
+
+(bug_reports https://github.com/Sketch-sh/sketch-sh/issues)
+
+(license MIT)
+
+(generate_opam_files true)
+
+(package
+ (name sketch-client)
+ (synopsis "Sketch.sh client")
+ (description "Client-side code for Sketch.sh")
+ (depends
+  (ocaml
+   (= 4.06.1))
+  (dune
+   (>= 2.0))
+  (reason
+   (>= 3.6.0))
+  (ocaml-lsp-server :dev)))
