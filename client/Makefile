@@ -32,14 +32,6 @@ install: ## Install development dependencies
 .PHONY: deps
 deps: $(opam_file) ## Alias to update the opam file and install the needed deps
 
-.PHONY: format
-format: ## Format the codebase with ocamlformat
-	$(DUNE) build @fmt --auto-promote
-
-.PHONY: format-check
-format-check: ## Checks if format is correct
-	$(DUNE) build @fmt
-
 .PHONY: watch
 watch: ## Watch for the filesystem and rebuild on every change
 	yarn bs:start

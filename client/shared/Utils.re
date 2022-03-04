@@ -56,7 +56,7 @@ let splitOnChar = (sep, s) => {
 };
 
 let listFindOpt = (p, l) =>
-  try (Some(List.find(p, l))) {
+  try(Some(List.find(p, l))) {
   | Not_found => None
   };
 

@@ -99,7 +99,7 @@ Server implementation contains 2 microservices: auth, hasura's graphql engine
 
 - You need to have these installed
   - `docker`: Find installation instructions for your platform from [docker's docs](https://docs.docker.com/install/#supported-platforms).
-  - `docker-compose`: Head over to [docker-compose's release page](https://github.com/docker/compose/releases). Choose the latest release and follow the instruction. If you are a macOS user, head over to https://docs.docker.com/desktop/mac/install/ to install Docker with docker-compose inside. 
+  - `docker-compose`: Head over to [docker-compose's release page](https://github.com/docker/compose/releases). Choose the latest release and follow the instruction. If you are a macOS user, head over to https://docs.docker.com/desktop/mac/install/ to install Docker with docker-compose inside.
 
 - Github OAuth apps
 
@@ -127,6 +127,13 @@ Server implementation contains 2 microservices: auth, hasura's graphql engine
 ```sh
 ~/sketch-sh/server: > make dev
 ```
+
+- Stop development server
+
+```sh
+~/sketch-sh/server: > make stop
+```
+
 
 ### View server logs
 
