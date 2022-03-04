@@ -1,0 +1,3 @@
+pin-depends: [
+  [ "ocaml-lsp-server.dev" "git+https://github.com/ocaml/ocaml-lsp.git#b264d8f" ]
+]
