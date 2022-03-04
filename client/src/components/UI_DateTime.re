@@ -19,22 +19,12 @@ module Transformer: {
   };
 };
 
-let component = ReasonReact.statelessComponent("DateDisplay");
+let make = (~date: Js.Json.t, ~transformer=Transformer.relative, ~className=?) => {
+  let date = date |> Js.Json.decodeString;
 
-let make =
-    (
-      ~date: Js.Json.t,
-      ~transformer=Transformer.relative,
-      ~className=?,
-      _children,
-    ) => {
-  ...component,
-  render: _self => {
-    let date = date |> Js.Json.decodeString;
-    switch (date) {
-    | None => ReasonReact.null
-    | Some(date) =>
-      <time dateTime=date ?className> {date->transformer->str} </time>
-    };
-  },
+  switch (date) {
+  | None => ReasonReact.null
+  | Some(date) =>
+    <time dateTime=date ?className> {date->transformer->str} </time>
+  };
 };
