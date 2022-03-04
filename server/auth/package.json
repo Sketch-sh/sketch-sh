@@ -24,7 +24,7 @@
     "graphql-tools": "^3.0.5",
     "jsonwebtoken": "^8.3.0",
     "morgan": "^1.9.0",
-    "nanoid": "^1.1.0",
+    "nanoid": "^3.1.31",
     "node-fetch": "^2.6.7",
     "passport": "^0.4.0",
     "passport-github2": "^0.1.11"
