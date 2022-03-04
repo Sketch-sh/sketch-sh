@@ -67,10 +67,5 @@ module Store = {
 };
 
 module Consumer = {
-  let component = ReasonReact.statelessComponent("Shortcut.Consumer");
-
-  let make = children => {
-    ...component,
-    render: _self => children(Store.subscribe),
-  };
+  let make = (~children) => children(Store.subscribe);
 };
