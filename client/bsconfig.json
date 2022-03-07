@@ -1,7 +1,7 @@
 {
   "name": "sketch",
   "reason": {
-    "react-jsx": 2
+    "react-jsx": 3
   },
   "sources": [
     "src",
