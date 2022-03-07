@@ -19,7 +19,7 @@ module Transformer: {
   };
 };
 
-let make = (~date: Js.Json.t, ~transformer=Transformer.relative, ~className=?) => {
+let make = (~transformer=Transformer.relative, ~className=?, ~date: Js.Json.t) => {
   let date = date |> Js.Json.decodeString;
 
   switch (date) {
