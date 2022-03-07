@@ -1,11 +1,9 @@
 Modules.require("./UI_TopbarUserInfo.css");
 
 open Utils;
-let component = ReasonReact.statelessComponent("UI_TopbarUserInfo");
 
+[@react.component]
 let make = (~user, _children) => {
-  ...component,
-  render: _self =>
     <div className="Topbar__userInfo Topbar__userInfo--dropdown">
       <div className="Topbar__userInfo--content">
         {user##name
@@ -18,14 +16,7 @@ let make = (~user, _children) => {
       </div>
       {user##avatar
        =>> (
-         avatar =>
-           <img
-             src=avatar
-             width="40"
-             height="40"
-             className="Topbar__userInfo--avatar"
-             alt={user##username ++ " avatar"}
-           />
+         name => <span className="Topbar__userInfo--name"> name->str </span>
        )}
       <div className="Topbar__userInfo--dropdownMenu">
         <div className="Topbar__userInfo--dropdownMenuInner">
@@ -40,5 +31,5 @@ let make = (~user, _children) => {
           </Router.Link>
         </div>
       </div>
-    </div>,
+    </div>
 };

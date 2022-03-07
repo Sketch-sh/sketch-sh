@@ -1,5 +1,4 @@
 Modules.require("./Balloon.css");
-let component = ReasonReact.statelessComponent("UI_Balloon");
 
 type position =
   | Up
@@ -39,20 +38,17 @@ type balloon = {
 
 external hackType: balloon => Js.t('a) = "%identity";
 
-let make = (~message, ~position, ~visible=?, ~length=?, children) => {
-  ...component,
-  render: _self =>
-    ReasonReact.cloneElement(
-      children,
-      ~props=
-        balloon(
-          ~message,
-          ~position=positionToString(position),
-          ~visible?,
-          ~length=?Belt.Option.map(length, a => a->lengthToString),
-          (),
-        )
-        ->hackType,
-      [||],
-    ),
-};
+let make = (~message, ~position, ~visible=?, ~length=?, ~children) =>
+  ReasonReact.cloneElement(
+    children,
+    ~props=
+      balloon(
+        ~message,
+        ~position=positionToString(position),
+        ~visible?,
+        ~length=?Belt.Option.map(length, a => a->lengthToString),
+        (),
+      )
+      ->hackType,
+    [||],
+  );
