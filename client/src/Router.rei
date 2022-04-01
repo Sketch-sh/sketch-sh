@@ -41,7 +41,7 @@ module Link: {
       ~className: string=?,
       ~popup: bool=?,
       ~role: string=?,
-      array(React.reactElement)
+      ~children: React.element
     ) =>
-    React.component(React.stateless, React.noRetainedProps, React.actionless);
+    React.element;
 };

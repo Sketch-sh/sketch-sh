@@ -32,11 +32,8 @@ module Store = {
 };
 
 module Provider = {
-  let component = ReasonReact.reducerComponent("AuthStatus.Provider");
-
-  let make = (_children): ReasonReact.component(unit, 'a, unit) => {
-    ...component,
-    didMount: self => {
+  let make = () => {
+    React.useEffect0(() => {
       let _ =
         Auth.(
           /*
@@ -72,59 +69,56 @@ module Provider = {
       };
       window |> Window.addEventListener("storage", listener);
 
-      self.onUnmount(() =>
-        Window.removeEventListener("storage", listener) |> ignore
-      );
-    },
-    render: _self => ReasonReact.null,
+      Some(() => Window.removeEventListener("storage", listener) |> ignore);
+    });
+
+    ReasonReact.null;
   };
 };
 
 module IsAuthenticated = {
-  let component = ReasonReact.reducerComponent("AuthStatus.IsAuthenticated");
-  let make = (children): ReasonReact.component(state, 'a, state) => {
-    ...component,
-    initialState: () => getCurrentState()->localStorageDataToState,
-    reducer: (newStatus, _state) => ReasonReact.Update(newStatus),
-    didMount: ({send, onUnmount}) => {
-      let id = Store.subscribe(send);
-      onUnmount(() => Store.unsubscribe(id));
-    },
-    render: ({state}) => children(state),
+  [@react.component]
+  let make = (~children) => {
+    let (state, setState) =
+      React.useState(_ => getCurrentState()->localStorageDataToState);
+
+    React.useEffect0(() => {
+      let id = Store.subscribe(setState);
+
+      Some(() => {Store.unsubscribe(id)});
+    });
+
+    children(state);
   };
 };
 
 module UserInfo = {
-  let component = ReasonReact.statelessComponent("AuthStatus.UserInfo");
-
-  let make = children => {
-    ...component,
-    render: _self => {
-      <IsAuthenticated>
-        ...{authState =>
-          switch (authState) {
-          | Anonymous => children(None)
-          | Login(userId) =>
-            open GqlUserInfo;
-            let query = UserInfoGql.make(~userId, ());
-            <UserInfoComponent variables=query##variables>
-              ...{({result}) =>
-                switch (result) {
-                | Loading => children(None)
-                | Error(_) => children(None)
-                | Data(response) =>
-                  response##user
-                  ->(
-                      arrayFirst(~empty=children(None), ~render=user =>
-                        children(Some((user, userId)))
-                      )
+  [@react.component]
+  let make = (~children) => {
+    <IsAuthenticated>
+      ...{authState =>
+        switch (authState) {
+        | Anonymous => children(None)
+        | Login(userId) =>
+          open GqlUserInfo;
+          let query = UserInfoGql.make(~userId, ());
+          <UserInfoComponent variables=query##variables>
+            ...{({result}) =>
+              switch (result) {
+              | Loading => children(None)
+              | Error(_) => children(None)
+              | Data(response) =>
+                response##user
+                ->(
+                    arrayFirst(~empty=children(None), ~render=user =>
+                      children(Some((user, userId)))
                     )
-                }
+                  )
               }
-            </UserInfoComponent>;
-          }
+            }
+          </UserInfoComponent>;
         }
-      </IsAuthenticated>;
-    },
+      }
+    </IsAuthenticated>;
   };
 };
