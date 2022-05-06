@@ -1,4 +1,4 @@
-Modules.require("./UI_FullpageLoading.css");
+Modules.import("./UI_FullpageLoading.css");
 
 [@react.component]
 let make = () => {
