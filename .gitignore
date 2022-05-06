@@ -10,6 +10,6 @@ client/src/*.js
 .env
 .env.*
 !.env.example
-.idea
+.idea/
 
 .DS_Store
