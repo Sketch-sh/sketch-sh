@@ -1,29 +1,41 @@
-Modules.require("./UI_TopbarUserInfo.css");
+Modules.require("./UI_TopbarUserInfo.css");4
 open Utils;
 
 [@react.component]
 let make = (~user) => {
-  <Router.Link
-    className="Topbar__userInfo" route={Route.User(user##username)}>
-    <div className="Topbar__userInfo--content">
-      {user##name
+    <div className="Topbar__userInfo Topbar__userInfo--dropdown">
+      <div className="Topbar__userInfo--content">
+        {user##name
+         =>> (
+           name => <span className="Topbar__userInfo--name"> name->str </span>
+         )}
+        <span className="Topbar__userInfo--username">
+          {user##username->str}
+        </span>
+      </div>
+      {user##avatar
        =>> (
-         name => <span className="Topbar__userInfo--name"> name->str </span>
+         avatar =>
+           <img
+             src=avatar
+             width="40"
+             height="40"
+             className="Topbar__userInfo--avatar"
+             alt={user##username ++ " avatar"}
+           />
        )}
-      <span className="Topbar__userInfo--username">
-        {user##username->str}
-      </span>
-    </div>
-    {user##avatar
-     =>> (
-       avatar =>
-         <img
-           src=avatar
-           width="40"
-           height="40"
-           className="Topbar__userInfo--avatar"
-           alt={user##username ++ " avatar"}
-         />
-     )}
-  </Router.Link>;
+      <div className="Topbar__userInfo--dropdownMenu">
+        <div className="Topbar__userInfo--dropdownMenuInner">
+          <Router.Link
+            className="Topbar__userInfo--dropdownItem"
+            route={Route.User(user##username)}>
+            "Your sketches"->str
+          </Router.Link>
+          <Router.Link
+            className="Topbar__userInfo--dropdownItem" route=Route.AuthLogout>
+            "Logout"->str
+          </Router.Link>
+        </div>
+      </div>
+    </div>;
 };

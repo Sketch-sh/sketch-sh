@@ -71,7 +71,7 @@ module Make = (B: EvaluatorSig) => {
   external unsafeAsError: Js.Exn.t => Refmt.error = "%identity";
   let _wrap: ('a => 'b, 'a) => Belt.Result.t('b, Refmt.error) =
     (f, x) =>
-      try (Ok(f(x))) {
+      try(Ok(f(x))) {
       | Js.Exn.Error(exn) => Error(unsafeAsError(exn))
       };
 

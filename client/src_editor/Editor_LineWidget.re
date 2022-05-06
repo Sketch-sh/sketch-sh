@@ -14,10 +14,9 @@ let lintTypToString =
 let createLintWidget = (modifier, html) => {
   open Webapi.Dom;
   let widget = document |> Document.createElement("div");
-  widget
-  ->Element.setClassName(
-      "widget__lint widget__lint-" ++ lintTypToString(modifier),
-    );
+  widget->Element.setClassName(
+    "widget__lint widget__lint-" ++ lintTypToString(modifier),
+  );
 
   let wrapper = document |> Document.createElement("div");
   wrapper->Element.setClassName("widget__lint--wrapper");
@@ -39,13 +38,12 @@ let copyButton = text => {
   let button = document |> Document.createElement("button");
   button->Element.setClassName("widget__copyButton");
   button |> Element.setAttribute("title", "Copy to clipboard");
-  button
-  ->D.Element.setInnerHTML(
-      {|<svg viewBox="0 0 24 24">
+  button->D.Element.setInnerHTML(
+    {|<svg viewBox="0 0 24 24">
       <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
       <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
   </svg>|},
-    );
+  );
   button
   |> Element.addClickEventListener(_ =>
        if (Copy.copy(text)) {
@@ -82,10 +80,9 @@ let createValueWidget = text => {
   };
 
   let toggle = document |> Document.createElement("div");
-  toggle
-  ->Element.setClassName(
-      "widget__foldable__gutter CodeMirror-guttermarker-subtle",
-    );
+  toggle->Element.setClassName(
+    "widget__foldable__gutter CodeMirror-guttermarker-subtle",
+  );
   widget |> Element.appendChild(toggle);
 
   let div = document |> Document.createElement("div");
@@ -102,11 +99,9 @@ let createValueWidget = text => {
     split->Belt.Array.truncateToLengthUnsafe(5);
 
     let firstFiveLinesPos =
-      split
-      ->Belt.Array.reduce(
-          0,
-          (pos, line) => pos + Js.String.length(line) + 1,
-        );
+      split->Belt.Array.reduce(0, (pos, line) =>
+        pos + Js.String.length(line) + 1
+      );
     let display =
       text |> Js.String.substring(~from=0, ~to_=firstFiveLinesPos);
     let truncated = text |> Js.String.substringToEnd(~from=firstFiveLinesPos);

@@ -31,3 +31,45 @@
 .Topbar__userInfo--avatar {
   border-radius: 4px;
 }
+
+.Topbar__userInfo--dropdown {
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.Topbar__userInfo--dropdown:hover .Topbar__userInfo--dropdownMenu {
+  display: block;
+}
+
+.Topbar__userInfo--dropdown {
+  position: relative;
+}
+
+.Topbar__userInfo--dropdownMenu {
+  display: none;
+  position: absolute;
+  top: 100%;
+  padding-top: 8px;
+  right: 0;
+  z-index: 2;
+}
+
+.Topbar__userInfo--dropdownMenuInner {
+  background-color: var(--bg-base);
+  min-width: 210px;
+  box-shadow: rgb(0 0 0 / 16%) 0px 1px 4px;
+  padding: 4px 0;
+}
+
+.Topbar__userInfo--dropdownItem {
+  color: var(--c-text);
+  display: block;
+  padding: 8px 16px;
+  transition: all 0.1s ease-in;
+}
+
+.Topbar__userInfo--dropdownItem:hover {
+  color: var(--c-text-inverse);
+  background-color: var(--c-primary);
+}
+

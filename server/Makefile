@@ -39,3 +39,7 @@ dev-build:
 .PHONY: do-build
 do-build:
 	docker-compose -f docker-compose.yml -f docker-compose.prod.yml build && docker-compose -f docker-compose.yml -f docker-compose.prod.yml push
+
+.PHONY: stop
+stop:
+	cd .. && docker-compose -f docker-compose.yml -f docker-compose.dev.yml down -v
