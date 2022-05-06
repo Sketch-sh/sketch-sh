@@ -393,8 +393,7 @@ module Editor_Note = {
 };
 
 module WithShortcut = {
-  let component = ReasonReact.statelessComponent("WithShortcut(Editor_Note)");
-
+  [@react.component]
   let make =
       (
         ~hasSavePermission,
@@ -407,27 +406,24 @@ module WithShortcut = {
         ~noteOwnerId,
         ~noteLastEdited,
         ~forkFrom=?,
-        _children,
       ) => {
-    ...component,
-    render: _self =>
-      <Shortcut.Consumer>
-        ...{registerShortcut =>
-          <Editor_Note
-            initialHasSavePermission=hasSavePermission
-            initialNoteId=noteId
-            initialNoteState=noteState
-            initialLang=?lang
-            initialTitle=?title
-            initialLinks=links
-            initialBlocks=blocks
-            initialNoteOwnerId=noteOwnerId
-            initialNoteLastEdited=noteLastEdited
-            initialForkFrom=?forkFrom
-            registerShortcut
-          />
-        }
-      </Shortcut.Consumer>,
+    <Shortcut.Consumer>
+      ...{registerShortcut =>
+        <Editor_Note
+          initialHasSavePermission=hasSavePermission
+          initialNoteId=noteId
+          initialNoteState=noteState
+          initialLang=?lang
+          initialTitle=?title
+          initialLinks=links
+          initialBlocks=blocks
+          initialNoteOwnerId=noteOwnerId
+          initialNoteLastEdited=noteLastEdited
+          initialForkFrom=?forkFrom
+          registerShortcut
+        />
+      }
+    </Shortcut.Consumer>;
   };
 };
 
