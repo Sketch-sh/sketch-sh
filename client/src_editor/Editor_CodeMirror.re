@@ -74,6 +74,7 @@ let getEditor = (state, ~default, ~f) =>
 //   },
 // ),
 
+[@react.element]
 let make =
     (
       ~className=?,
@@ -87,9 +88,9 @@ let make =
       ~onFocus: option(unit => unit)=?,
       ~onBlur: option(unit => unit)=?,
       ~onUpdate: option(unit => unit)=?,
-      _children,
     ) => {
   let state = React.useState({editor: ref(None), divRef: ref(None), value});
+
   React.useEffect0(() => {
     switch (state.divRef^) {
     | None => ()
@@ -167,5 +168,6 @@ let make =
       None;
     }
   });
+
   <div ?className ref={handle(setDivRef)} />;
 };
