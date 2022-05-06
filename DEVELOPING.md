@@ -58,6 +58,26 @@ git clone https://github.com/sketch-sh/sketch-sh
 ~/sketch-sh/client: > yarn build
 ```
 
+## Editor support: language server configuration
+
+To get IDE integration with the `client` folder, you will need [opam](https://opam.ocaml.org/doc/Install.html). If you use VSCode, the extension recommented to work with the project is [OCaml Platform](https://marketplace.visualstudio.com/items?itemName=ocamllabs.ocaml-platform).
+
+After installing `opam`:
+
+1. Run, from `client` folder:
+
+    ```bash
+    make create-switch
+    ```
+
+This will create an opam [local switch](https://opam.ocaml.org/blog/opam-local-switches/).
+
+2. Install dependencies with:
+
+    ```bash
+    make init
+    ```
+
 # Server
 
 Server implementation contains 2 microservices: auth, hasura's graphql engine
@@ -79,7 +99,7 @@ Server implementation contains 2 microservices: auth, hasura's graphql engine
 
 - You need to have these installed
   - `docker`: Find installation instructions for your platform from [docker's docs](https://docs.docker.com/install/#supported-platforms).
-  - `docker-compose`: Head over to [docker-compose's release page](https://github.com/docker/compose/releases). Choose the latest release and follow the instruction. If you are a macOS user, head over to https://docs.docker.com/desktop/mac/install/ to install Docker with docker-compose inside. 
+  - `docker-compose`: Head over to [docker-compose's release page](https://github.com/docker/compose/releases). Choose the latest release and follow the instruction. If you are a macOS user, head over to https://docs.docker.com/desktop/mac/install/ to install Docker with docker-compose inside.
 
 - Github OAuth apps
 
@@ -107,6 +127,13 @@ Server implementation contains 2 microservices: auth, hasura's graphql engine
 ```sh
 ~/sketch-sh/server: > make dev
 ```
+
+- Stop development server
+
+```sh
+~/sketch-sh/server: > make stop
+```
+
 
 ### View server logs
 

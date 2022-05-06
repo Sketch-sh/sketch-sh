@@ -5,9 +5,11 @@ let make = _children => {
   render: _self =>
     <div className="Layout__center">
       <div
-        style=(
-          ReactDOMRe.Style.make(~marginLeft="30px", ~maxWidth="800px", ())
-        )>
+        style={ReactDOMRe.Style.make(
+          ~marginLeft="30px",
+          ~maxWidth="800px",
+          (),
+        )}>
         <div>
           <ReactContentLoader width=600 height=100>
             <rect rx="4" ry="4" width="600" height="30" />
