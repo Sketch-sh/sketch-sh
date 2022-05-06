@@ -7,8 +7,6 @@ open Editor_Types;
  * on initial note load
  */
 module RedirectSketchURL = {
-  let component = ReasonReact.reducerComponent("Note_RedirectSketchURL");
-
   [@react.component]
   let make = (~noteId, ~children): React.component(unit, 'a, unit) => {
     React.useEffect0(() => {
