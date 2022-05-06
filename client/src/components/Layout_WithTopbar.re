@@ -1,4 +1,2 @@
 [@react.component]
-let make = (~children) => {
-  <> <UI_Topbar /> children </>;
-};
+let make = (~children) => <> <UI_Topbar /> children </>;
