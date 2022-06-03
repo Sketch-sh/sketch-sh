@@ -382,6 +382,7 @@ module Editor_Note = {
             <Editor_Blocks
               key={state.noteId}
               lang
+              compilerVersion={state.compilerVersion}
               blocks=state.blocks^
               links={state.links}
               registerExecuteCallback={callback =>

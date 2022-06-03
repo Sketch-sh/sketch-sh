@@ -78,7 +78,8 @@ const base = {
         test: file =>
           file.endsWith(".worker.js") ||
           file.endsWith("Worker_Index.bs.js") ||
-          file.endsWith("Toplevel_Worker.bs.js"),
+          file.endsWith("Toplevel_Worker_4_06.bs.js") ||
+          file.endsWith("Toplevel_Worker_4_13.bs.js"),
         exclude: ["public"],
         use: { loader: "worker-loader" },
       },
@@ -120,7 +121,7 @@ const base = {
         ],
       },
       {
-        test: /\.(png|jpg|gif)$|toplevel.js$/,
+        test: /\.(png|jpg|gif)$|toplevel_4_06.js|toplevel_4_13.js$/,
         loader: "file-loader?name=[name].[hash].[ext]",
       },
     ],

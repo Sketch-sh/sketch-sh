@@ -58,7 +58,17 @@ module Types = {
   };
 
   [@bs.new] [@bs.module]
-  external make: unit => Worker.worker = "./Toplevel_Worker.bs.js";
+  external make_406: unit => Worker.worker = "./Toplevel_Worker_4_06.bs.js";
+
+  [@bs.new] [@bs.module]
+  external make_413: unit => Worker.worker = "./Toplevel_Worker_4_13.bs.js";
+
+  let make = (~compilerVersion) => {
+    switch (compilerVersion) {
+    | CompilerVersion.V4_06 => make_406()
+    | V4_13_1 => make_413()
+    };
+  };
 };
 
 include Worker.Make(Types);
