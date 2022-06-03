@@ -7,7 +7,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node index.js",
-    "schema": "get-graphql-schema http://localhost:8081/v1alpha1/graphql > schema.graphql"
+    "schema": "get-graphql-schema --header 'x-hasura-admin-secret=hasura' http://localhost:8080/v1/graphql > schema.graphql"
   },
   "author": "",
   "license": "ISC",
@@ -30,6 +30,7 @@
     "passport-github2": "^0.1.11"
   },
   "devDependencies": {
+    "get-graphql-schema": "2.1.2",
     "nodemon": "^1.18.3"
   }
 }
