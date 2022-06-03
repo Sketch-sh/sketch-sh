@@ -2,10 +2,7 @@ open Toplevel.Types;
 open Toplevel.Worker;
 
 [@bs.module] external toplevelPath: string = "../public/toplevel_4_13.js";
-Js.log("HERER");
-Js.log(toplevelPath);
 importScripts(toplevelPath);
-Js.log("OK");
 
 postMessageFromWorker({w_id: "ready", w_message: Ready});
 
@@ -26,11 +23,8 @@ self->onMessageFromTop(event => {
       let result = Analyze.executeEmbed(. lang, code);
       ExecuteEmbedResult(Belt.Result.Ok(result));
     | LoadScript(string) =>
-      Js.log("INNER LOADSCRIPT");
       try(importScripts(string)) {
-      | Js.Exn.Error(exn) =>
-        Js.log("ERR");
-        Js.log(exn);
+      | Js.Exn.Error(exn) => Js.log(exn)
       };
       LoadScriptResult;
     };
