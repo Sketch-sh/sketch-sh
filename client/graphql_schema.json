@@ -2259,6 +2259,22 @@
               "args": [],
               "isDeprecated": false,
               "deprecationReason": null,
+              "name": "compiler_version",
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              },
+              "description": null
+            },
+            {
+              "args": [],
+              "isDeprecated": false,
+              "deprecationReason": null,
               "name": "created_at",
               "type": {
                 "kind": "NON_NULL",
@@ -3025,6 +3041,16 @@
                   "name": "note_bool_exp",
                   "ofType": null
                 }
+              },
+              "description": null
+            },
+            {
+              "name": "compiler_version",
+              "defaultValue": null,
+              "type": {
+                "kind": "INPUT_OBJECT",
+                "name": "varchar_comparison_exp",
+                "ofType": null
               },
               "description": null
             },
@@ -4030,6 +4056,16 @@
         {
           "inputFields": [
             {
+              "name": "compiler_version",
+              "defaultValue": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "description": null
+            },
+            {
               "name": "created_at",
               "defaultValue": null,
               "type": {
@@ -4171,6 +4207,18 @@
               "args": [],
               "isDeprecated": false,
               "deprecationReason": null,
+              "name": "compiler_version",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "description": null
+            },
+            {
+              "args": [],
+              "isDeprecated": false,
+              "deprecationReason": null,
               "name": "created_at",
               "type": {
                 "kind": "SCALAR",
@@ -4255,6 +4303,16 @@
         },
         {
           "inputFields": [
+            {
+              "name": "compiler_version",
+              "defaultValue": null,
+              "type": {
+                "kind": "ENUM",
+                "name": "order_by",
+                "ofType": null
+              },
+              "description": null
+            },
             {
               "name": "created_at",
               "defaultValue": null,
@@ -4347,6 +4405,18 @@
               "args": [],
               "isDeprecated": false,
               "deprecationReason": null,
+              "name": "compiler_version",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "description": null
+            },
+            {
+              "args": [],
+              "isDeprecated": false,
+              "deprecationReason": null,
               "name": "created_at",
               "type": {
                 "kind": "SCALAR",
@@ -4431,6 +4501,16 @@
         },
         {
           "inputFields": [
+            {
+              "name": "compiler_version",
+              "defaultValue": null,
+              "type": {
+                "kind": "ENUM",
+                "name": "order_by",
+                "ofType": null
+              },
+              "description": null
+            },
             {
               "name": "created_at",
               "defaultValue": null,
@@ -4645,6 +4725,16 @@
         },
         {
           "inputFields": [
+            {
+              "name": "compiler_version",
+              "defaultValue": null,
+              "type": {
+                "kind": "ENUM",
+                "name": "order_by",
+                "ofType": null
+              },
+              "description": null
+            },
             {
               "name": "created_at",
               "defaultValue": null,
@@ -5883,6 +5973,12 @@
             {
               "isDeprecated": false,
               "deprecationReason": null,
+              "name": "compiler_version",
+              "description": "column name"
+            },
+            {
+              "isDeprecated": false,
+              "deprecationReason": null,
               "name": "created_at",
               "description": "column name"
             },
@@ -5940,6 +6036,16 @@
         },
         {
           "inputFields": [
+            {
+              "name": "compiler_version",
+              "defaultValue": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "description": null
+            },
             {
               "name": "created_at",
               "defaultValue": null,
@@ -6046,6 +6152,12 @@
           "interfaces": null,
           "name": "note_update_column",
           "enumValues": [
+            {
+              "isDeprecated": false,
+              "deprecationReason": null,
+              "name": "compiler_version",
+              "description": "column name"
+            },
             {
               "isDeprecated": false,
               "deprecationReason": null,
