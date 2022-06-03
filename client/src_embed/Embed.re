@@ -167,7 +167,7 @@ let make = () => {
         };
 
         if (isRun) {
-         let cancelToken =
+          let cancelToken =
             Toplevel_Consumer.executeEmbed(
               ~lang=state.lang,
               ~code=state.value,
@@ -180,7 +180,9 @@ let make = () => {
               | Belt.Result.Error(message) => Js.log(message),
             );
           Toplevel_Consumer.cancel(cancelToken);
-      };
+        };
+      },
+    );
   });
 
   <>
