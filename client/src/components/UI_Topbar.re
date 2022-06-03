@@ -29,7 +29,7 @@ let make = _children => {
       <div className="Topbar__right">
         <UI_Balloon position=Down message="New sketch">
           ...<Router.Link
-               route={Route.NoteNew(RE)}
+               route={Route.NoteNew(ML)}
                className="Topbar__action Topbar__action--highlight"
                title="Create new Sketch">
                <Fi.Plus />

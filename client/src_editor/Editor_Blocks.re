@@ -616,7 +616,7 @@ let component = ReasonReact.reducerComponent("Editor_Page");
 
 let make =
     (
-      ~lang=RE,
+      ~lang=ML,
       ~links: array(Link.link),
       ~blocks: array(block),
       ~readOnly=false,
