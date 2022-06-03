@@ -60,6 +60,10 @@ let make = (~noteInfo: Route.noteRouteConfig, _children: React.childless) => {
                                   noteLastEdited={Some(note##updated_at)}
                                   noteId
                                   noteState=NoteState_Old
+                                  compilerVersion={
+                                    note##compiler_version
+                                    ->CompilerVersion.ofDbString
+                                  }
                                   title=?{note##title}
                                   lang
                                   links

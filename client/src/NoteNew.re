@@ -21,6 +21,7 @@ let make = (~blocks=defaultBlocks, ~title=?, ~links=[||], ~lang, _children) => {
           | Login(userId) => userId
           };
         let noteId = Utils.generateId();
+        let compilerVersion = CompilerVersion.current;
         <Editor_Note
           key=noteId
           hasSavePermission=true
@@ -28,6 +29,7 @@ let make = (~blocks=defaultBlocks, ~title=?, ~links=[||], ~lang, _children) => {
           noteLastEdited=None
           noteId
           noteState=NoteState_New
+          compilerVersion
           blocks
           lang
           ?title
