@@ -3,12 +3,12 @@ services:
   postgres:
     image: postgres:13.5
     ports:
-    - "5432:5432"
+      - "5432:5432"
     environment:
-    - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
     restart: always
     volumes:
-    - db_data:/var/lib/postgresql/data
+      - db_data:/var/lib/postgresql/data
 
   migration:
     depends_on:
@@ -22,12 +22,18 @@ services:
       - DATABASE_URL=postgres://postgres:${POSTGRES_PASSWORD}@postgres:5432/postgres
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - HASURA_ACCESS_KEY=${HASURA_ACCESS_KEY}
-    command: ["sh", "./wait-for-pg.sh", "postgres", "npm run migrate"]
+    command:
+      [
+        "sh",
+        "./wait-for-pg.sh",
+        "postgres",
+        "npm run migrate"
+      ]
 
   graphql-engine:
     image: hasura/graphql-engine:v1.0.0-beta.3
     depends_on:
-    - postgres
+      - postgres
     restart: always
     environment:
       - HASURA_GRAPHQL_DATABASE_URL=postgres://postgres:${POSTGRES_PASSWORD}@postgres:5432/postgres

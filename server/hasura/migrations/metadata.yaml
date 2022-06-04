@@ -296,6 +296,7 @@ tables:
       - title
       - updated_at
       - user_id
+      - compiler_version
       filter: {}
       limit: 30
     role: public
@@ -309,6 +310,7 @@ tables:
       - title
       - updated_at
       - user_id
+      - compiler_version
       filter: {}
       limit: 30
     role: user

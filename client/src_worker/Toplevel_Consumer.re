@@ -1,7 +1,8 @@
 open Toplevel.Types;
 
 let timeoutSeconds = ref(180);
-let toplevelWorker = ref(None);
+let toplevelWorker406 = ref(None);
+let toplevelWorker413 = ref(None);
 
 module MapStr = Belt.MutableMap.String;
 
@@ -65,28 +66,37 @@ let workerListener = event => {
   };
 };
 
-let getWorker = () =>
-  switch (toplevelWorker^) {
-  | None =>
-    let newWorker = Toplevel.make();
-    toplevelWorker := Some(newWorker);
-    newWorker->Toplevel.Top.onMessageFromWorker(workerListener);
-    newWorker->Toplevel.Top.onErrorFromWorker(Js.log);
-    newWorker;
-  | Some(worker) => worker
+let getWorkerRef = (~compilerVersion) =>
+  switch (compilerVersion) {
+  | CompilerVersion.V4_06 => toplevelWorker406
+  | V4_13_1 => toplevelWorker413
   };
-let terminate = id => {
+
+let getWorker = (~compilerVersion) => {
+  let pick = worker =>
+    switch (worker^) {
+    | None =>
+      let newWorker = Toplevel.make(~compilerVersion);
+      worker := Some(newWorker);
+      newWorker->Toplevel.Top.onMessageFromWorker(workerListener);
+      newWorker->Toplevel.Top.onErrorFromWorker(Js.log);
+      newWorker;
+    | Some(worker) => worker
+    };
+  getWorkerRef(~compilerVersion)->pick;
+};
+let terminate = (~compilerVersion, id) => {
   ongoingCallbacks->MapStr.remove(id);
-  getWorker()->Toplevel.Top.terminate;
-  toplevelWorker := None;
+  getWorker(~compilerVersion)->Toplevel.Top.terminate;
+  getWorkerRef(~compilerVersion) := None;
 };
 
 let cancel = id => ongoingCallbacks->MapStr.remove(id);
 
-let run = (payload, callback, timeoutCallback) => {
+let run = (~compilerVersion, payload, callback, timeoutCallback) => {
   let messageId = Utils.generateId();
 
-  getWorker()
+  getWorker(~compilerVersion)
   ->Toplevel.Top.postMessageToWorker({t_id: messageId, t_message: payload});
 
   let timeoutId =
@@ -96,7 +106,7 @@ let run = (payload, callback, timeoutCallback) => {
         | None => ()
         | Some(_) => timeoutCallback()
         };
-        terminate(messageId);
+        terminate(~compilerVersion, messageId);
       },
       timeoutSeconds^ * 1000,
     );
@@ -112,20 +122,34 @@ let registerReadyCb = cb =>
     readyCb := Some(cb);
   };
 
-let execute = (~lang, ~blocks, ~links, callback) =>
-  run(Execute(lang, blocks, links), ExecuteCallback(callback), () =>
+let execute = (~compilerVersion, ~lang, ~blocks, ~links, callback) =>
+  run(
+    ~compilerVersion,
+    Execute(lang, blocks, links),
+    ExecuteCallback(callback),
+    () =>
     callback(Belt.Result.Error("Evaluation timeout."))
   );
 
-let executeEmbed = (~lang, ~code, callback) =>
-  run(ExecuteEmbed(lang, code), ExecuteEmbedCallback(callback), () =>
+let executeEmbed = (~compilerVersion, ~lang, ~code, callback) =>
+  run(
+    ~compilerVersion,
+    ExecuteEmbed(lang, code),
+    ExecuteEmbedCallback(callback),
+    () =>
     callback(Belt.Result.Error("Evaluation timeout."))
   );
 
-let refmt = (refmtTypes, blocks, callback) =>
-  run(Refmt(refmtTypes, blocks), RefmtCallback(callback), () =>
+let refmt = (~compilerVersion, refmtTypes, blocks, callback) =>
+  run(
+    ~compilerVersion, Refmt(refmtTypes, blocks), RefmtCallback(callback), () =>
     callback(Belt.Result.Error("Evaluation timeout."))
   );
 
-let loadScript = (url, callback) =>
-  run(LoadScript(url), LoadScriptCallback(callback), callback);
+let loadScript = (~compilerVersion, url, callback) =>
+  run(
+    ~compilerVersion,
+    LoadScript(url),
+    LoadScriptCallback(callback),
+    callback,
+  );

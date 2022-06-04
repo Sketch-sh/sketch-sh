@@ -2,7 +2,8 @@ Modules.require("./UI_SketchOwnerInfo.css");
 open Utils;
 let component = ReasonReact.statelessComponent("Edit_NoteOwnerInfo");
 
-let make = (~owner, ~noteLastEdited=?, ~className=?, _children) => {
+let make =
+    (~owner, ~noteCompilerVersion, ~noteLastEdited=?, ~className=?, _children) => {
   ...component,
   render: _self =>
     <div className={Cn.make(["UI_SketchOwnerInfo", Cn.unwrap(className)])}>
@@ -25,13 +26,19 @@ let make = (~owner, ~noteLastEdited=?, ~className=?, _children) => {
       {noteLastEdited
        =>> (
          noteLastEdited =>
-           <span className="UI_SketchOwnerInfo__lastEdited">
-             "last edited"->str
-             <UI_DateTime
-               date=noteLastEdited
-               className="UI_SketchOwnerInfo__time"
-             />
-           </span>
+           <>
+             <span className="UI_SketchOwnerInfo__lastEdited">
+               "last edited"->str
+               <UI_DateTime
+                 date=noteLastEdited
+                 className="UI_SketchOwnerInfo__time"
+               />
+             </span>
+             <span className="UI_SketchOwnerInfo__lastEdited">
+               {("OCaml " ++ noteCompilerVersion->CompilerVersion.toUiString)
+                ->str}
+             </span>
+           </>
        )}
     </div>,
 };

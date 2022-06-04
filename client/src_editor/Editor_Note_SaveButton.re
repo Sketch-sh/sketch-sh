@@ -87,12 +87,14 @@ module CreateLogin = {
       $noteId: String!,
       $userId: String!,
       $title: String!,
+      $compilerVersion: String!,
       $data: jsonb!
     ) {
       mutate: insert_note(objects: [{
         title: $title,
         id: $noteId,
         user_id: $userId,
+        compiler_version: $compilerVersion,
         data: $data
       }]) {
         returning {
@@ -108,7 +110,15 @@ module CreateLogin = {
   let component =
     ReasonReact.statelessComponent("Editor_Note_SaveButton_Create");
 
-  let make = (~noteId, ~userId, ~getCurrentData, ~updateSaveStatus, children) => {
+  let make =
+      (
+        ~noteId,
+        ~compilerVersion,
+        ~userId,
+        ~getCurrentData,
+        ~updateSaveStatus,
+        children,
+      ) => {
     ...component,
     render: _self =>
       <CreateLoginComponent>
@@ -116,8 +126,17 @@ module CreateLogin = {
           children(~handleSave=() => {
             open Js.Promise;
             let (title, data) = getCurrentData();
+            let compilerVersion =
+              CompilerVersion.(compilerVersion->toDbString);
             let newNote =
-              CreateLoginGql.make(~noteId, ~userId, ~title, ~data, ());
+              CreateLoginGql.make(
+                ~noteId,
+                ~compilerVersion,
+                ~userId,
+                ~title,
+                ~data,
+                (),
+              );
             updateSaveStatus(SaveStatus_Loading);
 
             mutation(~variables=newNote##variables, ())
@@ -166,12 +185,14 @@ module CreateAnonymous = {
       $editToken: String!,
       $userId: String!,
       $title: String!,
+      $compilerVersion: String!,
       $data: jsonb!
     ) {
       mutate: insert_note(objects: [{
         title: $title,
         id: $noteId,
         user_id: $userId,
+        compiler_version: $compilerVersion,
         data: $data
       }]) {
         returning {
@@ -202,12 +223,14 @@ module CreateAnonymous = {
           children(~handleSave=() => {
             open Js.Promise;
             let (title, data) = getCurrentData();
+            let compilerVersion = CompilerVersion.(current->toDbString);
             let newNote =
               CreateNoteAnonymousGql.make(
                 ~noteId,
                 ~userId,
                 ~title,
                 ~data,
+                ~compilerVersion,
                 ~editToken=Auth.Auth.getOrCreateEditToken(),
                 (),
               );
@@ -314,6 +337,7 @@ let make =
     (
       ~hasSavePermission,
       ~noteId,
+      ~compilerVersion,
       ~getCurrentData,
       ~noteState,
       ~updateSaveStatus,
@@ -328,7 +352,8 @@ let make =
       ...{user =>
         switch (user, noteState) {
         | (Login(userId), NoteState_New) =>
-          <CreateLogin getCurrentData userId noteId updateSaveStatus>
+          <CreateLogin
+            getCurrentData userId noteId compilerVersion updateSaveStatus>
             ...{(~handleSave) =>
               <SaveButton
                 hasSavePermission

@@ -22,6 +22,7 @@ module TimeoutMap = Belt.Map.String;
 
 type state = {
   lang,
+  compilerVersion: Sketch.CompilerVersion.t,
   blocks: array(Block.block),
   blocksCopy: option(array(Block.block)),
   deletedBlockMeta: ref(TimeoutMap.t(Js.Global.timeoutId)),
@@ -32,6 +33,7 @@ type state = {
 let make:
   (
     ~lang: lang=?,
+    ~compilerVersion: Sketch.CompilerVersion.t,
     ~links: array(Link.link),
     ~blocks: array(Block.block),
     ~readOnly: bool=?,

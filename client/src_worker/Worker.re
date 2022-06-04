@@ -1,11 +1,9 @@
 type worker;
 
-[@bs.new] external make: string => worker = "Worker";
-
 module type Config = {
   type topToWorkerData;
   type workerToTopData;
-  let make: unit => worker;
+  let make: (~compilerVersion: CompilerVersion.t) => worker;
 };
 
 module Make = (Config: Config) => {

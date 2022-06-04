@@ -34,7 +34,7 @@ let make =
       ~onUpdate=?,
       ~readOnly=?,
       ~viewportMargin=infinity,
-      ~lang=RE,
+      ~lang=ML,
       _children,
     )
     : ReasonReact.component(state, _, unit) => {

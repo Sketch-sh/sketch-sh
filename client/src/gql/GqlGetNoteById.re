@@ -11,6 +11,7 @@ module GetNoteById = [%graphql
         updated_at
         user_id
         fork_from
+        compiler_version
       }
       note_edit_token(where: {note_id: {_eq: $noteId}}) {
         note_id
