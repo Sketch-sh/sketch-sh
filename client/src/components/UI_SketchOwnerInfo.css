@@ -2,12 +2,13 @@
   display: flex;
   align-items: center;
 
-  & > a {
+  &>a {
     display: flex;
     align-items: center;
     text-decoration: none;
   }
-  & > a:hover {
+
+  &>a:hover {
     text-decoration: underline;
     text-decoration-color: var(--c-text-sub2);
   }
@@ -25,7 +26,6 @@
 }
 
 .UI_SketchOwnerInfo__lastEdited {
-  padding-right: var(--space2);
   font-weight: 400;
   color: var(--c-text-sub2);
 }

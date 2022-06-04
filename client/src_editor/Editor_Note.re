@@ -6,6 +6,7 @@ module Editor_Note = {
   type state = {
     hasSavePermission: bool,
     noteId: id,
+    compilerVersion: CompilerVersion.t,
     forkFrom: option(id),
     noteState,
     lang,
@@ -39,9 +40,10 @@ module Editor_Note = {
       (
         ~initialHasSavePermission,
         ~initialNoteId,
+        ~initialCompilerVersion,
         ~initialForkFrom=?,
         ~initialNoteState: noteState,
-        ~initialLang: lang=RE,
+        ~initialLang: lang=ML,
         ~initialTitle: string="",
         ~initialLinks: array(Link.link),
         ~initialBlocks: array(Block.block),
@@ -53,6 +55,7 @@ module Editor_Note = {
     let makeInitialState = () => {
       hasSavePermission: initialHasSavePermission,
       noteId: initialNoteId,
+      compilerVersion: initialCompilerVersion,
       forkFrom: initialForkFrom,
       noteState: initialNoteState,
       lang: initialLang,
@@ -223,6 +226,7 @@ module Editor_Note = {
                 <Editor_Note_SaveButton
                   hasSavePermission={state.hasSavePermission}
                   noteId={state.noteId}
+                  compilerVersion={state.compilerVersion}
                   noteState={state.noteState}
                   editorContentStatus
                   updateSaveStatus={saveStatus =>
@@ -247,6 +251,7 @@ module Editor_Note = {
                   hasSavePermission={state.hasSavePermission}
                   noteId={state.noteId}
                   noteState={state.noteState}
+                  compilerVersion={state.compilerVersion}
                   updateForkStatus={forkStatus =>
                     forkStatus->UpdateForkStatus->send
                   }
@@ -272,18 +277,6 @@ module Editor_Note = {
                        <span>
                          <input
                            type_="radio"
-                           id="RE"
-                           name="language"
-                           checked={lang == RE}
-                           onChange={_ => send(ChangeLang(RE))}
-                         />
-                         <label htmlFor="RE" className="EditorNote__lang--RE">
-                           "RE"->str
-                         </label>
-                       </span>
-                       <span>
-                         <input
-                           type_="radio"
                            id="ML"
                            name="language"
                            checked={lang == ML}
@@ -291,6 +284,18 @@ module Editor_Note = {
                          />
                          <label htmlFor="ML" className="EditorNote__lang--ML">
                            "ML"->str
+                         </label>
+                       </span>
+                       <span>
+                         <input
+                           type_="radio"
+                           id="RE"
+                           name="language"
+                           checked={lang == RE}
+                           onChange={_ => send(ChangeLang(RE))}
+                         />
+                         <label htmlFor="RE" className="EditorNote__lang--RE">
+                           "RE"->str
                          </label>
                        </span>
                      </fieldset>
@@ -321,6 +326,7 @@ module Editor_Note = {
                          <UI_SketchOwnerInfo
                            owner=user
                            noteLastEdited=?{state.noteLastEdited}
+                           noteCompilerVersion={state.compilerVersion}
                            className="EditorNote__owner"
                          />
                      }
@@ -376,6 +382,7 @@ module Editor_Note = {
             <Editor_Blocks
               key={state.noteId}
               lang
+              compilerVersion={state.compilerVersion}
               blocks=state.blocks^
               links={state.links}
               registerExecuteCallback={callback =>
@@ -399,6 +406,7 @@ module WithShortcut = {
         ~hasSavePermission,
         ~noteId,
         ~noteState,
+        ~compilerVersion,
         ~lang=?,
         ~title=?,
         ~links,
@@ -413,6 +421,7 @@ module WithShortcut = {
           initialHasSavePermission=hasSavePermission
           initialNoteId=noteId
           initialNoteState=noteState
+          initialCompilerVersion=compilerVersion
           initialLang=?lang
           initialTitle=?title
           initialLinks=links

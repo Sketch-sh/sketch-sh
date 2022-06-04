@@ -28,6 +28,7 @@ let isReady = s => s.ready && s.packageLoaded;
 type state = {
   value: string,
   lang: Editor_Types.lang,
+  compilerVersion: CompilerVersion.t,
   widgets: array(Editor_Types.Widget.t),
   scrollHeight: ref(float),
   heightTyp,
@@ -48,13 +49,15 @@ let component = ReasonReact.reducerComponent("Embed");
 let make = _children => {
   ...component,
   didMount: ({state, send, onUnmount}) => {
-    Toplevel_Consumer.getWorker() |> ignore;
+    Toplevel_Consumer.getWorker(~compilerVersion=state.compilerVersion)
+    |> ignore;
     Toplevel_Consumer.registerReadyCb(() => send(WorkerReady));
     switch (state.loadPackage) {
     | None => ()
     | Some(package) =>
       let cancelToken =
         Toplevel_Consumer.loadScript(
+          ~compilerVersion=state.compilerVersion,
           package,
           () => {
             Js.log("package loaded");
@@ -81,6 +84,15 @@ let make = _children => {
       | value => value
       | exception _ => RE
       };
+    let compilerVersion =
+      params
+      ->URLSearchParams.get("compilerVersion")
+      ->Belt.Option.getWithDefault("4.06");
+    let compilerVersion =
+      switch (compilerVersion->CompilerVersion.ofDbString) {
+      | value => value
+      | exception _ => V4_06
+      };
     let heightTyp =
       switch (params->URLSearchParams.get("autoHeight")) {
       | Some("false") => Fixed
@@ -92,6 +104,7 @@ let make = _children => {
     {
       value,
       lang,
+      compilerVersion,
       widgets: [||],
       scrollHeight: ref(getScrollHeight()),
       heightTyp,
@@ -132,6 +145,7 @@ let make = _children => {
           let cancelToken =
             Toplevel_Consumer.executeEmbed(
               ~lang=state.lang,
+              ~compilerVersion=state.compilerVersion,
               ~code=state.value,
               fun
               | Belt.Result.Ok(result) => {

@@ -17,7 +17,7 @@ update-schema: save
 
 .PHONY: clear
 clear:
-	docker-compose -f docker-compose.yml -f docker-compose.dev.yml down -v && \
+	cd .. && docker-compose -f docker-compose.yml -f docker-compose.dev.yml down -v && \
 	docker-compose -f docker-compose.yml -f docker-compose.dev.yml up -d
 
 .PHONY: reset
@@ -34,8 +34,12 @@ dev:
 
 .PHONY: dev-build
 dev-build:
-	docker-compose -f docker-compose.yml -f docker-compose.dev.yml build
+	cd .. && docker-compose -f docker-compose.yml -f docker-compose.dev.yml build
 
 .PHONY: do-build
 do-build:
 	docker-compose -f docker-compose.yml -f docker-compose.prod.yml build && docker-compose -f docker-compose.yml -f docker-compose.prod.yml push
+
+.PHONY: stop
+stop:
+	cd .. && docker-compose -f docker-compose.yml -f docker-compose.dev.yml down -v

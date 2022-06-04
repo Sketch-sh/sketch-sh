@@ -22,13 +22,19 @@ let make = (~owner, ~noteLastEdited=?, ~className=?) => {
     {noteLastEdited
      =>> (
        noteLastEdited =>
-         <span className="UI_SketchOwnerInfo__lastEdited">
-           "last edited"->str
-           <UI_DateTime
-             date=noteLastEdited
-             className="UI_SketchOwnerInfo__time"
-           />
-         </span>
+         <>
+           <span className="UI_SketchOwnerInfo__lastEdited">
+             "last edited"->str
+             <UI_DateTime
+               date=noteLastEdited
+               className="UI_SketchOwnerInfo__time"
+             />
+           </span>
+           <span className="UI_SketchOwnerInfo__lastEdited">
+             {("OCaml " ++ noteCompilerVersion->CompilerVersion.toUiString)
+              ->str}
+           </span>
+         </>
      )}
   </div>;
 };

@@ -32,6 +32,7 @@ module TimeoutMap = Belt.Map.String;
 
 type state = {
   lang,
+  compilerVersion: CompilerVersion.t,
   blocks: array(block),
   blocksCopy: option(array(block)),
   deletedBlockMeta: ref(TimeoutMap.t(Js.Global.timeoutId)),
@@ -58,6 +59,7 @@ module Actions = {
   let callRefmt = (operation, self) => {
     let id =
       Toplevel_Consumer.refmt(
+        ~compilerVersion=self.ReasonReact.state.compilerVersion,
         operation,
         self.ReasonReact.state.blocks->codeBlockDataPairs,
         fun
@@ -412,6 +414,7 @@ module Actions = {
 
         let executeId =
           Toplevel_Consumer.execute(
+            ~compilerVersion=state.compilerVersion,
             ~lang,
             ~blocks=allCodeToExecute,
             ~links=Array.to_list(links),
@@ -616,7 +619,8 @@ let component = ReasonReact.reducerComponent("Editor_Page");
 
 let make =
     (
-      ~lang=RE,
+      ~lang=ML,
+      ~compilerVersion,
       ~links: array(Link.link),
       ~blocks: array(block),
       ~readOnly=false,
@@ -628,6 +632,7 @@ let make =
     ) => {
   let makeInitialState = () => {
     lang,
+    compilerVersion,
     blocks: blocks->syncLineNumber,
     blocksCopy: None,
     deletedBlockMeta: ref(TimeoutMap.empty),

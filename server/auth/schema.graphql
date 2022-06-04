@@ -4,403 +4,896 @@ schema {
   subscription: subscription_root
 }
 
-# conflict action
+"""
+expression to compare columns of type boolean. All fields are combined with logical 'AND'.
+"""
+input boolean_comparison_exp {
+  _eq: Boolean
+  _gt: Boolean
+  _gte: Boolean
+  _in: [Boolean!]
+  _is_null: Boolean
+  _lt: Boolean
+  _lte: Boolean
+  _neq: Boolean
+  _nin: [Boolean!]
+}
+
+"""conflict action"""
 enum conflict_action {
-  # ignore the insert on this row
+  """ignore the insert on this row"""
   ignore
 
-  # update the row with the given values
+  """update the row with the given values"""
   update
 }
 
 scalar jsonb
 
-# expression to compare columns of type jsonb. All fields are combined with logical 'AND'.
+"""
+expression to compare columns of type jsonb. All fields are combined with logical 'AND'.
+"""
 input jsonb_comparison_exp {
+  """is the column contained in the given json value"""
+  _contained_in: jsonb
+
+  """does the column contain the given json value at the top level"""
+  _contains: jsonb
   _eq: jsonb
   _gt: jsonb
   _gte: jsonb
-  _in: [jsonb]
+
+  """does the string exist as a top-level key in the column"""
+  _has_key: String
+
+  """do all of these strings exist as top-level keys in the column"""
+  _has_keys_all: [String!]
+
+  """do any of these strings exist as top-level keys in the column"""
+  _has_keys_any: [String!]
+  _in: [jsonb!]
   _is_null: Boolean
   _lt: jsonb
   _lte: jsonb
   _neq: jsonb
-  _nin: [jsonb]
+  _nin: [jsonb!]
 }
 
-# mutation root
+"""mutation root"""
 type mutation_root {
-  # delete data from the table: "note"
+  """
+  delete data from the table: "note"
+  """
   delete_note(
-    # filter the rows which have to be deleted
+    """filter the rows which have to be deleted"""
     where: note_bool_exp!
   ): note_mutation_response
 
-  # delete data from the table: "note_revision"
+  """
+  delete data from the table: "note_edit_token"
+  """
+  delete_note_edit_token(
+    """filter the rows which have to be deleted"""
+    where: note_edit_token_bool_exp!
+  ): note_edit_token_mutation_response
+
+  """
+  delete data from the table: "note_revision"
+  """
   delete_note_revision(
-    # filter the rows which have to be deleted
+    """filter the rows which have to be deleted"""
     where: note_revision_bool_exp!
   ): note_revision_mutation_response
 
-  # delete data from the table: "user"
+  """
+  delete data from the table: "user"
+  """
   delete_user(
-    # filter the rows which have to be deleted
+    """filter the rows which have to be deleted"""
     where: user_bool_exp!
   ): user_mutation_response
 
-  # delete data from the table: "user_identity"
+  """
+  delete data from the table: "user_identity"
+  """
   delete_user_identity(
-    # filter the rows which have to be deleted
+    """filter the rows which have to be deleted"""
     where: user_identity_bool_exp!
   ): user_identity_mutation_response
 
-  # delete data from the table: "user_identity_type"
+  """
+  delete data from the table: "user_identity_type"
+  """
   delete_user_identity_type(
-    # filter the rows which have to be deleted
+    """filter the rows which have to be deleted"""
     where: user_identity_type_bool_exp!
   ): user_identity_type_mutation_response
 
-  # insert data into the table: "note"
+  """
+  delete data from the table: "user_private"
+  """
+  delete_user_private(
+    """filter the rows which have to be deleted"""
+    where: user_private_bool_exp!
+  ): user_private_mutation_response
+
+  """
+  delete data from the table: "user_public"
+  """
+  delete_user_public(
+    """filter the rows which have to be deleted"""
+    where: user_public_bool_exp!
+  ): user_public_mutation_response
+
+  """
+  insert data into the table: "note"
+  """
   insert_note(
-    # the rows to be inserted
+    """the rows to be inserted"""
     objects: [note_insert_input!]!
 
-    # on conflict condition
+    """on conflict condition"""
     on_conflict: note_on_conflict
   ): note_mutation_response
 
-  # insert data into the table: "note_revision"
+  """
+  insert data into the table: "note_edit_token"
+  """
+  insert_note_edit_token(
+    """the rows to be inserted"""
+    objects: [note_edit_token_insert_input!]!
+
+    """on conflict condition"""
+    on_conflict: note_edit_token_on_conflict
+  ): note_edit_token_mutation_response
+
+  """
+  insert data into the table: "note_revision"
+  """
   insert_note_revision(
-    # the rows to be inserted
+    """the rows to be inserted"""
     objects: [note_revision_insert_input!]!
 
-    # on conflict condition
+    """on conflict condition"""
     on_conflict: note_revision_on_conflict
   ): note_revision_mutation_response
 
-  # insert data into the table: "user"
+  """
+  insert data into the table: "user"
+  """
   insert_user(
-    # the rows to be inserted
+    """the rows to be inserted"""
     objects: [user_insert_input!]!
 
-    # on conflict condition
+    """on conflict condition"""
     on_conflict: user_on_conflict
   ): user_mutation_response
 
-  # insert data into the table: "user_identity"
+  """
+  insert data into the table: "user_identity"
+  """
   insert_user_identity(
-    # the rows to be inserted
+    """the rows to be inserted"""
     objects: [user_identity_insert_input!]!
 
-    # on conflict condition
+    """on conflict condition"""
     on_conflict: user_identity_on_conflict
   ): user_identity_mutation_response
 
-  # insert data into the table: "user_identity_type"
+  """
+  insert data into the table: "user_identity_type"
+  """
   insert_user_identity_type(
-    # the rows to be inserted
+    """the rows to be inserted"""
     objects: [user_identity_type_insert_input!]!
 
-    # on conflict condition
+    """on conflict condition"""
     on_conflict: user_identity_type_on_conflict
   ): user_identity_type_mutation_response
 
-  # update data of the table: "note"
+  """
+  insert data into the table: "user_private"
+  """
+  insert_user_private(
+    """the rows to be inserted"""
+    objects: [user_private_insert_input!]!
+  ): user_private_mutation_response
+
+  """
+  insert data into the table: "user_public"
+  """
+  insert_user_public(
+    """the rows to be inserted"""
+    objects: [user_public_insert_input!]!
+  ): user_public_mutation_response
+
+  """
+  update data of the table: "note"
+  """
   update_note(
-    # append existing jsonb value of filtered columns with new jsonb value
+    """append existing jsonb value of filtered columns with new jsonb value"""
     _append: note_append_input
 
-    # delete the field or element with specified path (for JSON arrays, negative integers count from the end)
+    """
+    delete the field or element with specified path (for JSON arrays, negative integers count from the end)
+    """
     _delete_at_path: note_delete_at_path_input
 
-    # delete the array element with specified index (negative integers count from
-    # the end). throws an error if top level container is not an array
+    """
+    delete the array element with specified index (negative integers count from
+    the end). throws an error if top level container is not an array
+    """
     _delete_elem: note_delete_elem_input
 
-    # delete key/value pair or string element. key/value pairs are matched based on their key value
+    """
+    delete key/value pair or string element. key/value pairs are matched based on their key value
+    """
     _delete_key: note_delete_key_input
 
-    # prepend existing jsonb value of filtered columns with new jsonb value
+    """prepend existing jsonb value of filtered columns with new jsonb value"""
     _prepend: note_prepend_input
 
-    # sets the columns of the filtered rows to the given values
+    """sets the columns of the filtered rows to the given values"""
     _set: note_set_input
 
-    # filter the rows which have to be updated
+    """filter the rows which have to be updated"""
     where: note_bool_exp!
   ): note_mutation_response
 
-  # update data of the table: "note_revision"
+  """
+  update data of the table: "note_edit_token"
+  """
+  update_note_edit_token(
+    """sets the columns of the filtered rows to the given values"""
+    _set: note_edit_token_set_input
+
+    """filter the rows which have to be updated"""
+    where: note_edit_token_bool_exp!
+  ): note_edit_token_mutation_response
+
+  """
+  update data of the table: "note_revision"
+  """
   update_note_revision(
-    # append existing jsonb value of filtered columns with new jsonb value
+    """append existing jsonb value of filtered columns with new jsonb value"""
     _append: note_revision_append_input
 
-    # delete the field or element with specified path (for JSON arrays, negative integers count from the end)
+    """
+    delete the field or element with specified path (for JSON arrays, negative integers count from the end)
+    """
     _delete_at_path: note_revision_delete_at_path_input
 
-    # delete the array element with specified index (negative integers count from
-    # the end). throws an error if top level container is not an array
+    """
+    delete the array element with specified index (negative integers count from
+    the end). throws an error if top level container is not an array
+    """
     _delete_elem: note_revision_delete_elem_input
 
-    # delete key/value pair or string element. key/value pairs are matched based on their key value
+    """
+    delete key/value pair or string element. key/value pairs are matched based on their key value
+    """
     _delete_key: note_revision_delete_key_input
 
-    # prepend existing jsonb value of filtered columns with new jsonb value
+    """prepend existing jsonb value of filtered columns with new jsonb value"""
     _prepend: note_revision_prepend_input
 
-    # sets the columns of the filtered rows to the given values
+    """sets the columns of the filtered rows to the given values"""
     _set: note_revision_set_input
 
-    # filter the rows which have to be updated
+    """filter the rows which have to be updated"""
     where: note_revision_bool_exp!
   ): note_revision_mutation_response
 
-  # update data of the table: "user"
+  """
+  update data of the table: "user"
+  """
   update_user(
-    # sets the columns of the filtered rows to the given values
+    """sets the columns of the filtered rows to the given values"""
     _set: user_set_input
 
-    # filter the rows which have to be updated
+    """filter the rows which have to be updated"""
     where: user_bool_exp!
   ): user_mutation_response
 
-  # update data of the table: "user_identity"
+  """
+  update data of the table: "user_identity"
+  """
   update_user_identity(
-    # append existing jsonb value of filtered columns with new jsonb value
+    """append existing jsonb value of filtered columns with new jsonb value"""
     _append: user_identity_append_input
 
-    # delete the field or element with specified path (for JSON arrays, negative integers count from the end)
+    """
+    delete the field or element with specified path (for JSON arrays, negative integers count from the end)
+    """
     _delete_at_path: user_identity_delete_at_path_input
 
-    # delete the array element with specified index (negative integers count from
-    # the end). throws an error if top level container is not an array
+    """
+    delete the array element with specified index (negative integers count from
+    the end). throws an error if top level container is not an array
+    """
     _delete_elem: user_identity_delete_elem_input
 
-    # delete key/value pair or string element. key/value pairs are matched based on their key value
+    """
+    delete key/value pair or string element. key/value pairs are matched based on their key value
+    """
     _delete_key: user_identity_delete_key_input
 
-    # prepend existing jsonb value of filtered columns with new jsonb value
+    """prepend existing jsonb value of filtered columns with new jsonb value"""
     _prepend: user_identity_prepend_input
 
-    # sets the columns of the filtered rows to the given values
+    """sets the columns of the filtered rows to the given values"""
     _set: user_identity_set_input
 
-    # filter the rows which have to be updated
+    """filter the rows which have to be updated"""
     where: user_identity_bool_exp!
   ): user_identity_mutation_response
 
-  # update data of the table: "user_identity_type"
+  """
+  update data of the table: "user_identity_type"
+  """
   update_user_identity_type(
-    # sets the columns of the filtered rows to the given values
+    """sets the columns of the filtered rows to the given values"""
     _set: user_identity_type_set_input
 
-    # filter the rows which have to be updated
+    """filter the rows which have to be updated"""
     where: user_identity_type_bool_exp!
   ): user_identity_type_mutation_response
+
+  """
+  update data of the table: "user_private"
+  """
+  update_user_private(
+    """sets the columns of the filtered rows to the given values"""
+    _set: user_private_set_input
+
+    """filter the rows which have to be updated"""
+    where: user_private_bool_exp!
+  ): user_private_mutation_response
+
+  """
+  update data of the table: "user_public"
+  """
+  update_user_public(
+    """sets the columns of the filtered rows to the given values"""
+    _set: user_public_set_input
+
+    """filter the rows which have to be updated"""
+    where: user_public_bool_exp!
+  ): user_public_mutation_response
 }
 
-# columns and relationships of "note"
+"""
+columns and relationships of "note"
+"""
 type note {
-  created_at: timestamptz
-  data: jsonb
-  id: String
+  compiler_version: String!
+  created_at: timestamptz!
+  data(
+    """JSON select path"""
+    path: String
+  ): jsonb
 
-  # An array relationship
-  notes(
-    # limit the nuber of rows returned
+  """An array relationship"""
+  edit_tokens(
+    """distinct select on columns"""
+    distinct_on: [note_edit_token_select_column!]
+
+    """limit the nuber of rows returned"""
     limit: Int
 
-    # skip the first n rows. Use only with order_by
+    """skip the first n rows. Use only with order_by"""
     offset: Int
 
-    # sort the rows by one or more columns
+    """sort the rows by one or more columns"""
+    order_by: [note_edit_token_order_by!]
+
+    """filter the rows returned"""
+    where: note_edit_token_bool_exp
+  ): [note_edit_token!]!
+
+  """An aggregated array relationship"""
+  edit_tokens_aggregate(
+    """distinct select on columns"""
+    distinct_on: [note_edit_token_select_column!]
+
+    """limit the nuber of rows returned"""
+    limit: Int
+
+    """skip the first n rows. Use only with order_by"""
+    offset: Int
+
+    """sort the rows by one or more columns"""
+    order_by: [note_edit_token_order_by!]
+
+    """filter the rows returned"""
+    where: note_edit_token_bool_exp
+  ): note_edit_token_aggregate!
+  fork_from: String
+  id: String!
+  is_published: Boolean!
+
+  """An array relationship"""
+  revisions(
+    """distinct select on columns"""
+    distinct_on: [note_revision_select_column!]
+
+    """limit the nuber of rows returned"""
+    limit: Int
+
+    """skip the first n rows. Use only with order_by"""
+    offset: Int
+
+    """sort the rows by one or more columns"""
     order_by: [note_revision_order_by!]
 
-    # filter the rows returned
+    """filter the rows returned"""
     where: note_revision_bool_exp
   ): [note_revision!]!
-  title: String
-  updated_at: timestamptz
 
-  # An object relationship
-  user: user
-  user_id: String
+  """An aggregated array relationship"""
+  revisions_aggregate(
+    """distinct select on columns"""
+    distinct_on: [note_revision_select_column!]
+
+    """limit the nuber of rows returned"""
+    limit: Int
+
+    """skip the first n rows. Use only with order_by"""
+    offset: Int
+
+    """sort the rows by one or more columns"""
+    order_by: [note_revision_order_by!]
+
+    """filter the rows returned"""
+    where: note_revision_bool_exp
+  ): note_revision_aggregate!
+  slug: String
+  title: String
+  updated_at: timestamptz!
+
+  """An object relationship"""
+  user: user!
+  user_id: String!
 }
 
-# append existing jsonb value of filtered columns with new jsonb value
+"""
+aggregated selection of "note"
+"""
+type note_aggregate {
+  aggregate: note_aggregate_fields
+  nodes: [note!]!
+}
+
+"""
+aggregate fields of "note"
+"""
+type note_aggregate_fields {
+  count(columns: [note_select_column!], distinct: Boolean): Int
+  max: note_max_fields
+  min: note_min_fields
+}
+
+"""
+order by aggregate values of table "note"
+"""
+input note_aggregate_order_by {
+  count: order_by
+  max: note_max_order_by
+  min: note_min_order_by
+}
+
+"""append existing jsonb value of filtered columns with new jsonb value"""
 input note_append_input {
   data: jsonb
 }
 
-# Boolean expression to filter rows from the table "note". All fields are combined with a logical 'AND'.
+"""
+input type for inserting array relation for remote table "note"
+"""
+input note_arr_rel_insert_input {
+  data: [note_insert_input!]!
+  on_conflict: note_on_conflict
+}
+
+"""
+Boolean expression to filter rows from the table "note". All fields are combined with a logical 'AND'.
+"""
 input note_bool_exp {
   _and: [note_bool_exp]
   _not: note_bool_exp
   _or: [note_bool_exp]
+  compiler_version: varchar_comparison_exp
   created_at: timestamptz_comparison_exp
   data: jsonb_comparison_exp
+  edit_tokens: note_edit_token_bool_exp
+  fork_from: varchar_comparison_exp
   id: varchar_comparison_exp
-  notes: note_revision_bool_exp
+  is_published: boolean_comparison_exp
+  revisions: note_revision_bool_exp
+  slug: varchar_comparison_exp
   title: text_comparison_exp
   updated_at: timestamptz_comparison_exp
   user: user_bool_exp
   user_id: varchar_comparison_exp
 }
 
-# unique or primary key constraints on table "note"
+"""
+unique or primary key constraints on table "note"
+"""
 enum note_constraint {
-  # unique or primary key constraint
+  """unique or primary key constraint"""
   note_pkey
 }
 
-# delete the field or element with specified path (for JSON arrays, negative integers count from the end)
+"""
+delete the field or element with specified path (for JSON arrays, negative integers count from the end)
+"""
 input note_delete_at_path_input {
   data: [String]
 }
 
-# delete the array element with specified index (negative integers count from the
-# end). throws an error if top level container is not an array
+"""
+delete the array element with specified index (negative integers count from the
+end). throws an error if top level container is not an array
+"""
 input note_delete_elem_input {
   data: Int
 }
 
-# delete key/value pair or string element. key/value pairs are matched based on their key value
+"""
+delete key/value pair or string element. key/value pairs are matched based on their key value
+"""
 input note_delete_key_input {
   data: String
 }
 
-# input type for inserting data into table "note"
-input note_insert_input {
-  created_at: timestamptz
-  data: jsonb
-  id: String
-  title: String
-  updated_at: timestamptz
-  user_id: String
+"""
+columns and relationships of "note_edit_token"
+"""
+type note_edit_token {
+  """An object relationship"""
+  note: note!
+  note_id: String!
+  token: String!
 }
 
-# response of any mutation on the table "note"
-type note_mutation_response {
-  # number of affected rows by the mutation
+"""
+aggregated selection of "note_edit_token"
+"""
+type note_edit_token_aggregate {
+  aggregate: note_edit_token_aggregate_fields
+  nodes: [note_edit_token!]!
+}
+
+"""
+aggregate fields of "note_edit_token"
+"""
+type note_edit_token_aggregate_fields {
+  count(columns: [note_edit_token_select_column!], distinct: Boolean): Int
+  max: note_edit_token_max_fields
+  min: note_edit_token_min_fields
+}
+
+"""
+order by aggregate values of table "note_edit_token"
+"""
+input note_edit_token_aggregate_order_by {
+  count: order_by
+  max: note_edit_token_max_order_by
+  min: note_edit_token_min_order_by
+}
+
+"""
+input type for inserting array relation for remote table "note_edit_token"
+"""
+input note_edit_token_arr_rel_insert_input {
+  data: [note_edit_token_insert_input!]!
+  on_conflict: note_edit_token_on_conflict
+}
+
+"""
+Boolean expression to filter rows from the table "note_edit_token". All fields are combined with a logical 'AND'.
+"""
+input note_edit_token_bool_exp {
+  _and: [note_edit_token_bool_exp]
+  _not: note_edit_token_bool_exp
+  _or: [note_edit_token_bool_exp]
+  note: note_bool_exp
+  note_id: varchar_comparison_exp
+  token: varchar_comparison_exp
+}
+
+"""
+unique or primary key constraints on table "note_edit_token"
+"""
+enum note_edit_token_constraint {
+  """unique or primary key constraint"""
+  note_edit_token_pkey
+}
+
+"""
+input type for inserting data into table "note_edit_token"
+"""
+input note_edit_token_insert_input {
+  note: note_obj_rel_insert_input
+  note_id: String
+  token: String
+}
+
+"""aggregate max on columns"""
+type note_edit_token_max_fields {
+  note_id: String
+  token: String
+}
+
+"""
+order by max() on columns of table "note_edit_token"
+"""
+input note_edit_token_max_order_by {
+  note_id: order_by
+  token: order_by
+}
+
+"""aggregate min on columns"""
+type note_edit_token_min_fields {
+  note_id: String
+  token: String
+}
+
+"""
+order by min() on columns of table "note_edit_token"
+"""
+input note_edit_token_min_order_by {
+  note_id: order_by
+  token: order_by
+}
+
+"""
+response of any mutation on the table "note_edit_token"
+"""
+type note_edit_token_mutation_response {
+  """number of affected rows by the mutation"""
   affected_rows: Int!
 
-  # data of the affected rows by the mutation
-  returning: [note_no_rels!]!
+  """data of the affected rows by the mutation"""
+  returning: [note_edit_token!]!
 }
 
-# only postgres columns (no relationships) from "note"
-type note_no_rels {
+"""
+input type for inserting object relation for remote table "note_edit_token"
+"""
+input note_edit_token_obj_rel_insert_input {
+  data: note_edit_token_insert_input!
+  on_conflict: note_edit_token_on_conflict
+}
+
+"""
+on conflict condition type for table "note_edit_token"
+"""
+input note_edit_token_on_conflict {
+  constraint: note_edit_token_constraint!
+  update_columns: [note_edit_token_update_column!]!
+}
+
+"""
+ordering options when selecting data from "note_edit_token"
+"""
+input note_edit_token_order_by {
+  note: note_order_by
+  note_id: order_by
+  token: order_by
+}
+
+"""
+select columns of table "note_edit_token"
+"""
+enum note_edit_token_select_column {
+  """column name"""
+  note_id
+
+  """column name"""
+  token
+}
+
+"""
+input type for updating data in table "note_edit_token"
+"""
+input note_edit_token_set_input {
+  note_id: String
+  token: String
+}
+
+"""
+update columns of table "note_edit_token"
+"""
+enum note_edit_token_update_column {
+  """column name"""
+  note_id
+
+  """column name"""
+  token
+}
+
+"""
+input type for inserting data into table "note"
+"""
+input note_insert_input {
+  compiler_version: String
   created_at: timestamptz
   data: jsonb
+  edit_tokens: note_edit_token_arr_rel_insert_input
+  fork_from: String
   id: String
+  is_published: Boolean
+  revisions: note_revision_arr_rel_insert_input
+  slug: String
+  title: String
+  updated_at: timestamptz
+  user: user_obj_rel_insert_input
+  user_id: String
+}
+
+"""aggregate max on columns"""
+type note_max_fields {
+  compiler_version: String
+  created_at: timestamptz
+  fork_from: String
+  id: String
+  slug: String
   title: String
   updated_at: timestamptz
   user_id: String
 }
 
-# on conflict condition type for table "note"
+"""
+order by max() on columns of table "note"
+"""
+input note_max_order_by {
+  compiler_version: order_by
+  created_at: order_by
+  fork_from: order_by
+  id: order_by
+  slug: order_by
+  title: order_by
+  updated_at: order_by
+  user_id: order_by
+}
+
+"""aggregate min on columns"""
+type note_min_fields {
+  compiler_version: String
+  created_at: timestamptz
+  fork_from: String
+  id: String
+  slug: String
+  title: String
+  updated_at: timestamptz
+  user_id: String
+}
+
+"""
+order by min() on columns of table "note"
+"""
+input note_min_order_by {
+  compiler_version: order_by
+  created_at: order_by
+  fork_from: order_by
+  id: order_by
+  slug: order_by
+  title: order_by
+  updated_at: order_by
+  user_id: order_by
+}
+
+"""
+response of any mutation on the table "note"
+"""
+type note_mutation_response {
+  """number of affected rows by the mutation"""
+  affected_rows: Int!
+
+  """data of the affected rows by the mutation"""
+  returning: [note!]!
+}
+
+"""
+input type for inserting object relation for remote table "note"
+"""
+input note_obj_rel_insert_input {
+  data: note_insert_input!
+  on_conflict: note_on_conflict
+}
+
+"""
+on conflict condition type for table "note"
+"""
 input note_on_conflict {
-  action: conflict_action!
-  constraint: note_constraint
+  constraint: note_constraint!
+  update_columns: [note_update_column!]!
 }
 
-# ordering options when selecting data from "note"
-enum note_order_by {
-  # in the ascending order of "created_at", nulls last
-  created_at_asc
-
-  # in the ascending order of "created_at", nulls first
-  created_at_asc_nulls_first
-
-  # in the descending order of "created_at", nulls last
-  created_at_desc
-
-  # in the descending order of "created_at", nulls first
-  created_at_desc_nulls_first
-
-  # in the ascending order of "data", nulls last
-  data_asc
-
-  # in the ascending order of "data", nulls first
-  data_asc_nulls_first
-
-  # in the descending order of "data", nulls last
-  data_desc
-
-  # in the descending order of "data", nulls first
-  data_desc_nulls_first
-
-  # in the ascending order of "id", nulls last
-  id_asc
-
-  # in the ascending order of "id", nulls first
-  id_asc_nulls_first
-
-  # in the descending order of "id", nulls last
-  id_desc
-
-  # in the descending order of "id", nulls first
-  id_desc_nulls_first
-
-  # in the ascending order of "title", nulls last
-  title_asc
-
-  # in the ascending order of "title", nulls first
-  title_asc_nulls_first
-
-  # in the descending order of "title", nulls last
-  title_desc
-
-  # in the descending order of "title", nulls first
-  title_desc_nulls_first
-
-  # in the ascending order of "updated_at", nulls last
-  updated_at_asc
-
-  # in the ascending order of "updated_at", nulls first
-  updated_at_asc_nulls_first
-
-  # in the descending order of "updated_at", nulls last
-  updated_at_desc
-
-  # in the descending order of "updated_at", nulls first
-  updated_at_desc_nulls_first
-
-  # in the ascending order of "user_id", nulls last
-  user_id_asc
-
-  # in the ascending order of "user_id", nulls first
-  user_id_asc_nulls_first
-
-  # in the descending order of "user_id", nulls last
-  user_id_desc
-
-  # in the descending order of "user_id", nulls first
-  user_id_desc_nulls_first
+"""
+ordering options when selecting data from "note"
+"""
+input note_order_by {
+  compiler_version: order_by
+  created_at: order_by
+  data: order_by
+  edit_tokens_aggregate: note_edit_token_aggregate_order_by
+  fork_from: order_by
+  id: order_by
+  is_published: order_by
+  revisions_aggregate: note_revision_aggregate_order_by
+  slug: order_by
+  title: order_by
+  updated_at: order_by
+  user: user_order_by
+  user_id: order_by
 }
 
-# prepend existing jsonb value of filtered columns with new jsonb value
+"""prepend existing jsonb value of filtered columns with new jsonb value"""
 input note_prepend_input {
   data: jsonb
 }
 
-# columns and relationships of "note_revision"
+"""
+columns and relationships of "note_revision"
+"""
 type note_revision {
-  created_at: timestamptz
-  data: jsonb
+  created_at: timestamptz!
+  data(
+    """JSON select path"""
+    path: String
+  ): jsonb
 
-  # An object relationship
-  note: note
-  note_id: String
+  """An object relationship"""
+  note: note!
+  note_id: String!
   title: String
 }
 
-# append existing jsonb value of filtered columns with new jsonb value
+"""
+aggregated selection of "note_revision"
+"""
+type note_revision_aggregate {
+  aggregate: note_revision_aggregate_fields
+  nodes: [note_revision!]!
+}
+
+"""
+aggregate fields of "note_revision"
+"""
+type note_revision_aggregate_fields {
+  count(columns: [note_revision_select_column!], distinct: Boolean): Int
+  max: note_revision_max_fields
+  min: note_revision_min_fields
+}
+
+"""
+order by aggregate values of table "note_revision"
+"""
+input note_revision_aggregate_order_by {
+  count: order_by
+  max: note_revision_max_order_by
+  min: note_revision_min_order_by
+}
+
+"""append existing jsonb value of filtered columns with new jsonb value"""
 input note_revision_append_input {
   data: jsonb
 }
 
-# Boolean expression to filter rows from the table "note_revision". All fields are combined with a logical 'AND'.
+"""
+input type for inserting array relation for remote table "note_revision"
+"""
+input note_revision_arr_rel_insert_input {
+  data: [note_revision_insert_input!]!
+  on_conflict: note_revision_on_conflict
+}
+
+"""
+Boolean expression to filter rows from the table "note_revision". All fields are combined with a logical 'AND'.
+"""
 input note_revision_bool_exp {
   _and: [note_revision_bool_exp]
   _not: note_revision_bool_exp
@@ -412,116 +905,142 @@ input note_revision_bool_exp {
   title: text_comparison_exp
 }
 
-# unique or primary key constraints on table "note_revision"
+"""
+unique or primary key constraints on table "note_revision"
+"""
 enum note_revision_constraint {
-  # unique or primary key constraint
+  """unique or primary key constraint"""
   note_revision_pkey
 }
 
-# delete the field or element with specified path (for JSON arrays, negative integers count from the end)
+"""
+delete the field or element with specified path (for JSON arrays, negative integers count from the end)
+"""
 input note_revision_delete_at_path_input {
   data: [String]
 }
 
-# delete the array element with specified index (negative integers count from the
-# end). throws an error if top level container is not an array
+"""
+delete the array element with specified index (negative integers count from the
+end). throws an error if top level container is not an array
+"""
 input note_revision_delete_elem_input {
   data: Int
 }
 
-# delete key/value pair or string element. key/value pairs are matched based on their key value
+"""
+delete key/value pair or string element. key/value pairs are matched based on their key value
+"""
 input note_revision_delete_key_input {
   data: String
 }
 
-# input type for inserting data into table "note_revision"
+"""
+input type for inserting data into table "note_revision"
+"""
 input note_revision_insert_input {
   created_at: timestamptz
   data: jsonb
+  note: note_obj_rel_insert_input
   note_id: String
   title: String
 }
 
-# response of any mutation on the table "note_revision"
+"""aggregate max on columns"""
+type note_revision_max_fields {
+  created_at: timestamptz
+  note_id: String
+  title: String
+}
+
+"""
+order by max() on columns of table "note_revision"
+"""
+input note_revision_max_order_by {
+  created_at: order_by
+  note_id: order_by
+  title: order_by
+}
+
+"""aggregate min on columns"""
+type note_revision_min_fields {
+  created_at: timestamptz
+  note_id: String
+  title: String
+}
+
+"""
+order by min() on columns of table "note_revision"
+"""
+input note_revision_min_order_by {
+  created_at: order_by
+  note_id: order_by
+  title: order_by
+}
+
+"""
+response of any mutation on the table "note_revision"
+"""
 type note_revision_mutation_response {
-  # number of affected rows by the mutation
+  """number of affected rows by the mutation"""
   affected_rows: Int!
 
-  # data of the affected rows by the mutation
-  returning: [note_revision_no_rels!]!
+  """data of the affected rows by the mutation"""
+  returning: [note_revision!]!
 }
 
-# only postgres columns (no relationships) from "note_revision"
-type note_revision_no_rels {
-  created_at: timestamptz
-  data: jsonb
-  note_id: String
-  title: String
+"""
+input type for inserting object relation for remote table "note_revision"
+"""
+input note_revision_obj_rel_insert_input {
+  data: note_revision_insert_input!
+  on_conflict: note_revision_on_conflict
 }
 
-# on conflict condition type for table "note_revision"
+"""
+on conflict condition type for table "note_revision"
+"""
 input note_revision_on_conflict {
-  action: conflict_action!
-  constraint: note_revision_constraint
+  constraint: note_revision_constraint!
+  update_columns: [note_revision_update_column!]!
 }
 
-# ordering options when selecting data from "note_revision"
-enum note_revision_order_by {
-  # in the ascending order of "created_at", nulls last
-  created_at_asc
-
-  # in the ascending order of "created_at", nulls first
-  created_at_asc_nulls_first
-
-  # in the descending order of "created_at", nulls last
-  created_at_desc
-
-  # in the descending order of "created_at", nulls first
-  created_at_desc_nulls_first
-
-  # in the ascending order of "data", nulls last
-  data_asc
-
-  # in the ascending order of "data", nulls first
-  data_asc_nulls_first
-
-  # in the descending order of "data", nulls last
-  data_desc
-
-  # in the descending order of "data", nulls first
-  data_desc_nulls_first
-
-  # in the ascending order of "note_id", nulls last
-  note_id_asc
-
-  # in the ascending order of "note_id", nulls first
-  note_id_asc_nulls_first
-
-  # in the descending order of "note_id", nulls last
-  note_id_desc
-
-  # in the descending order of "note_id", nulls first
-  note_id_desc_nulls_first
-
-  # in the ascending order of "title", nulls last
-  title_asc
-
-  # in the ascending order of "title", nulls first
-  title_asc_nulls_first
-
-  # in the descending order of "title", nulls last
-  title_desc
-
-  # in the descending order of "title", nulls first
-  title_desc_nulls_first
+"""
+ordering options when selecting data from "note_revision"
+"""
+input note_revision_order_by {
+  created_at: order_by
+  data: order_by
+  note: note_order_by
+  note_id: order_by
+  title: order_by
 }
 
-# prepend existing jsonb value of filtered columns with new jsonb value
+"""prepend existing jsonb value of filtered columns with new jsonb value"""
 input note_revision_prepend_input {
   data: jsonb
 }
 
-# input type for updating data in table "note_revision"
+"""
+select columns of table "note_revision"
+"""
+enum note_revision_select_column {
+  """column name"""
+  created_at
+
+  """column name"""
+  data
+
+  """column name"""
+  note_id
+
+  """column name"""
+  title
+}
+
+"""
+input type for updating data in table "note_revision"
+"""
 input note_revision_set_input {
   created_at: timestamptz
   data: jsonb
@@ -529,186 +1048,832 @@ input note_revision_set_input {
   title: String
 }
 
-# input type for updating data in table "note"
+"""
+update columns of table "note_revision"
+"""
+enum note_revision_update_column {
+  """column name"""
+  created_at
+
+  """column name"""
+  data
+
+  """column name"""
+  note_id
+
+  """column name"""
+  title
+}
+
+"""
+select columns of table "note"
+"""
+enum note_select_column {
+  """column name"""
+  compiler_version
+
+  """column name"""
+  created_at
+
+  """column name"""
+  data
+
+  """column name"""
+  fork_from
+
+  """column name"""
+  id
+
+  """column name"""
+  is_published
+
+  """column name"""
+  slug
+
+  """column name"""
+  title
+
+  """column name"""
+  updated_at
+
+  """column name"""
+  user_id
+}
+
+"""
+input type for updating data in table "note"
+"""
 input note_set_input {
+  compiler_version: String
   created_at: timestamptz
   data: jsonb
+  fork_from: String
   id: String
+  is_published: Boolean
+  slug: String
   title: String
   updated_at: timestamptz
   user_id: String
 }
 
-# query root
+"""
+update columns of table "note"
+"""
+enum note_update_column {
+  """column name"""
+  compiler_version
+
+  """column name"""
+  created_at
+
+  """column name"""
+  data
+
+  """column name"""
+  fork_from
+
+  """column name"""
+  id
+
+  """column name"""
+  is_published
+
+  """column name"""
+  slug
+
+  """column name"""
+  title
+
+  """column name"""
+  updated_at
+
+  """column name"""
+  user_id
+}
+
+"""column ordering options"""
+enum order_by {
+  """in the ascending order, nulls last"""
+  asc
+
+  """in the ascending order, nulls first"""
+  asc_nulls_first
+
+  """in the ascending order, nulls last"""
+  asc_nulls_last
+
+  """in the descending order, nulls first"""
+  desc
+
+  """in the descending order, nulls first"""
+  desc_nulls_first
+
+  """in the descending order, nulls last"""
+  desc_nulls_last
+}
+
+"""query root"""
 type query_root {
-  # fetch data from the table: "note"
+  """
+  fetch data from the table: "note"
+  """
   note(
-    # limit the nuber of rows returned
+    """distinct select on columns"""
+    distinct_on: [note_select_column!]
+
+    """limit the nuber of rows returned"""
     limit: Int
 
-    # skip the first n rows. Use only with order_by
+    """skip the first n rows. Use only with order_by"""
     offset: Int
 
-    # sort the rows by one or more columns
+    """sort the rows by one or more columns"""
     order_by: [note_order_by!]
 
-    # filter the rows returned
+    """filter the rows returned"""
     where: note_bool_exp
   ): [note!]!
 
-  # fetch data from the table: "note_revision"
-  note_revision(
-    # limit the nuber of rows returned
+  """
+  fetch aggregated fields from the table: "note"
+  """
+  note_aggregate(
+    """distinct select on columns"""
+    distinct_on: [note_select_column!]
+
+    """limit the nuber of rows returned"""
     limit: Int
 
-    # skip the first n rows. Use only with order_by
+    """skip the first n rows. Use only with order_by"""
     offset: Int
 
-    # sort the rows by one or more columns
+    """sort the rows by one or more columns"""
+    order_by: [note_order_by!]
+
+    """filter the rows returned"""
+    where: note_bool_exp
+  ): note_aggregate!
+
+  """fetch data from the table: "note" using primary key columns"""
+  note_by_pk(id: String!): note
+
+  """
+  fetch data from the table: "note_edit_token"
+  """
+  note_edit_token(
+    """distinct select on columns"""
+    distinct_on: [note_edit_token_select_column!]
+
+    """limit the nuber of rows returned"""
+    limit: Int
+
+    """skip the first n rows. Use only with order_by"""
+    offset: Int
+
+    """sort the rows by one or more columns"""
+    order_by: [note_edit_token_order_by!]
+
+    """filter the rows returned"""
+    where: note_edit_token_bool_exp
+  ): [note_edit_token!]!
+
+  """
+  fetch aggregated fields from the table: "note_edit_token"
+  """
+  note_edit_token_aggregate(
+    """distinct select on columns"""
+    distinct_on: [note_edit_token_select_column!]
+
+    """limit the nuber of rows returned"""
+    limit: Int
+
+    """skip the first n rows. Use only with order_by"""
+    offset: Int
+
+    """sort the rows by one or more columns"""
+    order_by: [note_edit_token_order_by!]
+
+    """filter the rows returned"""
+    where: note_edit_token_bool_exp
+  ): note_edit_token_aggregate!
+
+  """fetch data from the table: "note_edit_token" using primary key columns"""
+  note_edit_token_by_pk(note_id: String!, token: String!): note_edit_token
+
+  """
+  fetch data from the table: "note_revision"
+  """
+  note_revision(
+    """distinct select on columns"""
+    distinct_on: [note_revision_select_column!]
+
+    """limit the nuber of rows returned"""
+    limit: Int
+
+    """skip the first n rows. Use only with order_by"""
+    offset: Int
+
+    """sort the rows by one or more columns"""
     order_by: [note_revision_order_by!]
 
-    # filter the rows returned
+    """filter the rows returned"""
     where: note_revision_bool_exp
   ): [note_revision!]!
 
-  # fetch data from the table: "user"
-  user(
-    # limit the nuber of rows returned
+  """
+  fetch aggregated fields from the table: "note_revision"
+  """
+  note_revision_aggregate(
+    """distinct select on columns"""
+    distinct_on: [note_revision_select_column!]
+
+    """limit the nuber of rows returned"""
     limit: Int
 
-    # skip the first n rows. Use only with order_by
+    """skip the first n rows. Use only with order_by"""
     offset: Int
 
-    # sort the rows by one or more columns
+    """sort the rows by one or more columns"""
+    order_by: [note_revision_order_by!]
+
+    """filter the rows returned"""
+    where: note_revision_bool_exp
+  ): note_revision_aggregate!
+
+  """fetch data from the table: "note_revision" using primary key columns"""
+  note_revision_by_pk(created_at: timestamptz!, note_id: String!): note_revision
+
+  """
+  fetch data from the table: "user"
+  """
+  user(
+    """distinct select on columns"""
+    distinct_on: [user_select_column!]
+
+    """limit the nuber of rows returned"""
+    limit: Int
+
+    """skip the first n rows. Use only with order_by"""
+    offset: Int
+
+    """sort the rows by one or more columns"""
     order_by: [user_order_by!]
 
-    # filter the rows returned
+    """filter the rows returned"""
     where: user_bool_exp
   ): [user!]!
 
-  # fetch data from the table: "user_identity"
-  user_identity(
-    # limit the nuber of rows returned
+  """
+  fetch aggregated fields from the table: "user"
+  """
+  user_aggregate(
+    """distinct select on columns"""
+    distinct_on: [user_select_column!]
+
+    """limit the nuber of rows returned"""
     limit: Int
 
-    # skip the first n rows. Use only with order_by
+    """skip the first n rows. Use only with order_by"""
     offset: Int
 
-    # sort the rows by one or more columns
+    """sort the rows by one or more columns"""
+    order_by: [user_order_by!]
+
+    """filter the rows returned"""
+    where: user_bool_exp
+  ): user_aggregate!
+
+  """fetch data from the table: "user" using primary key columns"""
+  user_by_pk(id: String!): user
+
+  """
+  fetch data from the table: "user_identity"
+  """
+  user_identity(
+    """distinct select on columns"""
+    distinct_on: [user_identity_select_column!]
+
+    """limit the nuber of rows returned"""
+    limit: Int
+
+    """skip the first n rows. Use only with order_by"""
+    offset: Int
+
+    """sort the rows by one or more columns"""
     order_by: [user_identity_order_by!]
 
-    # filter the rows returned
+    """filter the rows returned"""
     where: user_identity_bool_exp
   ): [user_identity!]!
 
-  # fetch data from the table: "user_identity_type"
-  user_identity_type(
-    # limit the nuber of rows returned
+  """
+  fetch aggregated fields from the table: "user_identity"
+  """
+  user_identity_aggregate(
+    """distinct select on columns"""
+    distinct_on: [user_identity_select_column!]
+
+    """limit the nuber of rows returned"""
     limit: Int
 
-    # skip the first n rows. Use only with order_by
+    """skip the first n rows. Use only with order_by"""
     offset: Int
 
-    # sort the rows by one or more columns
+    """sort the rows by one or more columns"""
+    order_by: [user_identity_order_by!]
+
+    """filter the rows returned"""
+    where: user_identity_bool_exp
+  ): user_identity_aggregate!
+
+  """fetch data from the table: "user_identity" using primary key columns"""
+  user_identity_by_pk(identity_type: String!, user_id: String!): user_identity
+
+  """
+  fetch data from the table: "user_identity_type"
+  """
+  user_identity_type(
+    """distinct select on columns"""
+    distinct_on: [user_identity_type_select_column!]
+
+    """limit the nuber of rows returned"""
+    limit: Int
+
+    """skip the first n rows. Use only with order_by"""
+    offset: Int
+
+    """sort the rows by one or more columns"""
     order_by: [user_identity_type_order_by!]
 
-    # filter the rows returned
+    """filter the rows returned"""
     where: user_identity_type_bool_exp
   ): [user_identity_type!]!
+
+  """
+  fetch aggregated fields from the table: "user_identity_type"
+  """
+  user_identity_type_aggregate(
+    """distinct select on columns"""
+    distinct_on: [user_identity_type_select_column!]
+
+    """limit the nuber of rows returned"""
+    limit: Int
+
+    """skip the first n rows. Use only with order_by"""
+    offset: Int
+
+    """sort the rows by one or more columns"""
+    order_by: [user_identity_type_order_by!]
+
+    """filter the rows returned"""
+    where: user_identity_type_bool_exp
+  ): user_identity_type_aggregate!
+
+  """
+  fetch data from the table: "user_identity_type" using primary key columns
+  """
+  user_identity_type_by_pk(user_identity_type: String!): user_identity_type
+
+  """
+  fetch data from the table: "user_private"
+  """
+  user_private(
+    """distinct select on columns"""
+    distinct_on: [user_private_select_column!]
+
+    """limit the nuber of rows returned"""
+    limit: Int
+
+    """skip the first n rows. Use only with order_by"""
+    offset: Int
+
+    """sort the rows by one or more columns"""
+    order_by: [user_private_order_by!]
+
+    """filter the rows returned"""
+    where: user_private_bool_exp
+  ): [user_private!]!
+
+  """
+  fetch aggregated fields from the table: "user_private"
+  """
+  user_private_aggregate(
+    """distinct select on columns"""
+    distinct_on: [user_private_select_column!]
+
+    """limit the nuber of rows returned"""
+    limit: Int
+
+    """skip the first n rows. Use only with order_by"""
+    offset: Int
+
+    """sort the rows by one or more columns"""
+    order_by: [user_private_order_by!]
+
+    """filter the rows returned"""
+    where: user_private_bool_exp
+  ): user_private_aggregate!
+
+  """
+  fetch data from the table: "user_public"
+  """
+  user_public(
+    """distinct select on columns"""
+    distinct_on: [user_public_select_column!]
+
+    """limit the nuber of rows returned"""
+    limit: Int
+
+    """skip the first n rows. Use only with order_by"""
+    offset: Int
+
+    """sort the rows by one or more columns"""
+    order_by: [user_public_order_by!]
+
+    """filter the rows returned"""
+    where: user_public_bool_exp
+  ): [user_public!]!
+
+  """
+  fetch aggregated fields from the table: "user_public"
+  """
+  user_public_aggregate(
+    """distinct select on columns"""
+    distinct_on: [user_public_select_column!]
+
+    """limit the nuber of rows returned"""
+    limit: Int
+
+    """skip the first n rows. Use only with order_by"""
+    offset: Int
+
+    """sort the rows by one or more columns"""
+    order_by: [user_public_order_by!]
+
+    """filter the rows returned"""
+    where: user_public_bool_exp
+  ): user_public_aggregate!
 }
 
-# subscription root
+"""subscription root"""
 type subscription_root {
-  # fetch data from the table: "note"
+  """
+  fetch data from the table: "note"
+  """
   note(
-    # limit the nuber of rows returned
+    """distinct select on columns"""
+    distinct_on: [note_select_column!]
+
+    """limit the nuber of rows returned"""
     limit: Int
 
-    # skip the first n rows. Use only with order_by
+    """skip the first n rows. Use only with order_by"""
     offset: Int
 
-    # sort the rows by one or more columns
+    """sort the rows by one or more columns"""
     order_by: [note_order_by!]
 
-    # filter the rows returned
+    """filter the rows returned"""
     where: note_bool_exp
   ): [note!]!
 
-  # fetch data from the table: "note_revision"
-  note_revision(
-    # limit the nuber of rows returned
+  """
+  fetch aggregated fields from the table: "note"
+  """
+  note_aggregate(
+    """distinct select on columns"""
+    distinct_on: [note_select_column!]
+
+    """limit the nuber of rows returned"""
     limit: Int
 
-    # skip the first n rows. Use only with order_by
+    """skip the first n rows. Use only with order_by"""
     offset: Int
 
-    # sort the rows by one or more columns
+    """sort the rows by one or more columns"""
+    order_by: [note_order_by!]
+
+    """filter the rows returned"""
+    where: note_bool_exp
+  ): note_aggregate!
+
+  """fetch data from the table: "note" using primary key columns"""
+  note_by_pk(id: String!): note
+
+  """
+  fetch data from the table: "note_edit_token"
+  """
+  note_edit_token(
+    """distinct select on columns"""
+    distinct_on: [note_edit_token_select_column!]
+
+    """limit the nuber of rows returned"""
+    limit: Int
+
+    """skip the first n rows. Use only with order_by"""
+    offset: Int
+
+    """sort the rows by one or more columns"""
+    order_by: [note_edit_token_order_by!]
+
+    """filter the rows returned"""
+    where: note_edit_token_bool_exp
+  ): [note_edit_token!]!
+
+  """
+  fetch aggregated fields from the table: "note_edit_token"
+  """
+  note_edit_token_aggregate(
+    """distinct select on columns"""
+    distinct_on: [note_edit_token_select_column!]
+
+    """limit the nuber of rows returned"""
+    limit: Int
+
+    """skip the first n rows. Use only with order_by"""
+    offset: Int
+
+    """sort the rows by one or more columns"""
+    order_by: [note_edit_token_order_by!]
+
+    """filter the rows returned"""
+    where: note_edit_token_bool_exp
+  ): note_edit_token_aggregate!
+
+  """fetch data from the table: "note_edit_token" using primary key columns"""
+  note_edit_token_by_pk(note_id: String!, token: String!): note_edit_token
+
+  """
+  fetch data from the table: "note_revision"
+  """
+  note_revision(
+    """distinct select on columns"""
+    distinct_on: [note_revision_select_column!]
+
+    """limit the nuber of rows returned"""
+    limit: Int
+
+    """skip the first n rows. Use only with order_by"""
+    offset: Int
+
+    """sort the rows by one or more columns"""
     order_by: [note_revision_order_by!]
 
-    # filter the rows returned
+    """filter the rows returned"""
     where: note_revision_bool_exp
   ): [note_revision!]!
 
-  # fetch data from the table: "user"
-  user(
-    # limit the nuber of rows returned
+  """
+  fetch aggregated fields from the table: "note_revision"
+  """
+  note_revision_aggregate(
+    """distinct select on columns"""
+    distinct_on: [note_revision_select_column!]
+
+    """limit the nuber of rows returned"""
     limit: Int
 
-    # skip the first n rows. Use only with order_by
+    """skip the first n rows. Use only with order_by"""
     offset: Int
 
-    # sort the rows by one or more columns
+    """sort the rows by one or more columns"""
+    order_by: [note_revision_order_by!]
+
+    """filter the rows returned"""
+    where: note_revision_bool_exp
+  ): note_revision_aggregate!
+
+  """fetch data from the table: "note_revision" using primary key columns"""
+  note_revision_by_pk(created_at: timestamptz!, note_id: String!): note_revision
+
+  """
+  fetch data from the table: "user"
+  """
+  user(
+    """distinct select on columns"""
+    distinct_on: [user_select_column!]
+
+    """limit the nuber of rows returned"""
+    limit: Int
+
+    """skip the first n rows. Use only with order_by"""
+    offset: Int
+
+    """sort the rows by one or more columns"""
     order_by: [user_order_by!]
 
-    # filter the rows returned
+    """filter the rows returned"""
     where: user_bool_exp
   ): [user!]!
 
-  # fetch data from the table: "user_identity"
-  user_identity(
-    # limit the nuber of rows returned
+  """
+  fetch aggregated fields from the table: "user"
+  """
+  user_aggregate(
+    """distinct select on columns"""
+    distinct_on: [user_select_column!]
+
+    """limit the nuber of rows returned"""
     limit: Int
 
-    # skip the first n rows. Use only with order_by
+    """skip the first n rows. Use only with order_by"""
     offset: Int
 
-    # sort the rows by one or more columns
+    """sort the rows by one or more columns"""
+    order_by: [user_order_by!]
+
+    """filter the rows returned"""
+    where: user_bool_exp
+  ): user_aggregate!
+
+  """fetch data from the table: "user" using primary key columns"""
+  user_by_pk(id: String!): user
+
+  """
+  fetch data from the table: "user_identity"
+  """
+  user_identity(
+    """distinct select on columns"""
+    distinct_on: [user_identity_select_column!]
+
+    """limit the nuber of rows returned"""
+    limit: Int
+
+    """skip the first n rows. Use only with order_by"""
+    offset: Int
+
+    """sort the rows by one or more columns"""
     order_by: [user_identity_order_by!]
 
-    # filter the rows returned
+    """filter the rows returned"""
     where: user_identity_bool_exp
   ): [user_identity!]!
 
-  # fetch data from the table: "user_identity_type"
-  user_identity_type(
-    # limit the nuber of rows returned
+  """
+  fetch aggregated fields from the table: "user_identity"
+  """
+  user_identity_aggregate(
+    """distinct select on columns"""
+    distinct_on: [user_identity_select_column!]
+
+    """limit the nuber of rows returned"""
     limit: Int
 
-    # skip the first n rows. Use only with order_by
+    """skip the first n rows. Use only with order_by"""
     offset: Int
 
-    # sort the rows by one or more columns
+    """sort the rows by one or more columns"""
+    order_by: [user_identity_order_by!]
+
+    """filter the rows returned"""
+    where: user_identity_bool_exp
+  ): user_identity_aggregate!
+
+  """fetch data from the table: "user_identity" using primary key columns"""
+  user_identity_by_pk(identity_type: String!, user_id: String!): user_identity
+
+  """
+  fetch data from the table: "user_identity_type"
+  """
+  user_identity_type(
+    """distinct select on columns"""
+    distinct_on: [user_identity_type_select_column!]
+
+    """limit the nuber of rows returned"""
+    limit: Int
+
+    """skip the first n rows. Use only with order_by"""
+    offset: Int
+
+    """sort the rows by one or more columns"""
     order_by: [user_identity_type_order_by!]
 
-    # filter the rows returned
+    """filter the rows returned"""
     where: user_identity_type_bool_exp
   ): [user_identity_type!]!
+
+  """
+  fetch aggregated fields from the table: "user_identity_type"
+  """
+  user_identity_type_aggregate(
+    """distinct select on columns"""
+    distinct_on: [user_identity_type_select_column!]
+
+    """limit the nuber of rows returned"""
+    limit: Int
+
+    """skip the first n rows. Use only with order_by"""
+    offset: Int
+
+    """sort the rows by one or more columns"""
+    order_by: [user_identity_type_order_by!]
+
+    """filter the rows returned"""
+    where: user_identity_type_bool_exp
+  ): user_identity_type_aggregate!
+
+  """
+  fetch data from the table: "user_identity_type" using primary key columns
+  """
+  user_identity_type_by_pk(user_identity_type: String!): user_identity_type
+
+  """
+  fetch data from the table: "user_private"
+  """
+  user_private(
+    """distinct select on columns"""
+    distinct_on: [user_private_select_column!]
+
+    """limit the nuber of rows returned"""
+    limit: Int
+
+    """skip the first n rows. Use only with order_by"""
+    offset: Int
+
+    """sort the rows by one or more columns"""
+    order_by: [user_private_order_by!]
+
+    """filter the rows returned"""
+    where: user_private_bool_exp
+  ): [user_private!]!
+
+  """
+  fetch aggregated fields from the table: "user_private"
+  """
+  user_private_aggregate(
+    """distinct select on columns"""
+    distinct_on: [user_private_select_column!]
+
+    """limit the nuber of rows returned"""
+    limit: Int
+
+    """skip the first n rows. Use only with order_by"""
+    offset: Int
+
+    """sort the rows by one or more columns"""
+    order_by: [user_private_order_by!]
+
+    """filter the rows returned"""
+    where: user_private_bool_exp
+  ): user_private_aggregate!
+
+  """
+  fetch data from the table: "user_public"
+  """
+  user_public(
+    """distinct select on columns"""
+    distinct_on: [user_public_select_column!]
+
+    """limit the nuber of rows returned"""
+    limit: Int
+
+    """skip the first n rows. Use only with order_by"""
+    offset: Int
+
+    """sort the rows by one or more columns"""
+    order_by: [user_public_order_by!]
+
+    """filter the rows returned"""
+    where: user_public_bool_exp
+  ): [user_public!]!
+
+  """
+  fetch aggregated fields from the table: "user_public"
+  """
+  user_public_aggregate(
+    """distinct select on columns"""
+    distinct_on: [user_public_select_column!]
+
+    """limit the nuber of rows returned"""
+    limit: Int
+
+    """skip the first n rows. Use only with order_by"""
+    offset: Int
+
+    """sort the rows by one or more columns"""
+    order_by: [user_public_order_by!]
+
+    """filter the rows returned"""
+    where: user_public_bool_exp
+  ): user_public_aggregate!
 }
 
-# expression to compare columns of type text. All fields are combined with logical 'AND'.
+"""
+expression to compare columns of type text. All fields are combined with logical 'AND'.
+"""
 input text_comparison_exp {
   _eq: String
   _gt: String
   _gte: String
   _ilike: String
-  _in: [String]
+  _in: [String!]
   _is_null: Boolean
   _like: String
   _lt: String
   _lte: String
   _neq: String
   _nilike: String
-  _nin: [String]
+  _nin: [String!]
   _nlike: String
   _nsimilar: String
   _similar: String
@@ -716,61 +1881,146 @@ input text_comparison_exp {
 
 scalar timestamptz
 
-# expression to compare columns of type timestamptz. All fields are combined with logical 'AND'.
+"""
+expression to compare columns of type timestamptz. All fields are combined with logical 'AND'.
+"""
 input timestamptz_comparison_exp {
   _eq: timestamptz
   _gt: timestamptz
   _gte: timestamptz
-  _in: [timestamptz]
+  _in: [timestamptz!]
   _is_null: Boolean
   _lt: timestamptz
   _lte: timestamptz
   _neq: timestamptz
-  _nin: [timestamptz]
+  _nin: [timestamptz!]
 }
 
-# columns and relationships of "user"
+"""
+columns and relationships of "user"
+"""
 type user {
   avatar: String
-  created_at: timestamptz
+  created_at: timestamptz!
   email: String
-  id: String
+  id: String!
 
-  # An array relationship
+  """An array relationship"""
   identities(
-    # limit the nuber of rows returned
+    """distinct select on columns"""
+    distinct_on: [user_identity_select_column!]
+
+    """limit the nuber of rows returned"""
     limit: Int
 
-    # skip the first n rows. Use only with order_by
+    """skip the first n rows. Use only with order_by"""
     offset: Int
 
-    # sort the rows by one or more columns
+    """sort the rows by one or more columns"""
     order_by: [user_identity_order_by!]
 
-    # filter the rows returned
+    """filter the rows returned"""
     where: user_identity_bool_exp
   ): [user_identity!]!
-  name: String
 
-  # An array relationship
-  notes(
-    # limit the nuber of rows returned
+  """An aggregated array relationship"""
+  identities_aggregate(
+    """distinct select on columns"""
+    distinct_on: [user_identity_select_column!]
+
+    """limit the nuber of rows returned"""
     limit: Int
 
-    # skip the first n rows. Use only with order_by
+    """skip the first n rows. Use only with order_by"""
     offset: Int
 
-    # sort the rows by one or more columns
+    """sort the rows by one or more columns"""
+    order_by: [user_identity_order_by!]
+
+    """filter the rows returned"""
+    where: user_identity_bool_exp
+  ): user_identity_aggregate!
+  name: String
+
+  """An array relationship"""
+  notes(
+    """distinct select on columns"""
+    distinct_on: [note_select_column!]
+
+    """limit the nuber of rows returned"""
+    limit: Int
+
+    """skip the first n rows. Use only with order_by"""
+    offset: Int
+
+    """sort the rows by one or more columns"""
     order_by: [note_order_by!]
 
-    # filter the rows returned
+    """filter the rows returned"""
     where: note_bool_exp
   ): [note!]!
-  updated_at: timestamptz
-  username: String
+
+  """An aggregated array relationship"""
+  notes_aggregate(
+    """distinct select on columns"""
+    distinct_on: [note_select_column!]
+
+    """limit the nuber of rows returned"""
+    limit: Int
+
+    """skip the first n rows. Use only with order_by"""
+    offset: Int
+
+    """sort the rows by one or more columns"""
+    order_by: [note_order_by!]
+
+    """filter the rows returned"""
+    where: note_bool_exp
+  ): note_aggregate!
+  updated_at: timestamptz!
+
+  """An object relationship"""
+  user_private: user_private
+  username: String!
 }
 
-# Boolean expression to filter rows from the table "user". All fields are combined with a logical 'AND'.
+"""
+aggregated selection of "user"
+"""
+type user_aggregate {
+  aggregate: user_aggregate_fields
+  nodes: [user!]!
+}
+
+"""
+aggregate fields of "user"
+"""
+type user_aggregate_fields {
+  count(columns: [user_select_column!], distinct: Boolean): Int
+  max: user_max_fields
+  min: user_min_fields
+}
+
+"""
+order by aggregate values of table "user"
+"""
+input user_aggregate_order_by {
+  count: order_by
+  max: user_max_order_by
+  min: user_min_order_by
+}
+
+"""
+input type for inserting array relation for remote table "user"
+"""
+input user_arr_rel_insert_input {
+  data: [user_insert_input!]!
+  on_conflict: user_on_conflict
+}
+
+"""
+Boolean expression to filter rows from the table "user". All fields are combined with a logical 'AND'.
+"""
 input user_bool_exp {
   _and: [user_bool_exp]
   _not: user_bool_exp
@@ -783,32 +2033,76 @@ input user_bool_exp {
   name: varchar_comparison_exp
   notes: note_bool_exp
   updated_at: timestamptz_comparison_exp
+  user_private: user_private_bool_exp
   username: text_comparison_exp
 }
 
-# unique or primary key constraints on table "user"
+"""
+unique or primary key constraints on table "user"
+"""
 enum user_constraint {
-  # unique or primary key constraint
+  """unique or primary key constraint"""
   user_pkey
 }
 
-# columns and relationships of "user_identity"
+"""
+columns and relationships of "user_identity"
+"""
 type user_identity {
-  data: jsonb
-  identity_id: String
-  identity_type: String
+  data(
+    """JSON select path"""
+    path: String
+  ): jsonb!
+  identity_id: String!
+  identity_type: String!
 
-  # An object relationship
-  user: user
-  user_id: String
+  """An object relationship"""
+  user: user!
+  user_id: String!
 }
 
-# append existing jsonb value of filtered columns with new jsonb value
+"""
+aggregated selection of "user_identity"
+"""
+type user_identity_aggregate {
+  aggregate: user_identity_aggregate_fields
+  nodes: [user_identity!]!
+}
+
+"""
+aggregate fields of "user_identity"
+"""
+type user_identity_aggregate_fields {
+  count(columns: [user_identity_select_column!], distinct: Boolean): Int
+  max: user_identity_max_fields
+  min: user_identity_min_fields
+}
+
+"""
+order by aggregate values of table "user_identity"
+"""
+input user_identity_aggregate_order_by {
+  count: order_by
+  max: user_identity_max_order_by
+  min: user_identity_min_order_by
+}
+
+"""append existing jsonb value of filtered columns with new jsonb value"""
 input user_identity_append_input {
   data: jsonb
 }
 
-# Boolean expression to filter rows from the table "user_identity". All fields are combined with a logical 'AND'.
+"""
+input type for inserting array relation for remote table "user_identity"
+"""
+input user_identity_arr_rel_insert_input {
+  data: [user_identity_insert_input!]!
+  on_conflict: user_identity_on_conflict
+}
+
+"""
+Boolean expression to filter rows from the table "user_identity". All fields are combined with a logical 'AND'.
+"""
 input user_identity_bool_exp {
   _and: [user_identity_bool_exp]
   _not: user_identity_bool_exp
@@ -820,116 +2114,142 @@ input user_identity_bool_exp {
   user_id: varchar_comparison_exp
 }
 
-# unique or primary key constraints on table "user_identity"
+"""
+unique or primary key constraints on table "user_identity"
+"""
 enum user_identity_constraint {
-  # unique or primary key constraint
+  """unique or primary key constraint"""
   user_identity_pkey
 }
 
-# delete the field or element with specified path (for JSON arrays, negative integers count from the end)
+"""
+delete the field or element with specified path (for JSON arrays, negative integers count from the end)
+"""
 input user_identity_delete_at_path_input {
   data: [String]
 }
 
-# delete the array element with specified index (negative integers count from the
-# end). throws an error if top level container is not an array
+"""
+delete the array element with specified index (negative integers count from the
+end). throws an error if top level container is not an array
+"""
 input user_identity_delete_elem_input {
   data: Int
 }
 
-# delete key/value pair or string element. key/value pairs are matched based on their key value
+"""
+delete key/value pair or string element. key/value pairs are matched based on their key value
+"""
 input user_identity_delete_key_input {
   data: String
 }
 
-# input type for inserting data into table "user_identity"
+"""
+input type for inserting data into table "user_identity"
+"""
 input user_identity_insert_input {
   data: jsonb
   identity_id: String
   identity_type: String
+  user: user_obj_rel_insert_input
   user_id: String
 }
 
-# response of any mutation on the table "user_identity"
-type user_identity_mutation_response {
-  # number of affected rows by the mutation
-  affected_rows: Int!
-
-  # data of the affected rows by the mutation
-  returning: [user_identity_no_rels!]!
-}
-
-# only postgres columns (no relationships) from "user_identity"
-type user_identity_no_rels {
-  data: jsonb
+"""aggregate max on columns"""
+type user_identity_max_fields {
   identity_id: String
   identity_type: String
   user_id: String
 }
 
-# on conflict condition type for table "user_identity"
+"""
+order by max() on columns of table "user_identity"
+"""
+input user_identity_max_order_by {
+  identity_id: order_by
+  identity_type: order_by
+  user_id: order_by
+}
+
+"""aggregate min on columns"""
+type user_identity_min_fields {
+  identity_id: String
+  identity_type: String
+  user_id: String
+}
+
+"""
+order by min() on columns of table "user_identity"
+"""
+input user_identity_min_order_by {
+  identity_id: order_by
+  identity_type: order_by
+  user_id: order_by
+}
+
+"""
+response of any mutation on the table "user_identity"
+"""
+type user_identity_mutation_response {
+  """number of affected rows by the mutation"""
+  affected_rows: Int!
+
+  """data of the affected rows by the mutation"""
+  returning: [user_identity!]!
+}
+
+"""
+input type for inserting object relation for remote table "user_identity"
+"""
+input user_identity_obj_rel_insert_input {
+  data: user_identity_insert_input!
+  on_conflict: user_identity_on_conflict
+}
+
+"""
+on conflict condition type for table "user_identity"
+"""
 input user_identity_on_conflict {
-  action: conflict_action!
-  constraint: user_identity_constraint
+  constraint: user_identity_constraint!
+  update_columns: [user_identity_update_column!]!
 }
 
-# ordering options when selecting data from "user_identity"
-enum user_identity_order_by {
-  # in the ascending order of "data", nulls last
-  data_asc
-
-  # in the ascending order of "data", nulls first
-  data_asc_nulls_first
-
-  # in the descending order of "data", nulls last
-  data_desc
-
-  # in the descending order of "data", nulls first
-  data_desc_nulls_first
-
-  # in the ascending order of "identity_id", nulls last
-  identity_id_asc
-
-  # in the ascending order of "identity_id", nulls first
-  identity_id_asc_nulls_first
-
-  # in the descending order of "identity_id", nulls last
-  identity_id_desc
-
-  # in the descending order of "identity_id", nulls first
-  identity_id_desc_nulls_first
-
-  # in the ascending order of "identity_type", nulls last
-  identity_type_asc
-
-  # in the ascending order of "identity_type", nulls first
-  identity_type_asc_nulls_first
-
-  # in the descending order of "identity_type", nulls last
-  identity_type_desc
-
-  # in the descending order of "identity_type", nulls first
-  identity_type_desc_nulls_first
-
-  # in the ascending order of "user_id", nulls last
-  user_id_asc
-
-  # in the ascending order of "user_id", nulls first
-  user_id_asc_nulls_first
-
-  # in the descending order of "user_id", nulls last
-  user_id_desc
-
-  # in the descending order of "user_id", nulls first
-  user_id_desc_nulls_first
+"""
+ordering options when selecting data from "user_identity"
+"""
+input user_identity_order_by {
+  data: order_by
+  identity_id: order_by
+  identity_type: order_by
+  user: user_order_by
+  user_id: order_by
 }
 
-# prepend existing jsonb value of filtered columns with new jsonb value
+"""prepend existing jsonb value of filtered columns with new jsonb value"""
 input user_identity_prepend_input {
   data: jsonb
 }
 
-# input type for updating data in table "user_identity"
+"""
+select columns of table "user_identity"
+"""
+enum user_identity_select_column {
+  """column name"""
+  data
+
+  """column name"""
+  identity_id
+
+  """column name"""
+  identity_type
+
+  """column name"""
+  user_id
+}
+
+"""
+input type for updating data in table "user_identity"
+"""
 input user_identity_set_input {
   data: jsonb
   identity_id: String
@@ -937,12 +2257,50 @@ input user_identity_set_input {
   user_id: String
 }
 
-# columns and relationships of "user_identity_type"
+"""
+columns and relationships of "user_identity_type"
+"""
 type user_identity_type {
-  user_identity_type: String
+  user_identity_type: String!
 }
 
-# Boolean expression to filter rows from the table "user_identity_type". All fields are combined with a logical 'AND'.
+"""
+aggregated selection of "user_identity_type"
+"""
+type user_identity_type_aggregate {
+  aggregate: user_identity_type_aggregate_fields
+  nodes: [user_identity_type!]!
+}
+
+"""
+aggregate fields of "user_identity_type"
+"""
+type user_identity_type_aggregate_fields {
+  count(columns: [user_identity_type_select_column!], distinct: Boolean): Int
+  max: user_identity_type_max_fields
+  min: user_identity_type_min_fields
+}
+
+"""
+order by aggregate values of table "user_identity_type"
+"""
+input user_identity_type_aggregate_order_by {
+  count: order_by
+  max: user_identity_type_max_order_by
+  min: user_identity_type_min_order_by
+}
+
+"""
+input type for inserting array relation for remote table "user_identity_type"
+"""
+input user_identity_type_arr_rel_insert_input {
+  data: [user_identity_type_insert_input!]!
+  on_conflict: user_identity_type_on_conflict
+}
+
+"""
+Boolean expression to filter rows from the table "user_identity_type". All fields are combined with a logical 'AND'.
+"""
 input user_identity_type_bool_exp {
   _and: [user_identity_type_bool_exp]
   _not: user_identity_type_bool_exp
@@ -950,79 +2308,137 @@ input user_identity_type_bool_exp {
   user_identity_type: varchar_comparison_exp
 }
 
-# unique or primary key constraints on table "user_identity_type"
+"""
+unique or primary key constraints on table "user_identity_type"
+"""
 enum user_identity_type_constraint {
-  # unique or primary key constraint
+  """unique or primary key constraint"""
   user_identity_type_pkey
 }
 
-# input type for inserting data into table "user_identity_type"
+"""
+input type for inserting data into table "user_identity_type"
+"""
 input user_identity_type_insert_input {
   user_identity_type: String
 }
 
-# response of any mutation on the table "user_identity_type"
-type user_identity_type_mutation_response {
-  # number of affected rows by the mutation
-  affected_rows: Int!
-
-  # data of the affected rows by the mutation
-  returning: [user_identity_type_no_rels!]!
-}
-
-# only postgres columns (no relationships) from "user_identity_type"
-type user_identity_type_no_rels {
+"""aggregate max on columns"""
+type user_identity_type_max_fields {
   user_identity_type: String
 }
 
-# on conflict condition type for table "user_identity_type"
+"""
+order by max() on columns of table "user_identity_type"
+"""
+input user_identity_type_max_order_by {
+  user_identity_type: order_by
+}
+
+"""aggregate min on columns"""
+type user_identity_type_min_fields {
+  user_identity_type: String
+}
+
+"""
+order by min() on columns of table "user_identity_type"
+"""
+input user_identity_type_min_order_by {
+  user_identity_type: order_by
+}
+
+"""
+response of any mutation on the table "user_identity_type"
+"""
+type user_identity_type_mutation_response {
+  """number of affected rows by the mutation"""
+  affected_rows: Int!
+
+  """data of the affected rows by the mutation"""
+  returning: [user_identity_type!]!
+}
+
+"""
+input type for inserting object relation for remote table "user_identity_type"
+"""
+input user_identity_type_obj_rel_insert_input {
+  data: user_identity_type_insert_input!
+  on_conflict: user_identity_type_on_conflict
+}
+
+"""
+on conflict condition type for table "user_identity_type"
+"""
 input user_identity_type_on_conflict {
-  action: conflict_action!
-  constraint: user_identity_type_constraint
+  constraint: user_identity_type_constraint!
+  update_columns: [user_identity_type_update_column!]!
 }
 
-# ordering options when selecting data from "user_identity_type"
-enum user_identity_type_order_by {
-  # in the ascending order of "user_identity_type", nulls last
-  user_identity_type_asc
-
-  # in the ascending order of "user_identity_type", nulls first
-  user_identity_type_asc_nulls_first
-
-  # in the descending order of "user_identity_type", nulls last
-  user_identity_type_desc
-
-  # in the descending order of "user_identity_type", nulls first
-  user_identity_type_desc_nulls_first
+"""
+ordering options when selecting data from "user_identity_type"
+"""
+input user_identity_type_order_by {
+  user_identity_type: order_by
 }
 
-# input type for updating data in table "user_identity_type"
+"""
+select columns of table "user_identity_type"
+"""
+enum user_identity_type_select_column {
+  """column name"""
+  user_identity_type
+}
+
+"""
+input type for updating data in table "user_identity_type"
+"""
 input user_identity_type_set_input {
   user_identity_type: String
 }
 
-# input type for inserting data into table "user"
+"""
+update columns of table "user_identity_type"
+"""
+enum user_identity_type_update_column {
+  """column name"""
+  user_identity_type
+}
+
+"""
+update columns of table "user_identity"
+"""
+enum user_identity_update_column {
+  """column name"""
+  data
+
+  """column name"""
+  identity_id
+
+  """column name"""
+  identity_type
+
+  """column name"""
+  user_id
+}
+
+"""
+input type for inserting data into table "user"
+"""
 input user_insert_input {
   avatar: String
   created_at: timestamptz
   email: String
   id: String
+  identities: user_identity_arr_rel_insert_input
   name: String
+  notes: note_arr_rel_insert_input
   updated_at: timestamptz
+  user_private: user_private_obj_rel_insert_input
   username: String
 }
 
-# response of any mutation on the table "user"
-type user_mutation_response {
-  # number of affected rows by the mutation
-  affected_rows: Int!
-
-  # data of the affected rows by the mutation
-  returning: [user_no_rels!]!
-}
-
-# only postgres columns (no relationships) from "user"
-type user_no_rels {
+"""aggregate max on columns"""
+type user_max_fields {
   avatar: String
   created_at: timestamptz
   email: String
@@ -1032,100 +2448,429 @@ type user_no_rels {
   username: String
 }
 
-# on conflict condition type for table "user"
+"""
+order by max() on columns of table "user"
+"""
+input user_max_order_by {
+  avatar: order_by
+  created_at: order_by
+  email: order_by
+  id: order_by
+  name: order_by
+  updated_at: order_by
+  username: order_by
+}
+
+"""aggregate min on columns"""
+type user_min_fields {
+  avatar: String
+  created_at: timestamptz
+  email: String
+  id: String
+  name: String
+  updated_at: timestamptz
+  username: String
+}
+
+"""
+order by min() on columns of table "user"
+"""
+input user_min_order_by {
+  avatar: order_by
+  created_at: order_by
+  email: order_by
+  id: order_by
+  name: order_by
+  updated_at: order_by
+  username: order_by
+}
+
+"""
+response of any mutation on the table "user"
+"""
+type user_mutation_response {
+  """number of affected rows by the mutation"""
+  affected_rows: Int!
+
+  """data of the affected rows by the mutation"""
+  returning: [user!]!
+}
+
+"""
+input type for inserting object relation for remote table "user"
+"""
+input user_obj_rel_insert_input {
+  data: user_insert_input!
+  on_conflict: user_on_conflict
+}
+
+"""
+on conflict condition type for table "user"
+"""
 input user_on_conflict {
-  action: conflict_action!
-  constraint: user_constraint
+  constraint: user_constraint!
+  update_columns: [user_update_column!]!
 }
 
-# ordering options when selecting data from "user"
-enum user_order_by {
-  # in the ascending order of "avatar", nulls last
-  avatar_asc
-
-  # in the ascending order of "avatar", nulls first
-  avatar_asc_nulls_first
-
-  # in the descending order of "avatar", nulls last
-  avatar_desc
-
-  # in the descending order of "avatar", nulls first
-  avatar_desc_nulls_first
-
-  # in the ascending order of "created_at", nulls last
-  created_at_asc
-
-  # in the ascending order of "created_at", nulls first
-  created_at_asc_nulls_first
-
-  # in the descending order of "created_at", nulls last
-  created_at_desc
-
-  # in the descending order of "created_at", nulls first
-  created_at_desc_nulls_first
-
-  # in the ascending order of "email", nulls last
-  email_asc
-
-  # in the ascending order of "email", nulls first
-  email_asc_nulls_first
-
-  # in the descending order of "email", nulls last
-  email_desc
-
-  # in the descending order of "email", nulls first
-  email_desc_nulls_first
-
-  # in the ascending order of "id", nulls last
-  id_asc
-
-  # in the ascending order of "id", nulls first
-  id_asc_nulls_first
-
-  # in the descending order of "id", nulls last
-  id_desc
-
-  # in the descending order of "id", nulls first
-  id_desc_nulls_first
-
-  # in the ascending order of "name", nulls last
-  name_asc
-
-  # in the ascending order of "name", nulls first
-  name_asc_nulls_first
-
-  # in the descending order of "name", nulls last
-  name_desc
-
-  # in the descending order of "name", nulls first
-  name_desc_nulls_first
-
-  # in the ascending order of "updated_at", nulls last
-  updated_at_asc
-
-  # in the ascending order of "updated_at", nulls first
-  updated_at_asc_nulls_first
-
-  # in the descending order of "updated_at", nulls last
-  updated_at_desc
-
-  # in the descending order of "updated_at", nulls first
-  updated_at_desc_nulls_first
-
-  # in the ascending order of "username", nulls last
-  username_asc
-
-  # in the ascending order of "username", nulls first
-  username_asc_nulls_first
-
-  # in the descending order of "username", nulls last
-  username_desc
-
-  # in the descending order of "username", nulls first
-  username_desc_nulls_first
+"""
+ordering options when selecting data from "user"
+"""
+input user_order_by {
+  avatar: order_by
+  created_at: order_by
+  email: order_by
+  id: order_by
+  identities_aggregate: user_identity_aggregate_order_by
+  name: order_by
+  notes_aggregate: note_aggregate_order_by
+  updated_at: order_by
+  user_private: user_private_order_by
+  username: order_by
 }
 
-# input type for updating data in table "user"
+"""
+columns and relationships of "user_private"
+"""
+type user_private {
+  email: String
+  id: String
+}
+
+"""
+aggregated selection of "user_private"
+"""
+type user_private_aggregate {
+  aggregate: user_private_aggregate_fields
+  nodes: [user_private!]!
+}
+
+"""
+aggregate fields of "user_private"
+"""
+type user_private_aggregate_fields {
+  count(columns: [user_private_select_column!], distinct: Boolean): Int
+  max: user_private_max_fields
+  min: user_private_min_fields
+}
+
+"""
+order by aggregate values of table "user_private"
+"""
+input user_private_aggregate_order_by {
+  count: order_by
+  max: user_private_max_order_by
+  min: user_private_min_order_by
+}
+
+"""
+input type for inserting array relation for remote table "user_private"
+"""
+input user_private_arr_rel_insert_input {
+  data: [user_private_insert_input!]!
+}
+
+"""
+Boolean expression to filter rows from the table "user_private". All fields are combined with a logical 'AND'.
+"""
+input user_private_bool_exp {
+  _and: [user_private_bool_exp]
+  _not: user_private_bool_exp
+  _or: [user_private_bool_exp]
+  email: varchar_comparison_exp
+  id: varchar_comparison_exp
+}
+
+"""
+input type for inserting data into table "user_private"
+"""
+input user_private_insert_input {
+  email: String
+  id: String
+}
+
+"""aggregate max on columns"""
+type user_private_max_fields {
+  email: String
+  id: String
+}
+
+"""
+order by max() on columns of table "user_private"
+"""
+input user_private_max_order_by {
+  email: order_by
+  id: order_by
+}
+
+"""aggregate min on columns"""
+type user_private_min_fields {
+  email: String
+  id: String
+}
+
+"""
+order by min() on columns of table "user_private"
+"""
+input user_private_min_order_by {
+  email: order_by
+  id: order_by
+}
+
+"""
+response of any mutation on the table "user_private"
+"""
+type user_private_mutation_response {
+  """number of affected rows by the mutation"""
+  affected_rows: Int!
+
+  """data of the affected rows by the mutation"""
+  returning: [user_private!]!
+}
+
+"""
+input type for inserting object relation for remote table "user_private"
+"""
+input user_private_obj_rel_insert_input {
+  data: user_private_insert_input!
+}
+
+"""
+ordering options when selecting data from "user_private"
+"""
+input user_private_order_by {
+  email: order_by
+  id: order_by
+}
+
+"""
+select columns of table "user_private"
+"""
+enum user_private_select_column {
+  """column name"""
+  email
+
+  """column name"""
+  id
+}
+
+"""
+input type for updating data in table "user_private"
+"""
+input user_private_set_input {
+  email: String
+  id: String
+}
+
+"""
+columns and relationships of "user_public"
+"""
+type user_public {
+  avatar: String
+  created_at: timestamptz
+  id: String
+  name: String
+  updated_at: timestamptz
+  username: String
+}
+
+"""
+aggregated selection of "user_public"
+"""
+type user_public_aggregate {
+  aggregate: user_public_aggregate_fields
+  nodes: [user_public!]!
+}
+
+"""
+aggregate fields of "user_public"
+"""
+type user_public_aggregate_fields {
+  count(columns: [user_public_select_column!], distinct: Boolean): Int
+  max: user_public_max_fields
+  min: user_public_min_fields
+}
+
+"""
+order by aggregate values of table "user_public"
+"""
+input user_public_aggregate_order_by {
+  count: order_by
+  max: user_public_max_order_by
+  min: user_public_min_order_by
+}
+
+"""
+input type for inserting array relation for remote table "user_public"
+"""
+input user_public_arr_rel_insert_input {
+  data: [user_public_insert_input!]!
+}
+
+"""
+Boolean expression to filter rows from the table "user_public". All fields are combined with a logical 'AND'.
+"""
+input user_public_bool_exp {
+  _and: [user_public_bool_exp]
+  _not: user_public_bool_exp
+  _or: [user_public_bool_exp]
+  avatar: varchar_comparison_exp
+  created_at: timestamptz_comparison_exp
+  id: varchar_comparison_exp
+  name: varchar_comparison_exp
+  updated_at: timestamptz_comparison_exp
+  username: text_comparison_exp
+}
+
+"""
+input type for inserting data into table "user_public"
+"""
+input user_public_insert_input {
+  avatar: String
+  created_at: timestamptz
+  id: String
+  name: String
+  updated_at: timestamptz
+  username: String
+}
+
+"""aggregate max on columns"""
+type user_public_max_fields {
+  avatar: String
+  created_at: timestamptz
+  id: String
+  name: String
+  updated_at: timestamptz
+  username: String
+}
+
+"""
+order by max() on columns of table "user_public"
+"""
+input user_public_max_order_by {
+  avatar: order_by
+  created_at: order_by
+  id: order_by
+  name: order_by
+  updated_at: order_by
+  username: order_by
+}
+
+"""aggregate min on columns"""
+type user_public_min_fields {
+  avatar: String
+  created_at: timestamptz
+  id: String
+  name: String
+  updated_at: timestamptz
+  username: String
+}
+
+"""
+order by min() on columns of table "user_public"
+"""
+input user_public_min_order_by {
+  avatar: order_by
+  created_at: order_by
+  id: order_by
+  name: order_by
+  updated_at: order_by
+  username: order_by
+}
+
+"""
+response of any mutation on the table "user_public"
+"""
+type user_public_mutation_response {
+  """number of affected rows by the mutation"""
+  affected_rows: Int!
+
+  """data of the affected rows by the mutation"""
+  returning: [user_public!]!
+}
+
+"""
+input type for inserting object relation for remote table "user_public"
+"""
+input user_public_obj_rel_insert_input {
+  data: user_public_insert_input!
+}
+
+"""
+ordering options when selecting data from "user_public"
+"""
+input user_public_order_by {
+  avatar: order_by
+  created_at: order_by
+  id: order_by
+  name: order_by
+  updated_at: order_by
+  username: order_by
+}
+
+"""
+select columns of table "user_public"
+"""
+enum user_public_select_column {
+  """column name"""
+  avatar
+
+  """column name"""
+  created_at
+
+  """column name"""
+  id
+
+  """column name"""
+  name
+
+  """column name"""
+  updated_at
+
+  """column name"""
+  username
+}
+
+"""
+input type for updating data in table "user_public"
+"""
+input user_public_set_input {
+  avatar: String
+  created_at: timestamptz
+  id: String
+  name: String
+  updated_at: timestamptz
+  username: String
+}
+
+"""
+select columns of table "user"
+"""
+enum user_select_column {
+  """column name"""
+  avatar
+
+  """column name"""
+  created_at
+
+  """column name"""
+  email
+
+  """column name"""
+  id
+
+  """column name"""
+  name
+
+  """column name"""
+  updated_at
+
+  """column name"""
+  username
+}
+
+"""
+input type for updating data in table "user"
+"""
 input user_set_input {
   avatar: String
   created_at: timestamptz
@@ -1136,20 +2881,48 @@ input user_set_input {
   username: String
 }
 
-# expression to compare columns of type varchar. All fields are combined with logical 'AND'.
+"""
+update columns of table "user"
+"""
+enum user_update_column {
+  """column name"""
+  avatar
+
+  """column name"""
+  created_at
+
+  """column name"""
+  email
+
+  """column name"""
+  id
+
+  """column name"""
+  name
+
+  """column name"""
+  updated_at
+
+  """column name"""
+  username
+}
+
+"""
+expression to compare columns of type varchar. All fields are combined with logical 'AND'.
+"""
 input varchar_comparison_exp {
   _eq: String
   _gt: String
   _gte: String
   _ilike: String
-  _in: [String]
+  _in: [String!]
   _is_null: Boolean
   _like: String
   _lt: String
   _lte: String
   _neq: String
   _nilike: String
-  _nin: [String]
+  _nin: [String!]
   _nlike: String
   _nsimilar: String
   _similar: String

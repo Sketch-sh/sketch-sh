@@ -45,6 +45,13 @@ let make =
                  date=sketch##date
                  className="UI_SketchList__sketch--time"
                />
+               {(
+                  " - OCaml "
+                  ++ sketch##compilerVersion
+                     ->CompilerVersion.ofDbString
+                     ->CompilerVersion.toUiString
+                )
+                ->str}
              </div>
              <DeleteNoteComponent>
                {(
@@ -111,6 +118,7 @@ module WithUserInfo = {
              "id": string,
              "title": option(string),
              "date": Js.Json.t,
+             "compilerVersion": string,
              "user": {
                .
                "id": string,
@@ -142,6 +150,9 @@ module WithUserInfo = {
              <UI_SketchOwnerInfo
                owner=sketch##user
                noteLastEdited=sketch##date
+               noteCompilerVersion={
+                 sketch##compilerVersion->CompilerVersion.ofDbString
+               }
              />
            </li>
          )

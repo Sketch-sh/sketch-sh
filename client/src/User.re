@@ -15,6 +15,7 @@ module GetNotes = [%graphql
         id
         title
         date: updated_at
+        compilerVersion: compiler_version
       }
     }
     |}

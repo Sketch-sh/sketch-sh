@@ -149,7 +149,7 @@ module EditorConfiguration = {
         and thus the browser's text search works on it. This will have bad effects on performance of big documents. */
     [@bs.optional]
     viewportMargin: float,
-    /** Optional lint configuration to be used in conjunction with CodeMirror's linter addon. *//* TODO */ /* lint?: boolean | LintOptions; */ /** Optional value to be used in conjunction with CodeMirror’s placeholder add-on. */
+    /** Optional lint configuration to be used in conjunction with CodeMirror's linter addon. */ /* TODO *//* lint?: boolean | LintOptions; */ /** Optional value to be used in conjunction with CodeMirror’s placeholder add-on. */
     [@bs.optional]
     placeholder: string,
     [@bs.optional]

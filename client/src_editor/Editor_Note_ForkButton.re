@@ -50,6 +50,7 @@ module ForkLogin = {
       $noteId: String!,
       $userId: String!,
       $title: String!,
+      $compilerVersion: String!,
       $data: jsonb!,
       $forkFrom: String!,
     ) {
@@ -57,6 +58,7 @@ module ForkLogin = {
         title: $title,
         id: $noteId,
         user_id: $userId,
+        compiler_version: $compilerVersion,
         data: $data,
         fork_from: $forkFrom
       }]) {
@@ -73,7 +75,15 @@ module ForkLogin = {
     ReasonApollo.CreateMutation(ForkNoteLoginGql);
 
   [@react.component]
-  let make = (~noteId, ~userId, ~getCurrentData, ~updateForkStatus, ~children) => {
+  let make =
+      (
+        ~noteId,
+        ~userId,
+        ~compilerVersion,
+        ~getCurrentData,
+        ~updateForkStatus,
+        ~children,
+      ) => {
     <ForkNoteLoginComponent>
       ...{(mutation, _) =>
         children(~handleFork=() => {
@@ -85,6 +95,7 @@ module ForkLogin = {
               ~noteId=newNoteId,
               ~userId,
               ~title,
+              ~compilerVersion=compilerVersion->CompilerVersion.toDbString,
               ~data,
               ~forkFrom=noteId,
               (),
@@ -141,6 +152,7 @@ module ForkAnonymous = {
       $editToken: String!,
       $userId: String!,
       $title: String!,
+      $compilerVersion: String!,
       $data: jsonb!,
       $forkFrom: String!,
     ) {
@@ -148,6 +160,7 @@ module ForkAnonymous = {
         title: $title,
         id: $noteId,
         user_id: $userId,
+        compiler_version: $compilerVersion,
         data: $data,
         fork_from: $forkFrom
       }]) {
@@ -169,7 +182,15 @@ module ForkAnonymous = {
   module ForkNoteAnonymousComponent =
     ReasonApollo.CreateMutation(ForkNoteAnonymousGql);
 
-  let make = (~noteId, ~userId, ~getCurrentData, ~updateForkStatus, ~children) => {
+  let make =
+      (
+        ~noteId,
+        ~userId,
+        ~compilerVersion,
+        ~getCurrentData,
+        ~updateForkStatus,
+        ~children,
+      ) => {
     <ForkNoteAnonymousComponent>
       ...{(mutation, _createNoteResult) =>
         children(~handleFork=() => {
@@ -180,6 +201,7 @@ module ForkAnonymous = {
               ~noteId=newNoteId,
               ~userId,
               ~title,
+              ~compilerVersion=compilerVersion->CompilerVersion.toDbString,
               ~data,
               ~editToken=Auth.Auth.getOrCreateEditToken(),
               ~forkFrom=noteId,
@@ -238,6 +260,7 @@ let make =
       ~forkStatus,
       ~noteId,
       ~noteState,
+      ~compilerVersion,
       ~getCurrentData,
       ~updateForkStatus,
       ~className=?,
@@ -249,7 +272,8 @@ let make =
       ...(
            fun
            | Login(userId) =>
-             <ForkLogin getCurrentData userId noteId updateForkStatus>
+             <ForkLogin
+               getCurrentData userId noteId compilerVersion updateForkStatus>
                ...{(~handleFork) =>
                  <ForkButton
                    hasSavePermission
@@ -264,6 +288,7 @@ let make =
                getCurrentData
                userId=Config.anonymousUserId
                noteId
+               compilerVersion
                updateForkStatus>
                ...{(~handleFork) =>
                  <ForkButton

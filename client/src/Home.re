@@ -12,6 +12,7 @@ module GetRecentSketches = [%graphql
       ) {
         id
         title
+        compilerVersion: compiler_version
         date: updated_at
       }
     }
@@ -39,6 +40,7 @@ module GetCommunitySketches = [%graphql
         id
         title
         date: created_at
+        compilerVersion: compiler_version
         user {
           id
           avatar
