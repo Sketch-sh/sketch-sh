@@ -10,8 +10,6 @@ let make =
       ~onBlockDown=?,
       ~readOnly=?,
     ) => {
-  let state = React.useState({editor: ref(none)});
-
   <Editor_CodeMirror
     value
     focused
@@ -20,10 +18,7 @@ let make =
     ?onBlur
     ?onBlockUp
     ?onBlockDown
-    setEditor={editor => {
-      state.editor := Some(editor);
-      CodeMirror_Links.register(editor);
-    }}
+    setEditor={editor => {CodeMirror_Links.register(editor)}}
     options={CodeMirror.EditorConfiguration.make(
       ~mode="gfm",
       ~theme=Config.cmTheme,

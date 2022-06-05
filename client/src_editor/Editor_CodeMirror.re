@@ -71,7 +71,7 @@ let getEditor = (state, ~f) =>
 //   },
 // ),
 
-[@react.element]
+[@react.component]
 let make =
     (
       ~className=?,

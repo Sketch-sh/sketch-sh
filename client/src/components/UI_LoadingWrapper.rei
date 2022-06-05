@@ -4,13 +4,13 @@
  */
 type state = {
   displayLoading: bool,
-  timeoutId: ref(option(Js.Global.timeoutId)),
+  timeoutId: option(Js.Global.timeoutId),
 };
 
 type action =
-  | ChangeLoading(bool)
+  | SetTimeoutId(option(Js.Global.timeoutId))
   | ChangeLoadingDisplay(bool);
 
+[@react.component]
 let make:
-  (~delayMs: int=?, ~loading: bool, bool => ReasonReact.reactElement) =>
-  ReasonReact.component(state, ReasonReact.noRetainedProps, action);
+  (~delayMs: int=?, ~loading: bool, ~children: 'children) => React.element;

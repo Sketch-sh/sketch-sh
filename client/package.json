@@ -54,7 +54,7 @@
     "react-dom": "^16.4.1",
     "react-helmet": "^5.2.0",
     "react-icons": "^3.0.4",
-    "reason-apollo": "0.15.2",
+    "reason-apollo": "0.20.0",
     "reason-react": "^0.7.0",
     "subscriptions-transport-ws": "^0.9.14"
   },

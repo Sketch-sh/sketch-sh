@@ -21,10 +21,8 @@ module Unload: {
    * Provider
    * Put this in any component
    */
-  module Provider: {
-    let make:
-      React.childless => React.component(unit, React.noRetainedProps, unit);
-  };
+  [@react.component]
+  module Provider: {let make: React.element => React.element;};
 };
 
 let redirect: string => unit;

@@ -20,7 +20,7 @@ let clearTimeout =
   | Some(timeoutId) => Js.Global.clearTimeout(timeoutId);
 
 [@react.component]
-let make = (~delayMs=1000, ~loading: bool, children) => {
+let make = (~delayMs=1000, ~loading: bool, ~children) => {
   let (state, dispatch) =
     React.useReducer(reducer, {displayLoading: loading, timeoutId: None});
 

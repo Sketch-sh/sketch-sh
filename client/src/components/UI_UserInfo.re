@@ -9,7 +9,7 @@ let make = (~userId) => {
     ...{({result}) =>
       switch (result) {
       | Loading => <div> {ReasonReact.string("Loading")} </div>
-      | Error(error) => <div> {ReasonReact.string(error##message)} </div>
+      | Error(error) => <div> {ReasonReact.string(error.message)} </div>
       | Data(response) =>
         response##user
         ->(

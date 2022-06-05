@@ -1,30 +1,13 @@
 open Editor_Types;
-type state = {
-  editor: ref(option(CodeMirror.editor)),
-  lineWidgets: ref(list(CodeMirror.LineWidget.t)),
-  codeBlockWidgets: array(Widget.t),
-  firstLineNumber: int,
-  lang,
-};
-
-let getEditor = (state, ~default, ~f) =>
-  switch (state.editor^) {
-  | None => default
-  | Some(editor) => f(editor)
-  };
 
 let langToMode =
   fun
   | RE => "reason"
   | ML => "mllike";
 
+[@react.component]
 let make =
     (
-      ~value,
-      ~focused,
-      ~firstLineNumber,
-      ~widgets,
-      ~onChange,
       ~onFocus=?,
       ~onBlur=?,
       ~onBlockUp=?,
@@ -33,163 +16,148 @@ let make =
       ~readOnly=?,
       ~viewportMargin=infinity,
       ~lang=ML,
+      ~value,
+      ~focused,
+      ~firstLineNumber,
+      ~widgets,
+      ~onChange,
     ) => {
-  let (state, setState) =
-    React.useState(_ =>
-      {
-        editor: ref(None),
-        lineWidgets: ref([]),
-        codeBlockWidgets: widgets,
-        firstLineNumber,
-        lang,
-      }
-    );
+  let (editor, setEditor) = React.useState(() => None);
+  let (cachedLineWidgets, setCachedLineWidgets) = React.useState(() => []);
 
   React.useEffect1(
     () => {
-      getEditor(state, ~default=state, ~f=editor =>
-        {
-          ...state,
-          firstLineNumber: {
-            if (state.firstLineNumber != firstLineNumber) {
-              editor->(
-                        CodeMirror.Editor.setOption(
-                          "firstLineNumber",
-                          firstLineNumber,
-                        )
-                      );
-            };
-            firstLineNumber;
-          },
-          lang: {
-            if (state.lang != lang) {
-              editor->(CodeMirror.Editor.setOption("mode", lang->langToMode));
-            };
-            lang;
-          },
-          codeBlockWidgets: {
-            if (widgets != state.codeBlockWidgets) {
-              let cachedLineWidgets = state.lineWidgets^;
-
-              editor->CodeMirror.Editor.operation((.) => {
-                cachedLineWidgets->(
-                                     Belt.List.forEachU((. lw)
-                                       /* TODO: should I remove the domNode ?
-                                          Potential memory leaks? */
-                                       => lw->CodeMirror.LineWidget.clear)
-                                   );
-
-                state.lineWidgets :=
-                  widgets->(
-                             Belt.Array.reduceU(
-                               [],
-                               (. acc, w) => {
-                                 open Editor_Types.Widget;
-                                 open Editor_LineWidget;
-                                 let {lw_line: line, lw_data} = w;
-                                 let newLineWidget =
-                                   switch (lw_data) {
-                                   | Lw_Error(content) =>
-                                     editor->(
-                                               CodeMirror.Editor.addLineWidget(
-                                                 ~line,
-                                                 ~element=
-                                                   createErrorWidget(content),
-                                                 ~options=
-                                                   CodeMirror.LineWidget.options(
-                                                     ~coverGutter=false,
-                                                     ~noHScroll=false,
-                                                     ~above=false,
-                                                     ~showIfHidden=false,
-                                                     ~handleMouseEvents=true,
-                                                   ),
-                                               )
-                                             )
-                                   | Lw_Warning(content) =>
-                                     editor->(
-                                               CodeMirror.Editor.addLineWidget(
-                                                 ~line,
-                                                 ~element=
-                                                   createWarningWidget(
-                                                     content,
-                                                   ),
-                                                 ~options=
-                                                   CodeMirror.LineWidget.options(
-                                                     ~coverGutter=false,
-                                                     ~noHScroll=false,
-                                                     ~above=false,
-                                                     ~showIfHidden=false,
-                                                     ~handleMouseEvents=true,
-                                                   ),
-                                               )
-                                             )
-                                   | Lw_Value(content) =>
-                                     let (element, setCallback) =
-                                       createValueWidget(content);
-                                     let newLineWidget =
-                                       editor->(
-                                                 CodeMirror.Editor.addLineWidget(
-                                                   ~line,
-                                                   ~element,
-                                                   ~options=
-                                                     CodeMirror.LineWidget.options(
-                                                       ~coverGutter=false,
-                                                       ~noHScroll=false,
-                                                       ~above=false,
-                                                       ~showIfHidden=false,
-                                                       ~handleMouseEvents=true,
-                                                     ),
-                                                 )
-                                               );
-                                     setCallback(() =>
-                                       newLineWidget->CodeMirror.LineWidget.changed
-                                     );
-                                     newLineWidget;
-                                   | Lw_Stdout(content) =>
-                                     editor->(
-                                               CodeMirror.Editor.addLineWidget(
-                                                 ~line,
-                                                 ~element=
-                                                   createStdoutWidget(
-                                                     content,
-                                                   ),
-                                                 ~options=
-                                                   CodeMirror.LineWidget.options(
-                                                     ~coverGutter=false,
-                                                     ~noHScroll=false,
-                                                     ~above=false,
-                                                     ~showIfHidden=false,
-                                                     ~handleMouseEvents=true,
-                                                   ),
-                                               )
-                                             )
-                                   };
-                                 [newLineWidget, ...acc];
-                               },
-                             )
-                           );
-              });
-            };
-            widgets;
-          },
-        }
-      )
+      switch (editor) {
+      | None => ()
+      | Some(editor) =>
+        editor->(
+                  CodeMirror.Editor.setOption(
+                    "firstLineNumber",
+                    firstLineNumber,
+                  )
+                )
+      };
+      None;
     },
-    [|
-      value,
-      focused,
-      firstLineNumber,
-      widgets,
-      onChange,
-      onFocus,
-      onBlur,
-      onBlockUp,
-      onBlockDown,
-      onUpdate,
-      readOnly,
-      viewportMargin,
-      lang,
-    |],
+    [|firstLineNumber|],
+  );
+
+  React.useEffect1(
+    () => {
+      switch (editor) {
+      | None => ()
+      | Some(editor) =>
+        editor->(CodeMirror.Editor.setOption("mode", lang->langToMode))
+      };
+      None;
+    },
+    [|lang|],
+  );
+
+  React.useEffect1(
+    () => {
+      switch (editor) {
+      | None => ()
+      | Some(editor) =>
+        editor->CodeMirror.Editor.operation((.) => {
+          cachedLineWidgets->(
+                               Belt.List.forEachU((. lw)
+                                 /* TODO: should I remove the domNode ?
+                                    Potential memory leaks? */
+                                 => lw->CodeMirror.LineWidget.clear)
+                             );
+
+          setCachedLineWidgets(_ =>
+            widgets->(
+                       Belt.Array.reduceU(
+                         [],
+                         (. acc, w) => {
+                           open Editor_Types.Widget;
+                           open Editor_LineWidget;
+                           let {lw_line: line, lw_data} = w;
+                           let newLineWidget =
+                             switch (lw_data) {
+                             | Lw_Error(content) =>
+                               editor->(
+                                         CodeMirror.Editor.addLineWidget(
+                                           ~line,
+                                           ~element=
+                                             createErrorWidget(content),
+                                           ~options=
+                                             CodeMirror.LineWidget.options(
+                                               ~coverGutter=false,
+                                               ~noHScroll=false,
+                                               ~above=false,
+                                               ~showIfHidden=false,
+                                               ~handleMouseEvents=true,
+                                             ),
+                                         )
+                                       )
+                             | Lw_Warning(content) =>
+                               editor->(
+                                         CodeMirror.Editor.addLineWidget(
+                                           ~line,
+                                           ~element=
+                                             createWarningWidget(content),
+                                           ~options=
+                                             CodeMirror.LineWidget.options(
+                                               ~coverGutter=false,
+                                               ~noHScroll=false,
+                                               ~above=false,
+                                               ~showIfHidden=false,
+                                               ~handleMouseEvents=true,
+                                             ),
+                                         )
+                                       )
+                             | Lw_Value(content) =>
+                               let (element, setCallback) =
+                                 createValueWidget(content);
+                               let newLineWidget =
+                                 editor->(
+                                           CodeMirror.Editor.addLineWidget(
+                                             ~line,
+                                             ~element,
+                                             ~options=
+                                               CodeMirror.LineWidget.options(
+                                                 ~coverGutter=false,
+                                                 ~noHScroll=false,
+                                                 ~above=false,
+                                                 ~showIfHidden=false,
+                                                 ~handleMouseEvents=true,
+                                               ),
+                                           )
+                                         );
+                               setCallback(() =>
+                                 newLineWidget->CodeMirror.LineWidget.changed
+                               );
+                               newLineWidget;
+                             | Lw_Stdout(content) =>
+                               editor->(
+                                         CodeMirror.Editor.addLineWidget(
+                                           ~line,
+                                           ~element=
+                                             createStdoutWidget(content),
+                                           ~options=
+                                             CodeMirror.LineWidget.options(
+                                               ~coverGutter=false,
+                                               ~noHScroll=false,
+                                               ~above=false,
+                                               ~showIfHidden=false,
+                                               ~handleMouseEvents=true,
+                                             ),
+                                         )
+                                       )
+                             };
+                           [newLineWidget, ...acc];
+                         },
+                       )
+                     )
+          );
+        })
+      };
+      None;
+    },
+    [|widgets|],
   );
 
   <Editor_CodeMirror
@@ -201,7 +169,7 @@ let make =
     ?onBlockUp
     ?onBlockDown
     ?onUpdate
-    setEditor={editor => state.editor := Some(editor)}
+    setEditor={editor => setEditor(_ => Some(editor))}
     options={CodeMirror.EditorConfiguration.make(
       ~mode=lang->langToMode,
       ~theme=Config.cmTheme,
