@@ -3,7 +3,6 @@
  * By only renderng the loading indicator after delayMs
  */
 type state = {
-  loading: bool,
   displayLoading: bool,
   timeoutId: ref(option(Js.Global.timeoutId)),
 };

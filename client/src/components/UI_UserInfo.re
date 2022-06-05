@@ -2,6 +2,7 @@ open GqlUserInfo;
 
 open Utils;
 
+[@react.component]
 let make = (~userId) => {
   let query = UserInfoGql.make(~userId, ());
   <UserInfoComponent variables=query##variables>

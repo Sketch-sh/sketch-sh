@@ -17,12 +17,9 @@ type state = {
   value: string,
 };
 
-let setDivRef = (theRef, {ReasonReact.state}) =>
-  state.divRef := Js.Nullable.toOption(theRef);
-
-let getEditor = (state, ~default, ~f) =>
+let getEditor = (state, ~f) =>
   switch (state.editor^) {
-  | None => default
+  | None => ()
   | Some(editor) => f(editor)
   };
 
@@ -78,9 +75,6 @@ let getEditor = (state, ~default, ~f) =>
 let make =
     (
       ~className=?,
-      ~value,
-      ~focused,
-      ~options: CodeMirror.EditorConfiguration.t,
       ~setEditor: option(CodeMirror.editor => unit)=?,
       ~onBlockUp: option(unit => unit)=?,
       ~onBlockDown: option(unit => unit)=?,
@@ -88,12 +82,16 @@ let make =
       ~onFocus: option(unit => unit)=?,
       ~onBlur: option(unit => unit)=?,
       ~onUpdate: option(unit => unit)=?,
+      ~value,
+      ~focused,
+      ~options: CodeMirror.EditorConfiguration.t,
     ) => {
-  let state = React.useState({editor: ref(None), divRef: ref(None), value});
+  let (state, setState) =
+    React.useState(() => {editor: ref(None), divRef: ref(None), value});
 
   React.useEffect0(() => {
     switch (state.divRef^) {
-    | None => ()
+    | None => None
     | Some(div) =>
       let editor = CodeMirror.make(div, options);
       switch (setEditor) {
@@ -169,5 +167,61 @@ let make =
     }
   });
 
-  <div ?className ref={handle(setDivRef)} />;
+  React.useEffect(() => {
+    getEditor(
+      state,
+      ~f=editor => {
+        switch (focused) {
+        | None => ()
+        | Some(typ) =>
+          open Editor_Types.Block;
+          editor->CodeMirror.Editor.focus;
+          switch (typ) {
+          | FcTyp_BlockFocusDown =>
+            let doc = editor->CodeMirror.Editor.getDoc;
+            doc->(
+                   CodeMirror.Doc.setCursor(
+                     CodeMirror.Position.make(~line=0, ~ch=0, ()),
+                   )
+                 );
+          | FcTyp_BlockFocusUp =>
+            let doc = editor->CodeMirror.Editor.getDoc;
+            let lastLinePlusOne = editor->CodeMirror.Editor.lineCount;
+            doc->(
+                   CodeMirror.Doc.setCursor(
+                     CodeMirror.Position.make(
+                       ~line=lastLinePlusOne,
+                       ~ch=0,
+                       (),
+                     ),
+                   )
+                 );
+          | FcTyp_BlockNew
+          | FcTyp_BlockExecuteAndFocusNextBlock
+          | FcTyp_EditorFocus => ()
+          };
+        };
+        setState(state =>
+          {
+            ...state,
+            value: {
+              if (state.value != value
+                  && value != editor->CodeMirror.Editor.getValue) {
+                editor->(CodeMirror.Editor.setValue(value));
+              };
+              value;
+            },
+          }
+        );
+      },
+    );
+    None;
+  });
+
+  <div
+    ?className
+    ref={ReactDOMRe.Ref.callbackDomRef(ref =>
+      state.divRef := Js.Nullable.toOption(ref)
+    )}
+  />;
 };
