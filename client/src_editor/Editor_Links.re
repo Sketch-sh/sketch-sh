@@ -113,7 +113,7 @@ module SingleLink = {
                 {!isLinkRefreshing
                    ? <button
                        className="link__button link__button--danger action__button"
-                       onClick={_ => setIsLinkRefreshing(true)}>
+                       onClick={_ => setIsLinkRefreshing(_ => true)}>
                        <Fi.FiRefreshCw />
                      </button>
                    : <Fi.Loader />}
@@ -128,7 +128,7 @@ module SingleLink = {
 
                          | Error(_error) =>
                            Notify.error("Fetching link " ++ id ++ " failed.");
-                           setIsLinkRefreshing(false);
+                           setIsLinkRefreshing(_ => false);
 
                          | Data(response) =>
                            let note = response##note->Belt.Array.get(0);
@@ -137,7 +137,7 @@ module SingleLink = {
                              let link: Link.link =
                                createInternalLink(~name, ~note);
                              onRefresh(link);
-                             setIsLinkRefreshing(false);
+                             setIsLinkRefreshing(_ => false);
                            | None =>
                              Notify.error("Link " ++ id ++ " not found.")
                            };
