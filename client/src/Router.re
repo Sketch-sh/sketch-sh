@@ -81,7 +81,8 @@ let pushSilentUnsafe = path =>
   switch ([%external history], [%external window]) {
   | (None, _)
   | (_, None) => ()
-  | (Some(history: Dom.history), Some(_)) => pushState(history, ~href=path)
+  | (Some((history: Dom.history)), Some(_)) =>
+    pushState(history, ~href=path)
   };
 
 let pushSilent = route => pushSilentUnsafe(Route.routeToUrl(route));
@@ -96,7 +97,7 @@ let replaceSilentUnsafe = path =>
   switch ([%external history], [%external window]) {
   | (None, _)
   | (_, None) => ()
-  | (Some(history: Dom.history), Some(_)) =>
+  | (Some((history: Dom.history)), Some(_)) =>
     replaceState(history, ~href=path)
   };
 

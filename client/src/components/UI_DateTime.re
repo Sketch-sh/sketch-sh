@@ -19,6 +19,7 @@ module Transformer: {
   };
 };
 
+[@react.component]
 let make = (~transformer=Transformer.relative, ~className=?, ~date: Js.Json.t) => {
   let date = date |> Js.Json.decodeString;
 

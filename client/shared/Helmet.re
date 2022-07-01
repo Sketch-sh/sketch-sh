@@ -11,6 +11,7 @@ type jsProps = {
 [@bs.module "react-helmet"]
 external reactClass: ReasonReact.reactClass = "default";
 
+[@react.component]
 let make =
     (~encodeSpecialCharacters=?, ~titleTemplate=?, ~defaultTitle=?, children) =>
   ReasonReact.wrapJsForReason(

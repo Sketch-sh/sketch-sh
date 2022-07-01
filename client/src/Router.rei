@@ -21,8 +21,10 @@ module Unload: {
    * Provider
    * Put this in any component
    */
-  [@react.component]
-  module Provider: {let make: React.element => React.element;};
+  module Provider: {
+    [@react.component]
+    let make: unit => React.element;
+  };
 };
 
 let redirect: string => unit;
@@ -31,6 +33,7 @@ let pushSilent: Route.t => unit;
 let replaceSilent: Route.t => unit;
 
 module Link: {
+  [@react.component]
   let make:
     (
       ~route: Route.t,

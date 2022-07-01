@@ -1,7 +1,8 @@
 Modules.require("./UI_SketchOwnerInfo.css");
 open Utils;
 
-let make = (~owner, ~noteLastEdited=?, ~className=?) => {
+[@react.component]
+let make = (~noteLastEdited=?, ~className=?, ~owner, ~noteCompilerVersion) => {
   <div className={Cn.make(["UI_SketchOwnerInfo", Cn.unwrap(className)])}>
     <Router.Link route={Route.User(owner##username)}>
       {owner##avatar

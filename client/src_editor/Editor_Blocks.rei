@@ -37,10 +37,9 @@ let make:
     ~links: array(Link.link),
     ~blocks: array(Block.block),
     ~readOnly: bool=?,
-    ~onUpdate: array(Block.block) => unit,
-    ~onExecute: bool => 'a,
     ~registerExecuteCallback: (unit => unit) => unit=?,
     ~registerShortcut: Shortcut.subscribeFun=?,
-    React.childless
+    ~onUpdate: array(Block.block) => unit,
+    ~onExecute: bool => 'a
   ) =>
-  ReasonReact.component(state, ReasonReact.noRetainedProps, action);
+  React.element;

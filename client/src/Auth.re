@@ -65,7 +65,8 @@ module AuthCallback = {
              resolve(Js.log(error));
            })
       )
-      |> ignore
+      |> ignore;
+      None;
     });
 
     React.useEffect1(
@@ -92,7 +93,7 @@ module AuthCallback = {
     );
 
     let message =
-      switch (state) {
+      switch (uiState) {
       | Initial => "Authenticating..."
       | Success => "Authentication successful. Redirecting..."
       | Failure(a) =>

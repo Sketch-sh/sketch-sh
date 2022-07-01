@@ -113,7 +113,7 @@ module SingleLink = {
                 {!isLinkRefreshing
                    ? <button
                        className="link__button link__button--danger action__button"
-                       onClick={_ => setIsLinkRefreshing(true)}>
+                       onClick={_ => setIsLinkRefreshing(_ => true)}>
                        <Fi.FiRefreshCw />
                      </button>
                    : <Fi.Loader />}
@@ -128,7 +128,7 @@ module SingleLink = {
 
                          | Error(_error) =>
                            Notify.error("Fetching link " ++ id ++ " failed.");
-                           setIsLinkRefreshing(false);
+                           setIsLinkRefreshing(_ => false);
 
                          | Data(response) =>
                            let note = response##note->Belt.Array.get(0);
@@ -137,7 +137,7 @@ module SingleLink = {
                              let link: Link.link =
                                createInternalLink(~name, ~note);
                              onRefresh(link);
-                             setIsLinkRefreshing(false);
+                             setIsLinkRefreshing(_ => false);
                            | None =>
                              Notify.error("Link " ++ id ++ " not found.")
                            };
@@ -226,7 +226,13 @@ module EmptyLink = {
                 className="link__button"
                 onClick={_ =>
                   if (state.name != "" && state.id != "") {
-                    onSubmit((state.name, state.id));
+                    onSubmit(
+                      {
+                        name,
+                        id,
+                        timestamp: Js.Date.make() |> Js.Date.toISOString,
+                      }: uiLink,
+                    );
                   }
                 }
                 disabled={status == Loading}>
@@ -267,23 +273,17 @@ let make = (~currentSketchId, ~links, ~onUpdate) => {
       Notify.error("Cannot link current sketch.");
     } else {
       let linkWithSameNameExists =
-        arrayFind(links, l => getNameFromLink(l) == name);
+        arrayFind(links, l => getNameFromLink(l) == uiLink.name);
 
       switch (linkWithSameNameExists) {
       | Some(_) => Notify.error("Link with same module name already exists.")
       | None =>
         let linkWithSameIdExists =
-          arrayFind(links, l => getIdFromLink(l) == id);
+          arrayFind(links, l => getIdFromLink(l) == uiLink.id);
 
         switch (linkWithSameIdExists) {
         | Some(_) => Notify.error("Link with same id already exists.")
-        | None =>
-          dispatch @@
-          Link_Add({
-            name: uiLink.name,
-            id: uiLink.id,
-            timestamp: Js.Date.make() |> Js.Date.toISOString,
-          })
+        | None => dispatch @@ Link_Add(uiLink)
         };
       };
     };
@@ -307,6 +307,7 @@ let make = (~currentSketchId, ~links, ~onUpdate) => {
           name
           timestamp=revision_at
           onDelete={() => {
+            let linkToDelete = link;
             let links =
               Belt.Array.keepU(links, (. link) =>
                 switch (link, linkToDelete) {
@@ -318,7 +319,7 @@ let make = (~currentSketchId, ~links, ~onUpdate) => {
 
             onUpdate(links);
           }}
-          onRefresh={link =>
+          onRefresh={linkToRefresh =>
             onUpdate(
               Belt.Array.mapU(links, (. link) =>
                 switch (link, linkToRefresh) {
@@ -339,7 +340,7 @@ let make = (~currentSketchId, ~links, ~onUpdate) => {
     <span id="linkedLists" className="UI_SketchOwnerInfo__username">
       {str("Linked Links")}
     </span>
-    <UI_Balloon position=Down message="Edit sketches">
+    <UI_Balloon position=UI_Balloon.Down message="Edit sketches">
       ...<button
            className="EditorNote__linkMenu"
            onClick={_ => dispatch @@ ToggleLinkModal}>

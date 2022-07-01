@@ -28,6 +28,7 @@ let isReady = s => s.ready && s.packageLoaded;
 type state = {
   value: string,
   lang: Editor_Types.lang,
+  compilerVersion: CompilerVersion.t,
   widgets: array(Editor_Types.Widget.t),
   scrollHeight: float,
   heightTyp,
@@ -106,6 +107,16 @@ let make = () => {
       | exception _ => RE
       };
 
+    let compilerVersion =
+      params
+      ->URLSearchParams.get("compilerVersion")
+      ->Belt.Option.getWithDefault("4.06");
+    let compilerVersion =
+      switch (compilerVersion->CompilerVersion.ofDbString) {
+      | value => value
+      | exception _ => V4_06
+      };
+
     let heightTyp =
       switch (params->URLSearchParams.get("autoHeight")) {
       | Some("false") => Fixed
@@ -119,6 +130,7 @@ let make = () => {
       {
         value,
         lang,
+        compilerVersion,
         widgets: [||],
         scrollHeight: getScrollHeight(),
         heightTyp,
@@ -139,7 +151,8 @@ let make = () => {
   let {value, widgets, heightTyp, loadPackage, workerState, isRun} = state;
 
   React.useEffect0(() => {
-    Toplevel_Consumer.getWorker() |> ignore;
+    Toplevel_Consumer.getWorker(~compilerVersion=state.compilerVersion)
+    |> ignore;
     Toplevel_Consumer.registerReadyCb(() => {
       dispatch @@ WorkerReady;
       if (workerState->isReady) {
@@ -154,6 +167,7 @@ let make = () => {
         | Some(package) =>
           let cancelToken =
             Toplevel_Consumer.loadScript(
+              ~compilerVersion=state.compilerVersion,
               package,
               () => {
                 Js.log("package loaded");
@@ -169,6 +183,7 @@ let make = () => {
         if (isRun) {
           let cancelToken =
             Toplevel_Consumer.executeEmbed(
+              ~compilerVersion=state.compilerVersion,
               ~lang=state.lang,
               ~code=state.value,
               fun
@@ -197,7 +212,7 @@ let make = () => {
       <Editor_CodeBlock
         value
         firstLineNumber=1
-        focused={Some(FcTyp_EditorFocus)}
+        focused={Some(Editor_Types.Block.FcTyp_EditorFocus)}
         widgets
         /* viewportMargin=10. */
         onChange={(value, _) => dispatch @@ UpdateValue(value)}

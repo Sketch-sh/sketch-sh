@@ -576,7 +576,7 @@ module Actions = {
 
 let blockControlsButtons = (blockId, isDeleted, send) =>
   <div className="block__controls--buttons">
-    <UI_Balloon message="Add code block" position=Down>
+    <UI_Balloon message="Add code block" position=UI_Balloon.Down>
       ...<button
            className="block__controls--button"
            ariaLabel="Add code block"
@@ -585,7 +585,7 @@ let blockControlsButtons = (blockId, isDeleted, send) =>
            <sup> "+"->str </sup>
          </button>
     </UI_Balloon>
-    <UI_Balloon message="Add text block" position=Down>
+    <UI_Balloon message="Add text block" position=UI_Balloon.Down>
       ...<button
            className="block__controls--button"
            ariaLabel="Add text block"
@@ -595,7 +595,7 @@ let blockControlsButtons = (blockId, isDeleted, send) =>
          </button>
     </UI_Balloon>
     {!isDeleted
-       ? <UI_Balloon message="Delete block" position=Down>
+       ? <UI_Balloon message="Delete block" position=UI_Balloon.Down>
            ...<button
                 className="block__controls--button block__controls--danger"
                 ariaLabel="Delete block"
@@ -604,7 +604,7 @@ let blockControlsButtons = (blockId, isDeleted, send) =>
                 <sup> "-"->str </sup>
               </button>
          </UI_Balloon>
-       : <UI_Balloon message="Restore block" position=Down>
+       : <UI_Balloon message="Restore block" position=UI_Balloon.Down>
            ...<button
                 className="block__controls--button"
                 ariaLabel="Restore block"
@@ -617,6 +617,7 @@ let blockControlsButtons = (blockId, isDeleted, send) =>
 
 let component = ReasonReact.reducerComponent("Editor_Page");
 
+[@react.component]
 let make =
     (
       ~lang=ML,
@@ -624,11 +625,10 @@ let make =
       ~links: array(Link.link),
       ~blocks: array(block),
       ~readOnly=false,
-      ~onUpdate,
-      ~onExecute,
       ~registerExecuteCallback=?,
       ~registerShortcut: option(Shortcut.subscribeFun)=?,
-      _children: React.childless,
+      ~onUpdate,
+      ~onExecute,
     ) => {
   let makeInitialState = () => {
     lang,

@@ -13,4 +13,4 @@ type action =
 
 [@react.component]
 let make:
-  (~delayMs: int=?, ~loading: bool, ~children: 'children) => React.element;
+  (~delayMs: int=?, ~loading: bool, ~children: bool => 'children) => 'children;
