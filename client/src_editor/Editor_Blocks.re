@@ -615,7 +615,42 @@ let blockControlsButtons = (blockId, isDeleted, send) =>
          </UI_Balloon>}
   </div>;
 
-let component = ReasonReact.reducerComponent("Editor_Page");
+let reducer = (state, action) => {
+  switch (action) {
+  | Block_CleanBlocksCopy => Actions.cleanBlocksCopy(action, state)
+  | Block_PrettyPrint => Actions.prettyPrint(action, state)
+  | Block_ChangeLanguage => Actions.changeLanguage(action, state)
+  | Block_MapRefmtToBlocks(results) =>
+    Actions.mapRefmtToBlocks(action, state, results)
+  | Block_AddWidgets(blockId, widgets) =>
+    Actions.addWidgets(action, state, blockId, widgets)
+  | Block_FocusNextBlockOrCreate(blockTyp) =>
+    Actions.focusNextBlockOrCreate(action, state, blockTyp)
+  | Block_Execute(focusNextBlock, blockTyp) =>
+    Actions.execute(
+      action,
+      state,
+      focusNextBlock,
+      blockTyp,
+      onExecute,
+      lang,
+      links,
+    )
+  | Block_UpdateValue(blockId, newValue, diff) =>
+    Actions.update(action, state, blockId, newValue, diff)
+  | Block_QueueDelete(blockId) => Actions.queueDelete(action, state, blockId)
+  | Block_DeleteQueued(blockId) =>
+    Actions.deleteQueued(action, state, blockId)
+  | Block_Restore(blockId) => Actions.restore(action, state, blockId)
+  | Block_Focus(blockId, blockTyp) =>
+    Actions.focus(action, state, blockId, blockTyp)
+  | Block_Blur(blockId) => Actions.blur(action, state, blockId)
+  | Block_Add(afterBlockId, blockTyp) =>
+    Actions.add(action, state, afterBlockId, blockTyp)
+  | Block_FocusUp(blockId) => Actions.focusUp(action, state, blockId)
+  | Block_FocusDown(blockId) => Actions.focusDown(action, state, blockId)
+  };
+};
 
 [@react.component]
 let make =
@@ -630,269 +665,238 @@ let make =
       ~onUpdate,
       ~onExecute,
     ) => {
-  let makeInitialState = () => {
-    lang,
-    compilerVersion,
-    blocks: blocks->syncLineNumber,
-    blocksCopy: None,
-    deletedBlockMeta: ref(TimeoutMap.empty),
-    stateUpdateReason: None,
-    focusedBlock: None,
-  };
-  {
-    ...component,
-    initialState: makeInitialState,
-    willReceiveProps: ({state}) =>
-      if (state.lang != lang) {
-        {...state, lang};
-      } else {
-        state;
+  let (state, dispatch) =
+    React.useReducer(
+      reducer,
+      {
+        lang,
+        compilerVersion,
+        blocks: blocks->syncLineNumber,
+        blocksCopy: None,
+        deletedBlockMeta: ref(TimeoutMap.empty),
+        stateUpdateReason: None,
+        focusedBlock: None,
       },
-    didMount: self => {
-      self.send(Block_Execute(false, BTyp_Code));
-      switch (registerExecuteCallback) {
-      | None => ()
-      | Some(register) =>
-        register(() => self.send(Block_Execute(false, BTyp_Code)))
-      };
-      switch (registerShortcut) {
-      | None => ()
-      | Some(registerShortcut) =>
-        let unReg =
-          registerShortcut(
-            ~global=true,
-            "mod+enter",
-            event => {
-              open Webapi.Dom;
+    );
 
-              event->KeyboardEvent.preventDefault;
-              self.send(Block_Execute(false, BTyp_Code));
-            },
-          );
-        let unReg2 =
-          registerShortcut(
-            ~global=true,
-            "shift+enter",
-            event => {
-              open Webapi.Dom;
+  React.useEffect0(() => {
+    dispatch(Block_Execute(false, BTyp_Code));
+    switch (registerExecuteCallback) {
+    | None => ()
+    | Some(register) =>
+      register(() => dispatch(Block_Execute(false, BTyp_Code)))
+    };
+    switch (registerShortcut) {
+    | None => None
+    | Some(registerShortcut) =>
+      let unReg =
+        registerShortcut(
+          ~global=true,
+          "mod+enter",
+          event => {
+            open Webapi.Dom;
 
-              event->KeyboardEvent.preventDefault;
-              self.send(Block_Execute(true, BTyp_Code));
-            },
-          );
-        let unReg3 =
-          registerShortcut(
-            ~global=true,
-            "mod+shift+enter",
-            event => {
-              open Webapi.Dom;
+            event->KeyboardEvent.preventDefault;
+            dispatch(Block_Execute(false, BTyp_Code));
+          },
+        );
+      let unReg2 =
+        registerShortcut(
+          ~global=true,
+          "shift+enter",
+          event => {
+            open Webapi.Dom;
 
-              event->KeyboardEvent.preventDefault;
-              self.send(Block_Execute(true, BTyp_Text));
-            },
-          );
-        let unReg4 =
-          registerShortcut(
-            ~global=true,
-            "mod+shift+i",
-            event => {
-              open Webapi.Dom;
-              event->KeyboardEvent.preventDefault;
-              self.send(Block_PrettyPrint);
-            },
-          );
-        self.onUnmount(() => {
+            event->KeyboardEvent.preventDefault;
+            dispatch(Block_Execute(true, BTyp_Code));
+          },
+        );
+      let unReg3 =
+        registerShortcut(
+          ~global=true,
+          "mod+shift+enter",
+          event => {
+            open Webapi.Dom;
+
+            event->KeyboardEvent.preventDefault;
+            dispatch(Block_Execute(true, BTyp_Text));
+          },
+        );
+      let unReg4 =
+        registerShortcut(
+          ~global=true,
+          "mod+shift+i",
+          event => {
+            open Webapi.Dom;
+            event->KeyboardEvent.preventDefault;
+            dispatch(Block_PrettyPrint);
+          },
+        );
+      Some(
+        () => {
           unReg();
           unReg2();
           unReg3();
           unReg4();
-        });
-      };
-    },
-    didUpdate: ({oldSelf, newSelf}) => {
-      if (oldSelf.state.lang != lang) {
-        newSelf.send(Block_ChangeLanguage);
-      };
-      if (oldSelf.state.blocks !== newSelf.state.blocks) {
-        let cleanBlocksCopyHelper = () =>
-          switch (newSelf.state.blocksCopy) {
-          | None => ()
-          | Some(_) => newSelf.send(Block_CleanBlocksCopy)
-          };
-        switch (newSelf.state.stateUpdateReason) {
-        | None => ()
-        | Some(action) =>
-          switch (action) {
-          | Block_Focus(_, _)
-          | Block_Blur(_)
-          | Block_AddWidgets(_, _)
-          | Block_FocusUp(_)
-          | Block_FocusDown(_)
-          | Block_ChangeLanguage
-          | Block_CleanBlocksCopy
-          | Block_FocusNextBlockOrCreate(_)
-          | Block_Execute(_, _) => ()
-          | Block_PrettyPrint
-          | Block_MapRefmtToBlocks(_)
-          | Block_Add(_, _)
-          | Block_Restore(_)
-          | Block_QueueDelete(_)
-          | Block_DeleteQueued(_)
-          | Block_UpdateValue(_, _, _) => onUpdate(newSelf.state.blocks)
-          };
+        },
+      );
+    };
+  });
 
-          switch (action) {
-          | Block_Add(_, _)
-          | Block_Restore(_)
-          | Block_QueueDelete(_)
-          | Block_DeleteQueued(_)
-          | Block_PrettyPrint => cleanBlocksCopyHelper()
-          | Block_UpdateValue(_, _, diff) =>
-            switch (diff->CodeMirror.EditorChange.originGet) {
-            | "setValue" => ()
-            | _ => cleanBlocksCopyHelper()
-            }
-          | _ => ()
-          };
+  React.useEffect1(
+    () => {
+      dispatch(Block_ChangeLanguage);
+      None;
+    },
+    [|state.lang|],
+  );
+
+  React.useEffect1(
+    () => {
+      let cleanBlocksCopyHelper = () =>
+        switch (state.blocksCopy) {
+        | None => ()
+        | Some(_) => dispatch(Block_CleanBlocksCopy)
+        };
+      switch (state.stateUpdateReason) {
+      | None => ()
+      | Some(action) =>
+        switch (action) {
+        | Block_Focus(_, _)
+        | Block_Blur(_)
+        | Block_AddWidgets(_, _)
+        | Block_FocusUp(_)
+        | Block_FocusDown(_)
+        | Block_ChangeLanguage
+        | Block_CleanBlocksCopy
+        | Block_FocusNextBlockOrCreate(_)
+        | Block_Execute(_, _) => ()
+        | Block_PrettyPrint
+        | Block_MapRefmtToBlocks(_)
+        | Block_Add(_, _)
+        | Block_Restore(_)
+        | Block_QueueDelete(_)
+        | Block_DeleteQueued(_)
+        | Block_UpdateValue(_, _, _) => onUpdate(state.blocks)
+        };
+
+        switch (action) {
+        | Block_Add(_, _)
+        | Block_Restore(_)
+        | Block_QueueDelete(_)
+        | Block_DeleteQueued(_)
+        | Block_PrettyPrint => cleanBlocksCopyHelper()
+        | Block_UpdateValue(_, _, diff) =>
+          switch (diff->CodeMirror.EditorChange.originGet) {
+          | "setValue" => ()
+          | _ => cleanBlocksCopyHelper()
+          }
+        | _ => ()
         };
       };
+      None;
     },
-    reducer: (action, state) =>
-      switch (action) {
-      | Block_CleanBlocksCopy => Actions.cleanBlocksCopy(action, state)
-      | Block_PrettyPrint => Actions.prettyPrint(action, state)
-      | Block_ChangeLanguage => Actions.changeLanguage(action, state)
-      | Block_MapRefmtToBlocks(results) =>
-        Actions.mapRefmtToBlocks(action, state, results)
-      | Block_AddWidgets(blockId, widgets) =>
-        Actions.addWidgets(action, state, blockId, widgets)
-      | Block_FocusNextBlockOrCreate(blockTyp) =>
-        Actions.focusNextBlockOrCreate(action, state, blockTyp)
-      | Block_Execute(focusNextBlock, blockTyp) =>
-        Actions.execute(
-          action,
-          state,
-          focusNextBlock,
-          blockTyp,
-          onExecute,
-          lang,
-          links,
-        )
-      | Block_UpdateValue(blockId, newValue, diff) =>
-        Actions.update(action, state, blockId, newValue, diff)
-      | Block_QueueDelete(blockId) =>
-        Actions.queueDelete(action, state, blockId)
-      | Block_DeleteQueued(blockId) =>
-        Actions.deleteQueued(action, state, blockId)
-      | Block_Restore(blockId) => Actions.restore(action, state, blockId)
-      | Block_Focus(blockId, blockTyp) =>
-        Actions.focus(action, state, blockId, blockTyp)
-      | Block_Blur(blockId) => Actions.blur(action, state, blockId)
-      | Block_Add(afterBlockId, blockTyp) =>
-        Actions.add(action, state, afterBlockId, blockTyp)
-      | Block_FocusUp(blockId) => Actions.focusUp(action, state, blockId)
-      | Block_FocusDown(blockId) => Actions.focusDown(action, state, blockId)
-      },
-    render: ({send, state}) =>
-      <>
-        {state.blocks
-         ->(
-             Belt.Array.mapU((. {b_id, b_data, b_deleted}) =>
-               b_deleted
-                 ? <div key=b_id id=b_id className="block__container">
-                     <div className="block__deleted">
-                       <h3> "This block has been removed"->str </h3>
-                       <p>
-                         "It will be permanently deleted after 10 seconds"->str
-                       </p>
-                       <div className="block__deleted--buttons">
-                         <button
-                           className="block__deleted--button restore"
-                           onClick={_ => send(Block_Restore(b_id))}
-                           ariaLabel="Restore block">
-                           <Fi.RefreshCw />
-                           "Restore"->str
-                         </button>
-                         <button
-                           className="block__deleted--button delete-immediately"
-                           onClick={_ => send(Block_DeleteQueued(b_id))}
-                           ariaLabel="Delete block immediately">
-                           <Fi.Trash2 />
-                           "Delete Immediately"->str
-                         </button>
-                       </div>
-                       <div className="block__deleted--progress" />
-                     </div>
-                     <div className="block__controls">
-                       {blockControlsButtons(b_id, b_deleted, send)}
-                     </div>
+    [|state.blocks|],
+  );
+
+  <>
+    {state.blocks
+     ->(
+         Belt.Array.mapU((. {b_id, b_data, b_deleted}) =>
+           b_deleted
+             ? <div key=b_id id=b_id className="block__container">
+                 <div className="block__deleted">
+                   <h3> "This block has been removed"->str </h3>
+                   <p>
+                     "It will be permanently deleted after 10 seconds"->str
+                   </p>
+                   <div className="block__deleted--buttons">
+                     <button
+                       className="block__deleted--button restore"
+                       onClick={_ => dispatch(Block_Restore(b_id))}
+                       ariaLabel="Restore block">
+                       <Fi.RefreshCw />
+                       "Restore"->str
+                     </button>
+                     <button
+                       className="block__deleted--button delete-immediately"
+                       onClick={_ => dispatch(Block_DeleteQueued(b_id))}
+                       ariaLabel="Delete block immediately">
+                       <Fi.Trash2 />
+                       "Delete Immediately"->str
+                     </button>
                    </div>
-                 : (
-                   switch (b_data) {
-                   | B_Code({bc_value, bc_widgets, bc_firstLineNumber}) =>
-                     <div key=b_id id=b_id className="block__container">
-                       <div className="source-editor">
-                         <Editor_CodeBlock
-                           value=bc_value
-                           focused={
-                             switch (state.focusedBlock) {
-                             | None => None
-                             | Some((id, _blockTyp, changeTyp)) =>
-                               id == b_id ? Some(changeTyp) : None
-                             }
-                           }
-                           onChange={(newValue, diff) =>
-                             send(Block_UpdateValue(b_id, newValue, diff))
-                           }
-                           onBlur={() => send(Block_Blur(b_id))}
-                           onFocus={() => send(Block_Focus(b_id, BTyp_Code))}
-                           onBlockUp={() => send(Block_FocusUp(b_id))}
-                           onBlockDown={() => send(Block_FocusDown(b_id))}
-                           widgets=bc_widgets
-                           readOnly
-                           firstLineNumber=bc_firstLineNumber
-                           lang
-                         />
-                       </div>
-                       <div className="block__controls">
-                         {readOnly
-                            ? React.null
-                            : blockControlsButtons(b_id, b_deleted, send)}
-                       </div>
-                     </div>
-                   | B_Text(text) =>
-                     <div key=b_id id=b_id className="block__container">
-                       <div className="text-editor">
-                         <Editor_TextBlock
-                           value=text
-                           focused={
-                             switch (state.focusedBlock) {
-                             | None => None
-                             | Some((id, _blockTyp, changeTyp)) =>
-                               id == b_id ? Some(changeTyp) : None
-                             }
-                           }
-                           onBlur={() => send(Block_Blur(b_id))}
-                           onFocus={() => send(Block_Focus(b_id, BTyp_Text))}
-                           onBlockUp={() => send(Block_FocusUp(b_id))}
-                           onBlockDown={() => send(Block_FocusDown(b_id))}
-                           onChange={(newValue, diff) =>
-                             send(Block_UpdateValue(b_id, newValue, diff))
-                           }
-                           readOnly
-                         />
-                       </div>
-                       {readOnly
-                          ? React.null
-                          : <div className="block__controls">
-                              {blockControlsButtons(b_id, b_deleted, send)}
-                            </div>}
-                     </div>
-                   }
-                 )
+                   <div className="block__deleted--progress" />
+                 </div>
+                 <div className="block__controls">
+                   {blockControlsButtons(b_id, b_deleted, dispatch)}
+                 </div>
+               </div>
+             : (
+               switch (b_data) {
+               | B_Code({bc_value, bc_widgets, bc_firstLineNumber}) =>
+                 <div key=b_id id=b_id className="block__container">
+                   <div className="source-editor">
+                     <Editor_CodeBlock
+                       value=bc_value
+                       focused={
+                         switch (state.focusedBlock) {
+                         | None => None
+                         | Some((id, _blockTyp, changeTyp)) =>
+                           id == b_id ? Some(changeTyp) : None
+                         }
+                       }
+                       onChange={(newValue, diff) =>
+                         dispatch(Block_UpdateValue(b_id, newValue, diff))
+                       }
+                       onBlur={() => dispatch(Block_Blur(b_id))}
+                       onFocus={() => dispatch(Block_Focus(b_id, BTyp_Code))}
+                       onBlockUp={() => dispatch(Block_FocusUp(b_id))}
+                       onBlockDown={() => dispatch(Block_FocusDown(b_id))}
+                       widgets=bc_widgets
+                       readOnly
+                       firstLineNumber=bc_firstLineNumber
+                       lang
+                     />
+                   </div>
+                   <div className="block__controls">
+                     {readOnly
+                        ? React.null
+                        : blockControlsButtons(b_id, b_deleted, dispatch)}
+                   </div>
+                 </div>
+               | B_Text(text) =>
+                 <div key=b_id id=b_id className="block__container">
+                   <div className="text-editor">
+                     <Editor_TextBlock
+                       value=text
+                       focused={
+                         switch (state.focusedBlock) {
+                         | None => None
+                         | Some((id, _blockTyp, changeTyp)) =>
+                           id == b_id ? Some(changeTyp) : None
+                         }
+                       }
+                       onBlur={() => dispatch(Block_Blur(b_id))}
+                       onFocus={() => dispatch(Block_Focus(b_id, BTyp_Text))}
+                       onBlockUp={() => dispatch(Block_FocusUp(b_id))}
+                       onBlockDown={() => dispatch(Block_FocusDown(b_id))}
+                       onChange={(newValue, diff) =>
+                         dispatch(Block_UpdateValue(b_id, newValue, diff))
+                       }
+                       readOnly
+                     />
+                   </div>
+                   {readOnly
+                      ? React.null
+                      : <div className="block__controls">
+                          {blockControlsButtons(b_id, b_deleted, dispatch)}
+                        </div>}
+                 </div>
+               }
              )
-           )
-         ->ReasonReact.array}
-      </>,
-  };
+         )
+       )
+     ->ReasonReact.array}
+  </>;
 };
