@@ -24,9 +24,8 @@ type action =
   | Block_FocusUp(id)
   | Block_FocusDown(id)
   | Block_ChangeLanguage
-  | Block_PrettyPrint
-  | Block_CleanBlocksCopy
-  | Block_MapRefmtToBlocks(list((id, string)));
+  | Block_PrettyPrint // remove
+  | Block_MapRefmtToBlocks(list((id, string))); // remove
 
 module TimeoutMap = Belt.Map.String;
 
@@ -34,28 +33,21 @@ type state = {
   lang,
   compilerVersion: CompilerVersion.t,
   blocks: array(block),
+  /*
+   * [state.blocksCopy]
+   * - Because refmt between 2 languages is destructive
+   *   We keep a copy of old state in `state.blocksCopy`
+   *   so when user switches back to original language
+   *   they will get the original content
+   * - This value is cleared (set to None) when user makes changes to the content
+   */
   blocksCopy: option(array(block)),
   deletedBlockMeta: ref(TimeoutMap.t(Js.Global.timeoutId)),
-  stateUpdateReason: option(action),
+  stateUpdateReason: option(action), // remove, can call onUpdate whenever state.blocks change
   focusedBlock: option((id, blockTyp, focusChangeType)),
 };
 
 module Actions = {
-  /*
-   * Clean blocks copy
-   * - This action is trigged when user made a changes to the content
-   * - Because refmt between 2 languages is destructive
-   *   We keep a copy of old state in `state.blocksCopy`
-   *   so when you switch back to original language
-   *   you'll get the original content
-   */
-  let cleanBlocksCopy = (action, state) =>
-    ReasonReact.Update({
-      ...state,
-      blocksCopy: None,
-      stateUpdateReason: Some(action),
-    });
-
   let callRefmt = (operation, self) => {
     let id =
       Toplevel_Consumer.refmt(
@@ -87,12 +79,12 @@ module Actions = {
     switch (state.lang) {
     | ML =>
       ReasonReact.UpdateWithSideEffects(
-        {...state, stateUpdateReason: Some(action)},
+        {...state, blocksCopy: None, stateUpdateReason: Some(action)},
         _self => Notify.info("Prettify ML code is not currently supported"),
       )
     | RE =>
       ReasonReact.UpdateWithSideEffects(
-        {...state, stateUpdateReason: Some(action)},
+        {...state, blocksCopy: None, stateUpdateReason: Some(action)},
         callRefmt(PrettyPrintRe),
       )
     };
@@ -222,6 +214,7 @@ module Actions = {
       ...state,
       stateUpdateReason: Some(action),
       focusedBlock: Some((newBlockId, blockTyp, FcTyp_BlockNew)),
+      blocksCopy: None,
       blocks:
         state.blocks
         ->(
@@ -297,6 +290,7 @@ module Actions = {
     ReasonReact.UpdateWithSideEffects(
       {
         ...state,
+        blocksCopy: None,
         blocks:
           state.blocks
           ->(
@@ -332,6 +326,7 @@ module Actions = {
       ReasonReact.UpdateWithSideEffects(
         {
           ...state,
+          blocksCopy: None,
           blocks: [|
             {b_id: newBlockId, b_data: emptyCodeBlock(), b_deleted: false},
           |],
@@ -356,6 +351,7 @@ module Actions = {
     } else {
       ReasonReact.Update({
         ...state,
+        blocksCopy: None,
         blocks: blocksAfterDelete->syncLineNumber,
         stateUpdateReason: Some(action),
         focusedBlock:
@@ -377,6 +373,7 @@ module Actions = {
       ReasonReact.UpdateWithSideEffects(
         {
           ...state,
+          blocksCopy: None,
           blocks:
             state.blocks
             ->(
@@ -526,9 +523,15 @@ module Actions = {
    */
   let update = (action, state, blockId, newValue, diff) => {
     let blockIndex = state.blocks->getBlockIndex(blockId);
+    let blocksCopy =
+      switch (diff->CodeMirror.EditorChange.originGet) {
+      | "setValue" => state.blocksCopy
+      | _ => None
+      };
     ReasonReact.Update({
       ...state,
       stateUpdateReason: Some(action),
+      blocksCopy,
       blocks:
         state.blocks
         ->(
@@ -617,7 +620,6 @@ let blockControlsButtons = (blockId, isDeleted, send) =>
 
 let reducer = (state, action) => {
   switch (action) {
-  | Block_CleanBlocksCopy => Actions.cleanBlocksCopy(action, state)
   | Block_PrettyPrint => Actions.prettyPrint(action, state)
   | Block_ChangeLanguage => Actions.changeLanguage(action, state)
   | Block_MapRefmtToBlocks(results) =>
@@ -753,11 +755,6 @@ let make =
 
   React.useEffect1(
     () => {
-      let cleanBlocksCopyHelper = () =>
-        switch (state.blocksCopy) {
-        | None => ()
-        | Some(_) => dispatch(Block_CleanBlocksCopy)
-        };
       switch (state.stateUpdateReason) {
       | None => ()
       | Some(action) =>
@@ -768,7 +765,6 @@ let make =
         | Block_FocusUp(_)
         | Block_FocusDown(_)
         | Block_ChangeLanguage
-        | Block_CleanBlocksCopy
         | Block_FocusNextBlockOrCreate(_)
         | Block_Execute(_, _) => ()
         | Block_PrettyPrint
@@ -778,21 +774,7 @@ let make =
         | Block_QueueDelete(_)
         | Block_DeleteQueued(_)
         | Block_UpdateValue(_, _, _) => onUpdate(state.blocks)
-        };
-
-        switch (action) {
-        | Block_Add(_, _)
-        | Block_Restore(_)
-        | Block_QueueDelete(_)
-        | Block_DeleteQueued(_)
-        | Block_PrettyPrint => cleanBlocksCopyHelper()
-        | Block_UpdateValue(_, _, diff) =>
-          switch (diff->CodeMirror.EditorChange.originGet) {
-          | "setValue" => ()
-          | _ => cleanBlocksCopyHelper()
-          }
-        | _ => ()
-        };
+        }
       };
       None;
     },
