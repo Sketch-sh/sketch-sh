@@ -31,10 +31,9 @@ external unsafeToJson: GetNotes.t => Js.Json.t = "%identity";
 
 let updateQuery = (prev, next) => {
   let prev = unsafeFromJson(prev);
-  let fetchMoreResult = ReasonApolloQuery.fetchMoreResultGet(next);
 
   (
-    switch (fetchMoreResult) {
+    switch (next.ReasonApolloQuery.fetchMoreResult) {
     | None => prev
     | Some(moreNotes) =>
       let moreNotes = unsafeFromJson(moreNotes);
@@ -78,7 +77,7 @@ let make = (~userName, _children) => {
             <div style={ReactDOMRe.Style.make(~width="500px", ())}>
               <UI_SketchList.Placeholder />
             </div>
-          | Error(error) => error##message->str
+          | Error(error) => error.message->str
           | Data(response) =>
             let notesQuery =
               getNotesQuery(
@@ -88,7 +87,11 @@ let make = (~userName, _children) => {
               );
             let fetchMore = _e =>
               Js.Promise.(
-                fetchMore(~variables=notesQuery##variables, ~updateQuery, ())
+                fetchMore(
+                  ~variables=Some(notesQuery##variables),
+                  ~updateQuery,
+                  (),
+                )
                 |> then_(_ => {
                      self.send(ChangeCount);
                      resolve();

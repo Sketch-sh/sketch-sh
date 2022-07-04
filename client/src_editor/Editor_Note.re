@@ -34,8 +34,7 @@ module Editor_Note = {
     | ChangeLang(lang)
     | IsExecuting(bool);
 
-  let component = ReasonReact.reducerComponent("Editor_Page");
-
+  [@react.component]
   let make =
       (
         ~initialHasSavePermission,
@@ -50,7 +49,6 @@ module Editor_Note = {
         ~initialNoteOwnerId: id,
         ~initialNoteLastEdited: option(Js.Json.t),
         ~registerShortcut: Shortcut.subscribeFun,
-        _children,
       ) => {
     let makeInitialState = () => {
       hasSavePermission: initialHasSavePermission,
@@ -70,8 +68,8 @@ module Editor_Note = {
       forkStatus: ForkStatus_Initial,
       isExecuting: false,
     };
-    {
-      ...component,
+    ReactCompat.useRecordApi({
+      ...ReactCompat.component,
       initialState: makeInitialState,
       didUpdate: ({oldSelf, newSelf}) =>
         if (newSelf.state.editorContentStatus
@@ -85,7 +83,7 @@ module Editor_Note = {
         let unloadHandler = (message, self) => {
           message :=
             (
-              switch (self.ReasonReact.state.editorContentStatus) {
+              switch (self.ReactCompat.state.editorContentStatus) {
               | Ec_Saved
               | Ec_Pristine => None
               | _ => Some("Changes you made may not be saved")
@@ -99,11 +97,11 @@ module Editor_Note = {
       reducer: (action, state) =>
         switch (action) {
         | TitleUpdate(title) =>
-          ReasonReact.Update({...state, title, editorContentStatus: Ec_Dirty})
+          Update({...state, title, editorContentStatus: Ec_Dirty})
         | RegisterExecuteCallback(callback) =>
-          ReasonReact.Update({...state, executeCallback: Some(callback)})
+          Update({...state, executeCallback: Some(callback)})
         | Execute =>
-          ReasonReact.SideEffects(
+          SideEffects(
             ({state}) =>
               switch (state.executeCallback) {
               | None => ()
@@ -111,13 +109,10 @@ module Editor_Note = {
               },
           )
         | ToggleLinkMenu =>
-          ReasonReact.Update({
-            ...state,
-            isLinkMenuOpen: !state.isLinkMenuOpen,
-          })
+          Update({...state, isLinkMenuOpen: !state.isLinkMenuOpen})
 
         | LinkUpdate(links) =>
-          ReasonReact.UpdateWithSideEffects(
+          UpdateWithSideEffects(
             {...state, links, editorContentStatus: Ec_Dirty},
             _ =>
               switch (state.executeCallback) {
@@ -127,7 +122,7 @@ module Editor_Note = {
           )
         | BlockUpdate(blocks) =>
           state.blocks := blocks;
-          ReasonReact.Update({...state, editorContentStatus: Ec_Dirty});
+          Update({...state, editorContentStatus: Ec_Dirty});
         | ChangeLang(lang) =>
           let refmtNotificationKey = "rtop:refmt-acknowledge";
           Dom.Storage.(
@@ -141,17 +136,17 @@ module Editor_Note = {
               localStorage |> setItem(refmtNotificationKey, "acknowledged");
             }
           );
-          ReasonReact.Update({...state, lang, editorContentStatus: Ec_Dirty});
+          Update({...state, lang, editorContentStatus: Ec_Dirty});
         | UpdateNoteSaveStatus(saveStatus) =>
           switch (state.editorContentStatus, saveStatus) {
-          | (_, SaveStatus_Initial) => ReasonReact.NoUpdate
+          | (_, SaveStatus_Initial) => NoUpdate
           | (_, SaveStatus_Loading) =>
-            ReasonReact.Update({...state, editorContentStatus: Ec_Saving})
+            Update({...state, editorContentStatus: Ec_Saving})
           | (Ec_Dirty, SaveStatus_Done({lastEdited: _})) =>
-            ReasonReact.Update({...state, editorContentStatus: Ec_Dirty})
+            Update({...state, editorContentStatus: Ec_Dirty})
           | (_, SaveStatus_Done({lastEdited})) =>
             Notify.success("Saved successfully", ~sticky=false);
-            ReasonReact.UpdateWithSideEffects(
+            UpdateWithSideEffects(
               {
                 ...state,
                 editorContentStatus: Ec_Saved,
@@ -165,13 +160,13 @@ module Editor_Note = {
             );
           | (_, SaveStatus_Error) =>
             Notify.error("Save error");
-            ReasonReact.Update({...state, editorContentStatus: Ec_Dirty});
+            Update({...state, editorContentStatus: Ec_Dirty});
           }
         | UpdateForkStatus(forkStatus) =>
           switch (forkStatus) {
           | ForkStatus_Done({newId, forkFrom, lastEdited, owner}) =>
             Notify.success("Forked successfully", ~sticky=false);
-            ReasonReact.UpdateWithSideEffects(
+            UpdateWithSideEffects(
               {
                 ...state,
                 forkStatus,
@@ -187,121 +182,120 @@ module Editor_Note = {
             );
           | ForkStatus_Error =>
             Notify.error("Fork error");
-            ReasonReact.Update({...state, forkStatus});
-          | _ => ReasonReact.Update({...state, forkStatus})
+            Update({...state, forkStatus});
+          | _ => Update({...state, forkStatus})
           }
-        | IsExecuting(isExecuting) =>
-          ReasonReact.Update({...state, isExecuting})
+        | IsExecuting(isExecuting) => Update({...state, isExecuting})
         },
       render: ({state, send}) => {
         let {editorContentStatus, lang} = state;
         <>
           <UI_Topbar.Actions>
-            ...{(~buttonClassName) =>
-              <>
-                <UI_Balloon
-                  position=Down length=Fit message="Execute code (Ctrl+Enter)">
-                  ...<button
-                       disabled={state.isExecuting}
-                       className=buttonClassName
-                       onClick={_ =>
-                         switch (state.executeCallback) {
-                         | None => ()
-                         | Some(callback) => callback()
-                         }
-                       }>
-                       <UI_LoadingWrapper
-                         loading={state.isExecuting} delayMs=500>
-                         ...{loading =>
-                           loading
-                             ? <Fi.Loader
-                                 className="EditorNav__button--spin"
-                               />
-                             : <Fi.Play />
-                         }
-                       </UI_LoadingWrapper>
-                       <span> "Run"->str </span>
-                     </button>
-                </UI_Balloon>
-                <Editor_Note_SaveButton
-                  hasSavePermission={state.hasSavePermission}
-                  noteId={state.noteId}
-                  compilerVersion={state.compilerVersion}
-                  noteState={state.noteState}
-                  editorContentStatus
-                  updateSaveStatus={saveStatus =>
-                    saveStatus->UpdateNoteSaveStatus->send
-                  }
-                  getCurrentData={() =>
-                    (
-                      state.title,
-                      Editor_Json.V1.encode(
-                        state.lang,
-                        state.links,
-                        Editor_Blocks_Utils.filterDeletedBlocks(
-                          state.blocks^,
-                        ),
-                      ),
-                    )
-                  }
-                  registerShortcut
-                  className=buttonClassName
-                />
-                <Editor_Note_ForkButton
-                  hasSavePermission={state.hasSavePermission}
-                  noteId={state.noteId}
-                  noteState={state.noteState}
-                  compilerVersion={state.compilerVersion}
-                  updateForkStatus={forkStatus =>
-                    forkStatus->UpdateForkStatus->send
-                  }
-                  getCurrentData={() =>
-                    (
-                      state.title,
-                      Editor_Json.V1.encode(
-                        state.lang,
-                        state.links,
-                        Editor_Blocks_Utils.filterDeletedBlocks(
-                          state.blocks^,
-                        ),
-                      ),
-                    )
-                  }
-                  className=buttonClassName
-                  forkStatus={state.forkStatus}
-                />
-                <UI_Balloon message="Sketch language" position=Down>
-                  ...<fieldset
-                       className="EditorNote__lang"
-                       ariaLabel="Language toggle">
-                       <span>
-                         <input
-                           type_="radio"
-                           id="ML"
-                           name="language"
-                           checked={lang == ML}
-                           onChange={_ => send(ChangeLang(ML))}
-                         />
-                         <label htmlFor="ML" className="EditorNote__lang--ML">
-                           "ML"->str
-                         </label>
-                       </span>
-                       <span>
-                         <input
-                           type_="radio"
-                           id="RE"
-                           name="language"
-                           checked={lang == RE}
-                           onChange={_ => send(ChangeLang(RE))}
-                         />
-                         <label htmlFor="RE" className="EditorNote__lang--RE">
-                           "RE"->str
-                         </label>
-                       </span>
-                     </fieldset>
-                </UI_Balloon>
-              </>
-            }
+            {(~buttonClassName) =>
+               <>
+                 <UI_Balloon
+                   position=UI_Balloon.Down
+                   length=UI_Balloon.Fit
+                   message="Execute code (Ctrl+Enter)">
+                   <button
+                     disabled={state.isExecuting}
+                     className=buttonClassName
+                     onClick={_ =>
+                       switch (state.executeCallback) {
+                       | None => ()
+                       | Some(callback) => callback()
+                       }
+                     }>
+                     <UI_LoadingWrapper
+                       loading={state.isExecuting} delayMs=500>
+                       {loading =>
+                          loading
+                            ? <Fi.Loader
+                                className="EditorNav__button--spin"
+                              />
+                            : <Fi.Play />}
+                     </UI_LoadingWrapper>
+                     <span> "Run"->str </span>
+                   </button>
+                 </UI_Balloon>
+                 <Editor_Note_SaveButton
+                   hasSavePermission={state.hasSavePermission}
+                   noteId={state.noteId}
+                   compilerVersion={state.compilerVersion}
+                   noteState={state.noteState}
+                   editorContentStatus
+                   updateSaveStatus={saveStatus =>
+                     saveStatus->UpdateNoteSaveStatus->send
+                   }
+                   getCurrentData={() =>
+                     (
+                       state.title,
+                       Editor_Json.V1.encode(
+                         state.lang,
+                         state.links,
+                         Editor_Blocks_Utils.filterDeletedBlocks(
+                           state.blocks^,
+                         ),
+                       ),
+                     )
+                   }
+                   registerShortcut
+                   className=buttonClassName
+                 />
+                 <Editor_Note_ForkButton
+                   hasSavePermission={state.hasSavePermission}
+                   noteId={state.noteId}
+                   noteState={state.noteState}
+                   compilerVersion={state.compilerVersion}
+                   updateForkStatus={forkStatus =>
+                     forkStatus->UpdateForkStatus->send
+                   }
+                   getCurrentData={() =>
+                     (
+                       state.title,
+                       Editor_Json.V1.encode(
+                         state.lang,
+                         state.links,
+                         Editor_Blocks_Utils.filterDeletedBlocks(
+                           state.blocks^,
+                         ),
+                       ),
+                     )
+                   }
+                   className=buttonClassName
+                   forkStatus={state.forkStatus}
+                 />
+                 <UI_Balloon
+                   message="Sketch language" position=UI_Balloon.Down>
+                   <fieldset
+                     className="EditorNote__lang" ariaLabel="Language toggle">
+                     <span>
+                       <input
+                         type_="radio"
+                         id="ML"
+                         name="language"
+                         checked={lang == ML}
+                         onChange={_ => send(ChangeLang(ML))}
+                       />
+                       <label htmlFor="ML" className="EditorNote__lang--ML">
+                         "ML"->str
+                       </label>
+                     </span>
+                     <span>
+                       <input
+                         type_="radio"
+                         id="RE"
+                         name="language"
+                         checked={lang == RE}
+                         onChange={_ => send(ChangeLang(RE))}
+                       />
+                       <label htmlFor="RE" className="EditorNote__lang--RE">
+                         "RE"->str
+                       </label>
+                     </span>
+                   </fieldset>
+                 </UI_Balloon>
+               </>}
           </UI_Topbar.Actions>
           <Helmet>
             <title>
@@ -319,28 +313,26 @@ module Editor_Note = {
               />
               <div className="EditorNote__metadata--info">
                 <Editor_Note_GetUserInfo userId={state.noteOwnerId}>
-                  ...{
-                       fun
-                       | None => React.null
-                       | Some(user: Js.t('a)) =>
-                         <UI_SketchOwnerInfo
-                           owner=user
-                           noteLastEdited=?{state.noteLastEdited}
-                           noteCompilerVersion={state.compilerVersion}
-                           className="EditorNote__owner"
-                         />
-                     }
+                  {fun
+                   | None => React.null
+                   | Some((user: Js.t('a))) =>
+                     <UI_SketchOwnerInfo
+                       owner=user
+                       noteLastEdited=?{state.noteLastEdited}
+                       noteCompilerVersion={state.compilerVersion}
+                       className="EditorNote__owner"
+                     />}
                 </Editor_Note_GetUserInfo>
-                <UI_Balloon position=Down message="Link sketches">
-                  ...<button
-                       className={ClassNames.make([
-                         "EditorNote__linkMenu",
-                         state.isLinkMenuOpen
-                         ->ClassNames.ifTrue("EditorNote__linkMenu--open"),
-                       ])}
-                       onClick={_ => send(ToggleLinkMenu)}>
-                       <Fi.Link />
-                     </button>
+                <UI_Balloon position=UI_Balloon.Down message="Link sketches">
+                  <button
+                    className={ClassNames.make([
+                      "EditorNote__linkMenu",
+                      state.isLinkMenuOpen
+                      ->ClassNames.ifTrue("EditorNote__linkMenu--open"),
+                    ])}
+                    onClick={_ => send(ToggleLinkMenu)}>
+                    <Fi.Link />
+                  </button>
                 </UI_Balloon>
                 <i className="EditorNote__links">
                   {state.links
@@ -378,7 +370,7 @@ module Editor_Note = {
                    links={state.links}
                    onUpdate={links => send(LinkUpdate(links))}
                  />
-               : ReasonReact.null}
+               : React.null}
             <Editor_Blocks
               key={state.noteId}
               lang
@@ -395,13 +387,12 @@ module Editor_Note = {
           </main>
         </>;
       },
-    };
+    });
   };
 };
 
 module WithShortcut = {
-  let component = ReasonReact.statelessComponent("WithShortcut(Editor_Note)");
-
+  [@react.component]
   let make =
       (
         ~hasSavePermission,
@@ -415,29 +406,28 @@ module WithShortcut = {
         ~noteOwnerId,
         ~noteLastEdited,
         ~forkFrom=?,
-        _children,
-      ) => {
-    ...component,
-    render: _self =>
-      <Shortcut.Consumer>
-        ...{registerShortcut =>
-          <Editor_Note
-            initialHasSavePermission=hasSavePermission
-            initialNoteId=noteId
-            initialNoteState=noteState
-            initialCompilerVersion=compilerVersion
-            initialLang=?lang
-            initialTitle=?title
-            initialLinks=links
-            initialBlocks=blocks
-            initialNoteOwnerId=noteOwnerId
-            initialNoteLastEdited=noteLastEdited
-            initialForkFrom=?forkFrom
-            registerShortcut
-          />
-        }
-      </Shortcut.Consumer>,
-  };
+      ) =>
+    ReactCompat.useRecordApi({
+      ...ReactCompat.component,
+      render: _self =>
+        <Shortcut.Consumer>
+          {registerShortcut =>
+             <Editor_Note
+               initialHasSavePermission=hasSavePermission
+               initialNoteId=noteId
+               initialNoteState=noteState
+               initialCompilerVersion=compilerVersion
+               initialLang=?lang
+               initialTitle=?title
+               initialLinks=links
+               initialBlocks=blocks
+               initialNoteOwnerId=noteOwnerId
+               initialNoteLastEdited=noteLastEdited
+               initialForkFrom=?forkFrom
+               registerShortcut
+             />}
+        </Shortcut.Consumer>,
+    });
 };
 
 include WithShortcut;

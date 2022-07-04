@@ -8,56 +8,56 @@ type action =
   | ChangeLoading(bool)
   | ChangeLoadingDisplay(bool);
 
-let component = ReasonReact.reducerComponent("UI_LoadingWrapper");
-
 let clearTimeout =
   fun
   | None => ()
   | Some(timeoutId) => Js.Global.clearTimeout(timeoutId);
 
-let make = (~delayMs=1000, ~loading: bool, children) => {
-  ...component,
-  initialState: () => {
-    loading,
-    displayLoading: loading,
-    timeoutId: ref(None),
-  },
-  willUnmount: self => clearTimeout(self.state.timeoutId^),
-  willReceiveProps: self =>
-    if (loading != self.state.loading) {
-      {...self.state, loading};
-    } else {
-      self.state;
+[@react.component]
+let make = (~delayMs=1000, ~loading: bool, ~children) =>
+  ReactCompat.useRecordApi({
+    ...ReactCompat.component,
+    initialState: () => {
+      loading,
+      displayLoading: loading,
+      timeoutId: ref(None),
     },
-  didUpdate: ({oldSelf, newSelf: self}) =>
-    if (oldSelf.state.loading != loading) {
-      if (loading) {
-        /*
-         * Switching from not loading to loading
-         * Set new timeout to display spinner
-         */
-        clearTimeout(self.state.timeoutId^);
-        self.state.timeoutId :=
-          Some(
-            Js.Global.setTimeout(
-              () => self.send(ChangeLoadingDisplay(true)),
-              delayMs,
-            ),
-          );
+    willUnmount: self => clearTimeout(self.state.timeoutId^),
+    willReceiveProps: self =>
+      if (loading != self.state.loading) {
+        {...self.state, loading};
       } else {
-        /*
-         * Switching from loading to not loading
-         * Clean up and stop spinner
-         */
-        clearTimeout(self.state.timeoutId^);
-        self.send(ChangeLoadingDisplay(false));
-      };
-    },
-  reducer: (action, state) =>
-    switch (action) {
-    | ChangeLoadingDisplay(loading) =>
-      ReasonReact.Update({...state, displayLoading: loading})
-    | ChangeLoading(loading) => ReasonReact.Update({...state, loading})
-    },
-  render: ({state}) => children(state.displayLoading),
-};
+        self.state;
+      },
+    didUpdate: ({oldSelf, newSelf: self}) =>
+      if (oldSelf.state.loading != loading) {
+        if (loading) {
+          /*
+           * Switching from not loading to loading
+           * Set new timeout to display spinner
+           */
+          clearTimeout(self.state.timeoutId^);
+          self.state.timeoutId :=
+            Some(
+              Js.Global.setTimeout(
+                () => self.send(ChangeLoadingDisplay(true)),
+                delayMs,
+              ),
+            );
+        } else {
+          /*
+           * Switching from loading to not loading
+           * Clean up and stop spinner
+           */
+          clearTimeout(self.state.timeoutId^);
+          self.send(ChangeLoadingDisplay(false));
+        };
+      },
+    reducer: (action, state) =>
+      switch (action) {
+      | ChangeLoadingDisplay(loading) =>
+        Update({...state, displayLoading: loading})
+      | ChangeLoading(loading) => Update({...state, loading})
+      },
+    render: ({state}) => children(state.displayLoading),
+  });

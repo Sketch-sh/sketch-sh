@@ -50,7 +50,7 @@ module Actions = {
    *   you'll get the original content
    */
   let cleanBlocksCopy = (action, state) =>
-    ReasonReact.Update({
+    ReactCompat.Update({
       ...state,
       blocksCopy: None,
       stateUpdateReason: Some(action),
@@ -59,9 +59,9 @@ module Actions = {
   let callRefmt = (operation, self) => {
     let id =
       Toplevel_Consumer.refmt(
-        ~compilerVersion=self.ReasonReact.state.compilerVersion,
+        ~compilerVersion=self.ReactCompat.state.compilerVersion,
         operation,
-        self.ReasonReact.state.blocks->codeBlockDataPairs,
+        self.ReactCompat.state.blocks->codeBlockDataPairs,
         fun
         | Belt.Result.Error(error) => Notify.error(error)
         | Belt.Result.Ok({hasError, result}) =>
@@ -86,12 +86,12 @@ module Actions = {
   let prettyPrint = (action, state) =>
     switch (state.lang) {
     | ML =>
-      ReasonReact.UpdateWithSideEffects(
+      ReactCompat.UpdateWithSideEffects(
         {...state, stateUpdateReason: Some(action)},
         _self => Notify.info("Prettify ML code is not currently supported"),
       )
     | RE =>
-      ReasonReact.UpdateWithSideEffects(
+      ReactCompat.UpdateWithSideEffects(
         {...state, stateUpdateReason: Some(action)},
         callRefmt(PrettyPrintRe),
       )
@@ -99,7 +99,7 @@ module Actions = {
   let changeLanguage = (action, state) =>
     switch (state.blocksCopy) {
     | None =>
-      ReasonReact.UpdateWithSideEffects(
+      ReactCompat.UpdateWithSideEffects(
         {
           ...state,
           blocksCopy: Some(state.blocks),
@@ -113,7 +113,7 @@ module Actions = {
         ),
       )
     | Some(blocksCopy) =>
-      ReasonReact.UpdateWithSideEffects(
+      ReactCompat.UpdateWithSideEffects(
         {
           ...state,
           blocksCopy: None,
@@ -124,7 +124,7 @@ module Actions = {
       )
     };
   let mapRefmtToBlocks = (action, state, results) =>
-    ReasonReact.UpdateWithSideEffects(
+    ReactCompat.UpdateWithSideEffects(
       {
         ...state,
         stateUpdateReason: Some(action),
@@ -174,13 +174,13 @@ module Actions = {
       state.blocks->arrayFindIndex(({b_id}) => blockId == b_id);
     switch (blockIndex) {
     | None
-    | Some(0) => ReasonReact.NoUpdate
+    | Some(0) => ReactCompat.NoUpdate
     | Some(index) =>
       let upperBlockIndex = index - 1;
       let {b_data, b_id} =
         state.blocks->Belt.Array.getUnsafe(upperBlockIndex);
       let blockTyp = blockDataToBlockTyp(b_data);
-      ReasonReact.Update({
+      ReactCompat.Update({
         ...state,
         stateUpdateReason: Some(action),
         focusedBlock: Some((b_id, blockTyp, FcTyp_BlockFocusUp)),
@@ -198,14 +198,14 @@ module Actions = {
     let blockIndex =
       state.blocks->arrayFindIndex(({b_id}) => blockId == b_id);
     switch (blockIndex) {
-    | None => ReasonReact.NoUpdate
-    | Some(blockIndex) when blockIndex == length - 1 => ReasonReact.NoUpdate
+    | None => ReactCompat.NoUpdate
+    | Some(blockIndex) when blockIndex == length - 1 => ReactCompat.NoUpdate
     | Some(index) =>
       let lowerBlockIndex = index + 1;
       let {b_data, b_id} =
         state.blocks->Belt.Array.getUnsafe(lowerBlockIndex);
       let blockTyp = blockDataToBlockTyp(b_data);
-      ReasonReact.Update({
+      ReactCompat.Update({
         ...state,
         stateUpdateReason: Some(action),
         focusedBlock: Some((b_id, blockTyp, FcTyp_BlockFocusDown)),
@@ -218,7 +218,7 @@ module Actions = {
    */
   let add = (action, state, afterBlockId, blockTyp) => {
     let newBlockId = generateId();
-    ReasonReact.Update({
+    ReactCompat.Update({
       ...state,
       stateUpdateReason: Some(action),
       focusedBlock: Some((newBlockId, blockTyp, FcTyp_BlockNew)),
@@ -259,22 +259,22 @@ module Actions = {
    */
   /* TODO: Why blockTyp is needed? */
   let focus = (action, state, blockId, blockTyp) =>
-    ReasonReact.Update({
+    ReactCompat.Update({
       ...state,
       stateUpdateReason: Some(action),
       focusedBlock: Some((blockId, blockTyp, FcTyp_EditorFocus)),
     });
   let blur = (action, state, blockId) =>
     switch (state.focusedBlock) {
-    | None => ReasonReact.NoUpdate
+    | None => ReactCompat.NoUpdate
     | Some((focusedBlockId, _, _)) =>
       focusedBlockId == blockId
-        ? ReasonReact.Update({
+        ? ReactCompat.Update({
             ...state,
             stateUpdateReason: Some(action),
             focusedBlock: None,
           })
-        : ReasonReact.NoUpdate
+        : ReactCompat.NoUpdate
     };
   /*
    * Block delete and restore
@@ -287,14 +287,14 @@ module Actions = {
     let queueTimeout = self => {
       let timeoutId =
         Js.Global.setTimeout(
-          () => self.ReasonReact.send(Block_DeleteQueued(blockId)),
+          () => self.ReactCompat.send(Block_DeleteQueued(blockId)),
           10000,
         );
       self.onUnmount(() => Js.Global.clearTimeout(timeoutId));
       state.deletedBlockMeta :=
         (state.deletedBlockMeta^)->TimeoutMap.set(blockId, timeoutId);
     };
-    ReasonReact.UpdateWithSideEffects(
+    ReactCompat.UpdateWithSideEffects(
       {
         ...state,
         blocks:
@@ -329,7 +329,7 @@ module Actions = {
       state.blocks->(Belt.Array.keepU((. {b_id}) => b_id != blockId));
     if (Array.length(blocksAfterDelete) == 0) {
       let newBlockId = Utils.generateId();
-      ReasonReact.UpdateWithSideEffects(
+      ReactCompat.UpdateWithSideEffects(
         {
           ...state,
           blocks: [|
@@ -354,7 +354,7 @@ module Actions = {
         },
       );
     } else {
-      ReasonReact.Update({
+      ReactCompat.Update({
         ...state,
         blocks: blocksAfterDelete->syncLineNumber,
         stateUpdateReason: Some(action),
@@ -370,11 +370,11 @@ module Actions = {
   let restore = (action, state, blockId) => {
     let timeoutId = (state.deletedBlockMeta^)->TimeoutMap.get(blockId);
     switch (timeoutId) {
-    | None => ReasonReact.NoUpdate
+    | None => ReactCompat.NoUpdate
     | Some(timeoutId) =>
       state.deletedBlockMeta :=
         (state.deletedBlockMeta^)->TimeoutMap.remove(blockId);
-      ReasonReact.UpdateWithSideEffects(
+      ReactCompat.UpdateWithSideEffects(
         {
           ...state,
           blocks:
@@ -403,7 +403,7 @@ module Actions = {
       (action, state, focusNextBlock, blockTyp, onExecute, lang, links) => {
     let allCodeToExecute = codeBlockDataPairs(state.blocks);
 
-    ReasonReact.UpdateWithSideEffects(
+    ReactCompat.UpdateWithSideEffects(
       {...state, stateUpdateReason: Some(action)},
       self => {
         if (focusNextBlock) {
@@ -461,7 +461,7 @@ module Actions = {
     );
   };
   let addWidgets = (action, state, blockId, widgets) =>
-    ReasonReact.Update({
+    ReactCompat.Update({
       ...state,
       stateUpdateReason: Some(action),
       blocks:
@@ -500,13 +500,13 @@ module Actions = {
       (b_id, blockDataToBlockTyp(b_data));
     };
     if (currentBlockIndex == blockLength - 1) {
-      ReasonReact.SideEffects(
+      ReactCompat.SideEffects(
         ({send}) =>
           send(Block_Add(findBlockId(currentBlockIndex)->fst, blockTyp)),
       );
     } else if (currentBlockIndex < blockLength - 1) {
       let (nextBlockId, nextBlockTyp) = findBlockId(currentBlockIndex + 1);
-      ReasonReact.Update({
+      ReactCompat.Update({
         ...state,
         stateUpdateReason: Some(action),
         focusedBlock:
@@ -517,7 +517,7 @@ module Actions = {
           )),
       });
     } else {
-      ReasonReact.NoUpdate;
+      ReactCompat.NoUpdate;
     };
   };
   /*
@@ -526,7 +526,7 @@ module Actions = {
    */
   let update = (action, state, blockId, newValue, diff) => {
     let blockIndex = state.blocks->getBlockIndex(blockId);
-    ReasonReact.Update({
+    ReactCompat.Update({
       ...state,
       stateUpdateReason: Some(action),
       blocks:
@@ -576,47 +576,46 @@ module Actions = {
 
 let blockControlsButtons = (blockId, isDeleted, send) =>
   <div className="block__controls--buttons">
-    <UI_Balloon message="Add code block" position=Down>
-      ...<button
-           className="block__controls--button"
-           ariaLabel="Add code block"
-           onClick={_ => send(Block_Add(blockId, BTyp_Code))}>
-           <Fi.Code />
-           <sup> "+"->str </sup>
-         </button>
+    <UI_Balloon message="Add code block" position=UI_Balloon.Down>
+      <button
+        className="block__controls--button"
+        ariaLabel="Add code block"
+        onClick={_ => send(Block_Add(blockId, BTyp_Code))}>
+        <Fi.Code />
+        <sup> "+"->str </sup>
+      </button>
     </UI_Balloon>
-    <UI_Balloon message="Add text block" position=Down>
-      ...<button
-           className="block__controls--button"
-           ariaLabel="Add text block"
-           onClick={_ => send(Block_Add(blockId, BTyp_Text))}>
-           <Fi.Edit2 />
-           <sup> "+"->str </sup>
-         </button>
+    <UI_Balloon message="Add text block" position=UI_Balloon.Down>
+      <button
+        className="block__controls--button"
+        ariaLabel="Add text block"
+        onClick={_ => send(Block_Add(blockId, BTyp_Text))}>
+        <Fi.Edit2 />
+        <sup> "+"->str </sup>
+      </button>
     </UI_Balloon>
     {!isDeleted
-       ? <UI_Balloon message="Delete block" position=Down>
-           ...<button
-                className="block__controls--button block__controls--danger"
-                ariaLabel="Delete block"
-                onClick={_ => send(Block_QueueDelete(blockId))}>
-                <Fi.Trash2 />
-                <sup> "-"->str </sup>
-              </button>
+       ? <UI_Balloon message="Delete block" position=UI_Balloon.Down>
+           <button
+             className="block__controls--button block__controls--danger"
+             ariaLabel="Delete block"
+             onClick={_ => send(Block_QueueDelete(blockId))}>
+             <Fi.Trash2 />
+             <sup> "-"->str </sup>
+           </button>
          </UI_Balloon>
-       : <UI_Balloon message="Restore block" position=Down>
-           ...<button
-                className="block__controls--button"
-                ariaLabel="Restore block"
-                onClick={_ => send(Block_Restore(blockId))}>
-                <Fi.RefreshCw />
-                <sup> "+"->str </sup>
-              </button>
+       : <UI_Balloon message="Restore block" position=UI_Balloon.Down>
+           <button
+             className="block__controls--button"
+             ariaLabel="Restore block"
+             onClick={_ => send(Block_Restore(blockId))}>
+             <Fi.RefreshCw />
+             <sup> "+"->str </sup>
+           </button>
          </UI_Balloon>}
   </div>;
 
-let component = ReasonReact.reducerComponent("Editor_Page");
-
+[@react.component]
 let make =
     (
       ~lang=ML,
@@ -628,7 +627,6 @@ let make =
       ~onExecute,
       ~registerExecuteCallback=?,
       ~registerShortcut: option(Shortcut.subscribeFun)=?,
-      _children: React.childless,
     ) => {
   let makeInitialState = () => {
     lang,
@@ -639,8 +637,8 @@ let make =
     stateUpdateReason: None,
     focusedBlock: None,
   };
-  {
-    ...component,
+  ReactCompat.useRecordApi({
+    ...ReactCompat.component,
     initialState: makeInitialState,
     willReceiveProps: ({state}) =>
       if (state.lang != lang) {
@@ -894,5 +892,5 @@ let make =
            )
          ->ReasonReact.array}
       </>,
-  };
+  });
 };

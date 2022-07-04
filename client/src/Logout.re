@@ -1,13 +1,18 @@
-let component = ReasonReact.reducerComponent("Logout");
+[@bs.send]
+external resetStore:
+  (ApolloClient.generatedApolloClient, unit) => Js.Promise.t(unit) =
+  "resetStore";
 
-let make = (_children): ReasonReact.component(unit, 'a, unit) => {
-  ...component,
-  didMount: _ => {
+[@react.component]
+let make = () => {
+  React.useEffect0(() => {
     open Auth.Auth;
     Token.remove();
     UserId.remove();
-    GqlClient.instance##resetStore()->ignore;
+    GqlClient.instance->resetStore()->ignore;
     Js.Global.setTimeout(() => Router.push(Route.Home), 0)->ignore;
-  },
-  render: _self => "Logging out..."->ReasonReact.string,
+    None;
+  });
+
+  "Logging out..."->ReasonReact.string;
 };

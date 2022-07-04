@@ -81,50 +81,51 @@ module Provider = {
 };
 
 module IsAuthenticated = {
-  let component = ReasonReact.reducerComponent("AuthStatus.IsAuthenticated");
-  let make = (children): ReasonReact.component(state, 'a, state) => {
-    ...component,
-    initialState: () => getCurrentState()->localStorageDataToState,
-    reducer: (newStatus, _state) => ReasonReact.Update(newStatus),
-    didMount: ({send, onUnmount}) => {
-      let id = Store.subscribe(send);
-      onUnmount(() => Store.unsubscribe(id));
-    },
-    render: ({state}) => children(state),
-  };
+  [@react.component]
+  let make = (~children) =>
+    ReactCompat.useRecordApi({
+      ...ReactCompat.component,
+      initialState: () => getCurrentState()->localStorageDataToState,
+      reducer: (newStatus, _state) => ReactCompat.Update(newStatus),
+      didMount: ({send, onUnmount}) => {
+        let id = Store.subscribe(send);
+        onUnmount(() => Store.unsubscribe(id));
+      },
+      render: ({state}) => children(state),
+    });
 };
 
 module UserInfo = {
-  let component = ReasonReact.statelessComponent("AuthStatus.UserInfo");
-
-  let make = children => {
-    ...component,
-    render: _self => {
-      <IsAuthenticated>
-        ...{authState =>
-          switch (authState) {
-          | Anonymous => children(None)
-          | Login(userId) =>
-            open GqlUserInfo;
-            let query = UserInfoGql.make(~userId, ());
-            <UserInfoComponent variables=query##variables>
-              ...{({result}) =>
-                switch (result) {
-                | Loading => children(None)
-                | Error(_) => children(None)
-                | Data(response) =>
-                  response##user
-                  ->(
-                      arrayFirst(~empty=children(None), ~render=user =>
-                        children(Some((user, userId)))
-                      )
-                    )
-                }
-              }
-            </UserInfoComponent>;
-          }
-        }
-      </IsAuthenticated>;
-    },
-  };
+  [@react.component]
+  let make = (~children) =>
+    ReactCompat.useRecordApi({
+      ...ReactCompat.component,
+      render: _self => {
+        <IsAuthenticated>
+          {authState =>
+             switch (authState) {
+             | Anonymous => children(None)
+             | Login(userId) =>
+               open GqlUserInfo;
+               let query = UserInfoGql.make(~userId, ());
+               <UserInfoComponent variables=query##variables>
+                 {(
+                    ({result}) =>
+                      switch (result) {
+                      | Loading => children(None)
+                      | Error(_) => children(None)
+                      | Data(response) =>
+                        response##user
+                        ->(
+                            arrayFirst(~empty=children(None), ~render=user =>
+                              children(Some((user, userId)))
+                            )
+                          )
+                      }
+                  )}
+               </UserInfoComponent>;
+             }}
+        </IsAuthenticated>;
+      },
+    });
 };

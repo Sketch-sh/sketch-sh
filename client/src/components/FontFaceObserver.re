@@ -30,31 +30,26 @@ let setBodyClass = className =>
   );
 
 module Provider = {
-  let component = ReasonReact.reducerComponent("FontFaceObserver_Provider");
-
-  let make:
-    (~className: string=?, ~font: string=?, React.childless) =>
-    ReasonReact.component(unit, 'a, unit) =
-    (~className="fira-code", ~font="Fira Code", _children) => {
-      ...component,
-      didMount: _ =>
-        switch (FontSession.isLoaded()) {
-        | None =>
-          Js.Promise.(
-            Js.Promise.all([|
-              FontFaceObserver.make(font)->FontFaceObserver.load,
-              FontFaceObserver.makeWithOptions(font, {"weight": 400})
-              ->FontFaceObserver.load,
-              FontFaceObserver.makeWithOptions(font, {"weight": 700})
-              ->FontFaceObserver.load,
-            |])
-            |> then_(_ =>
-                 setBodyClass(className)->FontSession.loaded->resolve
-               )
-          )
-          ->ignore
-        | Some(_) => setBodyClass(className)->FontSession.loaded
-        },
-      render: _self => ReasonReact.null,
-    };
+  [@react.component]
+  let make = (~className="fira-code", ~font="Fira Code") => {
+    React.useEffect0(() => {
+      switch (FontSession.isLoaded()) {
+      | None =>
+        Js.Promise.(
+          Js.Promise.all([|
+            FontFaceObserver.make(font)->FontFaceObserver.load,
+            FontFaceObserver.makeWithOptions(font, {"weight": 400})
+            ->FontFaceObserver.load,
+            FontFaceObserver.makeWithOptions(font, {"weight": 700})
+            ->FontFaceObserver.load,
+          |])
+          |> then_(_ => setBodyClass(className)->FontSession.loaded->resolve)
+        )
+        ->ignore
+      | Some(_) => setBodyClass(className)->FontSession.loaded
+      };
+      None;
+    });
+    React.null;
+  };
 };
