@@ -32,52 +32,52 @@ module Store = {
 };
 
 module Provider = {
-  let component = ReasonReact.reducerComponent("AuthStatus.Provider");
-
-  let make = (_children): ReasonReact.component(unit, 'a, unit) => {
-    ...component,
-    didMount: self => {
-      let _ =
-        Auth.(
-          /*
-           * This set edit token on initial load
-           * only if user is not login
-           * AND token is empty
-           */
-          switch (UserId.get()) {
-          | Some(_) => ()
-          | None =>
-            switch (EditToken.get()) {
-            | None => EditToken.set(Utils.generateId())
+  [@react.component]
+  let make = () =>
+    ReactCompat.useRecordApi({
+      ...ReactCompat.component,
+      didMount: self => {
+        let _ =
+          Auth.(
+            /*
+             * This set edit token on initial load
+             * only if user is not login
+             * AND token is empty
+             */
+            switch (UserId.get()) {
             | Some(_) => ()
+            | None =>
+              switch (EditToken.get()) {
+              | None => EditToken.set(Utils.generateId())
+              | Some(_) => ()
+              }
             }
-          }
-        );
-      open Webapi.Dom;
+          );
+        open Webapi.Dom;
 
-      let listener = event => {
-        let event = Auth.toStorageEvent(event);
-        let key = event->StorageEvent.key;
-        if (key == Auth.UserId.key) {
-          let newValue =
-            localStorageDataToState(
-              event
-              ->StorageEvent.newValue
-              ->Utils.toNullable
-              ->Js.Nullable.toOption,
-            );
+        let listener = event => {
+          let event = Auth.toStorageEvent(event);
+          let key = event->StorageEvent.key;
+          if (key == Auth.UserId.key) {
+            let newValue =
+              localStorageDataToState(
+                event
+                ->StorageEvent.newValue
+                ->Utils.toNullable
+                ->Js.Nullable.toOption,
+              );
 
-          Store.broadcast(newValue);
+            Store.broadcast(newValue);
+          };
         };
-      };
-      window |> Window.addEventListener("storage", listener);
+        window |> Window.addEventListener("storage", listener);
 
-      self.onUnmount(() =>
-        Window.removeEventListener("storage", listener) |> ignore
-      );
-    },
-    render: _self => ReasonReact.null,
-  };
+        self.onUnmount(() =>
+          Window.removeEventListener("storage", listener) |> ignore
+        );
+      },
+      render: _self => ReasonReact.null,
+    });
 };
 
 module IsAuthenticated = {

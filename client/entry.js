@@ -1,7 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import { AppContainer } from "react-hot-loader";
-import App from "./src/App.bs";
+import { make as App } from "./src/App.bs";
 
 const render = Component => {
   ReactDOM.render(
