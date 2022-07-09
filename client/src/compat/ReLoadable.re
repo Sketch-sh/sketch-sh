@@ -9,6 +9,7 @@ type nothing;
 module type Configuration = {module type t;};
 
 module WithRender = (Config: Configuration) => {
+  type childless = array(nothing);
   type renderProp = (module Config.t) => ReasonReact.reactElement;
   type state =
     | Loading
@@ -34,33 +35,39 @@ module WithRender = (Config: Configuration) => {
         ~onLoading=() => React.null,
         ~delay=200,
         ~render: renderProp,
-      ) => {
-    let (state, setState) = React.useState(() => Loading);
-
-    React.useEffect0(() => {
-      let timeoutId =
-        Js.Global.setTimeout(
-          () =>
-            fetch()
-            /* Resolve module (unwrap). */
-            |> resolve
-            /* Resolve new state, user should refine module himself with correct type on render. */
-            <$> (data => setState(_ => Loaded(data)))
-            /* Forward error if some trouble happen. */
-            <$!> (err => setState(_ => Failed(err |> Js.String.make)))
-            |> ignore,
-          delay,
-        );
-
-      Some(() => {Js.Global.clearTimeout(timeoutId)});
+      ) =>
+    ReactCompat.useRecordApi({
+      ...ReactCompat.component,
+      initialState: () => Loading,
+      reducer: (action, _state) =>
+        switch (action) {
+        | Loading => Update(Loading)
+        | Failed(err) => Update(Failed(err))
+        | Loaded(component) => Update(Loaded(component))
+        },
+      didMount: self => {
+        let timeoutId =
+          Js.Global.setTimeout(
+            () =>
+              fetch()
+              /* Resolve module (unwrap). */
+              |> resolve
+              /* Resolve new state, user should refine module himself with correct type on render. */
+              <$> (data => self.send(Loaded(data)))
+              /* Forward error if some trouble happen. */
+              <$!> (err => self.send(Failed(err |> Js.String.make)))
+              |> ignore,
+            delay,
+          );
+        self.onUnmount(() => Js.Global.clearTimeout(timeoutId));
+      },
+      render: ({state}) =>
+        switch (state) {
+        | Loading => onLoading()
+        | Failed(err) => onFail(err)
+        | Loaded(component) => render(component)
+        },
     });
-
-    switch (state) {
-    | Loading => onLoading()
-    | Failed(err) => onFail(err)
-    | Loaded(component) => render(component)
-    };
-  };
 };
 
 module WithChildren = (Config: Configuration) => {
@@ -69,6 +76,7 @@ module WithChildren = (Config: Configuration) => {
     | Loading
     | Failed(string)
     | Loaded((module Config.t));
+  let component = ReasonReact.reducerComponent("Loadable.WithChildren");
   /** Our component accept different props :
     *
     * fetch
@@ -81,18 +89,23 @@ module WithChildren = (Config: Configuration) => {
     *
     * As you can see, some of props have default value.
   **/
-  [@react.component]
   let make =
       (
         ~fetch,
-        ~onFail=_error => React.null,
-        ~onLoading=() => React.null,
+        ~onFail=_error => ReasonReact.null,
+        ~onLoading=() => ReasonReact.null,
         ~delay=200,
-        ~children: renderChild,
+        children: renderChild,
       ) => {
-    let (state, setState) = React.useState(() => Loading);
-
-    React.useEffect0(() => {
+    ...component,
+    initialState: () => Loading,
+    reducer: (action, _state) =>
+      switch (action) {
+      | Loading => ReasonReact.Update(Loading)
+      | Failed(err) => ReasonReact.Update(Failed(err))
+      | Loaded(component) => ReasonReact.Update(Loaded(component))
+      },
+    didMount: self => {
       let timeoutId =
         Js.Global.setTimeout(
           () =>
@@ -100,20 +113,19 @@ module WithChildren = (Config: Configuration) => {
             /* Resolve module (unwrap). */
             |> resolve
             /* Resolve new state, user should refine module himself with correct type on render. */
-            <$> (data => setState(_ => Loaded(data)))
+            <$> (data => self.send(Loaded(data)))
             /* Forward error if some trouble happen. */
-            <$!> (err => setState(_ => Failed(err |> Js.String.make)))
+            <$!> (err => self.send(Failed(err |> Js.String.make)))
             |> ignore,
           delay,
         );
-
-      Some(() => {Js.Global.clearTimeout(timeoutId)});
-    });
-
-    switch (state) {
-    | Loading => onLoading()
-    | Failed(err) => onFail(err)
-    | Loaded(component) => children(component)
-    };
+      self.onUnmount(() => Js.Global.clearTimeout(timeoutId));
+    },
+    render: ({state}) =>
+      switch (state) {
+      | Loading => onLoading()
+      | Failed(err) => onFail(err)
+      | Loaded(component) => children(component)
+      },
   };
 };

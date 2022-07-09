@@ -24,7 +24,7 @@ let make = () => {
       <div id className="Topbar__actions" />
     </div>
     <div className="Topbar__right">
-      <UI_Balloon position=Down message="New sketch">
+      <UI_Balloon position=UI_Balloon.Down message="New sketch">
         <Router.Link
           route={Route.NoteNew(ML)}
           className="Topbar__action Topbar__action--highlight"
@@ -46,7 +46,7 @@ let make = () => {
 
 module Actions = {
   [@react.component]
-  let make = children => {
+  let make = (~children) => {
     let (isMounted, setIsMounted) = React.useState(() => false);
     React.useEffect0(() => {
       setIsMounted(_ => true);

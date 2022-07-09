@@ -8,9 +8,10 @@ open Editor_Types;
  */
 module RedirectSketchURL = {
   [@react.component]
-  let make = (~noteId, ~children): React.component(unit, 'a, unit) => {
+  let make = (~noteId, ~children) => {
     React.useEffect0(() => {
-      Router.replaceSilent(Route.Note({noteId, data: None}))
+      Router.replaceSilent(Route.Note({noteId, data: None}));
+      None;
     });
 
     children;
@@ -26,7 +27,7 @@ let make = (~noteInfo: Route.noteRouteConfig) => {
     ...{({result}) =>
       switch (result) {
       | Loading => <Editor_NotePlaceholder />
-      | Error(error) => error##message->str
+      | Error(error) => error.message->str
       | Data(response) =>
         let notes = response##note;
         notes->(
@@ -42,7 +43,7 @@ let make = (~noteInfo: Route.noteRouteConfig) => {
                        ...{authStatus => {
                          let hasSavePermission =
                            switch (authStatus) {
-                           | Login(currentUserId) =>
+                           | AuthStatus.Login(currentUserId) =>
                              note##user_id == currentUserId
                            | Anonymous =>
                              response##note_edit_token->Array.length > 0

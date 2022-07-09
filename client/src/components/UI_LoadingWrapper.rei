@@ -3,14 +3,16 @@
  * By only renderng the loading indicator after delayMs
  */
 type state = {
+  loading: bool,
   displayLoading: bool,
-  timeoutId: option(Js.Global.timeoutId),
+  timeoutId: ref(option(Js.Global.timeoutId)),
 };
 
 type action =
-  | SetTimeoutId(option(Js.Global.timeoutId))
+  | ChangeLoading(bool)
   | ChangeLoadingDisplay(bool);
 
 [@react.component]
 let make:
-  (~delayMs: int=?, ~loading: bool, ~children: bool => 'children) => 'children;
+  (~delayMs: int=?, ~loading: bool, ~children: bool => React.element) =>
+  React.element;

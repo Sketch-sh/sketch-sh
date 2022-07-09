@@ -39,11 +39,12 @@
   "namespace": true,
   "bs-dependencies": [
     "@glennsl/bs-json",
-    "reason-react",
-    "bs-webapi",
-    "reason-apollo",
     "bs-date-fns",
-    "re-classnames"
+    "bs-webapi",
+    "re-classnames",
+    "reason-apollo",
+    "reason-react",
+    "reason-react-compat"
   ],
   "bs-dev-dependencies": [
     "@glennsl/bs-jest"

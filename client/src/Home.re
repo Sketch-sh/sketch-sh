@@ -55,7 +55,8 @@ module GetCommunitySketchesComponent =
 
 Modules.require("./Home.css");
 
-let make = (~userId, _children) => {
+[@react.component]
+let make = (~userId) => {
   let recentSketchesQuery = GetRecentSketches.make(~userId, ());
 
   <div className="Layout__center Home">
@@ -73,7 +74,7 @@ let make = (~userId, _children) => {
             {switch (result) {
              | Loading =>
                <UI_SketchList.Placeholder className="Home__section--list" />
-             | Error(error) => error##message->str
+             | Error(error) => error.message->str
              | Data(response) =>
                <UI_SketchList
                  sketches=response##sketches
@@ -93,7 +94,7 @@ let make = (~userId, _children) => {
             {switch (result) {
              | Loading =>
                <UI_SketchList.Placeholder className="Home__section--list" />
-             | Error(error) => error##message->str
+             | Error(error) => error.message->str
              | Data(response) =>
                <UI_SketchList.WithUserInfo
                  sketches=response##sketches

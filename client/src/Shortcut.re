@@ -67,5 +67,6 @@ module Store = {
 };
 
 module Consumer = {
+  [@react.component]
   let make = (~children) => children(Store.subscribe);
 };

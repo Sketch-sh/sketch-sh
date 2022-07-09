@@ -3,7 +3,7 @@ Modules.require("./UI_TopbarUserInfo.css");
 open Utils;
 
 [@react.component]
-let make = (~user, _children) => {
+let make = (~user) => {
   <div className="Topbar__userInfo Topbar__userInfo--dropdown">
     <div className="Topbar__userInfo--content">
       {user##name

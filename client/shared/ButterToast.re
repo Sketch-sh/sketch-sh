@@ -1,4 +1,17 @@
 module Tray = {
+  [@bs.module "butter-toast"] [@react.component]
+  external makeRaw:
+    (
+      ~trayPosition: string=?,
+      ~toastMargin: int=?,
+      ~renderInContext: bool=?,
+      ~name: string=?,
+      ~pauseOnHover: bool=?,
+      ~theme: string=?
+    ) =>
+    React.element =
+    "default";
+
   [@bs.module "butter-toast"]
   external reactClass: ReasonReact.reactClass = "default";
 
@@ -18,22 +31,7 @@ module Tray = {
     | BottomCenter => "bottom-center"
     | BottomRight => "bottom-right";
 
-  [@bs.deriving abstract]
-  type jsProps = {
-    [@bs.optional]
-    trayPosition: string,
-    [@bs.optional]
-    toastMargin: int,
-    [@bs.optional]
-    renderInContext: bool,
-    [@bs.optional]
-    name: string,
-    [@bs.optional]
-    pauseOnHover: bool,
-    [@bs.optional]
-    theme: string,
-  };
-
+  [@react.component]
   let make =
       (
         ~trayPosition: option(trayPosition)=?,
@@ -42,22 +40,21 @@ module Tray = {
         ~name=?,
         ~pauseOnHover=?,
         ~theme=?,
-        children,
-      ) =>
-    ReasonReact.wrapJsForReason(
-      ~reactClass,
-      ~props=
-        jsProps(
-          ~trayPosition=?Belt.Option.map(trayPosition, trayPositionToString),
-          ~toastMargin?,
-          ~renderInContext?,
-          ~name?,
-          ~pauseOnHover?,
-          ~theme?,
-          (),
-        ),
-      children,
+      ) => {
+    let trayPosition = Belt.Option.map(trayPosition, trayPositionToString);
+    React.createElement(
+      makeRaw,
+      makeRawProps(
+        ~trayPosition?,
+        ~toastMargin?,
+        ~renderInContext?,
+        ~name?,
+        ~pauseOnHover?,
+        ~theme?,
+        (),
+      ),
     );
+  };
 };
 
 module ToastOption = {

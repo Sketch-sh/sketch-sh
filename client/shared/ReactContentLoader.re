@@ -1,5 +1,5 @@
 module Default = {
-  [@react.component "react-content-loader"] [@bs.module]
+  [@bs.module "react-content-loader"] [@react.component]
   external make:
     (
       ~animate: bool=?,
@@ -21,7 +21,7 @@ module Default = {
 };
 
 module Code = {
-  [@react.component "react-content-loader"] [@bs.module]
+  [@bs.module "react-content-loader"] [@react.component]
   external make:
     (
       ~animate: bool=?,

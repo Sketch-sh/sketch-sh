@@ -14,13 +14,7 @@ module DeleteNoteComponent = ReasonApollo.CreateMutation(DeleteNote);
 
 [@react.component]
 let make =
-    (
-      ~sketches,
-      ~className=?,
-      ~noSketches="No sketches"->str,
-      ~fetchMore=?,
-      _children,
-    ) => {
+    (~sketches, ~className=?, ~noSketches="No sketches"->str, ~fetchMore=?) => {
   switch (sketches) {
   | [||] => <div className={Cn.unwrap(className)}> noSketches </div>
   | sketches =>
@@ -128,7 +122,6 @@ module WithUserInfo = {
            }),
         ~className=?,
         ~noSketches="No sketches"->str,
-        _children,
       ) => {
     switch (sketches) {
     | [||] => <div className={Cn.unwrap(className)}> noSketches </div>
@@ -164,7 +157,7 @@ module WithUserInfo = {
 
 module Placeholder = {
   [@react.component]
-  let make = (~className=?, ~width=450, _children) => {
+  let make = (~className=?, ~width=450) => {
     <ReactContentLoader ?className height=250 width>
       <rect x="0" y="0" rx="0" ry="0" width="93" height="20" />
       <rect x="110" y="0" rx="0" ry="0" width="195" height="20" />

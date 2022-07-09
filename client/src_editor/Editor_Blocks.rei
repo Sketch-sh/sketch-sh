@@ -30,6 +30,7 @@ type state = {
   focusedBlock: option((id, Block.blockTyp, Block.focusChangeType)),
 };
 
+[@react.component]
 let make:
   (
     ~lang: lang=?,
@@ -37,9 +38,9 @@ let make:
     ~links: array(Link.link),
     ~blocks: array(Block.block),
     ~readOnly: bool=?,
-    ~registerExecuteCallback: (unit => unit) => unit=?,
-    ~registerShortcut: Shortcut.subscribeFun=?,
     ~onUpdate: array(Block.block) => unit,
-    ~onExecute: bool => 'a
+    ~onExecute: bool => 'a,
+    ~registerExecuteCallback: (unit => unit) => unit=?,
+    ~registerShortcut: Shortcut.subscribeFun=?
   ) =>
   React.element;

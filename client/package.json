@@ -56,6 +56,7 @@
     "react-icons": "^3.0.4",
     "reason-apollo": "0.20.0",
     "reason-react": "^0.7.0",
+    "reason-react-compat": "^2.0.0",
     "subscriptions-transport-ws": "^0.9.14"
   },
   "devDependencies": {

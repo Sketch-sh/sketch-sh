@@ -32,93 +32,100 @@ module Store = {
 };
 
 module Provider = {
-  let make = () => {
-    React.useEffect0(() => {
-      let _ =
-        Auth.(
-          /*
-           * This set edit token on initial load
-           * only if user is not login
-           * AND token is empty
-           */
-          switch (UserId.get()) {
-          | Some(_) => ()
-          | None =>
-            switch (EditToken.get()) {
-            | None => EditToken.set(Utils.generateId())
+  [@react.component]
+  let make = () =>
+    ReactCompat.useRecordApi({
+      ...ReactCompat.component,
+      didMount: self => {
+        let _ =
+          Auth.(
+            /*
+             * This set edit token on initial load
+             * only if user is not login
+             * AND token is empty
+             */
+            switch (UserId.get()) {
             | Some(_) => ()
+            | None =>
+              switch (EditToken.get()) {
+              | None => EditToken.set(Utils.generateId())
+              | Some(_) => ()
+              }
             }
-          }
-        );
-      open Webapi.Dom;
+          );
+        open Webapi.Dom;
 
-      let listener = event => {
-        let event = Auth.toStorageEvent(event);
-        let key = event->StorageEvent.key;
-        if (key == Auth.UserId.key) {
-          let newValue =
-            localStorageDataToState(
-              event
-              ->StorageEvent.newValue
-              ->Utils.toNullable
-              ->Js.Nullable.toOption,
-            );
+        let listener = event => {
+          let event = Auth.toStorageEvent(event);
+          let key = event->StorageEvent.key;
+          if (key == Auth.UserId.key) {
+            let newValue =
+              localStorageDataToState(
+                event
+                ->StorageEvent.newValue
+                ->Utils.toNullable
+                ->Js.Nullable.toOption,
+              );
 
-          Store.broadcast(newValue);
+            Store.broadcast(newValue);
+          };
         };
-      };
-      window |> Window.addEventListener("storage", listener);
+        window |> Window.addEventListener("storage", listener);
 
-      Some(() => Window.removeEventListener("storage", listener) |> ignore);
+        self.onUnmount(() =>
+          Window.removeEventListener("storage", listener) |> ignore
+        );
+      },
+      render: _self => ReasonReact.null,
     });
-
-    ReasonReact.null;
-  };
 };
 
 module IsAuthenticated = {
   [@react.component]
-  let make = (~children) => {
-    let (state, setState) =
-      React.useState(_ => getCurrentState()->localStorageDataToState);
-
-    React.useEffect0(() => {
-      let id = Store.subscribe(setState);
-
-      Some(() => {Store.unsubscribe(id)});
+  let make = (~children) =>
+    ReactCompat.useRecordApi({
+      ...ReactCompat.component,
+      initialState: () => getCurrentState()->localStorageDataToState,
+      reducer: (newStatus, _state) => ReactCompat.Update(newStatus),
+      didMount: ({send, onUnmount}) => {
+        let id = Store.subscribe(send);
+        onUnmount(() => Store.unsubscribe(id));
+      },
+      render: ({state}) => children(state),
     });
-
-    children(state);
-  };
 };
 
 module UserInfo = {
   [@react.component]
-  let make = (~children) => {
-    <IsAuthenticated>
-      ...{authState =>
-        switch (authState) {
-        | Anonymous => children(None)
-        | Login(userId) =>
-          open GqlUserInfo;
-          let query = UserInfoGql.make(~userId, ());
-          <UserInfoComponent variables=query##variables>
-            ...{({result}) =>
-              switch (result) {
-              | Loading => children(None)
-              | Error(_) => children(None)
-              | Data(response) =>
-                response##user
-                ->(
-                    arrayFirst(~empty=children(None), ~render=user =>
-                      children(Some((user, userId)))
-                    )
-                  )
-              }
-            }
-          </UserInfoComponent>;
-        }
-      }
-    </IsAuthenticated>;
-  };
+  let make = (~children) =>
+    ReactCompat.useRecordApi({
+      ...ReactCompat.component,
+      render: _self => {
+        <IsAuthenticated>
+          {authState =>
+             switch (authState) {
+             | Anonymous => children(None)
+             | Login(userId) =>
+               open GqlUserInfo;
+               let query = UserInfoGql.make(~userId, ());
+               <UserInfoComponent variables=query##variables>
+                 {(
+                    ({result}) =>
+                      switch (result) {
+                      | Loading => children(None)
+                      | Error(_) => children(None)
+                      | Data(response) =>
+                        response##user
+                        ->(
+                            arrayFirst(~empty=children(None), ~render=user =>
+                              children(Some((user, userId)))
+                            )
+                          )
+                      }
+                  )}
+               </UserInfoComponent>;
+             }}
+        </IsAuthenticated>;
+      },
+    });
 };

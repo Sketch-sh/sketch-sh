@@ -47,63 +47,68 @@ module AuthCallback = {
     | Success
     | Failure(string);
 
-  let make = (~token) => {
-    let (uiState, setUiState) = React.useState(_ => Initial);
+  type action =
+    | ChangeState(state);
 
-    React.useEffect0(() => {
-      Js.Promise.(
-        Jwt.async()
-        |> then_(jwt => resolve(jwt->(Jwt.decode(token))))
-        |> then_(decoded => {
-             Auth.Token.set(token);
-             Auth.UserId.set(Auth.decodeUserId(decoded));
-             setUiState(_ => Success);
-             resolve();
-           })
-        |> catch(error => {
-             setUiState(_ => Failure("Invalid auth token"));
-             resolve(Js.log(error));
-           })
-      )
-      |> ignore;
-      None;
-    });
-
-    React.useEffect1(
-      () => {
-        open Webapi.Dom.Window;
-        let window = Webapi.Dom.window;
-        switch (window->opener) {
-        | Some(_) => window->close
-        | None =>
-          Js.Global.setTimeout(
-            () => Router.push(Route.Home),
-            switch (uiState) {
-            | Initial
-            | Success => 1500
-            | Failure(_) => 3000
+  [@react.component]
+  let make = (~token) =>
+    ReactCompat.useRecordApi({
+      ...ReactCompat.component,
+      initialState: () => Initial,
+      reducer: (action, _state) =>
+        switch (action) {
+        | ChangeState(state) =>
+          UpdateWithSideEffects(
+            state,
+            _ => {
+              open Webapi.Dom.Window;
+              let window = Webapi.Dom.window;
+              switch (window->opener) {
+              | Some(_) => window->close
+              | None =>
+                Js.Global.setTimeout(
+                  () => Router.push(Route.Home),
+                  switch (state) {
+                  | Initial
+                  | Success => 1500
+                  | Failure(_) => 3000
+                  },
+                )
+                ->ignore
+              };
             },
           )
-          ->ignore
-        };
-
-        None;
+        },
+      didMount: ({send}) =>
+        Js.Promise.(
+          Jwt.async()
+          |> then_(jwt => resolve(jwt->(Jwt.decode(token))))
+          |> then_(decoded => {
+               Auth.Token.set(token);
+               Auth.UserId.set(Auth.decodeUserId(decoded));
+               send(ChangeState(Success));
+               resolve();
+             })
+          |> catch(error => {
+               send(ChangeState(Failure("Invalid auth token")));
+               resolve(Js.log(error));
+             })
+        )
+        |> ignore,
+      render: ({state}) => {
+        let message =
+          switch (state) {
+          | Initial => "Authenticating..."
+          | Success => "Authentication successful. Redirecting..."
+          | Failure(a) =>
+            "Authenticatin failure with the following reason: "
+            ++ a
+            ++ "\n"
+            ++ "Redirecting..."
+          };
+        message->str;
       },
-      [|uiState|],
-    );
-
-    let message =
-      switch (uiState) {
-      | Initial => "Authenticating..."
-      | Success => "Authentication successful. Redirecting..."
-      | Failure(a) =>
-        "Authenticatin failure with the following reason: "
-        ++ a
-        ++ "\n"
-        ++ "Redirecting..."
-      };
-    message->str;
-  };
+    });
 };
 
 module AuthGithub = {
@@ -111,10 +116,8 @@ module AuthGithub = {
   let make = () => {
     React.useEffect0(() => {
       Router.redirect(Auth.githubLoginRedirect);
-
       None;
     });
-
     "Redirecting to Github..."->str;
   };
 };

@@ -42,20 +42,15 @@ type linkStatus =
 
 type action =
   | ToggleLinkModal
-  | Link_Add(uiLink)
-  | Link_Fetched;
+  | Link_Add((name, id))
+  | Link_Fetched(link)
+  | Link_Refresh(link)
+  | Link_Delete(link);
 
 type state = {
   fetchingLink: option(uiLink),
   isLinkModalOpen: bool,
 };
-
-let reducer = (state, action) =>
-  switch (action) {
-  | ToggleLinkModal => {...state, isLinkModalOpen: !state.isLinkModalOpen}
-  | Link_Add(fetchingLink) => {...state, fetchingLink: Some(fetchingLink)}
-  | Link_Fetched => {...state, fetchingLink: None}
-  };
 
 let createInternalLink = (~name, ~note) => {
   /* TODO handle links that also have links */
@@ -177,85 +172,75 @@ module EmptyLink = {
     | UpdateId(string)
     | UpdateName(string);
 
-  let reducer = (state, action) =>
-    switch (action) {
-    | UpdateId(id) => {...state, id, dirty: true}
-    | UpdateName(name) => {...state, name, dirty: true}
-    };
-
   [@react.component]
-  let make = (~status, ~onSubmit, ~onFetched=?, ~name="", ~id="") => {
-    let (state, dispatch) = {
-      React.useReducer(reducer, {name, id, dirty: false});
-    };
-
-    React.useEffect0(() => {
-      switch (onFetched) {
-      | None => ()
-      | Some(f) => f()
-      };
-      None;
+  let make = (~status, ~onSubmit, ~onFetched=?, ~name="", ~id="") =>
+    ReactCompat.useRecordApi({
+      ...ReactCompat.component,
+      initialState: () => {name, id, dirty: false},
+      didMount: _ =>
+        switch (onFetched) {
+        | None => ()
+        | Some(f) => f()
+        },
+      reducer: (action, state) =>
+        switch (action) {
+        | UpdateId(id) => ReactCompat.Update({...state, id, dirty: true})
+        | UpdateName(name) => Update({...state, name, dirty: true})
+        },
+      render: ({send, state}) =>
+        <>
+          <hr />
+          <span className="links__new"> "New Link"->str </span>
+          <table className="links__container">
+            <tbody>
+              <tr>
+                <td>
+                  <input
+                    className="link__input"
+                    value={state.id}
+                    placeholder="id"
+                    onChange={id => send(UpdateId(valueFromEvent(id)))}
+                  />
+                </td>
+                <td>
+                  <input
+                    className="link__input"
+                    value={state.name}
+                    placeholder="name"
+                    onChange={name =>
+                      send(UpdateName(valueFromEvent(name)))
+                    }
+                  />
+                </td>
+                <td>
+                  <button
+                    className="link__button"
+                    onClick={_ =>
+                      if (state.name != "" && state.id != "") {
+                        onSubmit((state.name, state.id));
+                      }
+                    }
+                    disabled={status == Loading}>
+                    {switch (status, state.dirty) {
+                     | (NotAsked, _) => <Fi.PlusCircle />
+                     | (Loading, _) => <Fi.Loader />
+                     | (Error(message), false) =>
+                       <>
+                         <Fi.PlusCircle />
+                         <i className="link__button__error">
+                           {("  " ++ message)->str}
+                         </i>
+                       </>
+                     | (Error(_), true) => <Fi.PlusCircle />
+                     | (Fetched, _) => <Fi.Trash2 />
+                     }}
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </>,
     });
-
-    <>
-      <hr />
-      <span className="links__new"> "New Link"->str </span>
-      <table className="links__container">
-        <tbody>
-          <tr>
-            <td>
-              <input
-                className="link__input"
-                value={state.id}
-                placeholder="id"
-                onChange={id => dispatch @@ UpdateId(valueFromEvent(id))}
-              />
-            </td>
-            <td>
-              <input
-                className="link__input"
-                value={state.name}
-                placeholder="name"
-                onChange={name =>
-                  dispatch @@ UpdateName(valueFromEvent(name))
-                }
-              />
-            </td>
-            <td>
-              <button
-                className="link__button"
-                onClick={_ =>
-                  if (state.name != "" && state.id != "") {
-                    onSubmit(
-                      {
-                        name,
-                        id,
-                        timestamp: Js.Date.make() |> Js.Date.toISOString,
-                      }: uiLink,
-                    );
-                  }
-                }
-                disabled={status == Loading}>
-                {switch (status, state.dirty) {
-                 | (NotAsked, _) => <Fi.PlusCircle />
-                 | (Loading, _) => <Fi.Loader />
-                 | (Error(message), false) =>
-                   <>
-                     <Fi.PlusCircle />
-                     <i className="link__button__error">
-                       {("  " ++ message)->str}
-                     </i>
-                   </>
-                 | (Error(_), true) => <Fi.PlusCircle />
-                 | (Fetched, _) => <Fi.Trash2 />
-                 }}
-              </button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </>;
-  };
 };
 
 let getEmptyLink =
@@ -263,51 +248,60 @@ let getEmptyLink =
   <EmptyLink key=timestamp status id name onSubmit onFetched />;
 
 [@react.component]
-let make = (~currentSketchId, ~links, ~onUpdate) => {
-  let (state, dispatch) = {
-    React.useReducer(reducer, {fetchingLink: None, isLinkModalOpen: false});
-  };
+let make = (~currentSketchId, ~links, ~onUpdate) =>
+  ReactCompat.useRecordApi({
+    ...ReactCompat.component,
+    initialState: () => {fetchingLink: None, isLinkModalOpen: false},
+    reducer: (action, state) =>
+      switch (action) {
+      | ToggleLinkModal =>
+        ReactCompat.Update({
+          ...state,
+          isLinkModalOpen: !state.isLinkModalOpen,
+        })
 
-  let onSubmit = uiLink =>
-    if (uiLink.id == currentSketchId) {
-      Notify.error("Cannot link current sketch.");
-    } else {
-      let linkWithSameNameExists =
-        arrayFind(links, l => getNameFromLink(l) == uiLink.name);
+      | Link_Add((name, id)) =>
+        let timestamp = Js.Date.make() |> Js.Date.toISOString;
 
-      switch (linkWithSameNameExists) {
-      | Some(_) => Notify.error("Link with same module name already exists.")
-      | None =>
-        let linkWithSameIdExists =
-          arrayFind(links, l => getIdFromLink(l) == uiLink.id);
+        if (id == currentSketchId) {
+          SideEffects(_ => Notify.error("Cannot link current sketch."));
+        } else {
+          let linkWithSameNameExists =
+            arrayFind(links, l => getNameFromLink(l) == name);
 
-        switch (linkWithSameIdExists) {
-        | Some(_) => Notify.error("Link with same id already exists.")
-        | None => dispatch @@ Link_Add(uiLink)
+          switch (linkWithSameNameExists) {
+          | Some(_) =>
+            SideEffects(
+              _ => Notify.error("Link with same module name already exists."),
+            )
+          | None =>
+            let linkWithSameIdExists =
+              arrayFind(links, l => getIdFromLink(l) == id);
+
+            switch (linkWithSameIdExists) {
+            | Some(_) =>
+              SideEffects(
+                _ => Notify.error("Link with same id already exists."),
+              )
+            | None =>
+              Update({...state, fetchingLink: Some({name, id, timestamp})})
+            };
+          };
         };
-      };
-    };
+      | Link_Fetched(link) =>
+        UpdateWithSideEffects(
+          {...state, fetchingLink: None},
+          _ => {
+            let id = getIdFromLink(link);
+            Notify.info("Link " ++ id ++ " has been fetched.");
 
-  let displayLinks =
-    links->Belt.Array.mapU((. link: Link.link) =>
-      switch (link) {
-      | Internal({sketch_id, name, revision_at}) =>
-        <SingleLink id=sketch_id key=sketch_id name timestamp=revision_at />
-      | _ => failwith("There are no external links yet.")
-      }
-    );
-
-  let modalLinks =
-    links->Belt.Array.mapU((. link: Link.link) =>
-      switch (link) {
-      | Internal({sketch_id, name, revision_at}) =>
-        <SingleLink
-          id=sketch_id
-          key=sketch_id
-          name
-          timestamp=revision_at
-          onDelete={() => {
-            let linkToDelete = link;
+            let links = Belt.Array.concat(links, [|link|]);
+            onUpdate(links);
+          },
+        )
+      | Link_Delete(linkToDelete) =>
+        SideEffects(
+          _ => {
             let links =
               Belt.Array.keepU(links, (. link) =>
                 switch (link, linkToDelete) {
@@ -318,8 +312,11 @@ let make = (~currentSketchId, ~links, ~onUpdate) => {
               );
 
             onUpdate(links);
-          }}
-          onRefresh={linkToRefresh =>
+          },
+        )
+      | Link_Refresh(linkToRefresh) =>
+        SideEffects(
+          _ =>
             onUpdate(
               Belt.Array.mapU(links, (. link) =>
                 switch (link, linkToRefresh) {
@@ -328,103 +325,128 @@ let make = (~currentSketchId, ~links, ~onUpdate) => {
                 | _ => link
                 }
               ),
-            )
+            ),
+        )
+      },
+    render: ({send, state}) => {
+      let onSubmit = uiLink => send(Link_Add(uiLink));
+      let displayLinks =
+        links->Belt.Array.mapU((. link: Link.link) =>
+          switch (link) {
+          | Internal({sketch_id, name, revision_at}) =>
+            <SingleLink
+              id=sketch_id
+              key=sketch_id
+              name
+              timestamp=revision_at
+            />
+          | _ => failwith("There are no external links yet.")
           }
-        />
-      | _ => failwith("There are no external links yet.")
-      }
-    );
+        );
+      let modalLinks =
+        links->Belt.Array.mapU((. link: Link.link) =>
+          switch (link) {
+          | Internal({sketch_id, name, revision_at}) =>
+            <SingleLink
+              id=sketch_id
+              key=sketch_id
+              name
+              timestamp=revision_at
+              onDelete={() => send(Link_Delete(link))}
+              onRefresh={link => send(Link_Refresh(link))}
+            />
+          | _ => failwith("There are no external links yet.")
+          }
+        );
+      <>
+        <br />
+        <span id="linkedLists" className="UI_SketchOwnerInfo__username">
+          {str("Linked Links")}
+        </span>
+        <UI_Balloon position=UI_Balloon.Down message="Edit sketches">
+          <button
+            className="EditorNote__linkMenu"
+            onClick={_ => send(ToggleLinkModal)}>
+            <Fi.Edit2 />
+          </button>
+        </UI_Balloon>
+        <hr />
+        <table style=Style.table>
+          <tbody> displayLinks->ReasonReact.array </tbody>
+        </table>
+        <hr />
+        <Reach_Modal.DialogOverlay
+          isOpen={state.isLinkModalOpen}
+          className="EditorNote__Modal--overlay"
+          onDismiss={() => send(ToggleLinkModal)}>
+          <Reach_Modal.DialogContent className="EditorNote__Modal--content">
+            <button
+              className="EditorNote__linkMenu EditorNote__Modal--content--close"
+              onClick={_ => send(ToggleLinkModal)}>
+              <Fi.FiXCircle />
+            </button>
+            <h2 className="links__new"> {str("Linkings")} </h2>
+            <div className="links__container">
+              <span className="links__disclaimer">
+                "Add a link to another sketch by pasting its id and assigning it a module name."
+                ->str
+              </span>
+              <table style=Style.table>
+                <tbody> modalLinks->ReasonReact.array </tbody>
+              </table>
+              {switch (state.fetchingLink) {
+               | None => <EmptyLink key="notAsked" status=NotAsked onSubmit />
+               | Some({name, id, timestamp}) =>
+                 let getLinkQuery = GetLink.make(~noteId=id, ());
+                 <GetLinkComponent variables=getLinkQuery##variables>
+                   {(
+                      ({result}) => {
+                        let emptyLink =
+                          getEmptyLink(~timestamp, ~id, ~name, ~onSubmit);
+                        switch (result) {
+                        | Loading => emptyLink(~status=Loading, ())
 
-  <>
-    <br />
-    <span id="linkedLists" className="UI_SketchOwnerInfo__username">
-      {str("Linked Links")}
-    </span>
-    <UI_Balloon position=UI_Balloon.Down message="Edit sketches">
-      ...<button
-           className="EditorNote__linkMenu"
-           onClick={_ => dispatch @@ ToggleLinkModal}>
-           <Fi.Edit2 />
-         </button>
-    </UI_Balloon>
-    <hr />
-    <table style=Style.table>
-      <tbody> displayLinks->ReasonReact.array </tbody>
-    </table>
-    <hr />
-    <Reach_Modal.DialogOverlay
-      isOpen={state.isLinkModalOpen}
-      className="EditorNote__Modal--overlay"
-      onDismiss={() => dispatch @@ ToggleLinkModal}>
-      <Reach_Modal.DialogContent className="EditorNote__Modal--content">
-        <button
-          className="EditorNote__linkMenu EditorNote__Modal--content--close"
-          onClick={_ => dispatch @@ ToggleLinkModal}>
-          <Fi.FiXCircle />
-        </button>
-        <h2 className="links__new"> {str("Linkings")} </h2>
-        <div className="links__container">
-          <span className="links__disclaimer">
-            "Add a link to another sketch by pasting its id and assigning it a module name."
-            ->str
-          </span>
-          <table style=Style.table>
-            <tbody> modalLinks->ReasonReact.array </tbody>
-          </table>
-          {switch (state.fetchingLink) {
-           | None => <EmptyLink key="notAsked" status=NotAsked onSubmit />
-           | Some({name, id, timestamp}) =>
-             let getLinkQuery = GetLink.make(~noteId=id, ());
-             <GetLinkComponent variables=getLinkQuery##variables>
-               ...{({result}) => {
-                 let emptyLink =
-                   getEmptyLink(~timestamp, ~id, ~name, ~onSubmit);
-                 switch (result) {
-                 | Loading => emptyLink(~status=Loading, ())
+                        | Error(_error) =>
+                          Notify.error("Fetching link " ++ id ++ " failed.");
+                          emptyLink(~status=Error({|Fetching failed.|}), ());
 
-                 | Error(_error) =>
-                   Notify.error("Fetching link " ++ id ++ " failed.");
-                   emptyLink(~status=Error({|Fetching failed.|}), ());
+                        | Data(response) =>
+                          let note = response##note->Belt.Array.get(0);
 
-                 | Data(response) =>
-                   let note = response##note->Belt.Array.get(0);
+                          switch (note) {
+                          | Some(note) =>
+                            let link: Link.link =
+                              createInternalLink(~name, ~note);
+                            let timestamp =
+                              note##updated_at
+                              |> Js.Json.decodeString
+                              |> Belt.Option.getExn;
+                            let onFetched = () => send(Link_Fetched(link));
+                            getEmptyLink(
+                              ~status=Fetched,
+                              ~id,
+                              ~name,
+                              ~onSubmit,
+                              ~timestamp,
+                              ~onFetched,
+                              (),
+                            );
 
-                   switch (note) {
-                   | Some(note) =>
-                     let link: Link.link = createInternalLink(~name, ~note);
-                     let timestamp =
-                       note##updated_at
-                       |> Js.Json.decodeString
-                       |> Belt.Option.getExn;
-                     let onFetched = () => {
-                       dispatch @@ Link_Fetched;
-                       let id = getIdFromLink(link);
-                       Notify.info("Link " ++ id ++ " has been fetched.");
-
-                       let links = Belt.Array.concat(links, [|link|]);
-                       onUpdate(links);
-                     };
-
-                     getEmptyLink(
-                       ~status=Fetched,
-                       ~id,
-                       ~name,
-                       ~onSubmit,
-                       ~timestamp,
-                       ~onFetched,
-                       (),
-                     );
-
-                   | None =>
-                     Notify.error("Link " ++ id ++ " not found.");
-                     emptyLink(~status=Error({|No such link found.|}), ());
-                   };
-                 };
+                          | None =>
+                            Notify.error("Link " ++ id ++ " not found.");
+                            emptyLink(
+                              ~status=Error({|No such link found.|}),
+                              (),
+                            );
+                          };
+                        };
+                      }
+                    )}
+                 </GetLinkComponent>;
                }}
-             </GetLinkComponent>;
-           }}
-        </div>
-      </Reach_Modal.DialogContent>
-    </Reach_Modal.DialogOverlay>
-  </>;
-};
+            </div>
+          </Reach_Modal.DialogContent>
+        </Reach_Modal.DialogOverlay>
+      </>;
+    },
+  });
