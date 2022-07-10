@@ -21,7 +21,7 @@ let make =
     <>
       <ul className={Cn.make(["UI_SketchList", Cn.unwrap(className)])}>
         {Belt.Array.mapU(sketches, (. sketch) =>
-           <li className="UI_SketchList__sketch">
+           <li key=sketch##id className="UI_SketchList__sketch">
              <Router.Link
                className="UI_SketchList__sketch--link"
                route={Route.Note({noteId: sketch##id, data: None})}>
