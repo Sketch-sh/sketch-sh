@@ -25,6 +25,7 @@ let make =
       <Editor_CodeMirror
         value
         focused
+        editor=state.editor^
         onChange
         ?onFocus
         ?onBlur
