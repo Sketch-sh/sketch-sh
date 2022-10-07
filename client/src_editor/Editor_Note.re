@@ -118,7 +118,7 @@ module Editor_Note = {
         ~initialNoteOwnerId: id,
         ~initialNoteLastEdited: option(Js.Json.t),
         ~registerShortcut: Shortcut.subscribeFun,
-        ~refetch=None,
+        ~refetch=?,
       ) => {
     let ({editorContentStatus, lang} as state, dispatch) =
       React.useReducer(
@@ -200,7 +200,7 @@ module Editor_Note = {
           let intervalId =
             Js.Global.setInterval(
               () => {
-                refetch()
+                refetch(None)
                 ->Js.Promise.then_(
                     value => {
                       Js.log(value);
@@ -436,7 +436,7 @@ module WithShortcut = {
         ~noteOwnerId,
         ~noteLastEdited,
         ~forkFrom=?,
-        ~refetch,
+        ~refetch=?,
       ) =>
     ReactCompat.useRecordApi({
       ...ReactCompat.component,
@@ -456,7 +456,7 @@ module WithShortcut = {
                initialNoteLastEdited=noteLastEdited
                initialForkFrom=?forkFrom
                registerShortcut
-               refetch
+               ?refetch
              />}
         </Shortcut.Consumer>,
     });
