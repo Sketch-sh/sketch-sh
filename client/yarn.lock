@@ -188,10 +188,9 @@
     lodash "^4.17.19"
     to-fast-properties "^2.0.0"
 
-"@baransu/graphql_ppx_re@^0.7.1":
+"@baransu/graphql_ppx_re@ahrefs/graphql-ppx-0.7.1-patched#0.7.1-ahrefs":
   version "0.7.1"
-  resolved "https://registry.yarnpkg.com/@baransu/graphql_ppx_re/-/graphql_ppx_re-0.7.1.tgz#8146a36a94d56e65692d74488e2bd6cbd4eb8dc9"
-  integrity sha512-S9RYUWk8IkFxjE1Xl5eohRgbHJP5nCWOD6J1hMV3hY+D43igDrILq1doAXJatYB82BxcsrBC9V+VeU2LtCxIDw==
+  resolved "https://codeload.github.com/ahrefs/graphql-ppx-0.7.1-patched/tar.gz/01ad04026472d13d091b745bf6afedc0c1d2142a"
 
 "@cnakazawa/watch@^1.0.3":
   version "1.0.4"
