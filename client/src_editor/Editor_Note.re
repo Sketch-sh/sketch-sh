@@ -118,7 +118,6 @@ module Editor_Note = {
         ~initialNoteOwnerId: id,
         ~initialNoteLastEdited: option(Js.Json.t),
         ~registerShortcut: Shortcut.subscribeFun,
-        ~refetch=None,
       ) => {
     let ({editorContentStatus, lang} as state, dispatch) =
       React.useReducer(
@@ -190,32 +189,6 @@ module Editor_Note = {
         None;
       },
       [|state.noteId|],
-    );
-
-    React.useEffect1(
-      () => {
-        switch (refetch) {
-        | None => None
-        | Some(refetch) =>
-          let intervalId =
-            Js.Global.setInterval(
-              () => {
-                refetch()
-                ->Js.Promise.then_(
-                    value => {
-                      Js.log(value);
-                      Js.Promise.resolve();
-                    },
-                    _,
-                  )
-                ->ignore
-              },
-              5000,
-            );
-          Some(() => Js.Global.clearInterval(intervalId));
-        }
-      },
-      [|refetch|],
     );
 
     <>
@@ -316,17 +289,6 @@ module Editor_Note = {
                  </span>
                </fieldset>
              </UI_Balloon>
-             <div>
-               {React.string("foo")}
-               <input
-                 name="isGoing"
-                 type_="checkbox"
-                 checked=true
-                 onChange={event => {
-                   Webapi.Dom.(event->ReactEvent.Form.preventDefault)
-                 }}
-               />
-             </div>
            </>}
       </UI_Topbar.Actions>
       <Helmet>
@@ -349,7 +311,7 @@ module Editor_Note = {
             <Editor_Note_GetUserInfo userId={state.noteOwnerId}>
               {fun
                | None => React.null
-               | Some(user: Js.t('a)) =>
+               | Some((user: Js.t('a))) =>
                  <UI_SketchOwnerInfo
                    owner=user
                    noteLastEdited=?{state.noteLastEdited}
@@ -436,7 +398,6 @@ module WithShortcut = {
         ~noteOwnerId,
         ~noteLastEdited,
         ~forkFrom=?,
-        ~refetch,
       ) =>
     ReactCompat.useRecordApi({
       ...ReactCompat.component,
@@ -456,7 +417,6 @@ module WithShortcut = {
                initialNoteLastEdited=noteLastEdited
                initialForkFrom=?forkFrom
                registerShortcut
-               refetch
              />}
         </Shortcut.Consumer>,
     });
