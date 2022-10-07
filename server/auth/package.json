@@ -31,6 +31,6 @@
   },
   "devDependencies": {
     "get-graphql-schema": "2.1.2",
-    "nodemon": "^1.18.3"
+    "nodemon": "^2.0.20"
   }
 }
