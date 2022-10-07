@@ -142,6 +142,13 @@ module Editor_Note = {
         },
       );
 
+    let execute = () => {
+      switch (state.executeCallback) {
+      | None => ()
+      | Some(callback) => callback()
+      };
+    };
+
     React.useEffect0(() => {
       let unloadHandler = message => {
         message :=
@@ -157,30 +164,20 @@ module Editor_Note = {
       Router.Unload.register(unloadHandler);
       Some(Router.Unload.unregister);
     });
-    // didUpdate: ({oldSelf, newSelf}) =>
-    //     if (newSelf.state.editorContentStatus
-    //         != oldSelf.state.editorContentStatus) {
-    //       /* This execute the code after save */
-    //       if (newSelf.state.editorContentStatus == Ec_Saved) {
-    //         newSelf.send(Execute);
-    //       };
-    //     },
-
-    // ReactCompat.useRecordApi({
-    //   ...ReactCompat.component,
-    //   initialState: makeInitialState,
-    //
-    //   didMount: self => {
-
-    //   },
 
     React.useEffect1(
       () => {
-        // TODO: Should skip first render?
-        switch (state.executeCallback) {
-        | None => ()
-        | Some(callback) => callback()
+        if (editorContentStatus == Ec_Saved) {
+          execute();
         };
+        None;
+      },
+      [|editorContentStatus|],
+    );
+
+    React.useEffect1(
+      () => {
+        execute();
         None;
       },
       [|state.links|],
