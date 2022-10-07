@@ -54,12 +54,13 @@
     "react-dom": "^16.4.1",
     "react-helmet": "^5.2.0",
     "react-icons": "^3.0.4",
-    "reason-apollo": "0.15.2",
+    "reason-apollo": "0.20.0",
     "reason-react": "^0.7.0",
+    "reason-react-compat": "^2.0.0",
     "subscriptions-transport-ws": "^0.9.14"
   },
   "devDependencies": {
-    "@baransu/graphql_ppx_re": "^0.7.1",
+    "@baransu/graphql_ppx_re": "ahrefs/graphql-ppx-0.7.1-patched#0.7.1-ahrefs",
     "@glennsl/bs-jest": "^0.4.3",
     "babel-jest": "^23.4.0",
     "babel-preset-env": "^1.7.0",

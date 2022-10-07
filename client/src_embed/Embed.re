@@ -201,7 +201,7 @@ let make = _children => {
         <Editor_CodeBlock
           value
           firstLineNumber=1
-          focused={Some(FcTyp_EditorFocus)}
+          focused={Some(Editor_Types.Block.FcTyp_EditorFocus)}
           widgets
           /* viewportMargin=10. */
           onChange={(value, _) => send(UpdateValue(value))}

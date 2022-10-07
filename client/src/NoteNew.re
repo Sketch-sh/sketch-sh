@@ -8,34 +8,29 @@ let defaultBlocks = [|
   },
 |];
 
-let component = ReasonReact.statelessComponent("Note_New");
-
-let make = (~blocks=defaultBlocks, ~title=?, ~links=[||], ~lang, _children) => {
-  ...component,
-  render: _self => {
-    <AuthStatus.IsAuthenticated>
-      ...{authStatus => {
-        let userId =
-          switch (authStatus) {
-          | Anonymous => Config.anonymousUserId
-          | Login(userId) => userId
-          };
-        let noteId = Utils.generateId();
-        let compilerVersion = CompilerVersion.current;
-        <Editor_Note
-          key=noteId
-          hasSavePermission=true
-          noteOwnerId=userId
-          noteLastEdited=None
-          noteId
-          noteState=NoteState_New
-          compilerVersion
-          blocks
-          lang
-          ?title
-          links
-        />;
-      }}
-    </AuthStatus.IsAuthenticated>;
-  },
-};
+[@react.component]
+let make = (~blocks=defaultBlocks, ~title=?, ~links=[||], ~lang) =>
+  <AuthStatus.IsAuthenticated>
+    {authStatus => {
+       let userId =
+         switch (authStatus) {
+         | AuthStatus.Anonymous => Config.anonymousUserId
+         | Login(userId) => userId
+         };
+       let noteId = Utils.generateId();
+       let compilerVersion = CompilerVersion.current;
+       <Editor_Note
+         key=noteId
+         hasSavePermission=true
+         noteOwnerId=userId
+         noteLastEdited=None
+         noteId
+         noteState=NoteState_New
+         compilerVersion
+         blocks
+         lang
+         ?title
+         links
+       />;
+     }}
+  </AuthStatus.IsAuthenticated>;

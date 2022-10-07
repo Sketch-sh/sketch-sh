@@ -1,6 +1,2 @@
-let component = ReasonReact.statelessComponent("Layout_WithTopbar");
-
-let make = children => {
-  ...component,
-  render: _self => <> <UI_Topbar /> children </>,
-};
+[@react.component]
+let make = (~children) => <> <UI_Topbar /> children </>;

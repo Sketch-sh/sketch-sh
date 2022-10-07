@@ -30,6 +30,7 @@ type state = {
   focusedBlock: option((id, Block.blockTyp, Block.focusChangeType)),
 };
 
+[@react.component]
 let make:
   (
     ~lang: lang=?,
@@ -40,7 +41,6 @@ let make:
     ~onUpdate: array(Block.block) => unit,
     ~onExecute: bool => 'a,
     ~registerExecuteCallback: (unit => unit) => unit=?,
-    ~registerShortcut: Shortcut.subscribeFun=?,
-    React.childless
+    ~registerShortcut: Shortcut.subscribeFun=?
   ) =>
-  ReasonReact.component(state, ReasonReact.noRetainedProps, action);
+  React.element;

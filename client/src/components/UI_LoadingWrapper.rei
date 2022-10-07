@@ -12,6 +12,7 @@ type action =
   | ChangeLoading(bool)
   | ChangeLoadingDisplay(bool);
 
+[@react.component]
 let make:
-  (~delayMs: int=?, ~loading: bool, bool => ReasonReact.reactElement) =>
-  ReasonReact.component(state, ReasonReact.noRetainedProps, action);
+  (~delayMs: int=?, ~loading: bool, ~children: bool => React.element) =>
+  React.element;
