@@ -141,10 +141,23 @@ module Editor_Note = {
           isExecuting: false,
         },
       );
-    // ReactCompat.useRecordApi({
-    //   ...ReactCompat.component,
-    //   initialState: makeInitialState,
-    //   didUpdate: ({oldSelf, newSelf}) =>
+
+    React.useEffect0(() => {
+      let unloadHandler = message => {
+        message :=
+          (
+            switch (state.editorContentStatus) {
+            | Ec_Saved
+            | Ec_Pristine => None
+            | _ => Some("Changes you made may not be saved")
+            }
+          );
+        ();
+      };
+      Router.Unload.register(unloadHandler);
+      Some(Router.Unload.unregister);
+    });
+    // didUpdate: ({oldSelf, newSelf}) =>
     //     if (newSelf.state.editorContentStatus
     //         != oldSelf.state.editorContentStatus) {
     //       /* This execute the code after save */
@@ -152,20 +165,13 @@ module Editor_Note = {
     //         newSelf.send(Execute);
     //       };
     //     },
+
+    // ReactCompat.useRecordApi({
+    //   ...ReactCompat.component,
+    //   initialState: makeInitialState,
+    //
     //   didMount: self => {
-    //     let unloadHandler = (message, self) => {
-    //       message :=
-    //         (
-    //           switch (self.ReactCompat.state.editorContentStatus) {
-    //           | Ec_Saved
-    //           | Ec_Pristine => None
-    //           | _ => Some("Changes you made may not be saved")
-    //           }
-    //         );
-    //       ();
-    //     };
-    //     Router.Unload.register(self.handle(unloadHandler));
-    //     self.onUnmount(Router.Unload.unregister);
+
     //   },
 
     React.useEffect1(
