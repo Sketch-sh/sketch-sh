@@ -30,7 +30,6 @@ module Editor_Note = {
     | RegisterExecuteCallback(unit => unit)
     | UpdateNoteSaveStatus(saveStatus)
     | UpdateForkStatus(forkStatus)
-    | Execute
     | ChangeLang(lang)
     | IsExecuting(bool);
 
@@ -41,17 +40,7 @@ module Editor_Note = {
         ...state,
         executeCallback: Some(callback),
       }
-    | Execute => state
-    // SIDE EFFECT
-    // SideEffects(
-    //   ({state}) =>
-    //     switch (state.executeCallback) {
-    //     | None => ()
-    //     | Some(callback) => callback()
-    //     },
-    // )
     | ToggleLinkMenu => {...state, isLinkMenuOpen: !state.isLinkMenuOpen}
-
     | LinkUpdate(links) => {...state, links, editorContentStatus: Ec_Dirty}
     | BlockUpdate(blocks) =>
       state.blocks := blocks;
