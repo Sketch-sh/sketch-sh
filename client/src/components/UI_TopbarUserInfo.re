@@ -15,7 +15,16 @@ let make = (~user) => {
       </span>
     </div>
     {user##avatar
-     =>> (name => <span className="Topbar__userInfo--name"> name->str </span>)}
+     =>> (
+       avatar =>
+         <img
+           src=avatar
+           width="40"
+           height="40"
+           className="Topbar__userInfo--avatar"
+           alt={user##username ++ " avatar"}
+         />
+     )}
     <div className="Topbar__userInfo--dropdownMenu">
       <div className="Topbar__userInfo--dropdownMenuInner">
         <Router.Link
