@@ -75,11 +75,6 @@ module Editor_Note = {
           noteState: NoteState_Old,
           noteLastEdited: Some(lastEdited),
         };
-      // SIDE EFFECT
-      // _ =>
-      //   Router.pushSilent(
-      //     Route.Note({noteId: state.noteId, data: None}),
-      //   ),
       | (_, SaveStatus_Error) =>
         Notify.error("Save error");
         {...state, editorContentStatus: Ec_Dirty};
@@ -99,8 +94,6 @@ module Editor_Note = {
           noteOwnerId: owner,
           hasSavePermission: true,
         };
-      // SIDE EFFECT
-      // _ => Router.push(Route.Note({noteId: newId, data: None})),
       | ForkStatus_Error =>
         Notify.error("Fork error");
         {...state, forkStatus};
@@ -185,6 +178,14 @@ module Editor_Note = {
         None;
       },
       [|state.links|],
+    );
+
+    React.useEffect1(
+      () => {
+        Router.pushSilent(Route.Note({noteId: state.noteId, data: None}));
+        None;
+      },
+      [|state.noteId|],
     );
 
     <>
