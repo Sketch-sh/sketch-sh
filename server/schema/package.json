@@ -2,7 +2,7 @@
   "name": "schema-migration",
   "private": true,
   "dependencies": {
-    "knex": "^0.15.2",
+    "knex": "^2.3.0",
     "pg": "^7.4.3"
   },
   "scripts": {
