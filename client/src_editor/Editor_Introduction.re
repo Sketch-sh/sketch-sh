@@ -45,7 +45,10 @@ let code8 = {|let rec loop = (i) => if (i <= 3) {
     };|};
 
 let text9 = {|## Authors:
-This project is brought to you by
+This project is brought to you by:
+- [Ahrefs](https://ahrefs.com)
+
+The original author of Sketch.sh:
 - [thangngoc89](https://github.com/thangngoc89)
 
 And contributors:
