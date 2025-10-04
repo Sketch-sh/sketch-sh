@@ -39,7 +39,7 @@ jobs:
           docker pull ${NGINX_IMAGE_LATEST} || true
       - name: Build images
         run: |
-          docker-compose -f docker-compose.yml -f docker-compose.prod.yml build
+          docker compose -f docker-compose.yml -f docker-compose.prod.yml build
       - name: Push images
         run: |
           docker push ${AUTH_IMAGE}
@@ -105,5 +105,5 @@ jobs:
             docker pull $AUTH_IMAGE
             docker pull $MIGRATION_IMAGE
             docker pull $NGINX_IMAGE
-            docker-compose -f docker-compose.yml -f docker-compose.prod.yml up --no-build -d
+            docker compose -f docker-compose.yml -f docker-compose.prod.yml up --no-build -d
           ENDSSH
