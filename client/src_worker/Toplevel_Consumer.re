@@ -3,6 +3,7 @@ open Toplevel.Types;
 let timeoutSeconds = ref(180);
 let toplevelWorker406 = ref(None);
 let toplevelWorker413 = ref(None);
+let toplevelWorker5_3_0 = ref(None);
 
 module MapStr = Belt.MutableMap.String;
 
@@ -70,6 +71,7 @@ let getWorkerRef = (~compilerVersion) =>
   switch (compilerVersion) {
   | CompilerVersion.V4_06 => toplevelWorker406
   | V4_13_1 => toplevelWorker413
+  | V5_3_0 => toplevelWorker5_3_0
   };
 
 let getWorker = (~compilerVersion) => {
