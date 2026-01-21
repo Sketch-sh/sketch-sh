@@ -24,7 +24,7 @@ let make = (~noteInfo: Route.noteRouteConfig) => {
   let noteQuery = GetNoteById.make(~noteId, ());
 
   <GetNoteByIdComponent variables=noteQuery##variables>
-    ...{({result}) =>
+    ...{({refetch, result}) => {
       switch (result) {
       | Loading => <Editor_NotePlaceholder />
       | Error(error) => error.message->str
@@ -69,6 +69,7 @@ let make = (~noteInfo: Route.noteRouteConfig) => {
                                 blocks
                                 forkFrom=?{note##fork_from}
                                 hasSavePermission
+                                refetch
                               />
                          </RedirectSketchURL>;
                        }}
@@ -77,6 +78,6 @@ let make = (~noteInfo: Route.noteRouteConfig) => {
                  )
                );
       }
-    }
+    }}
   </GetNoteByIdComponent>;
 };
